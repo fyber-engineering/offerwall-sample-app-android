@@ -1,0 +1,158 @@
+/**
+ * SponsorPay Android Publisher SDK
+ *
+ * Copyright 2011 SponsorPay. All rights reserved.
+ */
+
+package com.sponsorpay.sdk.android.publisher;
+
+import java.util.HashMap;
+import java.util.Set;
+
+import android.net.Uri;
+import android.util.Log;
+
+/**
+ * <p>
+ * Contains utility methods to build URLs used to access the SponsorPay's back-end API.
+ * </p>
+ */
+public class UrlBuilder {
+	/**
+	 * The unique device ID (for url-encoding).
+	 */
+	private static final String UDID_KEY = "device_id";
+
+	/**
+	 * The user id key for encoding the corresponding URL parameter.
+	 */
+	private static final String USERID_KEY = "uid";
+
+	/**
+	 * The App ID key for encoding the corresponding URL parameter.
+	 */
+	private static final String APPID_KEY = "appid";
+
+	/**
+	 * The OS version key for encoding the corresponding URL parameter.
+	 */
+	private static final String OS_VERSION_KEY = "os_version";
+
+	/**
+	 * The phone model key for encoding the corresponding URL parameter.
+	 */
+	private static final String PHONE_VERSION_KEY = "phone_version";
+
+	/**
+	 * The default language setting key for encoding the corresponding URL parameter.
+	 */
+	private static final String LANGUAGE_KEY = "language";
+
+	/**
+	 * The SDK internal version key for encoding the corresponding URL parameter.
+	 */
+	private static final String SDK_INTERNAL_VERSION_KEY = "version";
+
+	/**
+	 * The SDK release version key for encoding the corresponding URL parameter.
+	 */
+	private static final String SDK_RELEASE_VERSION_KEY = "sdk_version";
+	
+	/**
+	 * The Android ID key for encoding the corresponding URL parameter.
+	 */
+	private static final String ANDROID_ID_KEY = "android_id";
+
+	/**
+	 * The WiFi MAC Address ID key for encoding the corresponding URL parameter.
+	 */
+	private static final String WIFI_MAC_ADDRESS_KEY = "mac_address";
+	
+	/**
+	 * Request signature parameter key.
+	 */
+	private static final String URL_PARAM_SIGNATURE = "signature";
+
+	/**
+	 * Builds a String URL with information gathered from the device and the specified parameters.
+	 * 
+	 * @param resourceUrl
+	 *            The base for the URL to be built and returned, including schema and host.
+	 * @param userId
+	 *            The user id parameter to encode in the result URL.
+	 * @param hostInfo
+	 *            A {@link PublisherHostInfo} instance used to retrieve data about the application id and the host
+	 *            device.
+	 * @param extraKeys
+	 *            An array of keys for extra parameters to encode in the result URL.
+	 * @param extraValues
+	 *            An array of values corresponding to the provided extraKeys.
+	 * @return The built URL as a String with the provided parameters encoded.
+	 */
+	public static String buildUrl(String resourceUrl, String userId, PublisherHostInfo hostInfo, String[] extraKeys,
+			String[] extraValues) {
+
+		return buildUrl(resourceUrl, userId, hostInfo, extraKeys, extraValues, null);
+	}
+
+	/**
+	 * Builds a String URL with information gathered from the device and the specified parameters.
+	 * 
+	 * @param resourceUrl
+	 *            The base for the URL to be built and returned, including schema and host.
+	 * @param userId
+	 *            The user id parameter to encode in the result URL.
+	 * @param hostInfo
+	 *            A {@link PublisherHostInfo} instance used to retrieve data about the application id and the host
+	 *            device.
+	 * @param extraKeys
+	 *            An array of keys for extra parameters to encode in the result URL.
+	 * @param extraValues
+	 *            An array of values corresponding to the provided extraKeys.
+	 * @param secretKey
+	 *            The publisher's secret token which will be used to sign the request. If left to null the request will
+	 *            be sent unsigned.
+	 * @return The built URL as a String with the provided parameters encoded.
+	 */
+	public static String buildUrl(String resourceUrl, String userId, PublisherHostInfo hostInfo, String[] extraKeys,
+			String[] extraValues, String secretKey) {
+		HashMap<String, String> keyValueParams = new HashMap<String, String>();
+
+		keyValueParams.put(USERID_KEY, userId);
+		keyValueParams.put(UDID_KEY, hostInfo.getUDID());
+		keyValueParams.put(APPID_KEY, String.valueOf(hostInfo.getAppId()));
+		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());
+		keyValueParams.put(PHONE_VERSION_KEY, hostInfo.getPhoneVersion());
+		keyValueParams.put(LANGUAGE_KEY, hostInfo.getLanguageSetting());
+		keyValueParams.put(SDK_INTERNAL_VERSION_KEY, String.format("%d", SponsorPayPublisher.PUBLISHER_SDK_INTERNAL_VERSION));
+		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPayPublisher.RELEASE_VERSION_STRING);
+		keyValueParams.put(ANDROID_ID_KEY, hostInfo.getAndroidId());
+		keyValueParams.put(WIFI_MAC_ADDRESS_KEY, hostInfo.getWifiMacAddress());
+		
+		if (extraKeys != null && extraValues != null) {
+			int minLength = Math.min(extraKeys.length, extraValues.length);
+			for (int i = 0; i < minLength; i++) {
+				keyValueParams.put(extraKeys[i], extraValues[i]);
+			}
+		}
+
+		Uri uri = Uri.parse(resourceUrl);
+		Uri.Builder builder = uri.buildUpon();
+
+		Set<String> keySet = keyValueParams.keySet();
+
+		for (String key : keySet) {
+			builder.appendQueryParameter(key, keyValueParams.get(key));
+		}
+
+		if (secretKey != null) {
+			builder.appendQueryParameter(URL_PARAM_SIGNATURE,
+					SignatureTools.generateSignatureForParameters(keyValueParams, secretKey));
+		}
+
+		uri = builder.build();
+		Log.d("SP", "url = " + uri.toString());
+
+		return uri.toString();
+	}
+}

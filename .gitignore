@@ -1,0 +1,5 @@
+gen/
+bin/
+.idea/
+Sponsorpay-adsdk.iml
+Sponsorpay-pubsdk.iml

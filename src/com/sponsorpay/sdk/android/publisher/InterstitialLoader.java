@@ -178,7 +178,7 @@ public class InterstitialLoader {
 	 */
 	private Activity mCallingActivity;
 	private String mUserId;
-	private PublisherHostInfo mHostInfo;
+	private HostInfo mHostInfo;
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 
 	private String mBackgroundUrl = "";
@@ -203,12 +203,12 @@ public class InterstitialLoader {
 	 * @param userId
 	 *            The current user of the host application.
 	 * @param hostInfo
-	 *            {@link PublisherHostInfo} with information from the host device and publisher application.
+	 *            {@link HostInfo} with information from the host device and publisher application.
 	 * @param loadingStatusListener
 	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial
 	 *            lifecycle.
 	 */
-	public InterstitialLoader(Activity callingActivity, String userId, PublisherHostInfo hostInfo,
+	public InterstitialLoader(Activity callingActivity, String userId, HostInfo hostInfo,
 			InterstitialLoadingStatusListener loadingStatusListener) {
 
 		mCallingActivity = callingActivity;
@@ -268,7 +268,7 @@ public class InterstitialLoader {
 	 * <p>
 	 * The process will be performed in a background thread. The invocation of the
 	 * {@link InterstitialLoadingStatusListener} registered in
-	 * {@link #InterstitialLoader(Activity, String, PublisherHostInfo, InterstitialLoadingStatusListener)} will be done
+	 * {@link #InterstitialLoader(Activity, String, HostInfo, InterstitialLoadingStatusListener)} will be done
 	 * in the calling thread.
 	 * </p>
 	 */

@@ -210,7 +210,7 @@ public class SponsorPayPublisher {
 	 *         launch the {@link OfferWallActivity}.
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId, boolean shouldStayOpen,
-			long overrideAppId) {
+			String overrideAppId) {
 		Intent intent = getIntentForOfferWallActivity(context, userId);
 		intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
 		intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
@@ -249,9 +249,9 @@ public class SponsorPayPublisher {
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String backgroundUrl,
-			String skinName, int loadingTimeoutSecs, Long overriddenAppId) {
+			String skinName, int loadingTimeoutSecs, String overriddenAppId) {
 
-		PublisherHostInfo hostInfo = new PublisherHostInfo(callingActivity);
+		HostInfo hostInfo = new HostInfo(callingActivity);
 
 		if (overriddenAppId != null)
 			hostInfo.setOverriddenAppId(overriddenAppId);
@@ -408,8 +408,8 @@ public class SponsorPayPublisher {
 	 *            Manifest.
 	 */
 	public static void requestNewCoins(Context context, String userId, SPCurrencyServerListener listener,
-			String transactionId, String securityToken, Long applicationId) {
-		PublisherHostInfo hostInfo = new PublisherHostInfo(context);
+			String transactionId, String securityToken, String applicationId) {
+		HostInfo hostInfo = new HostInfo(context);
 
 		if (applicationId != null)
 			hostInfo.setOverriddenAppId(applicationId);

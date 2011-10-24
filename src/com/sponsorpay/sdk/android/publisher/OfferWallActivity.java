@@ -71,7 +71,7 @@ public class OfferWallActivity extends Activity {
 	/**
 	 * Information about the hosting application and device.
 	 */
-	private PublisherHostInfo mHostInfo;
+	private HostInfo mHostInfo;
 
 	/**
 	 * Whether this activity should stay open or close when the user is redirected outside the application by clicking
@@ -103,16 +103,16 @@ public class OfferWallActivity extends Activity {
 		mProgressDialog.setMessage(SponsorPayPublisher.getUIString(UIStringIdentifier.LOADING_OFFERWALL));
 		mProgressDialog.show();
 		
-		mHostInfo = new PublisherHostInfo(getApplicationContext());
+		mHostInfo = new HostInfo(getApplicationContext());
 
 		// Get data from extras
 		mUserId = getIntent().getStringExtra(EXTRA_USERID_KEY);
 
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY, SHOULD_STAY_OPEN_DEFAULT);
 
-		long overridenAppId = getIntent().getLongExtra(EXTRA_OVERRIDEN_APP_ID, 0);
+		String overridenAppId = getIntent().getStringExtra(EXTRA_OVERRIDEN_APP_ID);
 
-		if (overridenAppId != 0) {
+		if (overridenAppId != null && !overridenAppId.equals("")) {
 			mHostInfo.setOverriddenAppId(overridenAppId);
 		}
 

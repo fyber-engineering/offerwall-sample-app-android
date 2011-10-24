@@ -7,6 +7,7 @@
 package com.sponsorpay.sdk.android.advertiser;
 
 import com.sponsorpay.sdk.android.advertiser.AsyncAPICaller.APIResultListener;
+import com.sponsorpay.sdk.android.publisher.HostInfo;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -93,7 +94,7 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	/**
 	 * {@link AdvertiserHostInfo} used to collect data related to the host device and application.
 	 */
-	private AdvertiserHostInfo mHostInfo;
+	private HostInfo mHostInfo;
 
 	/**
 	 * {@link AsyncAPICaller} used to call the Advertiser API asynchronously.
@@ -191,11 +192,11 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 * This method does the actual registration at Sponsorpay's Ad API, performing the advertiser callback request only
 	 * if a successful response hasn't been received yet.
 	 * 
-	 * @param overrideProgramId
+	 * @param overrideAppId
 	 *            If left empty (""), will use the program id value from the application manifest xml file. Otherwise,
 	 *            will use the specified program id.
 	 */
-	private void register(String overrideProgramId) {
+	private void register(String overrideAppId) {
 		/*
 		 * Check if we have called SponsorPay's API before and gotten a successful response.
 		 */
@@ -203,11 +204,11 @@ public class SponsorPayAdvertiser implements APIResultListener {
 
 		if (!gotSuccessfulResponseYet) {
 			/* Collect data about the device */
-			mHostInfo = new AdvertiserHostInfo(mContext);
+			mHostInfo = new HostInfo(mContext);
 
-			if (!overrideProgramId.equals("")) {
+			if (!overrideAppId.equals("")) {
 				// Override program ID
-				mHostInfo.setOverriddenProgramId(overrideProgramId);
+				mHostInfo.setOverriddenAppId(overrideAppId);
 			}
 
 			/* Send asynchronous call to SponsorPay's API */

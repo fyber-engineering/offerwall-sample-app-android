@@ -1,9 +1,10 @@
 /**
- * SponsorPay Android Advertiser SDK
+ * SponsorPay Android Publisher SDK
  *
  * Copyright 2011 SponsorPay. All rights reserved.
  */
-package com.sponsorpay.sdk.android;
+
+package com.sponsorpay.sdk.android.publisher;
 
 import java.util.Locale;
 
@@ -18,9 +19,11 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
 /**
- * Extracts device information from the host device in which the SDK runs.
+ * Extracts device information from the host device in which the SDK runs and SponsorPay App ID contained in the Android
+ * Application Manifest of the host app.
  */
-public class DeviceInfo {
+public class HostInfo {
+
 	/**
 	 * Prefix appended to the OS version to identify the Android platform.
 	 */
@@ -50,16 +53,26 @@ public class DeviceInfo {
 	 * Android ID as reported by Settings.Secure.ANDROID_ID
 	 */
 	private String mAndroidId;
-	
+
 	/**
 	 * MAC Address of the WiFi Adapter
 	 */
 	private String mWifiMacAddress;
-	
+
+	/**
+	 * The Sponsorpay App ID Key that is used in the AndroidManifest.xml file.
+	 */
+	private static final String SPONSORPAY_APP_ID_KEY = "SPONSORPAY_APP_ID";
+
+	/**
+	 * The App ID value.
+	 */
+	private String mAppId;
+
 	/**
 	 * Android application context, used to retrieve the rest of the properties.
 	 */
-	protected Context mContext;
+	private Context mContext;
 
 	/**
 	 * Get the unique device ID
@@ -98,26 +111,27 @@ public class DeviceInfo {
 	}
 
 	/**
-	 * Returns the device's Android ID. 
+	 * Returns the device's Android ID.
 	 */
 	public String getAndroidId() {
 		return mAndroidId;
 	}
-	
+
 	/**
-	 * Returns the MAC address of the device's WiFi adapter. 
+	 * Returns the MAC address of the device's WiFi adapter.
 	 */
 	public String getWifiMacAddress() {
 		return mWifiMacAddress;
 	}
-	
+
 	/**
-	 * The constructor immediately retrieves all the device information.
+	 * Constructor. Requires an Android application context which will be used to retrieve information from the device
+	 * and the host application's Android Manifest.
 	 * 
 	 * @param context
 	 *            Android application context
 	 */
-	public DeviceInfo(Context context) {
+	public HostInfo(Context context) {
 		mContext = context;
 
 		// Get access to the Telephony Services
@@ -134,88 +148,95 @@ public class DeviceInfo {
 
 		// Get the phone model
 		mPhoneVersion = android.os.Build.MANUFACTURER + "_" + android.os.Build.MODEL;
-		
+
 		// Android ID
 		mAndroidId = Settings.Secure.ANDROID_ID;
-		
+
 		if (mAndroidId == null) {
 			mAndroidId = "";
 		}
-		
+
 		try {
 			// MAC address of WiFi adapter
 			WifiManager wifiMan = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 			WifiInfo wifiInf = wifiMan.getConnectionInfo();
 			mWifiMacAddress = wifiInf.getMacAddress();
-		} catch (RuntimeException re) {	}
-		
+		} catch (RuntimeException re) {
+		}
+
 		if (mWifiMacAddress == null) {
 			mWifiMacAddress = "";
 		}
 	}
 
 	/**
-	 * Extracts a String value from the meta-data configured in the application manifest XML file
+	 * Extracts numeric or alphanumeric value from the meta-data configured in the application manifest XML file and
+	 * returns it as a String.
 	 * 
 	 * @param key
-	 *            key to identify the piece of meta-data to return
-	 * @return the value for the given key
+	 *            key to identify the piece of meta-data to return.
+	 * @return the value for the given key, or null on failure.
 	 */
-	protected String getStringFromAppMetadata(String key) {
-		String stringToReturn;
-		ApplicationInfo ai;
+	private String getValueFromAppMetadata(String key) {
+		Object retrievedValue;
 
+		ApplicationInfo ai = null;
+		Bundle appMetadata = null;
+
+		// Extract the meta data from the package manager
 		try {
-			// Extract the meta data from the package manager
 			ai = mContext.getPackageManager().getApplicationInfo(mContext.getPackageName(),
 					PackageManager.GET_META_DATA);
-			Bundle metadata = ai.metaData;
-
-			/*
-			 * If no meta data has been set, return nothing. Otherwise, get the value for the given key.
-			 */
-			if (metadata == null) {
-				stringToReturn = null;
-			} else {
-				stringToReturn = metadata.getString(key);
-			}
 		} catch (NameNotFoundException e) {
-
-			// The key wasn't found in the meta data, thus, we have to return null.
-			stringToReturn = null;
+			return null;
 		}
 
-		return stringToReturn;
+		appMetadata = ai.metaData;
+
+		if (appMetadata == null) {
+			return null;
+		}
+		
+		retrievedValue = appMetadata.get(key);
+
+		return retrievedValue == null ? null : retrievedValue.toString();
 	}
 
 	/**
-	 * Extracts a long value from the meta-data configured in the application manifest XML file
+	 * <p>
+	 * Extracts the App ID from the host application's Android Manifest XML file.
+	 * </p>
 	 * 
-	 * @param key
-	 *            key to identify the piece of meta-data to return
-	 * @return the value for the given key
+	 * <p>
+	 * If the App Id has already been set (i.e. by calling the {@link #setOverriddenAppId(String)}), this method will
+	 * just return the id which has been set without trying to retrieve it from the manifest.
+	 * </p>
+	 * 
+	 * <p>
+	 * If no App ID is present in the manifest and no non-empty App ID has been set by calling the mentioned method,
+	 * this method will throw a RuntimeException.
+	 * </p>
+	 * 
+	 * @return The offer id previously set or defined in the manifest, or 0.
 	 */
-	protected long getLongFromAppMetadata(String key) {
-		long longToReturn;
-		ApplicationInfo ai;
-		try {
-			ai = mContext.getPackageManager().getApplicationInfo(mContext.getPackageName(),
-					PackageManager.GET_META_DATA);
-			Bundle metadata = ai.metaData;
-
-			if (metadata == null) {
-				longToReturn = 0;
-			} else {
-				try {
-					longToReturn = metadata.getInt(key);
-				} catch (ClassCastException e) {
-					longToReturn = metadata.getLong(key);
-				}
+	public String getAppId() {
+		if (mAppId == null || mAppId.equals("")) {
+			mAppId = getValueFromAppMetadata(SPONSORPAY_APP_ID_KEY);
+			if (mAppId == null || mAppId.equals("")) {
+				throw new RuntimeException("SponsorPay SDK: no valid App ID has been provided. "
+						+ "Please set a valid App ID in your application manifest or provide one at runtime. "
+						+ "See the integration guide or the SDK javadoc for more information.");
 			}
-		} catch (NameNotFoundException e) {
-			longToReturn = 0;
 		}
+		return mAppId;
+	}
 
-		return longToReturn;
+	/**
+	 * Set the offerId, overriding the one which would be read from the manifest.
+	 * 
+	 * @param offerId
+	 */
+	public void setOverriddenAppId(String appId) {
+		mAppId = appId;
 	}
 }

@@ -12,14 +12,16 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.net.Uri;
+import com.sponsorpay.sdk.android.publisher.HostInfo;
+import com.sponsorpay.sdk.android.publisher.UrlBuilder;
+
 import android.os.AsyncTask;
 import android.util.Log;
 
 /**
  * Runs in the background the Advertiser Callback HTTP request.
  */
-public class AsyncAPICaller extends AsyncTask<AdvertiserHostInfo, Void, Boolean> {
+public class AsyncAPICaller extends AsyncTask<HostInfo, Void, Boolean> {
 
 	/**
 	 * HTTP status code that the response should have in order to determine that the API has been contacted
@@ -32,53 +34,6 @@ public class AsyncAPICaller extends AsyncTask<AdvertiserHostInfo, Void, Boolean>
 	 */
 	private static final String API_PRODUCTION_RESOURCE_URL = "http://service.sponsorpay.com/installs";
 	private static final String API_STAGING_RESOURCE_URL = "http://staging.service.sponsorpay.com/installs";
-
-	/**
-	 * The UDID key for the callback URL parameter
-	 */
-	private static final String UDID_KEY = "device_id";
-
-	/**
-	 * The program ID key for the callback URL parameter
-	 */
-	private static final String PROGRAM_ID_KEY = "program_id";
-
-	/**
-	 * The offer ID key for the callback URL parameter, only in use when
-	 * {@link SponsorPayAdvertiser#setShouldUseOfferId(boolean)} is set to true.
-	 */
-	private static final String OFFER_ID_KEY = "offer_id";
-
-	/**
-	 * The OS version key for the callback URL parameter
-	 */
-	private static final String OS_VERSION_KEY = "os_version";
-
-	/**
-	 * The phone version key for the callback URL parameter
-	 */
-	private static final String PHONE_VERSION_KEY = "phone_version";
-
-	/**
-	 * The language setting key for the callback URL parameter
-	 */
-	private static final String LANGUAGE_KEY = "language";
-
-	/**
-	 * The SDK release version key for encoding the corresponding URL parameter.
-	 */
-	private static final String SDK_RELEASE_VERSION_KEY = "sdk_version";
-	
-	/**
-	 * The Android ID key for encoding the corresponding URL parameter.
-	 */
-	private static final String ANDROID_ID_KEY = "android_id";
-
-	/**
-	 * The WiFi MAC Address ID key for encoding the corresponding URL parameter.
-	 */
-	private static final String WIFI_MAC_ADDRESS_KEY = "mac_address";
-
 	
 	/**
 	 * The HTTP request that will be executed to contact the API with the callback request
@@ -119,7 +74,7 @@ public class AsyncAPICaller extends AsyncTask<AdvertiserHostInfo, Void, Boolean>
 	 * Used to extract required information for the host application and device. This data will be sent on the callback
 	 * request.
 	 */
-	private AdvertiserHostInfo mHostInfo;
+	private HostInfo mHostInfo;
 
 	/**
 	 * <p>
@@ -132,7 +87,7 @@ public class AsyncAPICaller extends AsyncTask<AdvertiserHostInfo, Void, Boolean>
 	 * @param listener
 	 *            the callback listener
 	 */
-	public AsyncAPICaller(AdvertiserHostInfo hostInfo, APIResultListener listener) {
+	public AsyncAPICaller(HostInfo hostInfo, APIResultListener listener) {
 		mListener = listener;
 		mHostInfo = hostInfo;
 	}
@@ -161,37 +116,20 @@ public class AsyncAPICaller extends AsyncTask<AdvertiserHostInfo, Void, Boolean>
 	 *         Android {@link AsyncTask} implementation.
 	 */
 	@Override
-	protected Boolean doInBackground(AdvertiserHostInfo... params) {
+	protected Boolean doInBackground(HostInfo... params) {
 		Boolean returnValue = null;
 
-		AdvertiserHostInfo hostInfo = params[0];
+		HostInfo hostInfo = params[0];
 
 		// Prepare HTTP request by URL-encoding the device information
-		String urlString = SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
+		String baseUrl = SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
 				: API_PRODUCTION_RESOURCE_URL;
-		Uri uri = Uri.parse(urlString);
-		Uri.Builder builder = uri.buildUpon();
-		builder.appendQueryParameter(UDID_KEY, hostInfo.getUDID());
 
-		if (SponsorPayAdvertiser.shouldUseOfferId()) {
-			builder.appendQueryParameter(OFFER_ID_KEY, hostInfo.getProgramId());
-		} else {
-			builder.appendQueryParameter(PROGRAM_ID_KEY, hostInfo.getProgramId());
-		}
+		String callbackUrl = UrlBuilder.buildUrl(baseUrl, hostInfo, null, null);
+		
+		Log.d("SponsorPayAdvertiserSDK", "Advertiser callback will be sent to: " + callbackUrl);
 
-		builder.appendQueryParameter(OS_VERSION_KEY, hostInfo.getOsVersion());
-		builder.appendQueryParameter(PHONE_VERSION_KEY, hostInfo.getPhoneVersion());
-		builder.appendQueryParameter(LANGUAGE_KEY, hostInfo.getLanguageSetting());
-		builder.appendQueryParameter(SDK_RELEASE_VERSION_KEY, SponsorPayAdvertiser.RELEASE_VERSION_STRING);
-		builder.appendQueryParameter(ANDROID_ID_KEY, hostInfo.getAndroidId());
-		builder.appendQueryParameter(WIFI_MAC_ADDRESS_KEY, hostInfo.getWifiMacAddress());
-
-		/* Prepare the HTTP request by defining the HTTP method */
-		uri = builder.build();
-
-		Log.d("SponsorPayAdvertiserSDK", "Advertiser callback will be sent to: " + uri.toString());
-
-		mHttpRequest = new HttpGet(uri.toString());
+		mHttpRequest = new HttpGet(callbackUrl);
 		mHttpClient = new DefaultHttpClient();
 
 		try {

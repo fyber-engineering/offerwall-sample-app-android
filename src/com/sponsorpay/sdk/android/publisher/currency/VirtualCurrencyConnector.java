@@ -14,7 +14,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import com.sponsorpay.sdk.android.publisher.HttpResponseParser;
-import com.sponsorpay.sdk.android.publisher.PublisherHostInfo;
+import com.sponsorpay.sdk.android.publisher.HostInfo;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.UrlBuilder;
 
@@ -60,9 +60,9 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	private String mUserId;
 
 	/**
-	 * {@link PublisherHostInfo} containing data about the host device and application, including its application ID.
+	 * {@link HostInfo} containing data about the host device and application, including its application ID.
 	 */
-	private PublisherHostInfo mHostInfo;
+	private HostInfo mHostInfo;
 
 	/**
 	 * Security token used to sign requests to the server and verify its responses.
@@ -197,13 +197,13 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 *            {@link SPCurrencyServerListener} registered by the developer code to be notified of the result of
 	 *            requests to the Virtual Currency Server.
 	 * @param hostInfo
-	 *            {@link PublisherHostInfo} containing data about the host device and application, including its
+	 *            {@link HostInfo} containing data about the host device and application, including its
 	 *            application ID.
 	 * @param securityToken
 	 *            Security token used to sign requests to the server and verify its responses.
 	 */
 	public VirtualCurrencyConnector(Context context, String userId, SPCurrencyServerListener listener,
-			PublisherHostInfo hostInfo, String securityToken) {
+			HostInfo hostInfo, String securityToken) {
 		mContext = context;
 		mUserId = userId;
 		mHostInfo = hostInfo;

@@ -6,7 +6,7 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
-import com.sponsorpay.sdk.android.advertiser.AsyncAPICaller.APIResultListener;
+import com.sponsorpay.sdk.android.advertiser.AdvertiserCallbackSender.APIResultListener;
 import com.sponsorpay.sdk.android.publisher.HostInfo;
 
 import android.content.Context;
@@ -25,14 +25,6 @@ import android.content.SharedPreferences.Editor;
  * </p>
  */
 public class SponsorPayAdvertiser implements APIResultListener {
-	/**
-	 * Version information.
-	 */
-	public static final int MAJOR_RELEASE_NUMBER = 1;
-	public static final int MINOR_RELEASE_NUMBER = 2;
-	public static final int BUGFIX_RELEASE_NUMBER = 0;
-	public static final String RELEASE_VERSION_STRING = String.format("%d.%d.%d", MAJOR_RELEASE_NUMBER, MINOR_RELEASE_NUMBER,
-			BUGFIX_RELEASE_NUMBER);
 
 	/**
 	 * Shared preferences file name. We store a flag into the shared preferences which is checked on each consecutive
@@ -97,9 +89,9 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	private HostInfo mHostInfo;
 
 	/**
-	 * {@link AsyncAPICaller} used to call the Advertiser API asynchronously.
+	 * {@link AdvertiserCallbackSender} used to call the Advertiser API asynchronously.
 	 */
-	private AsyncAPICaller mAPICaller;
+	private AdvertiserCallbackSender mAPICaller;
 
 	/**
 	 * Host app's Android application context.
@@ -197,26 +189,23 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            will use the specified program id.
 	 */
 	private void register(String overrideAppId) {
+		/* Collect data about the device */
+		mHostInfo = new HostInfo(mContext);
+
+		if (!overrideAppId.equals("")) {
+			// Override program ID
+			mHostInfo.setOverriddenAppId(overrideAppId);
+		}
+
 		/*
 		 * Check if we have called SponsorPay's API before and gotten a successful response.
 		 */
 		boolean gotSuccessfulResponseYet = mPrefs.getBoolean(STATE_GOT_SUCCESSFUL_RESPONSE_KEY, false);
 
-		if (!gotSuccessfulResponseYet) {
-			/* Collect data about the device */
-			mHostInfo = new HostInfo(mContext);
-
-			if (!overrideAppId.equals("")) {
-				// Override program ID
-				mHostInfo.setOverriddenAppId(overrideAppId);
-			}
-
-			/* Send asynchronous call to SponsorPay's API */
-			mAPICaller = new AsyncAPICaller(mHostInfo, this);
-			mAPICaller.trigger();
-		} else {
-			// Nothing to do
-		}
+		/* Send asynchronous call to SponsorPay's API */
+		mAPICaller = new AdvertiserCallbackSender(mHostInfo, this);
+		mAPICaller.setWasAlreadySuccessful(gotSuccessfulResponseYet);
+		mAPICaller.trigger();
 	}
 
 	/**

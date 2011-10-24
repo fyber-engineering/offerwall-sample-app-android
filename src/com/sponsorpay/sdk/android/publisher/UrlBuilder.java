@@ -9,6 +9,8 @@ package com.sponsorpay.sdk.android.publisher;
 import java.util.HashMap;
 import java.util.Set;
 
+import com.sponsorpay.sdk.android.SponsorPay;
+
 import android.net.Uri;
 import android.util.Log;
 
@@ -150,7 +152,7 @@ public class UrlBuilder {
 		keyValueParams.put(LANGUAGE_KEY, hostInfo.getLanguageSetting());
 		keyValueParams.put(SDK_INTERNAL_VERSION_KEY,
 				String.format("%d", SponsorPayPublisher.PUBLISHER_SDK_INTERNAL_VERSION));
-		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPayPublisher.RELEASE_VERSION_STRING);
+		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(ANDROID_ID_KEY, hostInfo.getAndroidId());
 		keyValueParams.put(WIFI_MAC_ADDRESS_KEY, hostInfo.getWifiMacAddress());
 

@@ -20,12 +20,6 @@ import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
  * Provides convenience calls to load and show the mobile Offer Wall and the mobile Interstitial.
  */
 public class SponsorPayPublisher {
-	public static final int MAJOR_RELEASE_NUMBER = 1;
-	public static final int MINOR_RELEASE_NUMBER = 2;
-	public static final int BUGFIX_RELEASE_NUMBER = 0;
-	public static final String RELEASE_VERSION_STRING = String.format("%d.%d.%d", MAJOR_RELEASE_NUMBER, MINOR_RELEASE_NUMBER,
-			BUGFIX_RELEASE_NUMBER);
-
 	public static final String PREFERENCES_FILENAME = "SponsorPayPublisherState";
 
 	/**

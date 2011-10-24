@@ -21,7 +21,7 @@ import android.util.Log;
 /**
  * Runs in the background the Advertiser Callback HTTP request.
  */
-public class AsyncAPICaller extends AsyncTask<HostInfo, Void, Boolean> {
+public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean> {
 
 	/**
 	 * HTTP status code that the response should have in order to determine that the API has been contacted
@@ -34,7 +34,13 @@ public class AsyncAPICaller extends AsyncTask<HostInfo, Void, Boolean> {
 	 */
 	private static final String API_PRODUCTION_RESOURCE_URL = "http://service.sponsorpay.com/installs";
 	private static final String API_STAGING_RESOURCE_URL = "http://staging.service.sponsorpay.com/installs";
-	
+
+	/**
+	 * The key for encoding the parameter corresponding to whether a previous invocation of the advertiser callback had
+	 * received a successful response.
+	 */
+	private static final String SUCCESSFUL_ANSWER_RECEIVED_KEY = "answer_received";
+
 	/**
 	 * The HTTP request that will be executed to contact the API with the callback request
 	 */
@@ -49,6 +55,11 @@ public class AsyncAPICaller extends AsyncTask<HostInfo, Void, Boolean> {
 	 * The HTTP client employed to call the Sponsorpay API
 	 */
 	private HttpClient mHttpClient;
+
+	/**
+	 * True if the advertiser callback was sent and received a successful response in a previous invocation.
+	 */
+	private boolean mWasAlreadySuccessful = false;
 
 	/**
 	 * Interface to be implemented by parties interested in the response from the SponsorPay server for the advertiser
@@ -87,9 +98,16 @@ public class AsyncAPICaller extends AsyncTask<HostInfo, Void, Boolean> {
 	 * @param listener
 	 *            the callback listener
 	 */
-	public AsyncAPICaller(HostInfo hostInfo, APIResultListener listener) {
+	public AdvertiserCallbackSender(HostInfo hostInfo, APIResultListener listener) {
 		mListener = listener;
 		mHostInfo = hostInfo;
+	}
+
+	/**
+	 * Set whether a previous invocation of the advertiser callback had received a successful response.
+	 */
+	public void setWasAlreadySuccessful(boolean value) {
+		mWasAlreadySuccessful = value;
 	}
 
 	/**
@@ -125,8 +143,9 @@ public class AsyncAPICaller extends AsyncTask<HostInfo, Void, Boolean> {
 		String baseUrl = SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
 				: API_PRODUCTION_RESOURCE_URL;
 
-		String callbackUrl = UrlBuilder.buildUrl(baseUrl, hostInfo, null, null);
-		
+		String callbackUrl = UrlBuilder.buildUrl(baseUrl, hostInfo, new String[] { SUCCESSFUL_ANSWER_RECEIVED_KEY },
+				new String[] { mWasAlreadySuccessful ? "1" : "0" });
+
 		Log.d("SponsorPayAdvertiserSDK", "Advertiser callback will be sent to: " + callbackUrl);
 
 		mHttpRequest = new HttpGet(callbackUrl);

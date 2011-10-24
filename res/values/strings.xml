@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sponsorpay Android Test App</string>
+	<string name="hello">SponsorPay Publisher SDK Test App</string>
+	<string name="launch_offerwall">Launch Offer Wall</string>
+	<string name="launch_interstitial">Launch Interstitial</string>
+	<string name="request_new_coins">Request New Coins For User</string>
+
+	<string name="custom_error_message">Custom Error Message</string>
+</resources>

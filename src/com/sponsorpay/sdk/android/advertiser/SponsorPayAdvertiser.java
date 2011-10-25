@@ -28,9 +28,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 
 	/**
 	 * Shared preferences file name. We store a flag into the shared preferences which is checked on each consecutive
-	 * invocation of {@link #register()}, to ensure that once we have once successfully contacted the Advertiser API we
-	 * shall never send the advertiser callback request again (provided the user doesn't uninstall and reinstall the
-	 * application, or delete all its preferences).
+	 * invocation of {@link #register()}, to keep track of whether we have already successfully contacted the Advertiser
+	 * API.
 	 */
 	private static final String PREFERENCES_FILE_NAME = "SponsorPayAdvertiserState";
 
@@ -39,8 +38,6 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 * Advertiser API.
 	 */
 	private static final String STATE_GOT_SUCCESSFUL_RESPONSE_KEY = "SponsorPayAdvertiserState";
-
-	private static final boolean SHOULD_USE_OFFER_ID_DEFAULT = false;
 
 	/**
 	 * The shared preferences encoded in the {@link #PREFERENCES_FILE_NAME} file.
@@ -55,32 +52,6 @@ public class SponsorPayAdvertiser implements APIResultListener {
 
 	public static boolean shouldUseStagingUrls() {
 		return sShouldUseStagingUrls;
-	}
-
-	/**
-	 * Whether the advertiser callback should encode the program ID in the request to SponsorPay's backend with the key
-	 * 'offer_id' instead of 'program_id'. Default is {@value #SHOULD_USE_OFFER_ID_DEFAULT}.
-	 */
-	private static boolean sShouldUseOfferId = SHOULD_USE_OFFER_ID_DEFAULT;
-
-	/**
-	 * Whether the advertiser callback should encode the program ID in the request to SponsorPay's backend with the key
-	 * 'offer_id' instead of 'program_id'. Default is {@value #SHOULD_USE_OFFER_ID_DEFAULT}.
-	 * 
-	 * @param value
-	 */
-	public static void setShouldUseOfferId(boolean value) {
-		sShouldUseOfferId = value;
-	}
-
-	/**
-	 * Gets Whether the advertiser callback should encode the program ID in the request to SponsorPay's backend with the
-	 * key 'offer_id' instead of 'program_id'.
-	 * 
-	 * @return
-	 */
-	public static boolean shouldUseOfferId() {
-		return sShouldUseOfferId;
 	}
 
 	/**
@@ -115,8 +86,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	}
 
 	/**
-	 * Trigger the Advertiser callback. Will retrieve the program ID from the value defined in the host application's
-	 * Android Manifest XML file.
+	 * Trigger the Advertiser callback. Will try to retrieve the Application ID from the value defined in the host
+	 * application's Android Manifest XML file.
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -128,14 +99,13 @@ public class SponsorPayAdvertiser implements APIResultListener {
 			mInstance = new SponsorPayAdvertiser(context);
 		}
 
-		// The actual work is performed by the register(String overrideProgramId) instance method, which will be called
-		// by
-		// its parameterless overload.
+		// The actual work is performed by the register(String overrideAppId) instance method, which will be called
+		// by its parameterless overload with the App ID retrieved from the application manifest.
 		mInstance.register();
 	}
 
 	/**
-	 * Trigger the Advertiser callback after the specified delay has passed. Will retrieve the program ID from the value
+	 * Trigger the Advertiser callback after the specified delay has passed. Will retrieve the App ID from the value
 	 * defined in the host application's Android Manifest XML file.
 	 * 
 	 * @param context
@@ -148,52 +118,52 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	}
 
 	/**
-	 * Trigger the Advertiser callback after the specified delay has passed. Will use the provided program ID instead of
+	 * Trigger the Advertiser callback after the specified delay has passed. Will use the provided App ID instead of
 	 * trying to retrieve the one defined in the host application's manifest.
 	 * 
 	 * @param context
 	 *            Host application context.
 	 * @param delayMin
 	 *            The delay in minutes for triggering the Advertiser callback.
-	 * @param overrideProgramId
-	 *            The program id to use.
+	 * @param overrideAppId
+	 *            The App ID to use.
 	 */
-	public static void registerWithDelay(Context context, int delayMin, String overrideProgramId) {
-		SponsorPayCallbackDelayer.callWithDelay(context, overrideProgramId, delayMin);
+	public static void registerWithDelay(Context context, int delayMin, String overrideAppId) {
+		SponsorPayCallbackDelayer.callWithDelay(context, overrideAppId, delayMin);
 	}
 
 	/**
-	 * Trigger the Advertiser callback. Will use the provided program ID instead of retrieving it from the value defined
-	 * in the host application's Android Manifest XML file.
+	 * Trigger the Advertiser callback. If passed a non-null and non-empty Application ID, it will be used. Otherwise
+	 * the Application ID will be retrieved from the value defined in the host application's Android Manifest XML file.
 	 * 
 	 * @param context
 	 *            Host application context.
-	 * @param overrideProgramId
-	 *            The program id to use.
+	 * @param overrideAppId
+	 *            The App ID to use.
 	 */
-	public static void register(Context context, String overrideProgramId) {
+	public static void register(Context context, String overrideAppId) {
 		if (mInstance == null) {
 			mInstance = new SponsorPayAdvertiser(context);
 		}
 
-		// The actual work is performed by the register(String overrideProgramId) instance method.
-		mInstance.register(overrideProgramId);
+		// The actual work is performed by the register(String overrideAppId) instance method.
+		mInstance.register(overrideAppId);
 	}
 
 	/**
-	 * This method does the actual registration at Sponsorpay's Ad API, performing the advertiser callback request only
-	 * if a successful response hasn't been received yet.
+	 * This method does the actual registration at Sponsorpay's Ad API, performing the advertiser callback, and
+	 * including in it a parameter to signal if a successful response has been received yet.
 	 * 
 	 * @param overrideAppId
-	 *            If left empty (""), will use the program id value from the application manifest xml file. Otherwise,
-	 *            will use the specified program id.
+	 *            If left empty (""), will use the App ID value from the application manifest xml file. Otherwise, will
+	 *            use the specified App ID.
 	 */
 	private void register(String overrideAppId) {
 		/* Collect data about the device */
 		mHostInfo = new HostInfo(mContext);
 
-		if (!overrideAppId.equals("")) {
-			// Override program ID
+		if (overrideAppId != null && !overrideAppId.equals("")) {
+			// Override App ID
 			mHostInfo.setOverriddenAppId(overrideAppId);
 		}
 
@@ -209,7 +179,7 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	}
 
 	/**
-	 * Calls its overload {@link #register()} with an empty overrideProgramId parameter.
+	 * Calls its overload {@link #register()} with an empty overrideAppId parameter.
 	 */
 	private void register() {
 		SponsorPayAdvertiser.this.register("");
@@ -219,12 +189,12 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 * This method is invoked when a response for the advertiser callback is received.
 	 * 
 	 * @param wasSuccessful
-	 *            status flag if the Ad API has been contacted successfully
+	 *            status flag if the Advertiser API has been contacted successfully
 	 */
 	public void onAPIResponse(boolean wasSuccessful) {
 		/*
-		 * If we have been successful store the STATE_GOT_SUCCESSFUL_RESPONSE flag inside the preferences and flush them
-		 * to permanent storage.
+		 * If we have been successful store the STATE_GOT_SUCCESSFUL_RESPONSE_KEY flag inside the preferences and flush
+		 * them to permanent storage.
 		 */
 		if (wasSuccessful) {
 			Editor prefsEditor = mPrefs.edit();

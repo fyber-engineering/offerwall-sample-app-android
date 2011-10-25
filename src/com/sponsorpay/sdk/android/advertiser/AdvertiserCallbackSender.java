@@ -30,7 +30,7 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	private static final int SUCCESFUL_HTTP_STATUS_CODE = 200;
 
 	/**
-	 * The API resource URL to contact when talking to the Sponsorpay Ad API
+	 * The API resource URL to contact when talking to the Sponsorpay Advertiser API
 	 */
 	private static final String API_PRODUCTION_RESOURCE_URL = "http://service.sponsorpay.com/installs";
 	private static final String API_STAGING_RESOURCE_URL = "http://staging.service.sponsorpay.com/installs";
@@ -154,7 +154,7 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 		try {
 			mHttpResponse = mHttpClient.execute(mHttpRequest);
 
-			// We're not parsing the response, just making sure that a succesful status code was received.
+			// We're not parsing the response, just making sure that a successful status code has been received.
 			int httpStatusCode = mHttpResponse.getStatusLine().getStatusCode();
 
 			if (httpStatusCode == SUCCESFUL_HTTP_STATUS_CODE) {

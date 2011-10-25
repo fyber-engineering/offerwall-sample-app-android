@@ -22,23 +22,23 @@ import android.util.Log;
  */
 public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 	public static final String ACTION_TRIGGER_SPONSORPAY_CALLBACK = "ACTION_TRIGGER_SPONSORPAY_CALLBACK";
-	public static final String EXTRA_OFFERID_KEY = "EXTRA_OFFERID_KEY";
+	public static final String EXTRA_APPID_KEY = "EXTRA_APPID_KEY";
 	public static final int MILLISECONDS_IN_MINUTE = 60000;
 
 	/**
-	 * Triggers the Advertiser callback after the specified delay has passed. Will use the provided offer ID instead of
+	 * Triggers the Advertiser callback after the specified delay has passed. Will use the provided Apps ID instead of
 	 * trying to retrieve the one defined in the host application's manifest. Registers an alarm with the OS
 	 * {@link AlarmManager}. {@link #onReceive(Context, Intent)} will be invoked when the specified period of time has
 	 * elapsed .
 	 * 
 	 * @param context
 	 *            Host application context.
-	 * @param offerId
-	 *            The offer id to use.
+	 * @param appId
+	 *            The App ID to use. Pass an empty string to let the SDK try to retrieve it from the application manifest.
 	 * @param delayMinutes
 	 *            The delay in minutes for triggering the Advertiser callback.
 	 */
-	public static void callWithDelay(Context context, String offerId, long delayMinutes) {
+	public static void callWithDelay(Context context, String appId, long delayMinutes) {
 		Log.d(SponsorPayCallbackDelayer.class.toString(), "callWithDelay called");
 
 		// Create a new instance and register it as BroadcastReceiver
@@ -48,14 +48,14 @@ public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 
 		// Generate the PendingIntent which will be called with delay
 		Intent intent = new Intent(ACTION_TRIGGER_SPONSORPAY_CALLBACK);
-		intent.putExtra(EXTRA_OFFERID_KEY, offerId);
+		intent.putExtra(EXTRA_APPID_KEY, appId);
 		PendingIntent triggerCallbackPendingIntent = PendingIntent.getBroadcast(context, 0, intent,
 				PendingIntent.FLAG_ONE_SHOT);
 
 		// Calculate the delay and register the PendingIntent with the Alarm Manager
-		long timeForCheckinAlarm = SystemClock.elapsedRealtime() + delayMinutes * MILLISECONDS_IN_MINUTE;
+		long timeForCheckInAlarm = SystemClock.elapsedRealtime() + delayMinutes * MILLISECONDS_IN_MINUTE;
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeForCheckinAlarm, triggerCallbackPendingIntent);
+		alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeForCheckInAlarm, triggerCallbackPendingIntent);
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.d(this.getClass().toString(), "Calling SponsorPayAdvertiser.register");
-		SponsorPayAdvertiser.register(context, intent.getStringExtra(EXTRA_OFFERID_KEY));
+		SponsorPayAdvertiser.register(context, intent.getStringExtra(EXTRA_APPID_KEY));
 		context.unregisterReceiver(this);
 	}
 }

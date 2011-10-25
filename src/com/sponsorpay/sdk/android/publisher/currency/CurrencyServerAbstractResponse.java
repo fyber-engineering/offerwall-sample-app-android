@@ -8,7 +8,7 @@ package com.sponsorpay.sdk.android.publisher.currency;
 
 import org.json.JSONObject;
 
-import com.sponsorpay.sdk.android.publisher.SignatureTools;
+import com.sponsorpay.sdk.android.SignatureTools;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector.RequestType;
 
 /**

@@ -12,8 +12,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.sponsorpay.sdk.android.publisher.HostInfo;
-import com.sponsorpay.sdk.android.publisher.UrlBuilder;
+import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.UrlBuilder;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -116,6 +116,9 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	 * {@link #AsyncAPICaller(AdvertiserHostInfo, APIResultListener)} will be notified.
 	 */
 	public void trigger() {
+		// if HostInfo must launch a RuntimeException due to an invalid App ID value, let it do that in the main thread:
+		mHostInfo.getAppId();
+
 		execute(mHostInfo);
 	}
 
@@ -146,7 +149,7 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 		String callbackUrl = UrlBuilder.buildUrl(baseUrl, hostInfo, new String[] { SUCCESSFUL_ANSWER_RECEIVED_KEY },
 				new String[] { mWasAlreadySuccessful ? "1" : "0" });
 
-		Log.d("SponsorPayAdvertiserSDK", "Advertiser callback will be sent to: " + callbackUrl);
+		Log.d(AdvertiserCallbackSender.class.getSimpleName(), "Advertiser callback will be sent to: " + callbackUrl);
 
 		mHttpRequest = new HttpGet(callbackUrl);
 		mHttpClient = new DefaultHttpClient();
@@ -155,15 +158,18 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 			mHttpResponse = mHttpClient.execute(mHttpRequest);
 
 			// We're not parsing the response, just making sure that a successful status code has been received.
-			int httpStatusCode = mHttpResponse.getStatusLine().getStatusCode();
+			int responseStatusCode = mHttpResponse.getStatusLine().getStatusCode();
 
-			if (httpStatusCode == SUCCESFUL_HTTP_STATUS_CODE) {
+			if (responseStatusCode == SUCCESFUL_HTTP_STATUS_CODE) {
 				returnValue = true;
 			} else {
 				returnValue = false;
 			}
+			
+			Log.d(AdvertiserCallbackSender.class.getSimpleName(), "Server returned status code: " + responseStatusCode);
 		} catch (Exception e) {
 			returnValue = false;
+			Log.e(AdvertiserCallbackSender.class.getSimpleName(), "An exception occurred when trying to send advertiser callback: " + e);
 		}
 		return returnValue;
 	}

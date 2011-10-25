@@ -1,4 +1,10 @@
-package com.sponsorpay.sdk.android.publisher;
+/**
+ * SponsorPay Android Advertiser SDK
+ *
+ * Copyright 2011 SponsorPay. All rights reserved.
+ */
+
+package com.sponsorpay.sdk.android;
 
 import java.io.BufferedReader;
 import java.io.IOException;

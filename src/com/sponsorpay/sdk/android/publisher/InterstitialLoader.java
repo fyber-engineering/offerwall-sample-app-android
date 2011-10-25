@@ -20,6 +20,9 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
+import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.HttpResponseParser;
+import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 
 /**
@@ -275,12 +278,6 @@ public class InterstitialLoader {
 	public void startLoading() {
 		cancelInterstitialLoading();
 
-		mProgressDialog = new ProgressDialog(mCallingActivity);
-		mProgressDialog.setOwnerActivity(mCallingActivity);
-		mProgressDialog.setIndeterminate(true);
-		mProgressDialog.setMessage(SponsorPayPublisher.getUIString(UIStringIdentifier.LOADING_INTERSTITIAL));
-		mProgressDialog.show();
-
 		String[] interstitialUrlExtraKeys = new String[] { URL_PARAM_INTERSTITIAL_KEY, URL_PARAM_ALLOW_CAMPAIGN_KEY,
 				URL_PARAM_SKIN_KEY, URL_PARAM_OFFSET_KEY, URL_PARAM_BACKGROUND_KEY };
 		String[] interstitialUrlExtraValues = new String[] { URL_PARAM_INTERSTITIAL_VALUE_ON,
@@ -311,6 +308,12 @@ public class InterstitialLoader {
 		};
 
 		mHandler.postDelayed(mCancelLoadingOnTimeOut, mLoadingTimeoutSecs * MILLISECONDS_IN_SECOND);
+		
+		mProgressDialog = new ProgressDialog(mCallingActivity);
+		mProgressDialog.setOwnerActivity(mCallingActivity);
+		mProgressDialog.setIndeterminate(true);
+		mProgressDialog.setMessage(SponsorPayPublisher.getUIString(UIStringIdentifier.LOADING_INTERSTITIAL));
+		mProgressDialog.show();
 	}
 
 	/**

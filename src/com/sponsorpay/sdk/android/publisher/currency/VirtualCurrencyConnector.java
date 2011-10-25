@@ -13,10 +13,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.sponsorpay.sdk.android.publisher.HttpResponseParser;
-import com.sponsorpay.sdk.android.publisher.HostInfo;
+import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.HttpResponseParser;
+import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
-import com.sponsorpay.sdk.android.publisher.UrlBuilder;
 
 import android.content.Context;
 import android.content.SharedPreferences;

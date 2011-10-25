@@ -6,6 +6,8 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
+import com.sponsorpay.sdk.android.HostInfo;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -34,12 +36,19 @@ public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 	 * @param context
 	 *            Host application context.
 	 * @param appId
-	 *            The App ID to use. Pass an empty string to let the SDK try to retrieve it from the application manifest.
+	 *            The App ID to use. Pass an empty string to let the SDK try to retrieve it from the application
+	 *            manifest.
 	 * @param delayMinutes
 	 *            The delay in minutes for triggering the Advertiser callback.
 	 */
 	public static void callWithDelay(Context context, String appId, long delayMinutes) {
 		Log.d(SponsorPayCallbackDelayer.class.toString(), "callWithDelay called");
+
+		// if HostInfo must launch a RuntimeException due to an invalid App ID value, let it do that right now:
+		if (appId == null || appId.equals("")) {
+			HostInfo hostInfo = new HostInfo(context);
+			hostInfo.getAppId();
+		}
 
 		// Create a new instance and register it as BroadcastReceiver
 		SponsorPayCallbackDelayer instance = new SponsorPayCallbackDelayer();

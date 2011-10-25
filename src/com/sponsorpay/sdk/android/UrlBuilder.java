@@ -4,12 +4,12 @@
  * Copyright 2011 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android.publisher;
+package com.sponsorpay.sdk.android;
 
 import java.util.HashMap;
 import java.util.Set;
 
-import com.sponsorpay.sdk.android.SponsorPay;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 
 import android.net.Uri;
 import android.util.Log;

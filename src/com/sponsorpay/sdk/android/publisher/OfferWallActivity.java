@@ -19,6 +19,8 @@ import android.view.Window;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 
 /**
@@ -83,7 +85,7 @@ public class OfferWallActivity extends Activity {
 	 * Loading progress dialog.
 	 */
 	private ProgressDialog mProgressDialog;
-	
+
 	/**
 	 * Overriden from {@link Activity}. Upon activity start, extract the user ID from the extra, create the web view and
 	 * setup the interceptor for the web view exit-request.
@@ -102,7 +104,7 @@ public class OfferWallActivity extends Activity {
 		mProgressDialog.setIndeterminate(true);
 		mProgressDialog.setMessage(SponsorPayPublisher.getUIString(UIStringIdentifier.LOADING_OFFERWALL));
 		mProgressDialog.show();
-		
+
 		mHostInfo = new HostInfo(getApplicationContext());
 
 		// Get data from extras
@@ -128,7 +130,7 @@ public class OfferWallActivity extends Activity {
 				mProgressDialog.dismiss();
 				super.onPageFinished(view, url);
 			}
-			
+
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
 				if (url.startsWith("sponsorpay://exit")) { // ?status=<statusCode>&url=<url>)url is optional)
@@ -191,7 +193,11 @@ public class OfferWallActivity extends Activity {
 		super.onResume();
 		String offerWallBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? OFFERWALL_STAGING_BASE_URL
 				: OFFERWALL_PRODUCTION_BASE_URL;
-		mWebView.loadUrl(UrlBuilder.buildUrl(offerWallBaseUrl, mUserId, mHostInfo, null, null));
+		try {
+			mWebView.loadUrl(UrlBuilder.buildUrl(offerWallBaseUrl, mUserId, mHostInfo, null, null));
+		} catch (RuntimeException ex) {
+			showErrorDialog(ex.getMessage());
+		}
 	}
 
 	/**
@@ -202,6 +208,17 @@ public class OfferWallActivity extends Activity {
 	 */
 	protected void showErrorDialog(UIStringIdentifier error) {
 		String errorMessage = SponsorPayPublisher.getUIString(error);
+		showErrorDialog(errorMessage);
+	}
+
+	/**
+	 * Displays an error dialog with the passed error message on top of the activity.
+	 * 
+	 * @param error
+	 *            Error message to show.
+	 */
+	protected void showErrorDialog(String error) {
+		String errorMessage = error;
 		String errorDialogTitle = SponsorPayPublisher.getUIString(UIStringIdentifier.ERROR_DIALOG_TITLE);
 		String dismissButtonCaption = SponsorPayPublisher.getUIString(UIStringIdentifier.DISMISS_ERROR_DIALOG);
 
@@ -212,6 +229,7 @@ public class OfferWallActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
+				finish();
 			}
 		});
 

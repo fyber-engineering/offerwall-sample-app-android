@@ -6,8 +6,8 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
+import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.advertiser.AdvertiserCallbackSender.APIResultListener;
-import com.sponsorpay.sdk.android.publisher.HostInfo;
 
 import android.content.Context;
 import android.content.SharedPreferences;

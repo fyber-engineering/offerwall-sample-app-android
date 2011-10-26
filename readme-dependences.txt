@@ -1,0 +1,1 @@
+This project depends on the JAR file sponsorpay-android-sdk.jar, which is included in the SponsorPay Android SDK folder. Please make sure this file can be found on your project Java classpath in order to compile the project.

@@ -12,8 +12,8 @@
 
 		<EditText android:id="@+id/app_id_field"
 			android:layout_width="fill_parent" android:layout_height="wrap_content"
-			android:hint="SponsorPay app ID" android:inputType="number|text"
-			android:singleLine="true" android:imeOptions="actionNext" />
+			android:hint="SponsorPay app ID" android:singleLine="true"
+			android:imeOptions="actionNext" />
 
 		<LinearLayout android:orientation="vertical"
 			android:background="#442222" android:padding="10dp"

@@ -15,8 +15,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.provider.Settings.Secure;
 
 /**
  * Extracts device information from the host device in which the SDK runs and SponsorPay App ID contained in the Android
@@ -50,7 +50,7 @@ public class HostInfo {
 	private String mLanguageSetting;
 
 	/**
-	 * Android ID as reported by Settings.Secure.ANDROID_ID
+	 * Android ID as reported by Settings.Secure
 	 */
 	private String mAndroidId;
 
@@ -150,7 +150,7 @@ public class HostInfo {
 		mPhoneVersion = android.os.Build.MANUFACTURER + "_" + android.os.Build.MODEL;
 
 		// Android ID
-		mAndroidId = Settings.Secure.ANDROID_ID;
+		mAndroidId = Secure.getString(mContext.getContentResolver(), Secure.ANDROID_ID);
 
 		if (mAndroidId == null) {
 			mAndroidId = "";
@@ -196,7 +196,7 @@ public class HostInfo {
 		if (appMetadata == null) {
 			return null;
 		}
-		
+
 		retrievedValue = appMetadata.get(key);
 
 		return retrievedValue == null ? null : retrievedValue.toString();

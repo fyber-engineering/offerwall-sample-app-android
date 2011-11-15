@@ -87,6 +87,11 @@ public class OfferWallActivity extends Activity {
 	private ProgressDialog mProgressDialog;
 
 	/**
+	 * Error dialog.
+	 */
+	private AlertDialog mErrorDialog;
+	
+	/**
 	 * Overriden from {@link Activity}. Upon activity start, extract the user ID from the extra, create the web view and
 	 * setup the interceptor for the web view exit-request.
 	 * 
@@ -127,7 +132,10 @@ public class OfferWallActivity extends Activity {
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageFinished(WebView view, String url) {
-				mProgressDialog.dismiss();
+				if (mProgressDialog != null) {
+					mProgressDialog.dismiss();
+					mProgressDialog = null;
+				}
 				super.onPageFinished(view, url);
 			}
 
@@ -185,6 +193,19 @@ public class OfferWallActivity extends Activity {
 		});
 	}
 
+	@Override
+	protected void onPause() {
+		if (mErrorDialog != null) {
+			mErrorDialog.dismiss();
+			mErrorDialog = null;
+		}
+		if (mProgressDialog != null) {
+			mProgressDialog.dismiss();
+			mProgressDialog = null;
+		}
+		super.onPause();
+	}
+	
 	/**
 	 * Overriden from {@link Activity}. Loads or reloads the contents of the offer wall webview.
 	 */
@@ -229,11 +250,12 @@ public class OfferWallActivity extends Activity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
+				mErrorDialog = null;
 				finish();
 			}
 		});
-
-		dialogBuilder.show();
+		mErrorDialog = dialogBuilder.create();
+		mErrorDialog.show();
 	}
 
 	/**

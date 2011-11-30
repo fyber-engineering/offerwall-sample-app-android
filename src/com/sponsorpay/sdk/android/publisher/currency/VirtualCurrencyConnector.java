@@ -47,8 +47,9 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 * Key for the String containing the latest known transaction ID, which is saved as state in the Publisher SDK
 	 * preferences file (whose name is defined in {@link SponsorPayPublisher#PREFERENCES_FILENAME}).
 	 */
-	private static final String STATE_LATEST_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_FOR_USER_";
-
+	private static final String STATE_LATEST_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_";
+	private static final String STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR = "_";
+	
 	/**
 	 * Android application context.
 	 */
@@ -217,7 +218,7 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 * listener's callback methods.
 	 */
 	public void fetchDeltaOfCoins() {
-		fetchDeltaOfCoinsForCurrentUserSinceTransactionId(fetchLatestTransactionIdForCurrentUser());
+		fetchDeltaOfCoinsForCurrentUserSinceTransactionId(fetchLatestTransactionIdForCurrentAppAndUser());
 	}
 
 	/**
@@ -280,16 +281,22 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	private void saveLatestTransactionIdForCurrentUser(String transactionId) {
 		SharedPreferences prefs = mContext.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME,
 				Context.MODE_PRIVATE);
-		prefs.edit().putString(STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + mUserId, transactionId).commit();
+		prefs.edit().putString(generatePreferencesLatestTransactionIdKey(mUserId, mHostInfo.getAppId()), transactionId).commit();
 	}
 
+	private static String generatePreferencesLatestTransactionIdKey(String appId, String userId) {
+		return STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + appId + STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + userId;
+	}
+	
 	/**
 	 * Retrieves the saved latest known transaction ID for the current user from the publisher state preferences file.
 	 * 
 	 * @return The retrieved transaction ID or null.
 	 */
-	private String fetchLatestTransactionIdForCurrentUser() {
-		return fetchLatestTransactionIdForUser(mContext, mUserId);
+	private String fetchLatestTransactionIdForCurrentAppAndUser() {
+		String retval = fetchLatestTransactionId(mContext, mHostInfo.getAppId(), mUserId);
+		//Log.i(getClass().getSimpleName(), String.format("fetchLatestTransactionIdForCurrentAppAndUser will return %s", retval));
+		return retval;
 	}
 
 	/**
@@ -301,11 +308,12 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 *            ID of the user related to which the fetched transaction ID must belong.
 	 * @return The retrieved transaction ID or null.
 	 */
-	public static String fetchLatestTransactionIdForUser(Context context, String userId) {
+	public static String fetchLatestTransactionId(Context context, String appId, String userId) {
 		SharedPreferences prefs = context.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME,
 				Context.MODE_PRIVATE);
-		
-		return prefs.getString(STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + userId, URL_PARAM_VALUE_NO_TRANSACTION);
+		String retval = prefs.getString(generatePreferencesLatestTransactionIdKey(userId, appId), URL_PARAM_VALUE_NO_TRANSACTION);
+		//Log.i(VirtualCurrencyConnector.class.getSimpleName(), String.format("fetchLatestTransactionId(context, appId: %s, userId: %s) = %s", appId, userId, retval));
+		return retval;
 	}
 
 	/**

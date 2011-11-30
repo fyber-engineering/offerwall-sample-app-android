@@ -302,9 +302,9 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 	public void onRequestNewCoinsClick(View v) {
 		fetchValuesFromFields();
 
-		final String usedTransactionId = VirtualCurrencyConnector.fetchLatestTransactionIdForUser(
-				getApplicationContext(), mUserId);
-
+		final String usedTransactionId = VirtualCurrencyConnector.fetchLatestTransactionId(
+				getApplicationContext(), mOverridenAppId, mUserId);
+		
 		SPCurrencyServerListener requestListener = new SPCurrencyServerListener() {
 
 			@Override

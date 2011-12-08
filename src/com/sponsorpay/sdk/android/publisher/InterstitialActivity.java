@@ -9,8 +9,6 @@ package com.sponsorpay.sdk.android.publisher;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Window;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 
 /**
@@ -53,12 +51,8 @@ public class InterstitialActivity extends Activity {
 		mWebView = new WebView(InterstitialActivity.this);
 
 		// Add into the CookieManager used by the web view the cookies received as encoded extras.
-		if (cookieStrings.length > 0) {
-			for (String cookieString : cookieStrings) {
-				getCookieManagerInstance().setCookie(baseDomain, cookieString);
-			}
-		}
-
+		SponsorPayPublisher.setCookiesIntoCookieManagerInstance(cookieStrings, baseDomain, this);
+		
 		setContentView(mWebView);
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setPluginsEnabled(true);
@@ -67,23 +61,4 @@ public class InterstitialActivity extends Activity {
 
 		mWebView.loadDataWithBaseURL(baseDomain, initialInterstitialContent, "text/html", "utf-8", null);
 	}
-
-	private CookieManager getCookieManagerInstance() {
-		CookieManager instance;
-		
-		// CookieSyncManager.createInstance() has to be called before we get CookieManager's instance.
-		try {
-			CookieSyncManager.getInstance();
-		} catch (IllegalStateException e) {
-			CookieSyncManager.createInstance(InterstitialActivity.this);
-		}
-
-		instance = CookieManager.getInstance();
-
-		return instance;
-	}
-
-
-
-
 }

@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
 
 public class OfferBanner {
@@ -71,30 +69,11 @@ public class OfferBanner {
 				}
 			});
 			
-			if (mCookies != null && mCookies.length > 0) {
-				for (String cookieString : mCookies) {
-					getCookieManagerInstance().setCookie(mBaseUrl, cookieString);
-				}
-			}
+			SponsorPayPublisher.setCookiesIntoCookieManagerInstance(mCookies, mBaseUrl, mContext);
 			
 			mOfferBannerView = webView;
 		}
 		return mOfferBannerView;
-	}
-
-	private CookieManager getCookieManagerInstance() {
-		CookieManager instance;
-		
-		// CookieSyncManager.createInstance() has to be called before we get CookieManager's instance.
-		try {
-			CookieSyncManager.getInstance();
-		} catch (IllegalStateException e) {
-			CookieSyncManager.createInstance(mContext);
-		}
-
-		instance = CookieManager.getInstance();
-
-		return instance;
 	}
 	
 	private int convertDevicePixelsIntoPixelsMeasurement(float dps) {

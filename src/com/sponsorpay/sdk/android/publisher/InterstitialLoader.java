@@ -1,4 +1,5 @@
 /**
+
  * SponsorPay Android Publisher SDK
  *
  * Copyright 2011 SponsorPay. All rights reserved.
@@ -6,22 +7,13 @@
 
 package com.sponsorpay.sdk.android.publisher;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
 import com.sponsorpay.sdk.android.HostInfo;
-import com.sponsorpay.sdk.android.HttpResponseParser;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 
@@ -54,7 +46,7 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifi
  * events in the life of the interstitial.
  * </p>
  */
-public class InterstitialLoader {
+public class InterstitialLoader implements AsyncRequest.ResultListener {
 	/**
 	 * Interface to be implemented by parties interested in being notified of interesting events in
 	 * the life of the interstitial.
@@ -85,70 +77,7 @@ public class InterstitialLoader {
 		void onInterstitialLoadingTimeOut();
 	}
 
-	/**
-	 * Encloses the interesting data from the server's response to the interstitial request.
-	 */
-	private class InterstitialLoadingResults {
-		public static final int REQUEST_ERROR = -1;
-
-		int statusCode;
-		String returnedBody;
-		String[] cookieStrings;
-	}
-
-	/**
-	 * <p>
-	 * Requests and loads an interstitial ad in the background. Will call the
-	 * {@link InterstitialLoadingStatusListener} registered in the {@link InterstitialLoader} in the
-	 * same thread which triggered the request / loading process. Uses the Android {@link AsyncTask}
-	 * mechanism.
-	 * </p>
-	 * <p>
-	 * Used by {@link InterstitialLoader} to perform the background request / loading.
-	 * </p>
-	 */
-	public class InterstitialLoadingAsyncTask extends
-			AsyncTask<String, Integer, InterstitialLoadingResults> {
-		/**
-		 * Overrided from {@link AsyncTask}. Will run in a background thread.
-		 */
-		@Override
-		protected InterstitialLoadingResults doInBackground(String... params) {
-			String url = params[0];
-			HttpUriRequest request = new HttpGet(url);
-			request.addHeader(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE);
-			HttpClient client = new DefaultHttpClient();
-			InterstitialLoadingResults result = new InterstitialLoadingResults();
-
-			try {
-				HttpResponse response = client.execute(request);
-				result.statusCode = response.getStatusLine().getStatusCode();
-				result.returnedBody = HttpResponseParser.extractResponseString(response);
-
-				Header[] cookieHeaders = response.getHeaders("Set-Cookie");
-
-				// Populate result cookies with values of cookieHeaders
-				if (cookieHeaders.length > 0) {
-					result.cookieStrings = new String[cookieHeaders.length];
-					for (int i = 0; i < cookieHeaders.length; i++) {
-						result.cookieStrings[i] = cookieHeaders[i].getValue();
-					}
-				}
-			} catch (Exception e) {
-				result.statusCode = InterstitialLoadingResults.REQUEST_ERROR;
-			}
-			return result;
-		}
-
-		/**
-		 * Override from {@link AsyncTask}. Will run in the thread that triggered the load / execute
-		 * process (calling the AsyncTask.execute() method).
-		 */
-		@Override
-		protected void onPostExecute(InterstitialLoadingResults result) {
-			InterstitialLoader.this.onInterstitialLoadResultsAvailable(result);
-		}
-	};
+	public static final String LOG_TAG = "InterstitialLoader";
 
 	private static final boolean SHOULD_INTERSTITIAL_REMAIN_OPEN_DEFAULT = false;
 	private static final int LOADING_TIMEOUT_SECONDS_DEFAULT = 5;
@@ -164,9 +93,6 @@ public class InterstitialLoader {
 
 	private static final String URL_PARAM_SKIN_KEY = "skin";
 	private static final String URL_PARAM_BACKGROUND_KEY = "background";
-
-	private static String USER_AGENT_HEADER_NAME = "User-Agent";
-	private static String USER_AGENT_HEADER_VALUE = "Android";
 
 	private static final int MILLISECONDS_IN_SECOND = 1000;
 
@@ -189,7 +115,7 @@ public class InterstitialLoader {
 	private boolean mShouldStayOpen = SHOULD_INTERSTITIAL_REMAIN_OPEN_DEFAULT;
 	private int mLoadingTimeoutSecs = LOADING_TIMEOUT_SECONDS_DEFAULT;
 
-	private InterstitialLoadingAsyncTask mInterstitialLoadingAsyncTask;
+	private AsyncRequest mAsyncRequest;
 	private Runnable mCancelLoadingOnTimeOut;
 	private Handler mHandler;
 
@@ -282,8 +208,8 @@ public class InterstitialLoader {
 		cancelInterstitialLoading();
 
 		String[] interstitialUrlExtraKeys = new String[] { URL_PARAM_INTERSTITIAL_KEY,
-				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, URL_PARAM_SKIN_KEY, UrlBuilder.URL_PARAM_OFFSET_KEY,
-				URL_PARAM_BACKGROUND_KEY };
+				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, URL_PARAM_SKIN_KEY,
+				UrlBuilder.URL_PARAM_OFFSET_KEY, URL_PARAM_BACKGROUND_KEY };
 		String[] interstitialUrlExtraValues = new String[] { UrlBuilder.URL_PARAM_VALUE_ON,
 				UrlBuilder.URL_PARAM_VALUE_ON, mSkinName,
 				String.valueOf(sInterstitialAvailableResponseCount), mBackgroundUrl };
@@ -294,8 +220,8 @@ public class InterstitialLoader {
 		String interstitialUrl = UrlBuilder.buildUrl(interstitialBaseUrl, mUserId, mHostInfo,
 				interstitialUrlExtraKeys, interstitialUrlExtraValues);
 
-		mInterstitialLoadingAsyncTask = new InterstitialLoadingAsyncTask();
-		mInterstitialLoadingAsyncTask.execute(interstitialUrl);
+		mAsyncRequest = new AsyncRequest(interstitialUrl, this);
+		mAsyncRequest.execute();
 
 		if (mCancelLoadingOnTimeOut != null) {
 			mHandler.removeCallbacks(mCancelLoadingOnTimeOut);
@@ -327,13 +253,36 @@ public class InterstitialLoader {
 	 * shown.
 	 */
 	private void cancelInterstitialLoading() {
-		if (mInterstitialLoadingAsyncTask != null && !mInterstitialLoadingAsyncTask.isCancelled()) {
-			mInterstitialLoadingAsyncTask.cancel(false);
+		if (mAsyncRequest != null && !mAsyncRequest.isCancelled()) {
+			mAsyncRequest.cancel(false);
 		}
 		if (mProgressDialog != null && mProgressDialog.isShowing()) {
 			mProgressDialog.dismiss();
 		}
-		mInterstitialLoadingAsyncTask = null;
+		mAsyncRequest = null;
+	}
+
+	/**
+	 * Launches the {@link InterstitialActivity} with the initial contents of the interstitial ad,
+	 * the initial base URL for images, scripts and other dependencies, and the desired behavior for
+	 * staying open after user redirection.
+	 * 
+	 * @param result
+	 */
+	private void launchInterstitialActivity(AsyncRequest request) {
+		Intent interstitialIntent = new Intent(mCallingActivity, InterstitialActivity.class);
+		interstitialIntent.putExtra(InterstitialActivity.EXTRA_INITIAL_CONTENT_KEY, request
+				.getResponseBody());
+		interstitialIntent.putExtra(InterstitialActivity.EXTRA_COOKIESTRINGS_KEY, request
+				.getCookieStrings());
+		interstitialIntent.putExtra(InterstitialActivity.EXTRA_SHOULD_STAY_OPEN_KEY,
+				mShouldStayOpen);
+
+		String interstitialDomain = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_DOMAIN
+				: INTERSTITIAL_PRODUCTION_DOMAIN;
+		interstitialIntent.putExtra(InterstitialActivity.EXTRA_BASE_DOMAIN_KEY, interstitialDomain);
+
+		mCallingActivity.startActivity(interstitialIntent);
 	}
 
 	/**
@@ -346,20 +295,23 @@ public class InterstitialLoader {
 	 *            a {@link InterstitialLoadingResults} containing the status code and the contents
 	 *            of the response.
 	 */
-	protected void onInterstitialLoadResultsAvailable(InterstitialLoadingResults result) {
-		Log.d(this.getClass().toString(), "Result code: " + result.statusCode);
+	@Override
+	public void onAsyncRequestComplete(AsyncRequest request) {
+		Log.v(LOG_TAG, "Interstitial request completed with status code: "
+				+ request.getHttpStatusCode() + ", did trigger exception: "
+				+ request.didRequestTriggerException());
 
 		if (mProgressDialog != null && mProgressDialog.isShowing()) {
 			mProgressDialog.dismiss();
 		}
 
-		if (isInterstitialAvailableAccordingToStatusCode(result.statusCode)) {
+		if (request.hasSucessfulStatusCode()) {
 			sInterstitialAvailableResponseCount++;
 			if (mLoadingStatusListener != null) {
 				mLoadingStatusListener.onWillShowInterstitial();
 			}
-			launchInterstitialActivity(result);
-		} else if (result.statusCode == InterstitialLoadingResults.REQUEST_ERROR) {
+			launchInterstitialActivity(request);
+		} else if (request.didRequestTriggerException()) {
 			if (mLoadingStatusListener != null) {
 				mLoadingStatusListener.onInterstitialRequestError();
 			}
@@ -368,40 +320,5 @@ public class InterstitialLoader {
 				mLoadingStatusListener.onNoInterstitialAvailable();
 			}
 		}
-	}
-
-	/**
-	 * Launches the {@link InterstitialActivity} with the initial contents of the interstitial ad,
-	 * the initial base URL for images, scripts and other dependencies, and the desired behavior for
-	 * staying open after user redirection.
-	 * 
-	 * @param result
-	 */
-	private void launchInterstitialActivity(InterstitialLoadingResults result) {
-		Intent interstitialIntent = new Intent(mCallingActivity, InterstitialActivity.class);
-		interstitialIntent.putExtra(InterstitialActivity.EXTRA_INITIAL_CONTENT_KEY,
-				result.returnedBody);
-		interstitialIntent.putExtra(InterstitialActivity.EXTRA_COOKIESTRINGS_KEY,
-				result.cookieStrings);
-		interstitialIntent.putExtra(InterstitialActivity.EXTRA_SHOULD_STAY_OPEN_KEY,
-				mShouldStayOpen);
-
-		String interstitialDomain = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_DOMAIN
-				: INTERSTITIAL_PRODUCTION_DOMAIN;
-		interstitialIntent.putExtra(InterstitialActivity.EXTRA_BASE_DOMAIN_KEY, interstitialDomain);
-
-		mCallingActivity.startActivity(interstitialIntent);
-	}
-
-	/**
-	 * Takes an HTTP status code and returns whether it means that an interstitial ad is available.
-	 * 
-	 * @param statusCode
-	 *            The HTTP status code as int.
-	 * @return True for interstitial available, false otherwise.
-	 */
-	public static boolean isInterstitialAvailableAccordingToStatusCode(int statusCode) {
-		// "OK" and "Redirect" codes mean we've got an interstitial
-		return statusCode >= 200 && statusCode < 400;
 	}
 }

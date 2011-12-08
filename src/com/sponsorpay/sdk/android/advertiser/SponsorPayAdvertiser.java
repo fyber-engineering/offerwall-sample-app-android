@@ -37,7 +37,7 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 * The key to store in the preferences file the flag which determines if we have already successfully contacted the
 	 * Advertiser API.
 	 */
-	private static final String STATE_GOT_SUCCESSFUL_RESPONSE_KEY = "SponsorPayAdvertiserState";
+	private static final String STATE_GOT_SUCCESSFUL_RESPONSE_KEY = "SponsorPayAdvertiserState"; // TODO
 
 	/**
 	 * The shared preferences encoded in the {@link #PREFERENCES_FILE_NAME} file.

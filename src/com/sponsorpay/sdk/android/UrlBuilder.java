@@ -75,6 +75,11 @@ public class UrlBuilder {
 	 */
 	private static final String URL_PARAM_SIGNATURE = "signature";
 
+	public static final String URL_PARAM_ALLOW_CAMPAIGN_KEY = "allow_campaign";
+	public static final String URL_PARAM_VALUE_ON = "on";
+	public static final String URL_PARAM_OFFSET_KEY = "offset";
+	public static final String URL_PARAM_CURRENCY_NAME_KEY = "currency";
+
 	/**
 	 * Builds a String URL with information gathered from the device and the specified parameters.
 	 * 
@@ -159,7 +164,11 @@ public class UrlBuilder {
 		if (extraKeys != null && extraValues != null) {
 			int minLength = Math.min(extraKeys.length, extraValues.length);
 			for (int i = 0; i < minLength; i++) {
-				keyValueParams.put(extraKeys[i], extraValues[i]);
+				String key = extraKeys[i];
+				String value = extraValues[i];
+				
+				if (key != null && !key.equals("") && value != null && !value.equals(""))
+					keyValueParams.put(key, value);
 			}
 		}
 

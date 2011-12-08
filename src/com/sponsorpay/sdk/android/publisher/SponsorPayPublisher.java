@@ -40,6 +40,8 @@ public class SponsorPayPublisher {
 	 */
 	private static EnumMap<UIStringIdentifier, String> sUIStrings;
 
+	private static OfferBanner.AdShape sDefaultOfferBannerAdShape = OfferBanner.SP_AD_SHAPE_320X50;
+
 	/**
 	 * Fills {@link #sUIStrings} with the default messages.
 	 */
@@ -49,8 +51,7 @@ public class SponsorPayPublisher {
 		sUIStrings.put(UIStringIdentifier.DISMISS_ERROR_DIALOG, "Dismiss");
 		sUIStrings.put(UIStringIdentifier.GENERIC_ERROR, "An error happened when performing this operation");
 		sUIStrings.put(UIStringIdentifier.ERROR_LOADING_OFFERWALL, "An error happened when loading the offer wall");
-		sUIStrings.put(UIStringIdentifier.ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION,
-				"An error happened when loading the offer wall (no internet connection)");
+		sUIStrings.put(UIStringIdentifier.ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, "An error happened when loading the offer wall (no internet connection)");
 		sUIStrings.put(UIStringIdentifier.LOADING_INTERSTITIAL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.LOADING_OFFERWALL, "Loading...");
 	}
@@ -147,8 +148,7 @@ public class SponsorPayPublisher {
 	 *            The publisher application context.
 	 * @param userId
 	 *            The current user ID of the host application.
-	 * @return An Android {@link Intent} which can be used with the {@link Activity} method startActivityForResult() to
-	 *         launch the {@link OfferWallActivity}.
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method startActivityForResult() to launch the {@link OfferWallActivity}.
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId) {
 		Intent intent = new Intent(context, OfferWallActivity.class);
@@ -158,8 +158,8 @@ public class SponsorPayPublisher {
 
 	/**
 	 * <p>
-	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the caller specify the
-	 * behavior of the Offer Wall once the user gets redirected out of the application by clicking on an offer.
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the caller specify the behavior of the Offer Wall once the user gets redirected out of the application
+	 * by clicking on an offer.
 	 * </p>
 	 * <p>
 	 * Will retrieve the publisher application id from the application manifest.
@@ -170,10 +170,8 @@ public class SponsorPayPublisher {
 	 * @param userId
 	 *            The current user ID of the host application.
 	 * @param shouldStayOpen
-	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets redirected out of
-	 *            the app. False to close the Offer Wall.
-	 * @return An Android {@link Intent} which can be used with the {@link Activity} method startActivityForResult() to
-	 *         launch the {@link OfferWallActivity}.
+	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets redirected out of the app. False to close the Offer Wall.
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method startActivityForResult() to launch the {@link OfferWallActivity}.
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId, boolean shouldStayOpen) {
 		Intent intent = new Intent(context, OfferWallActivity.class);
@@ -184,8 +182,8 @@ public class SponsorPayPublisher {
 
 	/**
 	 * <p>
-	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the caller specify the
-	 * behavior of the Offer Wall once the user gets redirected out of the application by clicking on an offer.
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the caller specify the behavior of the Offer Wall once the user gets redirected out of the application
+	 * by clicking on an offer.
 	 * </p>
 	 * 
 	 * <p>
@@ -197,15 +195,12 @@ public class SponsorPayPublisher {
 	 * @param userId
 	 *            The current user ID of the host application.
 	 * @param shouldStayOpen
-	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets redirected out of
-	 *            the app. False to close the Offer Wall.
+	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets redirected out of the app. False to close the Offer Wall.
 	 * @param overrideAppId
 	 *            An app ID which will override the one included in the manifest.
-	 * @return An Android {@link Intent} which can be used with the {@link Activity} method startActivityForResult() to
-	 *         launch the {@link OfferWallActivity}.
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method startActivityForResult() to launch the {@link OfferWallActivity}.
 	 */
-	public static Intent getIntentForOfferWallActivity(Context context, String userId, boolean shouldStayOpen,
-			String overrideAppId) {
+	public static Intent getIntentForOfferWallActivity(Context context, String userId, boolean shouldStayOpen, String overrideAppId) {
 		Intent intent = getIntentForOfferWallActivity(context, userId);
 		intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
 		intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
@@ -216,34 +211,27 @@ public class SponsorPayPublisher {
 	 * Starts the mobile interstitial request / loading / showing process.
 	 * 
 	 * @param callingActivity
-	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an
-	 *            ad is returned, the calling activity will be used to launch the {@link InterstitialActivity} in order
-	 *            to show the ad.
+	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an ad is returned, the calling activity will be used to launch the
+	 *            {@link InterstitialActivity} in order to show the ad.
 	 * @param userId
 	 *            The current user ID of the host application.
 	 * @param loadingStatusListener
-	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial
-	 *            lifecycle.
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial lifecycle.
 	 * @param shouldStayOpen
-	 *            Used to specify the behavior of the interstitial once the user clicks on the presented ad and is
-	 *            redirected outside the host publisher app. The default behavior is to close the interstitial and let
-	 *            the user go back to the activity that called the interstitial when they come back to the app. If you
-	 *            want the interstitial not to close until the user does it explicitly, set this parameter to true.
+	 *            Used to specify the behavior of the interstitial once the user clicks on the presented ad and is redirected outside the host publisher app. The default behavior is to close the
+	 *            interstitial and let the user go back to the activity that called the interstitial when they come back to the app. If you want the interstitial not to close until the user does it
+	 *            explicitly, set this parameter to true.
 	 * @param backgroundUrl
-	 *            Can be set to the absolute URL of an image to use as background graphic for the interstitial. Must
-	 *            include the protocol scheme (http:// or https://) at the beginning of the URL. Leave it null for no
-	 *            custom background.
+	 *            Can be set to the absolute URL of an image to use as background graphic for the interstitial. Must include the protocol scheme (http:// or https://) at the beginning of the URL.
+	 *            Leave it null for no custom background.
 	 * @param skinName
-	 *            Used to specify the name of a custom skin or template for the requested interstitial. Leaving it null
-	 *            will make the interstitial fall back to the DEFAULT template.
+	 *            Used to specify the name of a custom skin or template for the requested interstitial. Leaving it null will make the interstitial fall back to the DEFAULT template.
 	 * @param loadingTimeoutSecs
-	 *            Sets the maximum amount of time the interstitial should take to load. If you set it to 0 or a negative
-	 *            number, it will fall back to the default value of 5 seconds.
+	 *            Sets the maximum amount of time the interstitial should take to load. If you set it to 0 or a negative number, it will fall back to the default value of 5 seconds.
 	 * @param overriddenAppId
 	 *            An app ID which will override the one included in the manifest.
 	 */
-	public static void loadShowInterstitial(Activity callingActivity, String userId,
-			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String backgroundUrl,
+	public static void loadShowInterstitial(Activity callingActivity, String userId, InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String backgroundUrl,
 			String skinName, int loadingTimeoutSecs, String overriddenAppId) {
 
 		HostInfo hostInfo = new HostInfo(callingActivity);
@@ -267,123 +255,98 @@ public class SponsorPayPublisher {
 	}
 
 	/**
-	 * Starts the mobile interstitial request / loading / showing process retrieving the application id from the Android
+	 * Starts the mobile interstitial request / loading / showing process retrieving the application id from the Android Manifest.
+	 * 
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an ad is returned, the calling activity will be used to launch the
+	 *            {@link InterstitialActivity} in order to show the ad.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial lifecycle.
+	 * @param shouldStayOpen
+	 *            Used to specify the behavior of the interstitial once the user clicks on the presented ad and is redirected outside the host publisher app. The default behavior is to close the
+	 *            interstitial and let the user go back to the activity that called the interstitial when they come back to the app. If you want the interstitial not to close until the user does it
+	 *            explicitly, set this parameter to true.
+	 * @param backgroundUrl
+	 *            Can be set to the absolute URL of an image to use as background graphic for the interstitial. Must include the protocol scheme (http:// or https://) at the beginning of the URL.
+	 *            Leave it null for no custom background.
+	 * @param skinName
+	 *            Used to specify the name of a custom skin or template for the requested interstitial. Leaving it null will make the interstitial fall back to the DEFAULT template.
+	 * @param loadingTimeoutSecs
+	 *            Sets the maximum amount of time the interstitial should take to load. If you set it to 0 or a negative number, it will fall back to the default value of 5 seconds.
+	 */
+	public static void loadShowInterstitial(Activity callingActivity, String userId, InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String backgroundUrl,
+			String skinName, int loadingTimeoutSecs) {
+
+		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, backgroundUrl, skinName, loadingTimeoutSecs, null);
+	}
+
+	/**
+	 * Starts the mobile interstitial request / loading / showing process using a default value for loadingTimeoutSecs and retrieving the application id from the Android Manifest.
+	 * 
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an ad is returned, the calling activity will be used to launch the
+	 *            {@link InterstitialActivity} in order to show the ad.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial lifecycle.
+	 * @param shouldStayOpen
+	 *            Used to specify the behavior of the interstitial once the user clicks on the presented ad and is redirected outside the host publisher app. The default behavior is to close the
+	 *            interstitial and let the user go back to the activity that called the interstitial when they come back to the app. If you want the interstitial not to close until the user does it
+	 *            explicitly, set this parameter to true.
+	 * @param backgroundUrl
+	 *            Can be set to the absolute URL of an image to use as background graphic for the interstitial. Must include the protocol scheme (http:// or https://) at the beginning of the URL.
+	 *            Leave it null for no custom background.
+	 * @param skinName
+	 *            Used to specify the name of a custom skin or template for the requested interstitial. Leaving it null will make the interstitial fall back to the DEFAULT template.
+	 */
+	public static void loadShowInterstitial(Activity callingActivity, String userId, InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String backgroundUrl,
+			String skinName) {
+		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, backgroundUrl, skinName, 0, null);
+	}
+
+	/**
+	 * Starts the mobile interstitial request / loading / showing process using default values for backgroundUrl, skinName, loadingTimeoutSecs and retrieving the application id from the Android
 	 * Manifest.
 	 * 
 	 * @param callingActivity
-	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an
-	 *            ad is returned, the calling activity will be used to launch the {@link InterstitialActivity} in order
-	 *            to show the ad.
+	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an ad is returned, the calling activity will be used to launch the
+	 *            {@link InterstitialActivity} in order to show the ad.
 	 * @param userId
 	 *            The current user ID of the host application.
 	 * @param loadingStatusListener
-	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial
-	 *            lifecycle.
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial lifecycle.
 	 * @param shouldStayOpen
-	 *            Used to specify the behavior of the interstitial once the user clicks on the presented ad and is
-	 *            redirected outside the host publisher app. The default behavior is to close the interstitial and let
-	 *            the user go back to the activity that called the interstitial when they come back to the app. If you
-	 *            want the interstitial not to close until the user does it explicitly, set this parameter to true.
-	 * @param backgroundUrl
-	 *            Can be set to the absolute URL of an image to use as background graphic for the interstitial. Must
-	 *            include the protocol scheme (http:// or https://) at the beginning of the URL. Leave it null for no
-	 *            custom background.
-	 * @param skinName
-	 *            Used to specify the name of a custom skin or template for the requested interstitial. Leaving it null
-	 *            will make the interstitial fall back to the DEFAULT template.
-	 * @param loadingTimeoutSecs
-	 *            Sets the maximum amount of time the interstitial should take to load. If you set it to 0 or a negative
-	 *            number, it will fall back to the default value of 5 seconds.
+	 *            Used to specify the behavior of the interstitial once the user clicks on the presented ad and is redirected outside the host publisher app. The default behavior is to close the
+	 *            interstitial and let the user go back to the activity that called the interstitial when they come back to the app. If you want the interstitial not to close until the user does it
+	 *            explicitly, set this parameter to true.
 	 */
-	public static void loadShowInterstitial(Activity callingActivity, String userId,
-			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String backgroundUrl,
-			String skinName, int loadingTimeoutSecs) {
-
-		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, backgroundUrl, skinName,
-				loadingTimeoutSecs, null);
-	}
-
-	/**
-	 * Starts the mobile interstitial request / loading / showing process using a default value for loadingTimeoutSecs
-	 * and retrieving the application id from the Android Manifest.
-	 * 
-	 * @param callingActivity
-	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an
-	 *            ad is returned, the calling activity will be used to launch the {@link InterstitialActivity} in order
-	 *            to show the ad.
-	 * @param userId
-	 *            The current user ID of the host application.
-	 * @param loadingStatusListener
-	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial
-	 *            lifecycle.
-	 * @param shouldStayOpen
-	 *            Used to specify the behavior of the interstitial once the user clicks on the presented ad and is
-	 *            redirected outside the host publisher app. The default behavior is to close the interstitial and let
-	 *            the user go back to the activity that called the interstitial when they come back to the app. If you
-	 *            want the interstitial not to close until the user does it explicitly, set this parameter to true.
-	 * @param backgroundUrl
-	 *            Can be set to the absolute URL of an image to use as background graphic for the interstitial. Must
-	 *            include the protocol scheme (http:// or https://) at the beginning of the URL. Leave it null for no
-	 *            custom background.
-	 * @param skinName
-	 *            Used to specify the name of a custom skin or template for the requested interstitial. Leaving it null
-	 *            will make the interstitial fall back to the DEFAULT template.
-	 */
-	public static void loadShowInterstitial(Activity callingActivity, String userId,
-			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String backgroundUrl,
-			String skinName) {
-		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, backgroundUrl, skinName,
-				0, null);
-	}
-
-	/**
-	 * Starts the mobile interstitial request / loading / showing process using default values for backgroundUrl,
-	 * skinName, loadingTimeoutSecs and retrieving the application id from the Android Manifest.
-	 * 
-	 * @param callingActivity
-	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an
-	 *            ad is returned, the calling activity will be used to launch the {@link InterstitialActivity} in order
-	 *            to show the ad.
-	 * @param userId
-	 *            The current user ID of the host application.
-	 * @param loadingStatusListener
-	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial
-	 *            lifecycle.
-	 * @param shouldStayOpen
-	 *            Used to specify the behavior of the interstitial once the user clicks on the presented ad and is
-	 *            redirected outside the host publisher app. The default behavior is to close the interstitial and let
-	 *            the user go back to the activity that called the interstitial when they come back to the app. If you
-	 *            want the interstitial not to close until the user does it explicitly, set this parameter to true.
-	 */
-	public static void loadShowInterstitial(Activity callingActivity, String userId,
-			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
+	public static void loadShowInterstitial(Activity callingActivity, String userId, InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, null, null, 0, null);
 	}
 
 	/**
-	 * Starts the mobile interstitial request / loading / showing process using default values for shouldStayOpen,
-	 * backgroundUrl, skinName, loadingTimeoutSecs and retrieving the application id from the Android Manifest.
+	 * Starts the mobile interstitial request / loading / showing process using default values for shouldStayOpen, backgroundUrl, skinName, loadingTimeoutSecs and retrieving the application id from
+	 * the Android Manifest.
 	 * 
 	 * @param callingActivity
-	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an
-	 *            ad is returned, the calling activity will be used to launch the {@link InterstitialActivity} in order
-	 *            to show the ad.
+	 *            The activity which requests the interstitial. A progress dialog will be shown on top of it and if an ad is returned, the calling activity will be used to launch the
+	 *            {@link InterstitialActivity} in order to show the ad.
 	 * @param userId
 	 *            The current user ID of the host application.
 	 * @param loadingStatusListener
-	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial
-	 *            lifecycle.
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in the interstitial lifecycle.
 	 */
-	public static void loadShowInterstitial(Activity callingActivity, String userId,
-			InterstitialLoadingStatusListener loadingStatusListener) {
+	public static void loadShowInterstitial(Activity callingActivity, String userId, InterstitialLoadingStatusListener loadingStatusListener) {
 
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, null, null, null, 0, null);
 	}
 
 	/**
-	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of virtual currency for a
-	 * given user. Returns immediately, and the answer is delivered to one of the provided listener's callback methods.
-	 * See {@link SPCurrencyServerListener}.
+	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of virtual currency for a given user. Returns immediately, and the answer is delivered to one of the provided
+	 * listener's callback methods. See {@link SPCurrencyServerListener}.
 	 * 
 	 * @param context
 	 *            Android application context.
@@ -392,18 +355,14 @@ public class SponsorPayPublisher {
 	 * @param listener
 	 *            {@link SPCurrencyServerListener} which will be notified of the result of the request.
 	 * @param transactionId
-	 *            Optionally, provide the ID of the latest known transaction. The delta of coins will be calculated from
-	 *            this transaction (not included) up to the present. Leave it to null to let the SDK use the latest
-	 *            transaction ID it kept track of.
+	 *            Optionally, provide the ID of the latest known transaction. The delta of coins will be calculated from this transaction (not included) up to the present. Leave it to null to let the
+	 *            SDK use the latest transaction ID it kept track of.
 	 * @param securityToken
-	 *            Security Token associated with the provided Application ID. It's used to sign the requests and verify
-	 *            the server responses.
+	 *            Security Token associated with the provided Application ID. It's used to sign the requests and verify the server responses.
 	 * @param applicationId
-	 *            Application ID assigned by SponsorPay. Provide null to read the Application ID from the Application
-	 *            Manifest.
+	 *            Application ID assigned by SponsorPay. Provide null to read the Application ID from the Application Manifest.
 	 */
-	public static void requestNewCoins(Context context, String userId, SPCurrencyServerListener listener,
-			String transactionId, String securityToken, String applicationId) {
+	public static void requestNewCoins(Context context, String userId, SPCurrencyServerListener listener, String transactionId, String securityToken, String applicationId) {
 		HostInfo hostInfo = new HostInfo(context);
 
 		if (applicationId != null)
@@ -411,5 +370,19 @@ public class SponsorPayPublisher {
 
 		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, userId, listener, hostInfo, securityToken);
 		vcc.fetchDeltaOfCoins();
+	}
+
+	public static OfferBannerRequest requestOfferBanner(Context context, String userId, SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape, String currencyName, String applicationId) {
+		HostInfo hostInfo = new HostInfo(context);
+
+		if (applicationId != null)
+			hostInfo.setOverriddenAppId(applicationId);
+		
+		if (offerBannerAdShape == null) {
+			offerBannerAdShape = sDefaultOfferBannerAdShape;
+		}
+		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, userId, hostInfo, listener, offerBannerAdShape, currencyName);
+		// bannerRequest starts loading immediately
+		return bannerRequest;
 	}
 }

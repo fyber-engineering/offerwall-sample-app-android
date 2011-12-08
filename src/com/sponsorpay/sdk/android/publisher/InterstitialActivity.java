@@ -83,7 +83,7 @@ public class InterstitialActivity extends Activity {
 					setResult(resultCode);
 
 					/*
-					 * Checking scheme if URL has been provided! If yes, try calling an app that will respond to the
+					 * Checking scheme if URL has been provided. If yes, try calling an app that will respond to the
 					 * given Uri (most likely, the Market App).
 					 */
 					String marketUrl = parseURLForProvidedURL(url);

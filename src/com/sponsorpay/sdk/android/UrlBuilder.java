@@ -12,7 +12,6 @@ import java.util.Set;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 
 import android.net.Uri;
-import android.util.Log;
 
 /**
  * <p>
@@ -187,7 +186,6 @@ public class UrlBuilder {
 		}
 
 		uri = builder.build();
-		Log.d("SP", "url = " + uri.toString());
 
 		return uri.toString();
 	}

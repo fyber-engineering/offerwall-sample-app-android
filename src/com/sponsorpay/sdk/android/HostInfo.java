@@ -19,8 +19,8 @@ import android.telephony.TelephonyManager;
 import android.provider.Settings.Secure;
 
 /**
- * Extracts device information from the host device in which the SDK runs and SponsorPay App ID contained in the Android
- * Application Manifest of the host app.
+ * Extracts device information from the host device in which the SDK runs and SponsorPay App ID
+ * contained in the Android Application Manifest of the host app.
  */
 public class HostInfo {
 
@@ -125,8 +125,8 @@ public class HostInfo {
 	}
 
 	/**
-	 * Constructor. Requires an Android application context which will be used to retrieve information from the device
-	 * and the host application's Android Manifest.
+	 * Constructor. Requires an Android application context which will be used to retrieve
+	 * information from the device and the host application's Android Manifest.
 	 * 
 	 * @param context
 	 *            Android application context
@@ -135,7 +135,8 @@ public class HostInfo {
 		mContext = context;
 
 		// Get access to the Telephony Services
-		TelephonyManager tManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+		TelephonyManager tManager = (TelephonyManager) context
+				.getSystemService(Context.TELEPHONY_SERVICE);
 
 		// Get the device id (UDID)
 		mUDID = tManager.getDeviceId();
@@ -170,8 +171,8 @@ public class HostInfo {
 	}
 
 	/**
-	 * Extracts numeric or alphanumeric value from the meta-data configured in the application manifest XML file and
-	 * returns it as a String.
+	 * Extracts numeric or alphanumeric value from the meta-data configured in the application
+	 * manifest XML file and returns it as a String.
 	 * 
 	 * @param key
 	 *            key to identify the piece of meta-data to return.
@@ -208,13 +209,14 @@ public class HostInfo {
 	 * </p>
 	 * 
 	 * <p>
-	 * If the App Id has already been set (i.e. by calling the {@link #setOverriddenAppId(String)}), this method will
-	 * just return the id which has been set without trying to retrieve it from the manifest.
+	 * If the App Id has already been set (i.e. by calling the {@link #setOverriddenAppId(String)}),
+	 * this method will just return the id which has been set without trying to retrieve it from the
+	 * manifest.
 	 * </p>
 	 * 
 	 * <p>
-	 * If no App ID is present in the manifest and no non-empty App ID has been set by calling the mentioned method,
-	 * this method will throw a RuntimeException.
+	 * If no App ID is present in the manifest and no non-empty App ID has been set by calling the
+	 * mentioned method, this method will throw a RuntimeException.
 	 * </p>
 	 * 
 	 * @return The offer id previously set or defined in the manifest, or 0.
@@ -223,9 +225,10 @@ public class HostInfo {
 		if (mAppId == null || mAppId.equals("")) {
 			mAppId = getValueFromAppMetadata(SPONSORPAY_APP_ID_KEY);
 			if (mAppId == null || mAppId.equals("")) {
-				throw new RuntimeException("SponsorPay SDK: no valid App ID has been provided. "
-						+ "Please set a valid App ID in your application manifest or provide one at runtime. "
-						+ "See the integration guide or the SDK javadoc for more information.");
+				throw new RuntimeException(
+						"SponsorPay SDK: no valid App ID has been provided. "
+								+ "Please set a valid App ID in your application manifest or provide one at runtime. "
+								+ "See the integration guide or the SDK javadoc for more information.");
 			}
 		}
 		return mAppId;

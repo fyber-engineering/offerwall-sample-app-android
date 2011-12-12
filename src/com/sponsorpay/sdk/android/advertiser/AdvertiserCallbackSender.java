@@ -24,8 +24,8 @@ import android.util.Log;
 public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean> {
 
 	/**
-	 * HTTP status code that the response should have in order to determine that the API has been contacted
-	 * successfully.
+	 * HTTP status code that the response should have in order to determine that the API has been
+	 * contacted successfully.
 	 */
 	private static final int SUCCESFUL_HTTP_STATUS_CODE = 200;
 
@@ -36,8 +36,8 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	private static final String API_STAGING_RESOURCE_URL = "http://staging.service.sponsorpay.com/installs";
 
 	/**
-	 * The key for encoding the parameter corresponding to whether a previous invocation of the advertiser callback had
-	 * received a successful response.
+	 * The key for encoding the parameter corresponding to whether a previous invocation of the
+	 * advertiser callback had received a successful response.
 	 */
 	private static final String SUCCESSFUL_ANSWER_RECEIVED_KEY = "answer_received";
 
@@ -57,13 +57,14 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	private HttpClient mHttpClient;
 
 	/**
-	 * True if the advertiser callback was sent and received a successful response in a previous invocation.
+	 * True if the advertiser callback was sent and received a successful response in a previous
+	 * invocation.
 	 */
 	private boolean mWasAlreadySuccessful = false;
 
 	/**
-	 * Interface to be implemented by parties interested in the response from the SponsorPay server for the advertiser
-	 * callback.
+	 * Interface to be implemented by parties interested in the response from the SponsorPay server
+	 * for the advertiser callback.
 	 */
 	public interface APIResultListener {
 
@@ -82,8 +83,8 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	private APIResultListener mListener;
 
 	/**
-	 * Used to extract required information for the host application and device. This data will be sent on the callback
-	 * request.
+	 * Used to extract required information for the host application and device. This data will be
+	 * sent on the callback request.
 	 */
 	private HostInfo mHostInfo;
 
@@ -104,19 +105,22 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	}
 
 	/**
-	 * Set whether a previous invocation of the advertiser callback had received a successful response.
+	 * Set whether a previous invocation of the advertiser callback had received a successful
+	 * response.
 	 */
 	public void setWasAlreadySuccessful(boolean value) {
 		mWasAlreadySuccessful = value;
 	}
 
 	/**
-	 * Triggers the callback request that contacts the Sponsorpay Advertiser API. If and when a succesful response is
-	 * received from the server, the {@link APIResultListener} registered through the constructor
-	 * {@link #AsyncAPICaller(AdvertiserHostInfo, APIResultListener)} will be notified.
+	 * Triggers the callback request that contacts the Sponsorpay Advertiser API. If and when a
+	 * succesful response is received from the server, the {@link APIResultListener} registered
+	 * through the constructor {@link #AsyncAPICaller(AdvertiserHostInfo, APIResultListener)} will
+	 * be notified.
 	 */
 	public void trigger() {
-		// if HostInfo must launch a RuntimeException due to an invalid App ID value, let it do that in the main thread:
+		// if HostInfo must launch a RuntimeException due to an invalid App ID value, let it do that
+		// in the main thread:
 		mHostInfo.getAppId();
 
 		execute(mHostInfo);
@@ -124,17 +128,19 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 
 	/**
 	 * <p>
-	 * Method overridden from {@link AsyncTask}. Executed on a background thread, runs the API contact request.
+	 * Method overridden from {@link AsyncTask}. Executed on a background thread, runs the API
+	 * contact request.
 	 * </p>
 	 * <p>
-	 * Encodes the host information in the request URL, runs the request, waits for the response, parses its status code
-	 * and lets the UI thread receive the result and notify the registered {@link APIResultListener}.
+	 * Encodes the host information in the request URL, runs the request, waits for the response,
+	 * parses its status code and lets the UI thread receive the result and notify the registered
+	 * {@link APIResultListener}.
 	 * <p/>
 	 * 
 	 * @param params
 	 *            Only one parameter of type {@link AdvertiserHostInfo} is expected.
-	 * @return True for a succesful request, false otherwise. This value will be communicated to the UI thread by the
-	 *         Android {@link AsyncTask} implementation.
+	 * @return True for a succesful request, false otherwise. This value will be communicated to the
+	 *         UI thread by the Android {@link AsyncTask} implementation.
 	 */
 	@Override
 	protected Boolean doInBackground(HostInfo... params) {
@@ -146,10 +152,12 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 		String baseUrl = SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
 				: API_PRODUCTION_RESOURCE_URL;
 
-		String callbackUrl = UrlBuilder.buildUrl(baseUrl, hostInfo, new String[] { SUCCESSFUL_ANSWER_RECEIVED_KEY },
+		String callbackUrl = UrlBuilder.buildUrl(baseUrl, hostInfo,
+				new String[] { SUCCESSFUL_ANSWER_RECEIVED_KEY },
 				new String[] { mWasAlreadySuccessful ? "1" : "0" });
 
-		Log.d(AdvertiserCallbackSender.class.getSimpleName(), "Advertiser callback will be sent to: " + callbackUrl);
+		Log.d(AdvertiserCallbackSender.class.getSimpleName(),
+				"Advertiser callback will be sent to: " + callbackUrl);
 
 		mHttpRequest = new HttpGet(callbackUrl);
 		mHttpClient = new DefaultHttpClient();
@@ -157,7 +165,8 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 		try {
 			mHttpResponse = mHttpClient.execute(mHttpRequest);
 
-			// We're not parsing the response, just making sure that a successful status code has been received.
+			// We're not parsing the response, just making sure that a successful status code has
+			// been received.
 			int responseStatusCode = mHttpResponse.getStatusLine().getStatusCode();
 
 			if (responseStatusCode == SUCCESFUL_HTTP_STATUS_CODE) {
@@ -165,23 +174,26 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 			} else {
 				returnValue = false;
 			}
-			
-			Log.d(AdvertiserCallbackSender.class.getSimpleName(), "Server returned status code: " + responseStatusCode);
+
+			Log.d(AdvertiserCallbackSender.class.getSimpleName(), "Server returned status code: "
+					+ responseStatusCode);
 		} catch (Exception e) {
 			returnValue = false;
-			Log.e(AdvertiserCallbackSender.class.getSimpleName(), "An exception occurred when trying to send advertiser callback: " + e);
+			Log.e(AdvertiserCallbackSender.class.getSimpleName(),
+					"An exception occurred when trying to send advertiser callback: " + e);
 		}
 		return returnValue;
 	}
 
 	/**
-	 * This method is called by the Android {@link AsyncTask} implementation in the UI thread (or the thread which
-	 * invoked {@link #trigger()}) when {@link #doInBackground(AdvertiserHostInfo...)} returns. It will invoke the
-	 * registered {@link APIResultListener}
+	 * This method is called by the Android {@link AsyncTask} implementation in the UI thread (or
+	 * the thread which invoked {@link #trigger()}) when
+	 * {@link #doInBackground(AdvertiserHostInfo...)} returns. It will invoke the registered
+	 * {@link APIResultListener}
 	 * 
 	 * @param requestWasSuccessful
-	 *            true if the response has a successful status code (equal to {@link #SUCCESFUL_HTTP_STATUS_CODE}).
-	 *            false otherwise.
+	 *            true if the response has a successful status code (equal to
+	 *            {@link #SUCCESFUL_HTTP_STATUS_CODE}). false otherwise.
 	 */
 	@Override
 	protected void onPostExecute(Boolean requestWasSuccessful) {

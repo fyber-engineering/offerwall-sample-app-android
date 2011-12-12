@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.publisher;
 
 import org.apache.http.Header;
@@ -15,9 +21,8 @@ import com.sponsorpay.sdk.android.HttpResponseParser;
 /**
  * <p>
  * Requests and loads a resource using the HTTP GET method in the background. Will call the
- * {@link AsyncRequest.ResultListener} registered in the constructor in the
- * same thread which triggered the request / loading process. Uses the Android {@link AsyncTask}
- * mechanism.
+ * {@link AsyncRequest.ResultListener} registered in the constructor in the same thread which
+ * triggered the request / loading process. Uses the Android {@link AsyncTask} mechanism.
  * </p>
  */
 public class AsyncRequest extends AsyncTask<Void, Void, Void> {
@@ -26,8 +31,15 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	}
 
 	public static String LOG_TAG = "AsyncRequest";
-	
+
+	/**
+	 * Key of the User-Agent header sent on background requests.
+	 */
 	private static String USER_AGENT_HEADER_NAME = "User-Agent";
+
+	/**
+	 * Value of the User-Agent header sent on background requests.
+	 */
 	private static String USER_AGENT_HEADER_VALUE = "Android";
 
 	/**
@@ -50,6 +62,10 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 */
 	private String[] mCookieStrings;
 
+	/**
+	 * Registered {@link ResultListener} to be notified of the request's results when they become
+	 * available.
+	 */
 	private ResultListener mResultListener;
 
 	/**
@@ -58,6 +74,14 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 */
 	private Exception mRequestException;
 
+	/**
+	 * 
+	 * @param requestUrl
+	 *            URL to send the backgorund request to.
+	 * @param listener
+	 *            {@link ResultListener} to be notified of the request's results when they become
+	 *            available.
+	 */
 	public AsyncRequest(String requestUrl, ResultListener listener) {
 		mRequestUrl = requestUrl;
 		mResultListener = listener;
@@ -113,26 +137,48 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		mResultListener.onAsyncRequestComplete(this);
 	}
 
+	/**
+	 * Gets the cookie strings returned by the server.
+	 */
 	public String[] getCookieStrings() {
 		return mCookieStrings;
 	}
 
+	/**
+	 * Gets the response body returned by the server.
+	 */
 	public String getResponseBody() {
 		return mResponseBody;
 	}
 
+	/**
+	 * Gets the returned HTTP status code.
+	 */
 	public int getHttpStatusCode() {
 		return mStatusCode;
 	}
 
+	/**
+	 * Returns whether a local exception was triggered when trying to send the request. An exception
+	 * typically means that there was a problem connecting to the network, but checking the type of
+	 * the exception returned by {@link #getRequestTriggeredException()} is recommended.
+	 */
 	public boolean didRequestTriggerException() {
 		return (mRequestException != null);
 	}
 
+	/**
+	 * Returns the local exception triggered when trying to send the request. An exception typically
+	 * means that there was a problem connecting to the network, but checking the type of the
+	 * returned exception can give a more accurate cause for the error.
+	 */
 	public Exception getRequestTriggeredException() {
 		return mRequestException;
 	}
 
+	/**
+	 * Returns whether a successful HTTP status code was returned.
+	 */
 	public boolean hasSucessfulStatusCode() {
 		// "OK" and "Redirect" are considered successful
 		return mStatusCode >= 200 && mStatusCode < 400;

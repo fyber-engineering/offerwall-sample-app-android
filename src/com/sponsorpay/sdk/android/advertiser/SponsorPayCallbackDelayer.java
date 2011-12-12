@@ -18,8 +18,8 @@ import android.os.SystemClock;
 import android.util.Log;
 
 /**
- * Enables triggering the advertiser's callback with a delay. Uses the Android alarm mechanism provided by
- * {@link AlarmManager}.
+ * Enables triggering the advertiser's callback with a delay. Uses the Android alarm mechanism
+ * provided by {@link AlarmManager}.
  * 
  */
 public class SponsorPayCallbackDelayer extends BroadcastReceiver {
@@ -28,23 +28,24 @@ public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 	public static final int MILLISECONDS_IN_MINUTE = 60000;
 
 	/**
-	 * Triggers the Advertiser callback after the specified delay has passed. Will use the provided Apps ID instead of
-	 * trying to retrieve the one defined in the host application's manifest. Registers an alarm with the OS
-	 * {@link AlarmManager}. {@link #onReceive(Context, Intent)} will be invoked when the specified period of time has
-	 * elapsed .
+	 * Triggers the Advertiser callback after the specified delay has passed. Will use the provided
+	 * Apps ID instead of trying to retrieve the one defined in the host application's manifest.
+	 * Registers an alarm with the OS {@link AlarmManager}. {@link #onReceive(Context, Intent)} will
+	 * be invoked when the specified period of time has elapsed .
 	 * 
 	 * @param context
 	 *            Host application context.
 	 * @param appId
-	 *            The App ID to use. Pass an empty string to let the SDK try to retrieve it from the application
-	 *            manifest.
+	 *            The App ID to use. Pass an empty string to let the SDK try to retrieve it from the
+	 *            application manifest.
 	 * @param delayMinutes
 	 *            The delay in minutes for triggering the Advertiser callback.
 	 */
 	public static void callWithDelay(Context context, String appId, long delayMinutes) {
 		Log.d(SponsorPayCallbackDelayer.class.toString(), "callWithDelay called");
 
-		// if HostInfo must launch a RuntimeException due to an invalid App ID value, let it do that right now:
+		// if HostInfo must launch a RuntimeException due to an invalid App ID value, let it do that
+		// right now:
 		if (appId == null || appId.equals("")) {
 			HostInfo hostInfo = new HostInfo(context);
 			hostInfo.getAppId();
@@ -62,13 +63,16 @@ public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 				PendingIntent.FLAG_ONE_SHOT);
 
 		// Calculate the delay and register the PendingIntent with the Alarm Manager
-		long timeForCheckInAlarm = SystemClock.elapsedRealtime() + delayMinutes * MILLISECONDS_IN_MINUTE;
+		long timeForCheckInAlarm = SystemClock.elapsedRealtime() + delayMinutes
+				* MILLISECONDS_IN_MINUTE;
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeForCheckInAlarm, triggerCallbackPendingIntent);
+		alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, timeForCheckInAlarm,
+				triggerCallbackPendingIntent);
 	}
 
 	/**
-	 * onReceived method overridden from {@link BroadcastReceiver}. Performs the actual triggering of the callback.
+	 * onReceived method overridden from {@link BroadcastReceiver}. Performs the actual triggering
+	 * of the callback.
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {

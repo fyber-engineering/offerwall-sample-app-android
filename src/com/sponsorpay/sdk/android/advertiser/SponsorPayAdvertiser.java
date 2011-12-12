@@ -15,9 +15,9 @@ import android.content.SharedPreferences.Editor;
 
 /**
  * <p>
- * Provides convenience calls to run the Advertiser callback request. Manages the state of the SDK determining whether a
- * successful response to the callback request has been already received since the application was installed in the host
- * device.
+ * Provides convenience calls to run the Advertiser callback request. Manages the state of the SDK
+ * determining whether a successful response to the callback request has been already received since
+ * the application was installed in the host device.
  * </p>
  * 
  * <p>
@@ -27,15 +27,15 @@ import android.content.SharedPreferences.Editor;
 public class SponsorPayAdvertiser implements APIResultListener {
 
 	/**
-	 * Shared preferences file name. We store a flag into the shared preferences which is checked on each consecutive
-	 * invocation of {@link #register()}, to keep track of whether we have already successfully contacted the Advertiser
-	 * API.
+	 * Shared preferences file name. We store a flag into the shared preferences which is checked on
+	 * each consecutive invocation of {@link #register()}, to keep track of whether we have already
+	 * successfully contacted the Advertiser API.
 	 */
 	private static final String PREFERENCES_FILE_NAME = "SponsorPayAdvertiserState";
 
 	/**
-	 * The key to store in the preferences file the flag which determines if we have already successfully contacted the
-	 * Advertiser API.
+	 * The key to store in the preferences file the flag which determines if we have already
+	 * successfully contacted the Advertiser API.
 	 */
 	private static final String STATE_GOT_SUCCESSFUL_RESPONSE_KEY = "SponsorPayAdvertiserState"; // TODO
 
@@ -86,8 +86,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	}
 
 	/**
-	 * Trigger the Advertiser callback. Will try to retrieve the Application ID from the value defined in the host
-	 * application's Android Manifest XML file.
+	 * Trigger the Advertiser callback. Will try to retrieve the Application ID from the value
+	 * defined in the host application's Android Manifest XML file.
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -99,14 +99,15 @@ public class SponsorPayAdvertiser implements APIResultListener {
 			mInstance = new SponsorPayAdvertiser(context);
 		}
 
-		// The actual work is performed by the register(String overrideAppId) instance method, which will be called
+		// The actual work is performed by the register(String overrideAppId) instance method, which
+		// will be called
 		// by its parameterless overload with the App ID retrieved from the application manifest.
 		mInstance.register();
 	}
 
 	/**
-	 * Trigger the Advertiser callback after the specified delay has passed. Will retrieve the App ID from the value
-	 * defined in the host application's Android Manifest XML file.
+	 * Trigger the Advertiser callback after the specified delay has passed. Will retrieve the App
+	 * ID from the value defined in the host application's Android Manifest XML file.
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -118,8 +119,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	}
 
 	/**
-	 * Trigger the Advertiser callback after the specified delay has passed. Will use the provided App ID instead of
-	 * trying to retrieve the one defined in the host application's manifest.
+	 * Trigger the Advertiser callback after the specified delay has passed. Will use the provided
+	 * App ID instead of trying to retrieve the one defined in the host application's manifest.
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -133,8 +134,9 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	}
 
 	/**
-	 * Trigger the Advertiser callback. If passed a non-null and non-empty Application ID, it will be used. Otherwise
-	 * the Application ID will be retrieved from the value defined in the host application's Android Manifest XML file.
+	 * Trigger the Advertiser callback. If passed a non-null and non-empty Application ID, it will
+	 * be used. Otherwise the Application ID will be retrieved from the value defined in the host
+	 * application's Android Manifest XML file.
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -151,12 +153,13 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	}
 
 	/**
-	 * This method does the actual registration at Sponsorpay's Ad API, performing the advertiser callback, and
-	 * including in it a parameter to signal if a successful response has been received yet.
+	 * This method does the actual registration at Sponsorpay's Ad API, performing the advertiser
+	 * callback, and including in it a parameter to signal if a successful response has been
+	 * received yet.
 	 * 
 	 * @param overrideAppId
-	 *            If left empty (""), will use the App ID value from the application manifest xml file. Otherwise, will
-	 *            use the specified App ID.
+	 *            If left empty (""), will use the App ID value from the application manifest xml
+	 *            file. Otherwise, will use the specified App ID.
 	 */
 	private void register(String overrideAppId) {
 		/* Collect data about the device */
@@ -170,7 +173,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 		/*
 		 * Check if we have called SponsorPay's API before and gotten a successful response.
 		 */
-		boolean gotSuccessfulResponseYet = mPrefs.getBoolean(STATE_GOT_SUCCESSFUL_RESPONSE_KEY, false);
+		boolean gotSuccessfulResponseYet = mPrefs.getBoolean(STATE_GOT_SUCCESSFUL_RESPONSE_KEY,
+				false);
 
 		/* Send asynchronous call to SponsorPay's API */
 		mAPICaller = new AdvertiserCallbackSender(mHostInfo, this);
@@ -193,8 +197,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 */
 	public void onAPIResponse(boolean wasSuccessful) {
 		/*
-		 * If we have been successful store the STATE_GOT_SUCCESSFUL_RESPONSE_KEY flag inside the preferences and flush
-		 * them to permanent storage.
+		 * If we have been successful store the STATE_GOT_SUCCESSFUL_RESPONSE_KEY flag inside the
+		 * preferences and flush them to permanent storage.
 		 */
 		if (wasSuccessful) {
 			Editor prefsEditor = mPrefs.edit();

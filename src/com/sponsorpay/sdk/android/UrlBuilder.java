@@ -85,19 +85,19 @@ public class UrlBuilder {
 	 * @param resourceUrl
 	 *            The base for the URL to be built and returned, including schema and host.
 	 * @param userId
-	 *            The user id parameter to encode in the result URL. It can be left to null and no user ID parameter key
-	 *            will be included in the request parameters.
+	 *            The user id parameter to encode in the result URL. It can be left to null and no
+	 *            user ID parameter key will be included in the request parameters.
 	 * @param hostInfo
-	 *            A {@link HostInfo} instance used to retrieve data about the application id and the host
-	 *            device.
+	 *            A {@link HostInfo} instance used to retrieve data about the application id and the
+	 *            host device.
 	 * @param extraKeys
 	 *            An array of keys for extra parameters to encode in the result URL.
 	 * @param extraValues
 	 *            An array of values corresponding to the provided extraKeys.
 	 * @return The built URL as a String with the provided parameters encoded.
 	 */
-	public static String buildUrl(String resourceUrl, String userId, HostInfo hostInfo, String[] extraKeys,
-			String[] extraValues) {
+	public static String buildUrl(String resourceUrl, String userId, HostInfo hostInfo,
+			String[] extraKeys, String[] extraValues) {
 
 		return buildUrl(resourceUrl, userId, hostInfo, extraKeys, extraValues, null);
 	}
@@ -108,8 +108,8 @@ public class UrlBuilder {
 	 * @param resourceUrl
 	 *            The base for the URL to be built and returned, including schema and host.
 	 * @param hostInfo
-	 *            A {@link HostInfo} instance used to retrieve data about the application id and the host
-	 *            device.
+	 *            A {@link HostInfo} instance used to retrieve data about the application id and the
+	 *            host device.
 	 * @param extraKeys
 	 *            An array of keys for extra parameters to encode in the result URL.
 	 * @param extraValues
@@ -121,29 +121,29 @@ public class UrlBuilder {
 
 		return buildUrl(resourceUrl, null, hostInfo, extraKeys, extraValues, null);
 	}
-	
+
 	/**
 	 * Builds a String URL with information gathered from the device and the specified parameters.
 	 * 
 	 * @param resourceUrl
 	 *            The base for the URL to be built and returned, including schema and host.
 	 * @param userId
-	 *            The user id parameter to encode in the result URL. It can be left to null and no user ID parameter key
-	 *            will be included in the request parameters.
+	 *            The user id parameter to encode in the result URL. It can be left to null and no
+	 *            user ID parameter key will be included in the request parameters.
 	 * @param hostInfo
-	 *            A {@link HostInfo} instance used to retrieve data about the application id and the host
-	 *            device.
+	 *            A {@link HostInfo} instance used to retrieve data about the application id and the
+	 *            host device.
 	 * @param extraKeys
 	 *            An array of keys for extra parameters to encode in the result URL.
 	 * @param extraValues
 	 *            An array of values corresponding to the provided extraKeys.
 	 * @param secretKey
-	 *            The publisher's secret token which will be used to sign the request. If left to null the request will
-	 *            be sent unsigned.
+	 *            The publisher's secret token which will be used to sign the request. If left to
+	 *            null the request will be sent unsigned.
 	 * @return The built URL as a String with the provided parameters encoded.
 	 */
-	public static String buildUrl(String resourceUrl, String userId, HostInfo hostInfo, String[] extraKeys,
-			String[] extraValues, String secretKey) {
+	public static String buildUrl(String resourceUrl, String userId, HostInfo hostInfo,
+			String[] extraKeys, String[] extraValues, String secretKey) {
 		HashMap<String, String> keyValueParams = new HashMap<String, String>();
 
 		if (userId != null) {
@@ -154,8 +154,8 @@ public class UrlBuilder {
 		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());
 		keyValueParams.put(PHONE_VERSION_KEY, hostInfo.getPhoneVersion());
 		keyValueParams.put(LANGUAGE_KEY, hostInfo.getLanguageSetting());
-		keyValueParams.put(SDK_INTERNAL_VERSION_KEY,
-				String.format("%d", SponsorPayPublisher.PUBLISHER_SDK_INTERNAL_VERSION));
+		keyValueParams.put(SDK_INTERNAL_VERSION_KEY, String.format("%d",
+				SponsorPayPublisher.PUBLISHER_SDK_INTERNAL_VERSION));
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(ANDROID_ID_KEY, hostInfo.getAndroidId());
 		keyValueParams.put(WIFI_MAC_ADDRESS_KEY, hostInfo.getWifiMacAddress());
@@ -165,7 +165,7 @@ public class UrlBuilder {
 			for (int i = 0; i < minLength; i++) {
 				String key = extraKeys[i];
 				String value = extraValues[i];
-				
+
 				if (key != null && !key.equals("") && value != null && !value.equals(""))
 					keyValueParams.put(key, value);
 			}
@@ -181,8 +181,8 @@ public class UrlBuilder {
 		}
 
 		if (secretKey != null) {
-			builder.appendQueryParameter(URL_PARAM_SIGNATURE,
-					SignatureTools.generateSignatureForParameters(keyValueParams, secretKey));
+			builder.appendQueryParameter(URL_PARAM_SIGNATURE, SignatureTools
+					.generateSignatureForParameters(keyValueParams, secretKey));
 		}
 
 		uri = builder.build();

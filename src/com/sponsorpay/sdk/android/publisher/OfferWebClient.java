@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.publisher;
 
 import android.app.Activity;
@@ -6,12 +12,18 @@ import android.net.Uri;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+/**
+ * {@link WebViewClient} implementing common functionality for {@link WebView} instances displaying
+ * SponsorPay offers.  
+ *
+ */
 public abstract class OfferWebClient extends WebViewClient {
 	public static final String LOG_TAG = "OfferWebClient";
 	
 	private static final String SPONSORPAY_EXIT_SCHEMA = "sponsorpay://exit";
 	private static final String EXIT_URL_TARGET_URL_PARAM_KEY = "url";
 	private static final String EXIT_URL_RESULT_CODE_PARAM_KEY = "status";
+	
 	/**
 	 * The result code that is returned when the parsed exit scheme does not contain a status code.
 	 */

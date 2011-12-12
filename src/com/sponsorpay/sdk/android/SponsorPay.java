@@ -6,13 +6,13 @@
 
 package com.sponsorpay.sdk.android;
 
+/**
+ * Contains version information of the SponsorPay SDK.
+ */
 public class SponsorPay {
-	/**
-	 * Version information.
-	 */
 	public static final int MAJOR_RELEASE_NUMBER = 1;
 	public static final int MINOR_RELEASE_NUMBER = 5;
 	public static final int BUGFIX_RELEASE_NUMBER = 1;
-	public static final String RELEASE_VERSION_STRING = String.format("%d.%d.%d", MAJOR_RELEASE_NUMBER, MINOR_RELEASE_NUMBER,
-			BUGFIX_RELEASE_NUMBER);
+	public static final String RELEASE_VERSION_STRING = String.format("%d.%d.%d",
+			MAJOR_RELEASE_NUMBER, MINOR_RELEASE_NUMBER, BUGFIX_RELEASE_NUMBER);
 }

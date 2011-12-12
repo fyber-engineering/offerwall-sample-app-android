@@ -17,6 +17,7 @@ import android.webkit.CookieSyncManager;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
+import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
 
@@ -35,7 +36,8 @@ public class SponsorPayPublisher {
 	 * Enumeration identifying the different messages which can be displayed in the user interface.
 	 */
 	public enum UIStringIdentifier {
-		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, ERROR_LOADING_OFFERWALL, ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, LOADING_INTERSTITIAL, LOADING_OFFERWALL
+		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, ERROR_LOADING_OFFERWALL,
+		ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, LOADING_INTERSTITIAL, LOADING_OFFERWALL
 	};
 
 	/**
@@ -43,6 +45,9 @@ public class SponsorPayPublisher {
 	 */
 	private static EnumMap<UIStringIdentifier, String> sUIStrings;
 
+	/**
+	 * Default {@link AdShape} used to request Offer Banners to the backend.
+	 */
 	private static OfferBanner.AdShape sDefaultOfferBannerAdShape = OfferBanner.SP_AD_SHAPE_320X50;
 
 	/**
@@ -444,6 +449,28 @@ public class SponsorPayPublisher {
 		vcc.fetchDeltaOfCoins();
 	}
 
+	/**
+	 * Requests an Offer Banner to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param context
+	 *            Android application context.
+	 * @param userId
+	 *            The ID of the user for whom the banner will be requested.
+	 * @param listener
+	 *            {@link SPOfferBannerListener} which will be notified of the results of the
+	 *            request.
+	 * @param offerBannerAdShape
+	 *            Provide null for this parameter to request a banner of the default dimensions (320
+	 *            x 50).
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param applicationId
+	 *            Your Application ID, or null to retrieve it from your application manifest.
+	 * @return An {@link OfferBannerRequest} instance which manages the request to the server on the
+	 *         background.
+	 */
 	public static OfferBannerRequest requestOfferBanner(Context context, String userId,
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
 			String currencyName, String applicationId) {
@@ -461,6 +488,17 @@ public class SponsorPayPublisher {
 		return bannerRequest;
 	}
 
+	/**
+	 * Sets the provided cookie strings into the application's cookie manager for the given base
+	 * URL.
+	 * 
+	 * @param cookies
+	 *            An array of cookie strings.
+	 * @param baseUrl
+	 *            The base URL to set the cookies for.
+	 * @param context
+	 *            Android application context.
+	 */
 	static void setCookiesIntoCookieManagerInstance(String[] cookies, String baseUrl,
 			Context context) {
 		if (cookies == null || cookies.length == 0) {
@@ -481,7 +519,7 @@ public class SponsorPayPublisher {
 
 		Log.v(AsyncRequest.LOG_TAG, "Setting the following cookies into CookieManager instance "
 				+ instance + " for base URL " + baseUrl + ": ");
-		
+
 		for (String cookieString : cookies) {
 			instance.setCookie(baseUrl, cookieString);
 			Log.v(AsyncRequest.LOG_TAG, cookieString);

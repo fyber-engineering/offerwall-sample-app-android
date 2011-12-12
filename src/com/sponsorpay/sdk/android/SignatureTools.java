@@ -17,7 +17,8 @@ import android.util.Log;
 
 /**
  * <p>
- * Contains convenience methods to generate digital signatures for texts and URL-encoded key-value maps.
+ * Contains convenience methods to generate digital signatures for texts and URL-encoded key-value
+ * maps.
  * </p>
  */
 public class SignatureTools {
@@ -26,8 +27,8 @@ public class SignatureTools {
 
 	/**
 	 * <p>
-	 * Returns the SHA1 hash of a key-value map serialized into a string in URL-encoded form, ordered alphabetically by
-	 * key in the following form:
+	 * Returns the SHA1 hash of a key-value map serialized into a string in URL-encoded form,
+	 * ordered alphabetically by key in the following form:
 	 * </p>
 	 * <p>
 	 * key_1=value_1&key_2&value_2&...&key_n=value_n&secret_token
@@ -39,7 +40,8 @@ public class SignatureTools {
 	 *            The secret_token to append at the end of the URL-encoded string before hashing it.
 	 * @return The SHA1 hash or {@link #NO_SHA1_RESULT} if no SHA1 algorithm is available.
 	 */
-	public static String generateSignatureForParameters(Map<String, String> parameters, String secretToken) {
+	public static String generateSignatureForParameters(Map<String, String> parameters,
+			String secretToken) {
 		TreeSet<String> orderedKeys = new TreeSet<String>();
 		orderedKeys.addAll(parameters.keySet());
 
@@ -58,13 +60,15 @@ public class SignatureTools {
 	}
 
 	/**
-	 * Appends the provided secret token to the provided clear text and returns the SHA1 hash of the result.
+	 * Appends the provided secret token to the provided clear text and returns the SHA1 hash of the
+	 * result.
 	 * 
 	 * @param text
 	 *            The clear text.
 	 * @param secretToken
 	 *            The secret token.
-	 * @return The SHA1 hash of text + secret token or {@link #NO_SHA1_RESULT} if no SHA1 algorithm is available.
+	 * @return The SHA1 hash of text + secret token or {@link #NO_SHA1_RESULT} if no SHA1 algorithm
+	 *         is available.
 	 */
 	public static String generateSignatureForString(String text, String secretToken) {
 		String textPlusKey = text + secretToken;

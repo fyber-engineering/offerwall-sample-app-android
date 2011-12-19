@@ -4,6 +4,9 @@ import java.util.EnumMap;
 
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
+import com.sponsorpay.sdk.android.publisher.OfferBanner;
+import com.sponsorpay.sdk.android.publisher.OfferBannerRequest;
+import com.sponsorpay.sdk.android.publisher.SPOfferBannerListener;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
@@ -23,12 +26,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 /**
  * Example activity in order to show the usage of Sponsorpay Android SDK.
  */
-public class SponsorpayAndroidTestAppActivity extends Activity {
+public class SponsorpayAndroidTestAppActivity extends Activity implements SPOfferBannerListener {
 
 	private static final String APP_ID_PREFS_KEY = "APP_ID";
 	private static final String USER_ID_PREFS_KEY = "USER_ID";
@@ -37,6 +42,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 	private static final String BACKGROUND_URL_PREFS_KEY = "BACKGROUND_URL";
 	private static final String SECURITY_TOKEN_PREFS_KEY = "SECURITY_TOKEN";
 	private static final String DELAY_PREFS_KEY = "DELAY";
+	private static final String CURRENCY_NAME_PREFS_KEY = "CURRENCY_NAME";
 	private static final String USE_STAGING_URLS_PREFS_KEY = "USE_STAGING_URLS";
 
 	private static final int DEFAULT_DELAY_MIN = 15;
@@ -54,6 +60,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 	private String mSkinName;
 	private String mSecurityToken;
 	private int mCallDelay;
+	private String mCurrencyName;
 
 	private EditText mAppIdField;
 	private EditText mUserIdField;
@@ -62,8 +69,11 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 	private EditText mBackgroundUrlField;
 	private EditText mSecurityTokenField;
 	private EditText mDelayField;
-
+	private EditText mCurrencyNameField;
+	
 	private CheckBox mUseStagingUrlsCheckBox;
+
+	private LinearLayout mBannerContainer;
 
 	private boolean mShouldSendAdvertiserCallbackOnResume;
 
@@ -86,8 +96,11 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 		mBackgroundUrlField = (EditText) findViewById(R.id.background_url_field);
 		mSecurityTokenField = (EditText) findViewById(R.id.security_token_field);
 		mDelayField = (EditText) findViewById(R.id.delay_field);
-
+		mCurrencyNameField = (EditText) findViewById(R.id.currency_name_field);
+		
 		mUseStagingUrlsCheckBox = (CheckBox) findViewById(R.id.use_staging_urls_checkbox);
+
+		mBannerContainer = (LinearLayout) findViewById(R.id.banner_container);
 
 		setCustomErrorMessages();
 
@@ -109,7 +122,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 		prefsEditor.putString(SKIN_NAME_PREFS_KEY, mSkinName);
 		prefsEditor.putString(SECURITY_TOKEN_PREFS_KEY, mSecurityToken);
 		prefsEditor.putInt(DELAY_PREFS_KEY, mCallDelay);
-
+		prefsEditor.putString(CURRENCY_NAME_PREFS_KEY, mCurrencyName);
+		
 		prefsEditor.putBoolean(USE_STAGING_URLS_PREFS_KEY, mUseStagingUrlsCheckBox.isChecked());
 
 		prefsEditor.commit();
@@ -131,7 +145,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 		mSkinName = prefs.getString(SKIN_NAME_PREFS_KEY, "");
 		mSecurityToken = prefs.getString(SECURITY_TOKEN_PREFS_KEY, DEFAULT_SECURITY_TOKEN_VALUE);
 		mCallDelay = prefs.getInt(DELAY_PREFS_KEY, DEFAULT_DELAY_MIN);
-
+		mCurrencyName = prefs.getString(CURRENCY_NAME_PREFS_KEY, "");
+		
 		setValuesInFields();
 
 		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
@@ -147,7 +162,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 	}
 
 	/**
-	 * Sets one custom UI message in the SDK to demonstrate the use of SponsorPayPublisher.setCustomUIStrings();
+	 * Sets one custom UI message in the SDK to demonstrate the use of
+	 * SponsorPayPublisher.setCustomUIStrings();
 	 */
 	private void setCustomErrorMessages() {
 		EnumMap<UIStringIdentifier, Integer> customUIStrings = new EnumMap<UIStringIdentifier, Integer>(
@@ -188,6 +204,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 
 		mCallDelay = parsedInt;
 
+		mCurrencyName = mCurrencyNameField.getText().toString();
+		
 		SponsorPayAdvertiser.setShouldUseStagingUrls(mUseStagingUrlsCheckBox.isChecked());
 		SponsorPayPublisher.setShouldUseStagingUrls(mUseStagingUrlsCheckBox.isChecked());
 	}
@@ -203,6 +221,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 		mBackgroundUrlField.setText(mBackgroundUrl);
 		mSecurityTokenField.setText(mSecurityToken);
 		mDelayField.setText(String.format("%d", mCallDelay));
+		mCurrencyNameField.setText(mCurrencyName);
 	}
 
 	/**
@@ -215,8 +234,9 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 
 		startActivityForResult(
 		/* Pass in a User ID */
-		SponsorPayPublisher.getIntentForOfferWallActivity(getApplicationContext(), mUserId, mShouldStayOpen,
-				mOverridenAppId), SponsorPayPublisher.DEFAULT_OFFERWALL_REQUEST_CODE);
+		SponsorPayPublisher.getIntentForOfferWallActivity(getApplicationContext(), mUserId,
+				mShouldStayOpen, mOverridenAppId),
+				SponsorPayPublisher.DEFAULT_OFFERWALL_REQUEST_CODE);
 	}
 
 	/**
@@ -249,7 +269,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 	public void onSendCallbackWithDelayButtonClick(View v) {
 		fetchValuesFromFields();
 		try {
-			SponsorPayAdvertiser.registerWithDelay(getApplicationContext(), mCallDelay, mOverridenAppId);
+			SponsorPayAdvertiser.registerWithDelay(getApplicationContext(), mCallDelay,
+					mOverridenAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 		}
@@ -264,38 +285,43 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 		fetchValuesFromFields();
 
 		try {
-			SponsorPayPublisher.loadShowInterstitial(this, mUserId, new InterstitialLoadingStatusListener() {
+			SponsorPayPublisher.loadShowInterstitial(this, mUserId,
+					new InterstitialLoadingStatusListener() {
 
-				@Override
-				public void onInterstitialLoadingTimeOut() {
-					Log.d(SponsorpayAndroidTestAppActivity.class.toString(), "onInterstitialLoadingTimeOut");
-				}
+						@Override
+						public void onInterstitialLoadingTimeOut() {
+							Log.d(SponsorpayAndroidTestAppActivity.class.toString(),
+									"onInterstitialLoadingTimeOut");
+						}
 
-				@Override
-				public void onInterstitialRequestError() {
-					Log.d(SponsorpayAndroidTestAppActivity.class.toString(), "onInterstitialRequestError");
-				}
+						@Override
+						public void onInterstitialRequestError() {
+							Log.d(SponsorpayAndroidTestAppActivity.class.toString(),
+									"onInterstitialRequestError");
+						}
 
-				@Override
-				public void onNoInterstitialAvailable() {
-					Log.d(SponsorpayAndroidTestAppActivity.class.toString(), "onNoInterstitialAvailable");
-				}
+						@Override
+						public void onNoInterstitialAvailable() {
+							Log.d(SponsorpayAndroidTestAppActivity.class.toString(),
+									"onNoInterstitialAvailable");
+						}
 
-				@Override
-				public void onWillShowInterstitial() {
-					Log.d(SponsorpayAndroidTestAppActivity.class.toString(), "onWillShowInterstitial");
-				}
+						@Override
+						public void onWillShowInterstitial() {
+							Log.d(SponsorpayAndroidTestAppActivity.class.toString(),
+									"onWillShowInterstitial");
+						}
 
-			}, mShouldStayOpen, mBackgroundUrl, mSkinName, 0, mOverridenAppId);
+					}, mShouldStayOpen, mBackgroundUrl, mSkinName, 0, mOverridenAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 		}
 	}
 
 	/**
-	 * Triggered when the user clicks on the Request New Coins button. Will send a request for delta of coins to the
-	 * currency server and register a callback object to show the result in a dialog box. Uses the values entered for
-	 * User ID, App ID and Security Token.
+	 * Triggered when the user clicks on the Request New Coins button. Will send a request for delta
+	 * of coins to the currency server and register a callback object to show the result in a dialog
+	 * box. Uses the values entered for User ID, App ID and Security Token.
 	 * 
 	 * @param v
 	 */
@@ -304,34 +330,53 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 
 		final String usedTransactionId = VirtualCurrencyConnector.fetchLatestTransactionId(
 				getApplicationContext(), mOverridenAppId, mUserId);
-		
+
 		SPCurrencyServerListener requestListener = new SPCurrencyServerListener() {
 
 			@Override
 			public void onSPCurrencyServerError(CurrencyServerAbstractResponse response) {
-				showCancellableAlertBox(
-						"Response or Request Error",
-						String.format("%s\n%s\n%s\n", response.getErrorType(), response.getErrorCode(),
-								response.getErrorMessage()));
+				showCancellableAlertBox("Response or Request Error", String.format("%s\n%s\n%s\n",
+						response.getErrorType(), response.getErrorCode(), response
+								.getErrorMessage()));
 			}
 
 			@Override
 			public void onSPCurrencyDeltaReceived(CurrencyServerDeltaOfCoinsResponse response) {
-				showCancellableAlertBox("Response From Currency Server", String.format("Delta of Coins: %s\n\n"
-						+ "Used Latest Transaction ID: %s\n\n" + "Returned Latest Transaction ID: %s\n\n",
-						response.getDeltaOfCoins(), usedTransactionId, response.getLatestTransactionId()));
+				showCancellableAlertBox("Response From Currency Server", String.format(
+						"Delta of Coins: %s\n\n" + "Used Latest Transaction ID: %s\n\n"
+								+ "Returned Latest Transaction ID: %s\n\n", response
+								.getDeltaOfCoins(), usedTransactionId, response
+								.getLatestTransactionId()));
 
 			}
 		};
 
 		try {
-			SponsorPayPublisher.requestNewCoins(getApplicationContext(), mUserId, requestListener, null,
-					mSecurityToken, mOverridenAppId);
+			SponsorPayPublisher.requestNewCoins(getApplicationContext(), mUserId, requestListener,
+					null, mSecurityToken, mOverridenAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 		}
 	}
 
+	public void onRequestBannerClick(View v) {
+		fetchValuesFromFields();
+
+		Log.i(getClass().getSimpleName(), "Requesting banner");
+		try {
+			SponsorPayPublisher.requestOfferBanner(getApplicationContext(), mUserId, this, null,
+					mCurrencyName, mOverridenAppId);
+			scrollToBottom();
+		} catch (RuntimeException ex) {
+			showCancellableAlertBox("Exception from SDK", ex.getMessage());
+		}
+	}
+
+	private void scrollToBottom() {
+		ScrollView rootScrollView = (ScrollView)findViewById(R.id.root_scroll_view);
+		rootScrollView.fullScroll(View.FOCUS_DOWN);
+	}
+	
 	/**
 	 * Shows an alert box with the provided title and message and a unique button to cancel it.
 	 * 
@@ -344,5 +389,42 @@ public class SponsorpayAndroidTestAppActivity extends Activity {
 		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 		dialogBuilder.setTitle(title).setMessage(text).setCancelable(true);
 		dialogBuilder.show();
+	}
+
+	@Override
+	public void onSPOfferBannerAvailable(OfferBanner banner) {
+		Log.i(OfferBanner.LOG_TAG, "onOfferBannerAvailable called");
+		mBannerContainer.removeAllViews();
+		mBannerContainer.addView(banner.getBannerView(this));
+	}
+
+	@Override
+	public void onSPOfferBannerNotAvailable(OfferBannerRequest bannerRequest) {
+		Log.i(OfferBanner.LOG_TAG, "onOfferBannerNotAvailable called");
+		mBannerContainer.removeAllViews();
+		TextView mMessageView = new TextView(getApplicationContext());
+		mMessageView.setText(String.format(getString(R.string.banner_not_available), bannerRequest
+				.getHttpStatusCode()));
+		mBannerContainer.addView(mMessageView);
+	}
+
+	@Override
+	public void onSPOfferBannerRequestError(OfferBannerRequest bannerRequest) {
+		Log.i(OfferBanner.LOG_TAG, "onOfferBannerRequestError called. HTTP status code="
+				+ bannerRequest.getHttpStatusCode());
+		mBannerContainer.removeAllViews();
+		TextView mMessageView = new TextView(getApplicationContext());
+
+		Exception requestException = bannerRequest.getRequestException();
+		String errorDescription = "";
+		if (requestException != null) {
+			if (requestException.getClass().isInstance(new java.net.UnknownHostException()))
+				errorDescription = getString(R.string.banner_request_error_unknown_host);
+			else
+				errorDescription = String.format("%s", requestException.toString());
+		}
+
+		mMessageView.setText(String.format(getString(R.string.banner_request_error), errorDescription));
+		mBannerContainer.addView(mMessageView);
 	}
 }

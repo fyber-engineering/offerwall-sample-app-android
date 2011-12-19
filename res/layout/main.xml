@@ -1,93 +1,181 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="wrap_content">
-	<LinearLayout android:orientation="vertical"
-		android:layout_width="fill_parent" android:layout_height="wrap_content">
+    android:id="@+id/root_scroll_view"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
 
-		<TextView android:id="@+id/sdk_version_string"
-			android:gravity="center_horizontal" android:textSize="16dp"
-			android:textStyle="bold" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:layout_marginTop="8dp"
-			android:layout_marginBottom="15dp" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
-		<EditText android:id="@+id/app_id_field"
-			android:layout_width="fill_parent" android:layout_height="wrap_content"
-			android:hint="SponsorPay app ID" android:singleLine="true"
-			android:imeOptions="actionNext" />
+        <TextView
+            android:id="@+id/sdk_version_string"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_horizontal"
+            android:textSize="16dp"
+            android:textStyle="bold" />
 
-		<LinearLayout android:orientation="vertical"
-			android:background="#442222" android:padding="10dp"
-			android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/app_id_field"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="SponsorPay app ID"
+            android:imeOptions="actionNext"
+            android:singleLine="true" />
 
-			<Button android:id="@+id/call_api_button" android:padding="20dp"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:text="Send advertiser callback now" android:onClick="onSendCallbackNowButtonClick" />
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#442222"
+            android:orientation="vertical"
+            android:padding="10dp" >
 
-			<LinearLayout android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:orientation="horizontal"
-				android:gravity="right">
+            <Button
+                android:id="@+id/call_api_button"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onSendCallbackNowButtonClick"
+                android:padding="20dp"
+                android:text="Send advertiser callback now" />
 
-				<TextView android:text="Send callback with delay (in minutes)"
-					android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:orientation="horizontal" >
 
-				<EditText android:id="@+id/delay_field"
-					android:layout_width="wrap_content" android:layout_height="45dp"
-					android:layout_marginLeft="8dp" android:gravity="right"
-					android:hint="min" android:text="15" android:inputType="number"
-					android:imeOptions="actionDone" />
-			</LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Send callback with delay (in minutes)" />
 
-			<Button android:id="@+id/call_api_with_delay_button"
-				android:padding="20dp" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="Send advertiser callback with delay"
-				android:onClick="onSendCallbackWithDelayButtonClick" />
-		</LinearLayout>
+                <EditText
+                    android:id="@+id/delay_field"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:layout_marginLeft="8dp"
+                    android:gravity="right"
+                    android:hint="min"
+                    android:imeOptions="actionDone"
+                    android:inputType="number"
+                    android:text="15" />
+            </LinearLayout>
 
-		<LinearLayout android:orientation="vertical"
-			android:background="#222244" android:padding="10dp"
-			android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/call_api_with_delay_button"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onSendCallbackWithDelayButtonClick"
+                android:padding="20dp"
+                android:text="Send advertiser callback with delay" />
+        </LinearLayout>
 
-			<EditText android:id="@+id/user_id_field"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:hint="User ID" android:singleLine="true" android:imeOptions="actionDone" />
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#222244"
+            android:orientation="vertical"
+            android:padding="10dp" >
 
-			<CheckBox android:id="@+id/keep_offerwall_open_checkbox"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:text="Keep the offer wall / interstitial open after user is redirected" />
+            <EditText
+                android:id="@+id/user_id_field"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="User ID"
+                android:imeOptions="actionDone"
+                android:singleLine="true" />
 
-			<CheckBox android:id="@+id/use_staging_urls_checkbox"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:text="Use staging URLs" />
+            <CheckBox
+                android:id="@+id/keep_offerwall_open_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Keep the offer wall / interstitial open after user is redirected" />
 
-			<Button android:text="@string/launch_offerwall"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:layout_marginBottom="25dp" android:onClick="onLaunchOfferwallClick" />
+            <CheckBox
+                android:id="@+id/use_staging_urls_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Use staging URLs" />
 
-			<EditText android:id="@+id/background_url_field"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:hint="Background URL" android:imeOptions="actionNext"
-				android:singleLine="true" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="25dp"
+                android:onClick="onLaunchOfferwallClick"
+                android:text="@string/launch_offerwall" />
 
-			<EditText android:id="@+id/skin_name_field"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:hint="Skin Name" android:imeOptions="actionDone"
-				android:singleLine="true" />
+            <EditText
+                android:id="@+id/background_url_field"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="Background URL"
+                android:imeOptions="actionNext"
+                android:singleLine="true" />
 
-			<Button android:text="@string/launch_interstitial"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:onClick="onLaunchInsterstitialClick" />
+            <EditText
+                android:id="@+id/skin_name_field"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="Skin Name"
+                android:imeOptions="actionDone"
+                android:singleLine="true" />
 
-			<TextView android:text="Security Token:"
-				android:layout_width="fill_parent" android:layout_height="wrap_content"
-				android:layout_marginTop="30dp" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onLaunchInsterstitialClick"
+                android:text="@string/launch_interstitial" />
 
-			<EditText android:id="@+id/security_token_field"
-				android:hint="Security Token" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="Security Token:" />
 
-			<Button android:text="@string/request_new_coins"
-				android:layout_width="wrap_content" android:layout_height="wrap_content"
-				android:onClick="onRequestNewCoinsClick" />
-		</LinearLayout>
-	</LinearLayout>
+            <EditText
+                android:id="@+id/security_token_field"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="Security Token" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRequestNewCoinsClick"
+                android:text="@string/request_new_coins" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="#224422"
+            android:orientation="vertical"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp" >
+
+             <EditText
+                android:id="@+id/currency_name_field"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="CurrencyName" />
+            
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRequestBannerClick"
+                android:text="@string/request_banner"/>
+
+            <LinearLayout
+                android:id="@+id/banner_container"
+                android:layout_width="fill_parent"
+                android:layout_height="75dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+    </LinearLayout>
+
 </ScrollView>

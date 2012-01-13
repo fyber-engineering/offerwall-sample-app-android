@@ -220,6 +220,8 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 		String interstitialUrl = UrlBuilder.buildUrl(interstitialBaseUrl, mUserId, mHostInfo,
 				interstitialUrlExtraKeys, interstitialUrlExtraValues);
 
+		Log.i("interstitial", "url: " + interstitialUrl);
+		
 		mAsyncRequest = new AsyncRequest(interstitialUrl, this);
 		mAsyncRequest.execute();
 
@@ -311,6 +313,7 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 				mLoadingStatusListener.onWillShowInterstitial();
 			}
 			launchInterstitialActivity(request);
+			// showInterstitialOverlay(request);
 		} else if (request.didRequestTriggerException()) {
 			if (mLoadingStatusListener != null) {
 				mLoadingStatusListener.onInterstitialRequestError();

@@ -141,6 +141,8 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 	 */
 	@Override
 	public void onAsyncRequestComplete(AsyncRequest request) {
+		Log.i(OfferBanner.LOG_TAG, "onAsyncRequestComplete, returned status code: "
+				+ request.getHttpStatusCode());
 		if (mAsyncRequest.hasSucessfulStatusCode()) {
 			OfferBanner banner = new OfferBanner(mContext, mBaseDomain, mAsyncRequest
 					.getResponseBody(), mAsyncRequest.getCookieStrings(), mOfferBannerAdShape);

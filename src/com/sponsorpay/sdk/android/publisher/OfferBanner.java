@@ -125,8 +125,8 @@ public class OfferBanner {
 		if (mOfferBannerView == null) {
 			WebView webView = new WebView(mContext);
 			webView.loadDataWithBaseURL(mBaseUrl, mHtmlContent, "text/html", "utf-8", null);
-			int width = convertDevicePixelsIntoPixelsMeasurement(mShape.getWidth());
-			int height = convertDevicePixelsIntoPixelsMeasurement(mShape.getHeight());
+			int width = SponsorPayPublisher.convertDevicePixelsIntoPixelsMeasurement(mShape.getWidth(), mContext);
+			int height = SponsorPayPublisher.convertDevicePixelsIntoPixelsMeasurement(mShape.getHeight(), mContext);
 			webView.setLayoutParams(new LayoutParams(width, height));
 
 			webView.setWebViewClient(new OfferWebClient() {
@@ -141,14 +141,5 @@ public class OfferBanner {
 			mOfferBannerView = webView;
 		}
 		return mOfferBannerView;
-	}
-
-	/**
-	 * Converts device pixels into screen pixels.
-	 */
-	private int convertDevicePixelsIntoPixelsMeasurement(float dps) {
-		final float scale = mContext.getResources().getDisplayMetrics().density;
-		int pixels = (int) (dps * scale + 0.5f);
-		return pixels;
 	}
 }

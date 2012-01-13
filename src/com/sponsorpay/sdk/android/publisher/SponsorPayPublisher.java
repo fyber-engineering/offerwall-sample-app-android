@@ -525,5 +525,12 @@ public class SponsorPayPublisher {
 			Log.v(AsyncRequest.LOG_TAG, cookieString);
 		}
 	}
-
+	/**
+	 * Converts device pixels into screen pixels.
+	 */
+	static int convertDevicePixelsIntoPixelsMeasurement(float dps, Context context) {
+		final float scale = context.getResources().getDisplayMetrics().density;
+		int pixels = (int) (dps * scale + 0.5f);
+		return pixels;
+	}
 }

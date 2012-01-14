@@ -12,6 +12,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager.BadTokenException;
 import android.webkit.WebView;
@@ -219,7 +220,7 @@ public class OfferWallActivity extends Activity {
 		try {
 			mErrorDialog.show();
 		} catch (BadTokenException e) {
-			Log.e(LOG_TAG, "Couldn't show error dialog. Not displayed error message is: "
+			Log.e(getClass().getSimpleName(), "Couldn't show error dialog. Not displayed error message is: "
 					+ errorMessage, e);
 		}
 	}

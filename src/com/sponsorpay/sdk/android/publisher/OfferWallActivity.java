@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
+import android.view.WindowManager.BadTokenException;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -255,7 +256,13 @@ public class OfferWallActivity extends Activity {
 			}
 		});
 		mErrorDialog = dialogBuilder.create();
-		mErrorDialog.show();
+		mErrorDialog.setOwnerActivity(this);
+		try {
+			mErrorDialog.show();
+		} catch (BadTokenException e) {
+			Log.e(LOG_TAG, "Couldn't show error dialog. Not displayed error message is: "
+					+ errorMessage, e);
+		}
 	}
 
 	/**

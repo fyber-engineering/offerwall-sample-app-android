@@ -166,9 +166,9 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 				Header[] responseSignatureHeaders = response.getHeaders(SIGNATURE_HEADER);
 				signature = responseSignatureHeaders.length > 0 ? responseSignatureHeaders[0].getValue() : "";
 
-			} catch (Exception e) {
+			} catch (Throwable t) {
 				Log.e(CurrencyServerRequestAsyncTask.class.getSimpleName(),
-						"Exception triggered when executing request: " + e);
+						"Error thrown when executing request: " + t);
 				didTriggerException = true;
 			}
 			return null;

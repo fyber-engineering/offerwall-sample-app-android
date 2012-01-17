@@ -6,6 +6,8 @@
 
 package com.sponsorpay.sdk.android.publisher;
 
+import java.util.Locale;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -26,9 +28,12 @@ import com.sponsorpay.sdk.android.HttpResponseParser;
  * </p>
  */
 public class AsyncRequest extends AsyncTask<Void, Void, Void> {
+
 	public interface ResultListener {
 		void onAsyncRequestComplete(AsyncRequest request);
 	}
+
+	public static boolean shouldLogVerbosely = false;
 
 	public static String LOG_TAG = "AsyncRequest";
 
@@ -36,6 +41,11 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 * Key of the User-Agent header sent on background requests.
 	 */
 	private static String USER_AGENT_HEADER_NAME = "User-Agent";
+
+	/**
+	 * Key of the Accept-Language header sent on background requests.
+	 */
+	private static String ACCEPT_LANGUAGE_HEADER_NAME = "Accept-Language";
 
 	/**
 	 * Value of the User-Agent header sent on background requests.
@@ -98,6 +108,13 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	protected Void doInBackground(Void... params) {
 		HttpUriRequest request = new HttpGet(mRequestUrl);
 		request.addHeader(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE);
+
+		String acceptLanguageHeaderValue = makeAcceptLanguageHeaderValue();
+		if (shouldLogVerbosely)
+			Log.i(getClass().getSimpleName(), "acceptLanguageHeaderValue: "
+					+ acceptLanguageHeaderValue);
+		request.addHeader(ACCEPT_LANGUAGE_HEADER_NAME, acceptLanguageHeaderValue);
+
 		HttpClient client = new DefaultHttpClient();
 
 		mRequestException = null;
@@ -111,11 +128,16 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 
 			// Populate result cookies with values of cookieHeaders
 			if (cookieHeaders.length > 0) {
-				Log.v(LOG_TAG, "Got the following cookies from server (url " + mRequestUrl + "):");
+				
+				if (shouldLogVerbosely)
+					Log.v(LOG_TAG, String.format("Got following cookies from server (url: %s):",
+							mRequestUrl));
+				
 				mCookieStrings = new String[cookieHeaders.length];
 				for (int i = 0; i < cookieHeaders.length; i++) {
 					mCookieStrings[i] = cookieHeaders[i].getValue();
-					Log.v(LOG_TAG, mCookieStrings[i]);
+					if (shouldLogVerbosely)
+						Log.v(LOG_TAG, mCookieStrings[i]);
 				}
 			}
 		} catch (Exception e) {
@@ -123,6 +145,24 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 			mRequestException = e;
 		}
 		return null;
+	}
+
+	/**
+	 * Returns a value for the HTTP Accept-Language header based on the current locale set up for
+	 * the device.
+	 */
+	private String makeAcceptLanguageHeaderValue() {
+		String preferredLanguage = Locale.getDefault().getLanguage();
+
+		String acceptLanguageLocaleValue = preferredLanguage;
+		final String englishLanguageCode = Locale.ENGLISH.getLanguage();
+
+		if (preferredLanguage == null || preferredLanguage.equals("")) {
+			acceptLanguageLocaleValue = englishLanguageCode;
+		} else if (!englishLanguageCode.equals(preferredLanguage)) {
+			acceptLanguageLocaleValue += String.format(", %s;q=0.8", englishLanguageCode);
+		}
+		return acceptLanguageLocaleValue;
 	}
 
 	/**

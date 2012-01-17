@@ -176,7 +176,9 @@ public class OfferWallActivity extends Activity {
 		String offerWallBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? OFFERWALL_STAGING_BASE_URL
 				: OFFERWALL_PRODUCTION_BASE_URL;
 		try {
-			mWebView.loadUrl(UrlBuilder.buildUrl(offerWallBaseUrl, mUserId, mHostInfo, null, null));
+			String offerwallUrl = UrlBuilder.buildUrl(offerWallBaseUrl, mUserId, mHostInfo, null, null);
+			Log.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
+			mWebView.loadUrl(offerwallUrl);
 		} catch (RuntimeException ex) {
 			showErrorDialog(ex.getMessage());
 		}

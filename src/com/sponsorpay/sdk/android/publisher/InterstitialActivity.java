@@ -70,7 +70,8 @@ public class InterstitialActivity extends Activity {
 		String[] cookieStrings = getIntent().getStringArrayExtra(EXTRA_COOKIESTRINGS_KEY);
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY, mShouldStayOpen);
 		mWebView = new WebView(InterstitialActivity.this);
-
+		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
+		
 		ViewGroup.LayoutParams interstitialSize = generateLayoutParamsForCurrentDisplay();
 		mWebView.setLayoutParams(interstitialSize);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);

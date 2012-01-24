@@ -120,6 +120,7 @@ public class OfferWallActivity extends Activity {
 		}
 
 		mWebView = new WebView(OfferWallActivity.this);
+		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 		setContentView(mWebView);
 
 		mWebView.getSettings().setJavaScriptEnabled(true);

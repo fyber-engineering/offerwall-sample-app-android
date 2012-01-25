@@ -6,6 +6,8 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
+import java.util.Map;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -21,7 +23,7 @@ import android.util.Log;
 /**
  * Runs in the background the Advertiser Callback HTTP request.
  */
-public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean> {
+public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 
 	/**
 	 * HTTP status code that the response should have in order to determine that the API has been
@@ -63,6 +65,11 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	private boolean mWasAlreadySuccessful = false;
 
 	/**
+	 * Map of custom parameters to be sent in the callback request.
+	 */
+	private Map<String, String> mCustomParams;
+
+	/**
 	 * Interface to be implemented by parties interested in the response from the SponsorPay server
 	 * for the advertiser callback.
 	 */
@@ -100,12 +107,20 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	 *            the callback listener
 	 */
 	public AdvertiserCallbackSender(HostInfo hostInfo, APIResultListener listener) {
+
 		mListener = listener;
 		mHostInfo = hostInfo;
 	}
 
 	/**
-	 * Set whether a previous invocation of the advertiser callback had received a successful
+	 * Sets the map of custom parameters to be sent in the callback request.
+	 */
+	public void setCustomParams(Map<String, String> customParams) {
+		mCustomParams = customParams;
+	}
+
+	/**
+	 * Sets whether a previous invocation of the advertiser callback had received a successful
 	 * response.
 	 */
 	public void setWasAlreadySuccessful(boolean value) {
@@ -119,11 +134,31 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	 * be notified.
 	 */
 	public void trigger() {
-		// if HostInfo must launch a RuntimeException due to an invalid App ID value, let it do that
-		// in the main thread:
-		mHostInfo.getAppId();
+		// The final URL with parameters is built right away, to make sure that possible runtime
+		// exceptions triggered from the SDK to the integrator's code --due to a missing App ID
+		// value or to an invalid collection of custom parameters-- are triggered on the calling
+		// thread.
+		execute(buildUrl());
+	}
 
-		execute(mHostInfo);
+	private String buildUrl() {
+		// Prepare HTTP request by URL-encoding the device information
+		String baseUrl = SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
+				: API_PRODUCTION_RESOURCE_URL;
+
+		Map<String, String> extraParams = UrlBuilder.mapKeysToValues(
+				new String[] { SUCCESSFUL_ANSWER_RECEIVED_KEY },
+				new String[] { mWasAlreadySuccessful ? "1" : "0" });
+
+		if (mCustomParams != null)
+			extraParams.putAll(mCustomParams);
+
+		String callbackUrl = UrlBuilder.buildUrl(baseUrl, mHostInfo, extraParams);
+
+		Log.d(AdvertiserCallbackSender.class.getSimpleName(),
+				"Advertiser callback will be sent to: " + callbackUrl);
+
+		return callbackUrl;
 	}
 
 	/**
@@ -138,26 +173,15 @@ public class AdvertiserCallbackSender extends AsyncTask<HostInfo, Void, Boolean>
 	 * <p/>
 	 * 
 	 * @param params
-	 *            Only one parameter of type {@link AdvertiserHostInfo} is expected.
-	 * @return True for a succesful request, false otherwise. This value will be communicated to the
+	 *            Only one parameter of type {@link String} containing the request URL is expected.
+	 * @return True for a successful request, false otherwise. This value will be communicated to the
 	 *         UI thread by the Android {@link AsyncTask} implementation.
 	 */
 	@Override
-	protected Boolean doInBackground(HostInfo... params) {
+	protected Boolean doInBackground(String... params) {
 		Boolean returnValue = null;
 
-		HostInfo hostInfo = params[0];
-
-		// Prepare HTTP request by URL-encoding the device information
-		String baseUrl = SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
-				: API_PRODUCTION_RESOURCE_URL;
-
-		String callbackUrl = UrlBuilder.buildUrl(baseUrl, hostInfo,
-				new String[] { SUCCESSFUL_ANSWER_RECEIVED_KEY },
-				new String[] { mWasAlreadySuccessful ? "1" : "0" });
-
-		Log.d(AdvertiserCallbackSender.class.getSimpleName(),
-				"Advertiser callback will be sent to: " + callbackUrl);
+		String callbackUrl = params[0];
 
 		mHttpRequest = new HttpGet(callbackUrl);
 		mHttpClient = new DefaultHttpClient();

@@ -7,6 +7,8 @@
 
 package com.sponsorpay.sdk.android.publisher;
 
+import java.util.Map;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -109,6 +111,7 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 	private String mUserId;
 	private HostInfo mHostInfo;
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
+	private Map<String, String> mCustomParams;
 
 	private String mBackgroundUrl = "";
 	private String mSkinName = SKIN_NAME_DEFAULT;
@@ -136,6 +139,8 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 	 * @param loadingStatusListener
 	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
 	 *            the interstitial lifecycle.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the result URL.
 	 */
 	public InterstitialLoader(Activity callingActivity, String userId, HostInfo hostInfo,
 			InterstitialLoadingStatusListener loadingStatusListener) {
@@ -144,10 +149,17 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 		mUserId = userId;
 		mHostInfo = hostInfo;
 		mLoadingStatusListener = loadingStatusListener;
-
+		
 		mHandler = new Handler();
 	}
 
+	/**
+	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
+	 */
+	public void setCustomParameters(Map<String, String> customParams) {
+		mCustomParams = customParams;
+	}
+	
 	/**
 	 * Can be set to the absolute URL of an image to use as background graphic for the interstitial.
 	 * Must include the protocol scheme (http:// or https://) at the beginning of the URL. Leave it
@@ -208,20 +220,33 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 		cancelInterstitialLoading();
 
 		String[] interstitialUrlExtraKeys = new String[] { URL_PARAM_INTERSTITIAL_KEY,
-				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, URL_PARAM_SKIN_KEY,
-				UrlBuilder.URL_PARAM_OFFSET_KEY, URL_PARAM_BACKGROUND_KEY };
+				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY,
+				UrlBuilder.URL_PARAM_OFFSET_KEY };
 		String[] interstitialUrlExtraValues = new String[] { UrlBuilder.URL_PARAM_VALUE_ON,
-				UrlBuilder.URL_PARAM_VALUE_ON, mSkinName,
-				String.valueOf(sInterstitialAvailableResponseCount), mBackgroundUrl };
+				UrlBuilder.URL_PARAM_VALUE_ON,
+				String.valueOf(sInterstitialAvailableResponseCount) };
 
+		Map<String, String> keysValues =
+				UrlBuilder.mapKeysToValues(interstitialUrlExtraKeys, interstitialUrlExtraValues);
+
+		if (mSkinName != null && !"".equals(mSkinName))
+			keysValues.put(URL_PARAM_SKIN_KEY, mSkinName);
+
+		if (mBackgroundUrl != null && !"".equals(mBackgroundUrl))
+			keysValues.put(URL_PARAM_BACKGROUND_KEY, mBackgroundUrl);
+		
+		if (mCustomParams != null) {
+			keysValues.putAll(mCustomParams);
+		}
+				
 		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
 				: INTERSTITIAL_PRODUCTION_BASE_URL;
 
 		String interstitialUrl = UrlBuilder.buildUrl(interstitialBaseUrl, mUserId, mHostInfo,
-				interstitialUrlExtraKeys, interstitialUrlExtraValues);
+				keysValues);
 
 		Log.i("interstitial", "url: " + interstitialUrl);
-		
+
 		mAsyncRequest = new AsyncRequest(interstitialUrl, this);
 		mAsyncRequest.execute();
 

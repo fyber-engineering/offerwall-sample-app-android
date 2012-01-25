@@ -7,6 +7,8 @@
 package com.sponsorpay.sdk.android.publisher;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +18,7 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
 import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
@@ -28,22 +31,21 @@ public class SponsorPayPublisher {
 	public static final String PREFERENCES_FILENAME = "SponsorPayPublisherState";
 
 	/**
-	 * Publisher SDK version number sent to the server on each request.
-	 */
-	public static final int PUBLISHER_SDK_INTERNAL_VERSION = 2;
-
-	/**
 	 * Enumeration identifying the different messages which can be displayed in the user interface.
 	 */
 	public enum UIStringIdentifier {
-		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, ERROR_LOADING_OFFERWALL,
-		ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, LOADING_INTERSTITIAL, LOADING_OFFERWALL
+		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, ERROR_LOADING_OFFERWALL, ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, LOADING_INTERSTITIAL, LOADING_OFFERWALL
 	};
 
 	/**
 	 * Messages which can be displayed in the user interface.
 	 */
 	private static EnumMap<UIStringIdentifier, String> sUIStrings;
+
+	/**
+	 * Map of custom key/values to add to the parameters on the requests to the REST API.
+	 */
+	private static Map<String, String> sCustomKeysValues;
 
 	/**
 	 * Default {@link AdShape} used to request Offer Banners to the backend.
@@ -133,6 +135,54 @@ public class SponsorPayPublisher {
 		}
 	}
 
+	/**
+	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
+	 */
+	public static void setCustomParameters(Map<String, String> params) {
+		sCustomKeysValues = params;
+	}
+
+	/**
+	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
+	 * 
+	 * @param keys
+	 * @param values
+	 */
+	public static void setCustomParameters(String[] keys, String[] values) {
+		sCustomKeysValues = UrlBuilder.mapKeysToValues(keys, values);
+	}
+
+	/**
+	 * Clears the map of custom key/values to add to the parameters on the requests to the REST API.
+	 */
+	public static void clearCustomParameters() {
+		sCustomKeysValues = null;
+	}
+
+	/**
+	 * Returns the map of custom key/values to add to the parameters on the requests to the REST
+	 * API.
+	 * 
+	 * @param
+	 * @return If passedParameters is not null, a copy of it is returned. Otherwise if the
+	 *         parameters set with {@link #setCustomParameters(Map)} or
+	 *         {@link #setCustomParameters(String[], String[])} are not null, a copy of that map is
+	 *         returned. Otherwise null is returned.
+	 */
+	private static HashMap<String, String> getCustomParameters(Map<String, String> passedParameters) {
+		HashMap<String, String> retval;
+
+		if (passedParameters != null)
+			retval = new HashMap<String, String>(passedParameters);
+		else if (sCustomKeysValues != null)
+			retval = new HashMap<String, String>(sCustomKeysValues);
+		else {
+			retval = null;
+		}
+
+		return retval;
+	}
+
 	private static boolean sShouldUseStagingUrls = false;
 
 	public static void setShouldUseStagingUrls(boolean value) {
@@ -164,9 +214,7 @@ public class SponsorPayPublisher {
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId) {
-		Intent intent = new Intent(context, OfferWallActivity.class);
-		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, userId);
-		return intent;
+		return getIntentForOfferWallActivity(context, userId, null, null, null);
 	}
 
 	/**
@@ -191,10 +239,8 @@ public class SponsorPayPublisher {
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
 			boolean shouldStayOpen) {
-		Intent intent = new Intent(context, OfferWallActivity.class);
-		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, userId);
-		intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
-		return intent;
+
+		return getIntentForOfferWallActivity(context, userId, shouldStayOpen, null, null);
 	}
 
 	/**
@@ -223,9 +269,51 @@ public class SponsorPayPublisher {
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
 			boolean shouldStayOpen, String overrideAppId) {
-		Intent intent = getIntentForOfferWallActivity(context, userId);
-		intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
-		intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
+
+		return getIntentForOfferWallActivity(context, userId, shouldStayOpen, overrideAppId, null);
+	}
+
+	/**
+	 * <p>
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the
+	 * caller specify the behavior of the Offer Wall once the user gets redirected out of the
+	 * application by clicking on an offer.
+	 * </p>
+	 * 
+	 * <p>
+	 * Will use the provided publisher application id instead of trying to retrieve it from the
+	 * application manifest.
+	 * </p>
+	 * 
+	 * @param context
+	 *            The publisher application context.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param shouldStayOpen
+	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets
+	 *            redirected out of the app. False to close the Offer Wall.
+	 * @param overrideAppId
+	 *            An app ID which will override the one included in the manifest.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * 
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
+	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 */
+	public static Intent getIntentForOfferWallActivity(Context context, String userId,
+			Boolean shouldStayOpen, String overrideAppId, HashMap<String, String> customParams) {
+
+		Intent intent = new Intent(context, OfferWallActivity.class);
+		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, userId);
+
+		if (shouldStayOpen != null)
+			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
+
+		if (overrideAppId != null)
+			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
+
+		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP, getCustomParameters(customParams));
+
 		return intent;
 	}
 
@@ -266,6 +354,50 @@ public class SponsorPayPublisher {
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName, int loadingTimeoutSecs, String overriddenAppId) {
 
+		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
+				backgroundUrl, skinName, loadingTimeoutSecs, overriddenAppId, null);
+	}
+
+	/**
+	 * Starts the mobile interstitial request / loading / showing process.
+	 * 
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on
+	 *            top of it and if an ad is returned, the calling activity will be used to launch
+	 *            the {@link InterstitialActivity} in order to show the ad.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
+	 *            the interstitial lifecycle.
+	 * @param shouldStayOpen
+	 *            Used to specify the behavior of the interstitial once the user clicks on the
+	 *            presented ad and is redirected outside the host publisher app. The default
+	 *            behavior is to close the interstitial and let the user go back to the activity
+	 *            that called the interstitial when they come back to the app. If you want the
+	 *            interstitial not to close until the user does it explicitly, set this parameter to
+	 *            true.
+	 * @param backgroundUrl
+	 *            Can be set to the absolute URL of an image to use as background graphic for the
+	 *            interstitial. Must include the protocol scheme (http:// or https://) at the
+	 *            beginning of the URL. Leave it null for no custom background.
+	 * @param skinName
+	 *            Used to specify the name of a custom skin or template for the requested
+	 *            interstitial. Leaving it null will make the interstitial fall back to the DEFAULT
+	 *            template.
+	 * @param loadingTimeoutSecs
+	 *            Sets the maximum amount of time the interstitial should take to load. If you set
+	 *            it to 0 or a negative number, it will fall back to the default value of 5 seconds.
+	 * @param overriddenAppId
+	 *            An app ID which will override the one included in the manifest.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void loadShowInterstitial(Activity callingActivity, String userId,
+			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
+			String backgroundUrl, String skinName, int loadingTimeoutSecs, String overriddenAppId,
+			Map<String, String> customParams) {
+
 		HostInfo hostInfo = new HostInfo(callingActivity);
 
 		if (overriddenAppId != null)
@@ -283,7 +415,13 @@ public class SponsorPayPublisher {
 		if (loadingTimeoutSecs > 0) {
 			il.setLoadingTimeoutSecs(loadingTimeoutSecs);
 		}
-
+		
+		Map<String, String> extraParams = getCustomParameters(customParams);
+		
+		if (extraParams != null) {
+			il.setCustomParameters(extraParams);
+		}
+		
 		il.startLoading();
 	}
 
@@ -324,7 +462,7 @@ public class SponsorPayPublisher {
 			String backgroundUrl, String skinName, int loadingTimeoutSecs) {
 
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
-				backgroundUrl, skinName, loadingTimeoutSecs, null);
+				backgroundUrl, skinName, loadingTimeoutSecs, null, null);
 	}
 
 	/**
@@ -359,8 +497,9 @@ public class SponsorPayPublisher {
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName) {
+		
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
-				backgroundUrl, skinName, 0, null);
+				backgroundUrl, skinName, 0, null, null);
 	}
 
 	/**
@@ -387,8 +526,9 @@ public class SponsorPayPublisher {
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
+		
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, null,
-				null, 0, null);
+				null, 0, null, null);
 	}
 
 	/**
@@ -410,7 +550,7 @@ public class SponsorPayPublisher {
 			InterstitialLoadingStatusListener loadingStatusListener) {
 
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, null, null, null, 0,
-				null);
+				null, null);
 	}
 
 	/**
@@ -439,6 +579,40 @@ public class SponsorPayPublisher {
 	public static void requestNewCoins(Context context, String userId,
 			SPCurrencyServerListener listener, String transactionId, String securityToken,
 			String applicationId) {
+
+		requestNewCoins(context, userId, listener, transactionId, securityToken, applicationId,
+				null);
+	}
+
+	/**
+	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
+	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
+	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}.
+	 * 
+	 * @param context
+	 *            Android application context.
+	 * @param userId
+	 *            The ID of the user for which the delta of coins will be requested.
+	 * @param listener
+	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
+	 *            request.
+	 * @param transactionId
+	 *            Optionally, provide the ID of the latest known transaction. The delta of coins
+	 *            will be calculated from this transaction (not included) up to the present. Leave
+	 *            it to null to let the SDK use the latest transaction ID it kept track of.
+	 * @param securityToken
+	 *            Security Token associated with the provided Application ID. It's used to sign the
+	 *            requests and verify the server responses.
+	 * @param applicationId
+	 *            Application ID assigned by SponsorPay. Provide null to read the Application ID
+	 *            from the Application Manifest.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void requestNewCoins(Context context, String userId,
+			SPCurrencyServerListener listener, String transactionId, String securityToken,
+			String applicationId, Map<String, String> customParams) {
+
 		HostInfo hostInfo = new HostInfo(context);
 
 		if (applicationId != null)
@@ -446,6 +620,9 @@ public class SponsorPayPublisher {
 
 		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, userId, listener,
 				hostInfo, securityToken);
+
+		vcc.setCustomParameters(getCustomParameters(customParams));
+		
 		vcc.fetchDeltaOfCoins();
 	}
 
@@ -474,6 +651,39 @@ public class SponsorPayPublisher {
 	public static OfferBannerRequest requestOfferBanner(Context context, String userId,
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
 			String currencyName, String applicationId) {
+
+		return requestOfferBanner(context, userId, listener, offerBannerAdShape, currencyName,
+				applicationId, null);
+	}
+
+	/**
+	 * Requests an Offer Banner to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param context
+	 *            Android application context.
+	 * @param userId
+	 *            The ID of the user for whom the banner will be requested.
+	 * @param listener
+	 *            {@link SPOfferBannerListener} which will be notified of the results of the
+	 *            request.
+	 * @param offerBannerAdShape
+	 *            Provide null for this parameter to request a banner of the default dimensions (320
+	 *            x 50).
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param applicationId
+	 *            Your Application ID, or null to retrieve it from your application manifest.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * 
+	 * @return An {@link OfferBannerRequest} instance which manages the request to the server on the
+	 *         background.
+	 */
+	public static OfferBannerRequest requestOfferBanner(Context context, String userId,
+			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
+			String currencyName, String applicationId, Map<String, String> customParams) {
 		HostInfo hostInfo = new HostInfo(context);
 
 		if (applicationId != null)
@@ -482,9 +692,12 @@ public class SponsorPayPublisher {
 		if (offerBannerAdShape == null) {
 			offerBannerAdShape = sDefaultOfferBannerAdShape;
 		}
+
 		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, userId, hostInfo,
-				listener, offerBannerAdShape, currencyName);
+				listener, offerBannerAdShape, currencyName, getCustomParameters(customParams));
+
 		// bannerRequest starts loading immediately
+
 		return bannerRequest;
 	}
 
@@ -525,6 +738,7 @@ public class SponsorPayPublisher {
 			Log.v(AsyncRequest.LOG_TAG, cookieString);
 		}
 	}
+
 	/**
 	 * Converts device pixels into screen pixels.
 	 */

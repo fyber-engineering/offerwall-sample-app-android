@@ -60,7 +60,7 @@ public class HostInfo {
 	private String mWifiMacAddress;
 
 	/**
-	 * The Sponsorpay App ID Key that is used in the AndroidManifest.xml file.
+	 * The SponsorPay's App ID Key that is used in the AndroidManifest.xml file.
 	 */
 	private static final String SPONSORPAY_APP_ID_KEY = "SPONSORPAY_APP_ID";
 
@@ -171,7 +171,7 @@ public class HostInfo {
 	}
 
 	/**
-	 * Extracts numeric or alphanumeric value from the meta-data configured in the application
+	 * Extracts a numeric or alphanumeric value from the meta-data configured in the application
 	 * manifest XML file and returns it as a String.
 	 * 
 	 * @param key

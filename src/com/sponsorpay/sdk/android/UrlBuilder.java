@@ -7,9 +7,8 @@
 package com.sponsorpay.sdk.android;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-
-import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 
 import android.net.Uri;
 
@@ -50,11 +49,6 @@ public class UrlBuilder {
 	private static final String LANGUAGE_KEY = "language";
 
 	/**
-	 * The SDK internal version key for encoding the corresponding URL parameter.
-	 */
-	private static final String SDK_INTERNAL_VERSION_KEY = "version";
-
-	/**
 	 * The SDK release version key for encoding the corresponding URL parameter.
 	 */
 	private static final String SDK_RELEASE_VERSION_KEY = "sdk_version";
@@ -90,16 +84,14 @@ public class UrlBuilder {
 	 * @param hostInfo
 	 *            A {@link HostInfo} instance used to retrieve data about the application id and the
 	 *            host device.
-	 * @param extraKeys
-	 *            An array of keys for extra parameters to encode in the result URL.
-	 * @param extraValues
-	 *            An array of values corresponding to the provided extraKeys.
+	 * @param extraKeysValues
+	 *            A map of extra key/value pairs to add to the result URL.
 	 * @return The built URL as a String with the provided parameters encoded.
 	 */
 	public static String buildUrl(String resourceUrl, String userId, HostInfo hostInfo,
-			String[] extraKeys, String[] extraValues) {
+			Map<String, String> extraKeysValues) {
 
-		return buildUrl(resourceUrl, userId, hostInfo, extraKeys, extraValues, null);
+		return buildUrl(resourceUrl, userId, hostInfo, extraKeysValues, null);
 	}
 
 	/**
@@ -110,16 +102,14 @@ public class UrlBuilder {
 	 * @param hostInfo
 	 *            A {@link HostInfo} instance used to retrieve data about the application id and the
 	 *            host device.
-	 * @param extraKeys
-	 *            An array of keys for extra parameters to encode in the result URL.
-	 * @param extraValues
-	 *            An array of values corresponding to the provided extraKeys.
+	 * @param extraKeysValues
+	 *            A map of extra key/value pairs to add to the result URL.
 	 * @return The built URL as a String with the provided parameters encoded.
 	 */
-	public static String buildUrl(String resourceUrl, HostInfo hostInfo, String[] extraKeys,
-			String[] extraValues) {
+	public static String buildUrl(String resourceUrl, HostInfo hostInfo,
+			Map<String, String> extraKeysValues) {
 
-		return buildUrl(resourceUrl, null, hostInfo, extraKeys, extraValues, null);
+		return buildUrl(resourceUrl, null, hostInfo, extraKeysValues, null);
 	}
 
 	/**
@@ -133,17 +123,16 @@ public class UrlBuilder {
 	 * @param hostInfo
 	 *            A {@link HostInfo} instance used to retrieve data about the application id and the
 	 *            host device.
-	 * @param extraKeys
-	 *            An array of keys for extra parameters to encode in the result URL.
-	 * @param extraValues
-	 *            An array of values corresponding to the provided extraKeys.
+	 * @param extraKeysValues
+	 *            A map of extra key/value pairs to add to the result URL.
 	 * @param secretKey
 	 *            The publisher's secret token which will be used to sign the request. If left to
 	 *            null the request will be sent unsigned.
 	 * @return The built URL as a String with the provided parameters encoded.
 	 */
 	public static String buildUrl(String resourceUrl, String userId, HostInfo hostInfo,
-			String[] extraKeys, String[] extraValues, String secretKey) {
+			Map<String, String> extraKeysValues, String secretKey) {
+		
 		HashMap<String, String> keyValueParams = new HashMap<String, String>();
 
 		if (userId != null) {
@@ -154,21 +143,13 @@ public class UrlBuilder {
 		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());
 		keyValueParams.put(PHONE_VERSION_KEY, hostInfo.getPhoneVersion());
 		keyValueParams.put(LANGUAGE_KEY, hostInfo.getLanguageSetting());
-		keyValueParams.put(SDK_INTERNAL_VERSION_KEY, String.format("%d",
-				SponsorPayPublisher.PUBLISHER_SDK_INTERNAL_VERSION));
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(ANDROID_ID_KEY, hostInfo.getAndroidId());
 		keyValueParams.put(WIFI_MAC_ADDRESS_KEY, hostInfo.getWifiMacAddress());
 
-		if (extraKeys != null && extraValues != null) {
-			int minLength = Math.min(extraKeys.length, extraValues.length);
-			for (int i = 0; i < minLength; i++) {
-				String key = extraKeys[i];
-				String value = extraValues[i];
-
-				if (key != null && !key.equals("") && value != null && !value.equals(""))
-					keyValueParams.put(key, value);
-			}
+		if (extraKeysValues != null) {
+			validateKeyValueParams(extraKeysValues);
+			keyValueParams.putAll(extraKeysValues);
 		}
 
 		Uri uri = Uri.parse(resourceUrl);
@@ -188,5 +169,58 @@ public class UrlBuilder {
 		uri = builder.build();
 
 		return uri.toString();
+	}
+
+	/**
+	 * Checks that the passed Map of key/value parameters doesn't contain empty or null keys or
+	 * values. If it does, triggers an {@link IllegalArgumentException}.
+	 * 
+	 * @param kvParams
+	 */
+	public static void validateKeyValueParams(Map<String, String> kvParams) {
+		if (kvParams != null) {
+			Set<String> extraKeySet = kvParams.keySet();
+			for (String k : extraKeySet) {
+				String v = kvParams.get(k);
+				if (k == null || "".equals(k) || v == null || "".equals(v)) {
+					throw new IllegalArgumentException(
+							"SponsorPay SDK: Custom Parameters cannot have an empty or null"
+									+ " Key or Value.");
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Constructs a Map of key / value parameters given an array of keys and an array of values.
+	 * If any of the arrays contains empty of null values, an {@link IllegalArgumentException}
+	 * will be triggered.
+	 *  
+	 * @param keys An array of keys
+	 * @param values an array of values in the same order than the provided array of keys
+	 * 
+	 * @return a Map of keys / values
+	 */
+	public static Map<String, String> mapKeysToValues(String[] keys, String[] values) {
+		if (keys.length != values.length) {
+			throw new IllegalArgumentException("SponsorPay SDK: When specifying Custom Parameters"
+					+ " using two arrays of Keys and Values, both must have the same length.");
+		}
+		HashMap<String, String> retval = new HashMap<String, String>(keys.length);
+
+		for (int i = 0; i < keys.length; i++) {
+			String k = keys[i];
+			String v = values[i];
+
+			if (k == null || "".equals(k) || v == null || "".equals(v)) {
+				throw new IllegalArgumentException("SponsorPay SDK: When specifying Custom"
+						+ " Parameters using two arrays of Keys and Values, none of their"
+						+ " elements can be empty or null.");
+			}
+
+			retval.put(k, v);
+		}
+
+		return retval;
 	}
 }

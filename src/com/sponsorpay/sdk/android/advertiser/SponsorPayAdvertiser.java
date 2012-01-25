@@ -6,7 +6,11 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.advertiser.AdvertiserCallbackSender.APIResultListener;
 
 import android.content.Context;
@@ -44,6 +48,11 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 */
 	private SharedPreferences mPrefs;
 
+	/**
+	 * Map of custom key/values to add to the parameters on the requests to the REST API.
+	 */
+	private static Map<String, String> sCustomParameters;
+
 	private static boolean sShouldUseStagingUrls = false;
 
 	public static void setShouldUseStagingUrls(boolean value) {
@@ -52,6 +61,32 @@ public class SponsorPayAdvertiser implements APIResultListener {
 
 	public static boolean shouldUseStagingUrls() {
 		return sShouldUseStagingUrls;
+	}
+
+	/**
+	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
+	 * 
+	 * @param params
+	 */
+	public static void setCustomParameters(Map<String, String> params) {
+		sCustomParameters = params;
+	}
+
+	/**
+	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
+	 * 
+	 * @param keys
+	 * @param values
+	 */
+	public static void setCustomParameters(String[] keys, String[] values) {
+		sCustomParameters = UrlBuilder.mapKeysToValues(keys, values);
+	}
+
+	/**
+	 * Clears the map of custom key/values to add to the parameters on the requests to the REST API.
+	 */
+	public static void clearCustomParameters() {
+		sCustomParameters = null;
 	}
 
 	/**
@@ -75,6 +110,30 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	private static SponsorPayAdvertiser mInstance;
 
 	/**
+	 * Returns the map of custom key/values to add to the parameters on the requests to the REST
+	 * API.
+	 * 
+	 * @param
+	 * @return If passedParameters is not null, a copy of it is returned. Otherwise if the
+	 *         parameters set with {@link #setCustomParameters(Map)} or
+	 *         {@link #setCustomParameters(String[], String[])} are not null, a copy of that map is
+	 *         returned. Otherwise null is returned.
+	 */
+	private static HashMap<String, String> getCustomParameters(Map<String, String> passedParameters) {
+		HashMap<String, String> retval;
+
+		if (passedParameters != null)
+			retval = new HashMap<String, String>(passedParameters);
+		else if (sCustomParameters != null)
+			retval = new HashMap<String, String>(sCustomParameters);
+		else {
+			retval = null;
+		}
+
+		return retval;
+	}
+
+	/**
 	 * Constructor. Stores the received application context and loads up the shared preferences.
 	 * 
 	 * @param context
@@ -86,27 +145,18 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	}
 
 	/**
-	 * Trigger the Advertiser callback. Will try to retrieve the Application ID from the value
+	 * Triggers the Advertiser callback. Will try to retrieve the Application ID from the value
 	 * defined in the host application's Android Manifest XML file.
 	 * 
 	 * @param context
 	 *            Host application context.
 	 */
 	public static void register(Context context) {
-
-		// Instantiate the singleton instance if yet uninitialized.
-		if (mInstance == null) {
-			mInstance = new SponsorPayAdvertiser(context);
-		}
-
-		// The actual work is performed by the register(String overrideAppId) instance method, which
-		// will be called
-		// by its parameterless overload with the App ID retrieved from the application manifest.
-		mInstance.register();
+		register(context, null, null);
 	}
 
 	/**
-	 * Trigger the Advertiser callback after the specified delay has passed. Will retrieve the App
+	 * Triggers the Advertiser callback after the specified delay has passed. Will retrieve the App
 	 * ID from the value defined in the host application's Android Manifest XML file.
 	 * 
 	 * @param context
@@ -115,11 +165,11 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            The delay in minutes for triggering the Advertiser callback.
 	 */
 	public static void registerWithDelay(Context context, int delayMin) {
-		SponsorPayCallbackDelayer.callWithDelay(context, "", delayMin);
+		registerWithDelay(context, delayMin, null, null);
 	}
 
 	/**
-	 * Trigger the Advertiser callback after the specified delay has passed. Will use the provided
+	 * Triggers the Advertiser callback after the specified delay has passed. Will use the provided
 	 * App ID instead of trying to retrieve the one defined in the host application's manifest.
 	 * 
 	 * @param context
@@ -130,11 +180,31 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            The App ID to use.
 	 */
 	public static void registerWithDelay(Context context, int delayMin, String overrideAppId) {
-		SponsorPayCallbackDelayer.callWithDelay(context, overrideAppId, delayMin);
+		registerWithDelay(context, delayMin, overrideAppId, null);
 	}
 
 	/**
-	 * Trigger the Advertiser callback. If passed a non-null and non-empty Application ID, it will
+	 * Triggers the Advertiser callback after the specified delay has passed. Will use the provided
+	 * App ID instead of trying to retrieve the one defined in the host application's manifest.
+	 * 
+	 * @param context
+	 *            Host application context.
+	 * @param delayMin
+	 *            The delay in minutes for triggering the Advertiser callback.
+	 * @param overrideAppId
+	 *            The App ID to use.
+	 * @param customParams
+	 *            Map of custom key/values to add to the parameters on the requests to the REST API.
+	 */
+	public static void registerWithDelay(Context context, int delayMin, String overrideAppId,
+			Map<String, String> customParams) {
+
+		SponsorPayCallbackDelayer.callWithDelay(context, overrideAppId, delayMin,
+				getCustomParameters(customParams));
+	}
+
+	/**
+	 * Triggers the Advertiser callback. If passed a non-null and non-empty Application ID, it will
 	 * be used. Otherwise the Application ID will be retrieved from the value defined in the host
 	 * application's Android Manifest XML file.
 	 * 
@@ -144,24 +214,44 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            The App ID to use.
 	 */
 	public static void register(Context context, String overrideAppId) {
+		register(context, overrideAppId, null);
+	}
+
+	/**
+	 * Triggers the Advertiser callback. If passed a non-null and non-empty Application ID, it will
+	 * be used. Otherwise the Application ID will be retrieved from the value defined in the host
+	 * application's Android Manifest XML file.
+	 * 
+	 * @param context
+	 *            Host application context.
+	 * @param overrideAppId
+	 *            The App ID to use.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void register(Context context, String overrideAppId,
+			Map<String, String> customParams) {
+
 		if (mInstance == null) {
 			mInstance = new SponsorPayAdvertiser(context);
 		}
 
-		// The actual work is performed by the register(String overrideAppId) instance method.
-		mInstance.register(overrideAppId);
+		// The actual work is performed by the register() instance method.
+		mInstance.register(overrideAppId, getCustomParameters(customParams));
 	}
 
 	/**
-	 * This method does the actual registration at Sponsorpay's Ad API, performing the advertiser
+	 * This method does the actual registration at the SponsorPay backend, performing the advertiser
 	 * callback, and including in it a parameter to signal if a successful response has been
 	 * received yet.
 	 * 
 	 * @param overrideAppId
 	 *            If left empty (""), will use the App ID value from the application manifest xml
 	 *            file. Otherwise, will use the specified App ID.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	private void register(String overrideAppId) {
+	private void register(String overrideAppId, Map<String, String> customParams) {
 		/* Collect data about the device */
 		mHostInfo = new HostInfo(mContext);
 
@@ -178,22 +268,18 @@ public class SponsorPayAdvertiser implements APIResultListener {
 
 		/* Send asynchronous call to SponsorPay's API */
 		mAPICaller = new AdvertiserCallbackSender(mHostInfo, this);
+
+		mAPICaller.setCustomParams(customParams);
+
 		mAPICaller.setWasAlreadySuccessful(gotSuccessfulResponseYet);
 		mAPICaller.trigger();
-	}
-
-	/**
-	 * Calls its overload {@link #register()} with an empty overrideAppId parameter.
-	 */
-	private void register() {
-		SponsorPayAdvertiser.this.register("");
 	}
 
 	/**
 	 * This method is invoked when a response for the advertiser callback is received.
 	 * 
 	 * @param wasSuccessful
-	 *            status flag if the Advertiser API has been contacted successfully
+	 *            Status flag to indicate if Advertiser API has been contacted successfully.
 	 */
 	public void onAPIResponse(boolean wasSuccessful) {
 		/*

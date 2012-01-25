@@ -6,6 +6,8 @@
 
 package com.sponsorpay.sdk.android.publisher;
 
+import java.util.Map;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -72,6 +74,11 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 	private String mCurrencyName;
 
 	/**
+	 * Map of custom key/values to add to the parameters on the OfferBanner request URL.
+	 */
+	private Map<String, String> mCustomParams;
+
+	/**
 	 * {@link AsyncRequest} used to send the request in the background.
 	 */
 	private AsyncRequest mAsyncRequest;
@@ -91,10 +98,12 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 	 *            {@link AdShape} of the requested banner.
 	 * @param currencyName
 	 *            Currency Name to be sent in the request.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
 	 */
 	public OfferBannerRequest(Context context, String userId, HostInfo hostInfo,
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
-			String currencyName) {
+			String currencyName, Map<String, String> customParams) {
 
 		mContext = context;
 		mListener = listener;
@@ -102,7 +111,8 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 		mOfferBannerAdShape = offerBannerAdShape;
 		mHostInfo = hostInfo;
 		mCurrencyName = currencyName;
-
+		mCustomParams = customParams;
+		
 		requestOfferBanner();
 	}
 
@@ -112,11 +122,20 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 	private void requestOfferBanner() {
 
 		String[] offerBannerUrlExtraKeys = new String[] { URL_PARAM_OFFERBANNER_KEY,
-				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, UrlBuilder.URL_PARAM_OFFSET_KEY,
-				UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY };
+				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, UrlBuilder.URL_PARAM_OFFSET_KEY };
 		String[] offerBannerUrlExtraValues = new String[] { UrlBuilder.URL_PARAM_VALUE_ON,
-				UrlBuilder.URL_PARAM_VALUE_ON, String.valueOf(fetchPersistedBannerOffset()),
-				mCurrencyName };
+				UrlBuilder.URL_PARAM_VALUE_ON, String.valueOf(fetchPersistedBannerOffset()) };
+
+		Map<String, String> extraKeysValues = UrlBuilder.mapKeysToValues(offerBannerUrlExtraKeys,
+				offerBannerUrlExtraValues);
+
+		if (mCurrencyName != null && !"".equals(mCurrencyName)) {
+			extraKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
+		}
+
+		if (mCustomParams != null) {
+			extraKeysValues.putAll(mCustomParams);
+		}
 
 		if (SponsorPayPublisher.shouldUseStagingUrls()) {
 			mBaseUrl = OFFERBANNER_STAGING_BASE_URL;
@@ -126,8 +145,7 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 			mBaseDomain = OFFERBANNER_PRODUCTION_DOMAIN;
 		}
 
-		String offerBannerUrl = UrlBuilder.buildUrl(mBaseUrl, mUserId, mHostInfo,
-				offerBannerUrlExtraKeys, offerBannerUrlExtraValues);
+		String offerBannerUrl = UrlBuilder.buildUrl(mBaseUrl, mUserId, mHostInfo, extraKeysValues);
 
 		Log.i(OfferBanner.LOG_TAG, "Offer Banner Request URL: " + offerBannerUrl);
 

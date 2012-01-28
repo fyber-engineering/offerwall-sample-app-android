@@ -1,6 +1,9 @@
 package com.sponsorpay.sdk.android.testapp;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
@@ -70,12 +73,16 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private EditText mSecurityTokenField;
 	private EditText mDelayField;
 	private EditText mCurrencyNameField;
-	
+
 	private CheckBox mUseStagingUrlsCheckBox;
 
 	private LinearLayout mBannerContainer;
 
 	private boolean mShouldSendAdvertiserCallbackOnResume;
+
+	private Map<String, String> mCustomKeyValuesForRequest;
+	private EditText mCustomKeyField, mCustomValueField;
+	private TextView mKeyValuesList;
 
 	/**
 	 * Called when the activity is first created. See {@link Activity}.
@@ -97,13 +104,17 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mSecurityTokenField = (EditText) findViewById(R.id.security_token_field);
 		mDelayField = (EditText) findViewById(R.id.delay_field);
 		mCurrencyNameField = (EditText) findViewById(R.id.currency_name_field);
-		
+
 		mUseStagingUrlsCheckBox = (CheckBox) findViewById(R.id.use_staging_urls_checkbox);
 
 		mBannerContainer = (LinearLayout) findViewById(R.id.banner_container);
 
 		setCustomErrorMessages();
 
+		mCustomKeyValuesForRequest = new HashMap<String, String>();
+		mCustomKeyField = (EditText) findViewById(R.id.custom_key_field);
+		mCustomValueField = (EditText) findViewById(R.id.custom_value_field);
+		mKeyValuesList = (TextView) findViewById(R.id.key_values_list);
 		mShouldSendAdvertiserCallbackOnResume = true;
 	}
 
@@ -123,7 +134,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		prefsEditor.putString(SECURITY_TOKEN_PREFS_KEY, mSecurityToken);
 		prefsEditor.putInt(DELAY_PREFS_KEY, mCallDelay);
 		prefsEditor.putString(CURRENCY_NAME_PREFS_KEY, mCurrencyName);
-		
+
 		prefsEditor.putBoolean(USE_STAGING_URLS_PREFS_KEY, mUseStagingUrlsCheckBox.isChecked());
 
 		prefsEditor.commit();
@@ -146,7 +157,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mSecurityToken = prefs.getString(SECURITY_TOKEN_PREFS_KEY, DEFAULT_SECURITY_TOKEN_VALUE);
 		mCallDelay = prefs.getInt(DELAY_PREFS_KEY, DEFAULT_DELAY_MIN);
 		mCurrencyName = prefs.getString(CURRENCY_NAME_PREFS_KEY, "");
-		
+
 		setValuesInFields();
 
 		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
@@ -205,7 +216,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mCallDelay = parsedInt;
 
 		mCurrencyName = mCurrencyNameField.getText().toString();
-		
+
 		SponsorPayAdvertiser.setShouldUseStagingUrls(mUseStagingUrlsCheckBox.isChecked());
 		SponsorPayPublisher.setShouldUseStagingUrls(mUseStagingUrlsCheckBox.isChecked());
 	}
@@ -249,6 +260,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 			SponsorPayAdvertiser.register(getApplicationContext(), mOverridenAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
+			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
+					ex);
 		}
 	}
 
@@ -273,6 +286,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 					mOverridenAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
+			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
+					ex);
 		}
 	}
 
@@ -315,6 +330,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 					}, mShouldStayOpen, mBackgroundUrl, mSkinName, 0, mOverridenAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
+			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
+					ex);
 		}
 	}
 
@@ -356,6 +373,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 					null, mSecurityToken, mOverridenAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
+			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
+					ex);
 		}
 	}
 
@@ -369,14 +388,63 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 			scrollToBottom();
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
+			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
+					ex);
 		}
 	}
 
+	/**
+	 * Invoked when the user clicks on the "Add" button on the custom key/values area.
+	 * 
+	 * @param v
+	 */
+	public void onAddCustomParameterClick(View v) {
+		mCustomKeyValuesForRequest.put(mCustomKeyField.getText().toString(), mCustomValueField
+				.getText().toString());
+
+		SponsorPayAdvertiser.setCustomParameters(mCustomKeyValuesForRequest);
+		SponsorPayPublisher.setCustomParameters(mCustomKeyValuesForRequest);
+
+		mCustomKeyField.setText("");
+		mCustomValueField.setText("");
+
+		updateCustomParametersList();
+	}
+
+	/**
+	 * Invoked when the user clicks on the "Clear" button on the custom key/values area.
+	 * 
+	 * @param v
+	 */
+	public void onClearCustomParametersClick(View v) {
+		mCustomKeyValuesForRequest.clear();
+
+		SponsorPayAdvertiser.setCustomParameters(mCustomKeyValuesForRequest);
+		SponsorPayPublisher.setCustomParameters(mCustomKeyValuesForRequest);
+
+		updateCustomParametersList();
+	}
+
+	private void updateCustomParametersList() {
+		String text = "";
+
+		Iterator<String> customKvIterator = mCustomKeyValuesForRequest.keySet().iterator();
+
+		while (customKvIterator.hasNext()) {
+			String key = customKvIterator.next();
+			String value = mCustomKeyValuesForRequest.get(key);
+
+			text += String.format("%s = %s\n", key, value);
+		}
+
+		mKeyValuesList.setText(text);
+	}
+
 	private void scrollToBottom() {
-		ScrollView rootScrollView = (ScrollView)findViewById(R.id.root_scroll_view);
+		ScrollView rootScrollView = (ScrollView) findViewById(R.id.root_scroll_view);
 		rootScrollView.fullScroll(View.FOCUS_DOWN);
 	}
-	
+
 	/**
 	 * Shows an alert box with the provided title and message and a unique button to cancel it.
 	 * 
@@ -424,7 +492,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 				errorDescription = String.format("%s", requestException.toString());
 		}
 
-		mMessageView.setText(String.format(getString(R.string.banner_request_error), errorDescription));
+		mMessageView.setText(String.format(getString(R.string.banner_request_error),
+				errorDescription));
 		mBannerContainer.addView(mMessageView);
 	}
 }

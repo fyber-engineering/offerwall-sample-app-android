@@ -27,6 +27,52 @@
             android:imeOptions="actionNext"
             android:singleLine="true" />
 
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/key_values_list"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true" />
+
+            <EditText
+                android:id="@+id/custom_key_field"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/key_values_list"
+                android:hint="Custom key" />
+
+            <Button
+                android:id="@+id/add_custom_key_value_button"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/key_values_list"
+                android:onClick="onAddCustomParameterClick"
+                android:text="Add" />
+
+            <Button
+                android:id="@+id/clear_custom_parameters_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/add_custom_key_value_button"
+                android:onClick="onClearCustomParametersClick"
+                android:text="Clear All" />
+            
+            <EditText
+                android:id="@+id/custom_value_field"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/key_values_list"
+                android:layout_toLeftOf="@id/add_custom_key_value_button"
+                android:layout_toRightOf="@id/custom_key_field"
+                android:hint="Custom value" />
+        </RelativeLayout>
+
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -157,17 +203,17 @@
             android:paddingBottom="10dp"
             android:paddingTop="10dp" >
 
-             <EditText
+            <EditText
                 android:id="@+id/currency_name_field"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:hint="CurrencyName" />
-            
+
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="onRequestBannerClick"
-                android:text="@string/request_banner"/>
+                android:text="@string/request_banner" />
 
             <LinearLayout
                 android:id="@+id/banner_container"

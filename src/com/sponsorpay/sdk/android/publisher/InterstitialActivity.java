@@ -38,10 +38,12 @@ import android.widget.LinearLayout;
  * </p>
  */
 public class InterstitialActivity extends Activity {
-	private static final int WEBVIEW_PADDING = 20;
+	private static final int INTERSTITIAL_BORDER_SMALLER_DEVICE = 3;
+	private static final int INTERSTITIAL_BORDER_BIGGER_DEVICE = 12;
+
 	private static final int BACKGROUND_DRAWABLE_CORNER_RADIUS = 10;
 	private static final int BACKGROUND_DRAWABLE_ALPHA = 196;
-	
+
 	public static final String EXTRA_SHOULD_STAY_OPEN_KEY = "EXTRA_SHOULD_REMAIN_OPEN_KEY";
 	public static final String EXTRA_INITIAL_CONTENT_KEY = "EXTRA_INITIAL_CONTENT_KEY";
 
@@ -71,15 +73,18 @@ public class InterstitialActivity extends Activity {
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY, mShouldStayOpen);
 		mWebView = new WebView(InterstitialActivity.this);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
-		
+
 		ViewGroup.LayoutParams interstitialSize = generateLayoutParamsForCurrentDisplay();
 		mWebView.setLayoutParams(interstitialSize);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 
 		mWebViewContainer = new LinearLayout(this);
-		mWebViewContainer.setPadding(WEBVIEW_PADDING, WEBVIEW_PADDING, WEBVIEW_PADDING,
-				WEBVIEW_PADDING);
+
+		int borderWidth = determineInterstitialBorderWidth();
+		mWebViewContainer.setPadding(borderWidth, borderWidth, borderWidth, borderWidth);
+
 		mWebView.setBackgroundColor(Color.TRANSPARENT);
+
 		mWebViewContainer.addView(mWebView);
 		mWebViewContainer.setBackgroundColor(Color.TRANSPARENT);
 
@@ -102,16 +107,16 @@ public class InterstitialActivity extends Activity {
 	}
 
 	private static Drawable generateBackgroundDrawable() {
-		float[] cornerRadii = new float[] {BACKGROUND_DRAWABLE_CORNER_RADIUS,
+		float[] cornerRadii = new float[] { BACKGROUND_DRAWABLE_CORNER_RADIUS,
 				BACKGROUND_DRAWABLE_CORNER_RADIUS, BACKGROUND_DRAWABLE_CORNER_RADIUS,
 				BACKGROUND_DRAWABLE_CORNER_RADIUS, BACKGROUND_DRAWABLE_CORNER_RADIUS,
 				BACKGROUND_DRAWABLE_CORNER_RADIUS, BACKGROUND_DRAWABLE_CORNER_RADIUS,
-				BACKGROUND_DRAWABLE_CORNER_RADIUS};
-		
+				BACKGROUND_DRAWABLE_CORNER_RADIUS };
+
 		RoundRectShape roundRectBg = new RoundRectShape(cornerRadii, null, null);
 		ShapeDrawable roundRectBgDrawable = new ShapeDrawable(roundRectBg);
 		roundRectBgDrawable.setAlpha(BACKGROUND_DRAWABLE_ALPHA);
-		
+
 		return roundRectBgDrawable;
 	}
 
@@ -167,12 +172,20 @@ public class InterstitialActivity extends Activity {
 				.convertDevicePixelsIntoPixelsMeasurement(BIGGER_SCREEN_LONG_SIDE_RESOLUTION_DP,
 						context);
 
-		// compare plain pixels to plain pixels. Both thresholds have to be matched or exceeded
+		// compare plain pixels to plain pixels. Both thresholds have to match or exceed
 		// for this method to return true.
 		boolean shorterSidePasses = displayShortSideResolutionPx >= biggerDeviceShortSideResolutionPx;
 		boolean longerSidePasses = displayLongSideResolutionPx >= biggerDeviceLongSideResolutionPx;
 
 		return (shorterSidePasses && longerSidePasses);
+	}
+
+	private int determineInterstitialBorderWidth() {
+		int worderWidthDP = isHostBiggerDevice() ? INTERSTITIAL_BORDER_BIGGER_DEVICE
+				: INTERSTITIAL_BORDER_SMALLER_DEVICE;
+
+		return SponsorPayPublisher.convertDevicePixelsIntoPixelsMeasurement(worderWidthDP,
+				getApplicationContext());
 	}
 
 	/**

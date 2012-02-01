@@ -138,9 +138,12 @@ public class HostInfo {
 		TelephonyManager tManager = (TelephonyManager) context
 				.getSystemService(Context.TELEPHONY_SERVICE);
 
-		// Get the device id (UDID)
-		mUDID = tManager.getDeviceId();
-
+		try {
+			mUDID = tManager.getDeviceId();
+		} catch (SecurityException e) {
+			mUDID = "";
+		}
+		
 		// Get the default locale
 		mLanguageSetting = Locale.getDefault().toString();
 

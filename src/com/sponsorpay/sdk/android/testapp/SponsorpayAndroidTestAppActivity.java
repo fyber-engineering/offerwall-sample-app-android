@@ -25,7 +25,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.method.KeyListener;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -114,6 +118,71 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mCustomKeyValuesForRequest = new HashMap<String, String>();
 		mCustomKeyField = (EditText) findViewById(R.id.custom_key_field);
 		mCustomValueField = (EditText) findViewById(R.id.custom_value_field);
+
+		mCustomKeyField.setKeyListener(new KeyListener() {
+			
+			@Override
+			public boolean onKeyUp(View view, Editable text, int keyCode, KeyEvent event) {
+				if (keyCode == KeyEvent.KEYCODE_ENTER) {
+					mCustomValueField.requestFocus();
+					return true;
+				}
+				return false;
+			}
+			
+			@Override
+			public boolean onKeyOther(View view, Editable text, KeyEvent event) {
+				return false;
+			}
+			
+			@Override
+			public boolean onKeyDown(View view, Editable text, int keyCode, KeyEvent event) {
+				return keyCode == KeyEvent.KEYCODE_ENTER;
+			}
+			
+			@Override
+			public int getInputType() {
+				return InputType.TYPE_CLASS_TEXT;
+			}
+			
+			@Override
+			public void clearMetaKeyState(View view, Editable content, int states) {
+			}
+		});
+
+		mCustomValueField.setKeyListener(new KeyListener() {
+			
+			@Override
+			public boolean onKeyUp(View view, Editable text, int keyCode, KeyEvent event) {
+				if (keyCode == KeyEvent.KEYCODE_ENTER) {
+					SponsorpayAndroidTestAppActivity.this.onAddCustomParameterClick(null);
+					mCustomKeyField.requestFocus();
+					return true;
+				}
+				return false;
+			}
+			
+			@Override
+			public boolean onKeyOther(View view, Editable text, KeyEvent event) {
+				return false;
+			}
+			
+			@Override
+			public boolean onKeyDown(View view, Editable text, int keyCode, KeyEvent event) {
+				return keyCode == KeyEvent.KEYCODE_ENTER;
+			}
+			
+			@Override
+			public int getInputType() {
+				return InputType.TYPE_CLASS_TEXT;
+			}
+			
+			@Override
+			public void clearMetaKeyState(View view, Editable content, int states) {
+			}
+		});
+
+		
 		mKeyValuesList = (TextView) findViewById(R.id.key_values_list);
 		mShouldSendAdvertiserCallbackOnResume = true;
 	}

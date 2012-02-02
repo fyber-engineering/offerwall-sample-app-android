@@ -62,7 +62,7 @@
                 android:layout_below="@id/add_custom_key_value_button"
                 android:onClick="onClearCustomParametersClick"
                 android:text="Clear All" />
-            
+
             <EditText
                 android:id="@+id/custom_value_field"
                 android:layout_width="wrap_content"

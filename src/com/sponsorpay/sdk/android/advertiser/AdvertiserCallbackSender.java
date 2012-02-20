@@ -34,14 +34,16 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	/**
 	 * The API resource URL to contact when talking to the Sponsorpay Advertiser API
 	 */
-	private static final String API_PRODUCTION_RESOURCE_URL = "http://service.sponsorpay.com/installs";
-	private static final String API_STAGING_RESOURCE_URL = "http://staging.service.sponsorpay.com/installs";
+	private static final String API_PRODUCTION_RESOURCE_URL = "http://service.sponsorpay.com/installs/v2";
+	private static final String API_STAGING_RESOURCE_URL = "http://staging.sws.sponsorpay.com/installs/v2";
 
 	/**
 	 * The key for encoding the parameter corresponding to whether a previous invocation of the
 	 * advertiser callback had received a successful response.
 	 */
 	private static final String SUCCESSFUL_ANSWER_RECEIVED_KEY = "answer_received";
+
+	private static final String INSTALL_SUBID_KEY = "subid";
 
 	/**
 	 * The HTTP request that will be executed to contact the API with the callback request
@@ -63,6 +65,8 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 * invocation.
 	 */
 	private boolean mWasAlreadySuccessful = false;
+
+	private String mInstallSubId;
 
 	/**
 	 * Map of custom parameters to be sent in the callback request.
@@ -107,7 +111,6 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 *            the callback listener
 	 */
 	public AdvertiserCallbackSender(HostInfo hostInfo, APIResultListener listener) {
-
 		mListener = listener;
 		mHostInfo = hostInfo;
 	}
@@ -117,6 +120,11 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 */
 	public void setCustomParams(Map<String, String> customParams) {
 		mCustomParams = customParams;
+	}
+
+	public void setInstallSubId(String subIdValue) {
+		Log.d(AdvertiserCallbackSender.class.getSimpleName(), "SubID value set to " + subIdValue);
+		mInstallSubId = subIdValue;
 	}
 
 	/**
@@ -150,6 +158,9 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 				new String[] { SUCCESSFUL_ANSWER_RECEIVED_KEY },
 				new String[] { mWasAlreadySuccessful ? "1" : "0" });
 
+		if (mInstallSubId != null && !"".equals(mInstallSubId))
+			extraParams.put(INSTALL_SUBID_KEY, mInstallSubId);
+
 		if (mCustomParams != null)
 			extraParams.putAll(mCustomParams);
 
@@ -174,8 +185,8 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 * 
 	 * @param params
 	 *            Only one parameter of type {@link String} containing the request URL is expected.
-	 * @return True for a successful request, false otherwise. This value will be communicated to the
-	 *         UI thread by the Android {@link AsyncTask} implementation.
+	 * @return True for a successful request, false otherwise. This value will be communicated to
+	 *         the UI thread by the Android {@link AsyncTask} implementation.
 	 */
 	@Override
 	protected Boolean doInBackground(String... params) {

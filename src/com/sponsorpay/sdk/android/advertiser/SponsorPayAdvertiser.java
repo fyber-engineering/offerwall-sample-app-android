@@ -9,13 +9,11 @@ package com.sponsorpay.sdk.android.advertiser;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.Context;
+
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.advertiser.AdvertiserCallbackSender.APIResultListener;
-
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 
 /**
  * <p>
@@ -29,24 +27,6 @@ import android.content.SharedPreferences.Editor;
  * </p>
  */
 public class SponsorPayAdvertiser implements APIResultListener {
-
-	/**
-	 * Shared preferences file name. We store a flag into the shared preferences which is checked on
-	 * each consecutive invocation of {@link #register()}, to keep track of whether we have already
-	 * successfully contacted the Advertiser API.
-	 */
-	private static final String PREFERENCES_FILE_NAME = "SponsorPayAdvertiserState";
-
-	/**
-	 * The key to store in the preferences file the flag which determines if we have already
-	 * successfully contacted the Advertiser API.
-	 */
-	private static final String STATE_GOT_SUCCESSFUL_RESPONSE_KEY = "SponsorPayAdvertiserState"; // TODO
-
-	/**
-	 * The shared preferences encoded in the {@link #PREFERENCES_FILE_NAME} file.
-	 */
-	private SharedPreferences mPrefs;
 
 	/**
 	 * Map of custom key/values to add to the parameters on the requests to the REST API.
@@ -104,6 +84,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 */
 	private Context mContext;
 
+	private SponsorPayAdvertiserState mPersistedState;
+
 	/**
 	 * Singleton instance.
 	 */
@@ -141,7 +123,7 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 */
 	private SponsorPayAdvertiser(Context context) {
 		mContext = context;
-		mPrefs = mContext.getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE);
+		mPersistedState = new SponsorPayAdvertiserState(mContext);
 	}
 
 	/**
@@ -263,15 +245,16 @@ public class SponsorPayAdvertiser implements APIResultListener {
 		/*
 		 * Check if we have called SponsorPay's API before and gotten a successful response.
 		 */
-		boolean gotSuccessfulResponseYet = mPrefs.getBoolean(STATE_GOT_SUCCESSFUL_RESPONSE_KEY,
-				false);
+		boolean gotSuccessfulResponseYet = mPersistedState
+				.getHasAdvertiserCallbackReceivedSuccessfulResponse();
 
 		/* Send asynchronous call to SponsorPay's API */
 		mAPICaller = new AdvertiserCallbackSender(mHostInfo, this);
 
-		mAPICaller.setCustomParams(customParams);
-
 		mAPICaller.setWasAlreadySuccessful(gotSuccessfulResponseYet);
+		mAPICaller.setInstallSubId(mPersistedState.getInstallSubId());
+		mAPICaller.setCustomParams(customParams);
+		
 		mAPICaller.trigger();
 	}
 
@@ -282,14 +265,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            Status flag to indicate if Advertiser API has been contacted successfully.
 	 */
 	public void onAPIResponse(boolean wasSuccessful) {
-		/*
-		 * If we have been successful store the STATE_GOT_SUCCESSFUL_RESPONSE_KEY flag inside the
-		 * preferences and flush them to permanent storage.
-		 */
 		if (wasSuccessful) {
-			Editor prefsEditor = mPrefs.edit();
-			prefsEditor.putBoolean(STATE_GOT_SUCCESSFUL_RESPONSE_KEY, true);
-			prefsEditor.commit();
+			mPersistedState.setHasAdvertiserCallbackReceivedSuccessfulResponse(true);
 		}
 	}
 }

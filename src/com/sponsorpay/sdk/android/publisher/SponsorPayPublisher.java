@@ -626,6 +626,10 @@ public class SponsorPayPublisher {
 		vcc.fetchDeltaOfCoins();
 	}
 
+	public static void requestUnlockItemsStatus(Context context, String userId) {
+		
+	}
+	
 	/**
 	 * Requests an Offer Banner to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
@@ -701,6 +705,8 @@ public class SponsorPayPublisher {
 		return bannerRequest;
 	}
 
+	
+	
 	/**
 	 * Sets the provided cookie strings into the application's cookie manager for the given base
 	 * URL.

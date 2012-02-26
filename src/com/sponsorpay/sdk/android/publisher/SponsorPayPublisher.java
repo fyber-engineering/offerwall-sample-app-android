@@ -23,6 +23,7 @@ import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadi
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
+import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
 
 /**
  * Provides convenience calls to load and show the mobile Offer Wall and the mobile Interstitial.
@@ -415,13 +416,13 @@ public class SponsorPayPublisher {
 		if (loadingTimeoutSecs > 0) {
 			il.setLoadingTimeoutSecs(loadingTimeoutSecs);
 		}
-		
+
 		Map<String, String> extraParams = getCustomParameters(customParams);
-		
+
 		if (extraParams != null) {
 			il.setCustomParameters(extraParams);
 		}
-		
+
 		il.startLoading();
 	}
 
@@ -497,7 +498,7 @@ public class SponsorPayPublisher {
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName) {
-		
+
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
 				backgroundUrl, skinName, 0, null, null);
 	}
@@ -526,7 +527,7 @@ public class SponsorPayPublisher {
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
-		
+
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, null,
 				null, 0, null, null);
 	}
@@ -622,14 +623,22 @@ public class SponsorPayPublisher {
 				hostInfo, securityToken);
 
 		vcc.setCustomParameters(getCustomParameters(customParams));
-		
+
 		vcc.fetchDeltaOfCoins();
 	}
 
-	public static void requestUnlockItemsStatus(Context context, String userId) {
+	public static void requestUnlockItemsStatus(Context context, String userId,
+			SPUnlockResponseListener listener, String securityToken, String applicationId,
+			Map<String, String> customParams) {
+
+		HostInfo hostInfo = new HostInfo(context);
+
+		if (applicationId != null)
+			hostInfo.setOverriddenAppId(applicationId);
+
 		
 	}
-	
+
 	/**
 	 * Requests an Offer Banner to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
@@ -705,8 +714,6 @@ public class SponsorPayPublisher {
 		return bannerRequest;
 	}
 
-	
-	
 	/**
 	 * Sets the provided cookie strings into the application's cookie manager for the given base
 	 * URL.

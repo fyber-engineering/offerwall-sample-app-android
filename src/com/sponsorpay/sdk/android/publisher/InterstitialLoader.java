@@ -48,7 +48,7 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifi
  * events in the life of the interstitial.
  * </p>
  */
-public class InterstitialLoader implements AsyncRequest.ResultListener {
+public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListener {
 	/**
 	 * Interface to be implemented by parties interested in being notified of interesting events in
 	 * the life of the interstitial.
@@ -326,7 +326,7 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 	public void onAsyncRequestComplete(AsyncRequest request) {
 		Log.v(LOG_TAG, "Interstitial request completed with status code: "
 				+ request.getHttpStatusCode() + ", did trigger exception: "
-				+ request.didRequestTriggerException());
+				+ request.didRequestThrowError());
 
 		if (mProgressDialog != null && mProgressDialog.isShowing()) {
 			mProgressDialog.dismiss();
@@ -339,7 +339,7 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 			}
 			launchInterstitialActivity(request);
 			// showInterstitialOverlay(request);
-		} else if (request.didRequestTriggerException()) {
+		} else if (request.didRequestThrowError()) {
 			if (mLoadingStatusListener != null) {
 				mLoadingStatusListener.onInterstitialRequestError();
 			}

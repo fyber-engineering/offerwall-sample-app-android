@@ -15,8 +15,8 @@ import android.util.Log;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
-import com.sponsorpay.sdk.android.publisher.AsyncRequest.AsyncRequestResultListener;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 
 /**
@@ -24,9 +24,7 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
  * Provides services to access SponsorPay's Virtual Currency Server.
  * </p>
  */
-public class VirtualCurrencyConnector implements AsyncRequestResultListener,
-		SPCurrencyServerListener {
-
+public class VirtualCurrencyConnector extends AbstractConnector implements SPCurrencyServerListener {
 	/*
 	 * VCS API Resource URLs.
 	 */
@@ -38,7 +36,6 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener,
 	 */
 	private static final String URL_PARAM_KEY_LAST_TRANSACTION_ID = "ltid";
 	private static final String URL_PARAM_VALUE_NO_TRANSACTION = "NO_TRANSACTION";
-	private static final String URL_PARAM_KEY_TIMESTAMP = "timestamp";
 
 	/**
 	 * Key for the String containing the latest known transaction ID, which is saved as state in the
@@ -47,32 +44,6 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener,
 	 */
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_";
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR = "_";
-
-	/**
-	 * Android application context.
-	 */
-	private Context mContext;
-
-	/**
-	 * ID of the user for whom the requests will be made.
-	 */
-	private String mUserId;
-
-	/**
-	 * {@link HostInfo} containing data about the host device and application, including its
-	 * application ID.
-	 */
-	private HostInfo mHostInfo;
-
-	/**
-	 * Security token used to sign requests to the server and verify its responses.
-	 */
-	private String mSecurityToken;
-
-	/**
-	 * Map of custom key/values to add to the parameters on the requests.
-	 */
-	private Map<String, String> mCustomParameters;
 
 	/**
 	 * {@link SPCurrencyServerListener} registered by the developer code to be notified of the
@@ -138,18 +109,8 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener,
 	 */
 	public VirtualCurrencyConnector(Context context, String userId,
 			SPCurrencyServerListener listener, HostInfo hostInfo, String securityToken) {
-		mContext = context;
-		mUserId = userId;
-		mHostInfo = hostInfo;
-		mSecurityToken = securityToken;
+		super(context, userId, hostInfo, securityToken);
 		mUserListener = listener;
-	}
-
-	/**
-	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
-	 */
-	public void setCustomParameters(Map<String, String> customParams) {
-		mCustomParameters = customParams;
 	}
 
 	/**
@@ -279,16 +240,6 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener,
 		// String.format("fetchLatestTransactionId(context, appId: %s, userId: %s) = %s", appId,
 		// userId, retval));
 		return retval;
-	}
-
-	/**
-	 * Gets the current UNIX timestamp (in seconds) for the outbound requests.
-	 * 
-	 * @return
-	 */
-	private static String getCurrentUnixTimestampAsString() {
-		final int MILLISECONDS_IN_SECOND = 1000;
-		return String.valueOf(System.currentTimeMillis() / MILLISECONDS_IN_SECOND);
 	}
 
 	/**

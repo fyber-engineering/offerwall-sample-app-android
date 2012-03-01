@@ -46,7 +46,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR = "_";
 
 	/**
-	 * {@link SPCurrencyServerListener} registered by the developer code to be notified of the
+	 * {@link SPCurrencyServerListener} registered by the developer's code to be notified of the
 	 * result of requests to the Virtual Currency Server.
 	 */
 	private SPCurrencyServerListener mUserListener;
@@ -96,7 +96,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 *            Android application context.
 	 * @param userId
 	 *            ID of the user for whom the requests will be made.
-	 * @param listener
+	 * @param userListener
 	 *            {@link SPCurrencyServerListener} registered by the developer code to be notified
 	 *            of the result of requests to the Virtual Currency Server.
 	 * @param hostInfo
@@ -108,9 +108,9 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
 	public VirtualCurrencyConnector(Context context, String userId,
-			SPCurrencyServerListener listener, HostInfo hostInfo, String securityToken) {
+			SPCurrencyServerListener userListener, HostInfo hostInfo, String securityToken) {
 		super(context, userId, hostInfo, securityToken);
-		mUserListener = listener;
+		mUserListener = userListener;
 	}
 
 	/**
@@ -148,7 +148,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 				+ CURRENCY_DELTA_REQUEST_RESOURCE, mUserId, mHostInfo, extraKeysValues,
 				mSecurityToken);
 
-		Log.d(VirtualCurrencyConnector.class.getSimpleName(),
+		Log.d(getClass().getSimpleName(),
 				"Delta of coins request will be sent to URL + params: " + requestUrl);
 
 		CurrencyServerRequestAsyncTask requestTask = new CurrencyServerRequestAsyncTask(
@@ -169,7 +169,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	public void onAsyncRequestComplete(AsyncRequest request) {
 		CurrencyServerRequestAsyncTask requestTask = (CurrencyServerRequestAsyncTask) request;
 
-		Log.d(VirtualCurrencyConnector.class.getSimpleName(), String.format(
+		Log.d(getClass().getSimpleName(), String.format(
 				"Currency Server Response, status code: %d, response body: %s, signature: %s",
 				requestTask.getHttpStatusCode(), requestTask.getResponseBody(), requestTask
 						.getResponseSignature()));

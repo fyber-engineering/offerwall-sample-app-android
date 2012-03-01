@@ -4,5 +4,5 @@ import com.sponsorpay.sdk.android.publisher.AbstractResponse;
 
 public interface SPUnlockResponseListener {
 	void onSPUnlockRequestError(AbstractResponse response);
-	void onSPUnlockedItemsResponseReceived(UnlockedItemsResponse response);
+	void onSPUnlockItemsStatusResponseReceived(UnlockedItemsResponse response);
 }

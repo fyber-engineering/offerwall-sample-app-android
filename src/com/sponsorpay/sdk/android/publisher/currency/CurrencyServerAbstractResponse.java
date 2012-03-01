@@ -26,8 +26,8 @@ public abstract class CurrencyServerAbstractResponse extends AbstractResponse {
 	protected SPCurrencyServerListener mListener;
 
 	/**
-	 * Set the response listener which will be notified when the parsing is complete. Every response type may call a
-	 * different listener method.
+	 * Set the response listener which will be notified when the parsing is complete. Every response
+	 * type may call a different listener method.
 	 * 
 	 * @param listener
 	 */

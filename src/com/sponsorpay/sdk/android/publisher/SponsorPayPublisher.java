@@ -24,6 +24,7 @@ import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
 import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
+import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
 
 /**
  * Provides convenience calls to load and show the mobile Offer Wall and the mobile Interstitial.
@@ -628,7 +629,7 @@ public class SponsorPayPublisher {
 	}
 
 	public static void requestUnlockItemsStatus(Context context, String userId,
-			SPUnlockResponseListener listener, String securityToken, String applicationId,
+			SPUnlockResponseListener userListener, String securityToken, String applicationId,
 			Map<String, String> customParams) {
 
 		HostInfo hostInfo = new HostInfo(context);
@@ -636,7 +637,12 @@ public class SponsorPayPublisher {
 		if (applicationId != null)
 			hostInfo.setOverriddenAppId(applicationId);
 
+		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, userId, userListener,
+				hostInfo, securityToken);
 		
+		uc.setCustomParameters(getCustomParameters(customParams));
+		
+		uc.fetchItemsStatus();
 	}
 
 	/**

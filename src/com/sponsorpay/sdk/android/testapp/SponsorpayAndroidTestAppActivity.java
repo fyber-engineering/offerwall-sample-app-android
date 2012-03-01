@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
+import com.sponsorpay.sdk.android.publisher.AbstractResponse;
 import com.sponsorpay.sdk.android.publisher.OfferBanner;
 import com.sponsorpay.sdk.android.publisher.OfferBannerRequest;
 import com.sponsorpay.sdk.android.publisher.SPOfferBannerListener;
@@ -17,6 +18,8 @@ import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerAbstractRespo
 import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerDeltaOfCoinsResponse;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
+import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
+import com.sponsorpay.sdk.android.publisher.unlock.UnlockedItemsResponse;
 import com.sponsorpay.sdk.android.testapp.R;
 
 import android.app.Activity;
@@ -58,7 +61,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	/**
 	 * Shared preferences file name. Stores the values entered into the UI fields.
 	 */
-	private static final String PREFERENCES_FILE_NAME = "SponsorPayAdvertiserState";
+	private static final String PREFERENCES_FILE_NAME = "SponsorPayTestAppState";
 
 	private String mOverridenAppId;
 	private String mUserId;
@@ -120,7 +123,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mCustomValueField = (EditText) findViewById(R.id.custom_value_field);
 
 		mCustomKeyField.setKeyListener(new KeyListener() {
-			
+
 			@Override
 			public boolean onKeyUp(View view, Editable text, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -129,29 +132,29 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 				}
 				return false;
 			}
-			
+
 			@Override
 			public boolean onKeyOther(View view, Editable text, KeyEvent event) {
 				return false;
 			}
-			
+
 			@Override
 			public boolean onKeyDown(View view, Editable text, int keyCode, KeyEvent event) {
 				return keyCode == KeyEvent.KEYCODE_ENTER;
 			}
-			
+
 			@Override
 			public int getInputType() {
 				return InputType.TYPE_CLASS_TEXT;
 			}
-			
+
 			@Override
 			public void clearMetaKeyState(View view, Editable content, int states) {
 			}
 		});
 
 		mCustomValueField.setKeyListener(new KeyListener() {
-			
+
 			@Override
 			public boolean onKeyUp(View view, Editable text, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -161,28 +164,27 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 				}
 				return false;
 			}
-			
+
 			@Override
 			public boolean onKeyOther(View view, Editable text, KeyEvent event) {
 				return false;
 			}
-			
+
 			@Override
 			public boolean onKeyDown(View view, Editable text, int keyCode, KeyEvent event) {
 				return keyCode == KeyEvent.KEYCODE_ENTER;
 			}
-			
+
 			@Override
 			public int getInputType() {
 				return InputType.TYPE_CLASS_TEXT;
 			}
-			
+
 			@Override
 			public void clearMetaKeyState(View view, Editable content, int states) {
 			}
 		});
 
-		
 		mKeyValuesList = (TextView) findViewById(R.id.key_values_list);
 		mShouldSendAdvertiserCallbackOnResume = true;
 	}
@@ -433,13 +435,47 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 								+ "Returned Latest Transaction ID: %s\n\n", response
 								.getDeltaOfCoins(), usedTransactionId, response
 								.getLatestTransactionId()));
-
 			}
 		};
 
 		try {
 			SponsorPayPublisher.requestNewCoins(getApplicationContext(), mUserId, requestListener,
 					null, mSecurityToken, mOverridenAppId);
+		} catch (RuntimeException ex) {
+			showCancellableAlertBox("Exception from SDK", ex.getMessage());
+			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
+					ex);
+		}
+	}
+
+	/**
+	 * Triggered when the user clicks on the Request SP Unlock Items button. Will send a request for
+	 * the status of the SP Unlock items to the server and register a callback object to show the
+	 * result in a dialog box. Uses the values entered for User ID, App ID and Security Token.
+	 * 
+	 * @param v
+	 */
+	public void onRequestSPUnlockItemsClick(View v) {
+		fetchValuesFromFields();
+
+		SPUnlockResponseListener listener = new SPUnlockResponseListener() {
+			@Override
+			public void onSPUnlockRequestError(AbstractResponse response) {
+				showCancellableAlertBox("Response or Request Error", String.format("%s\n%s\n%s\n",
+						response.getErrorType(), response.getErrorCode(), response
+								.getErrorMessage()));
+			}
+
+			@Override
+			public void onSPUnlockItemsStatusResponseReceived(UnlockedItemsResponse response) {
+				Map<String, UnlockedItemsResponse.Item> items = response.getItems();
+				showCancellableAlertBox("Response From SponsorPay Unlock Server", items.toString());
+			}
+		};
+
+		try {
+			SponsorPayPublisher.requestUnlockItemsStatus(getApplicationContext(), mUserId,
+					listener, mSecurityToken, mOverridenAppId, null);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
@@ -552,7 +588,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mBannerContainer.removeAllViews();
 		TextView mMessageView = new TextView(getApplicationContext());
 
-		Exception requestException = bannerRequest.getRequestException();
+		Throwable requestException = bannerRequest.getRequestThrownError();
 		String errorDescription = "";
 		if (requestException != null) {
 			if (requestException.getClass().isInstance(new java.net.UnknownHostException()))

@@ -221,7 +221,7 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 				interstitialUrlExtraKeys, interstitialUrlExtraValues);
 
 		Log.i("interstitial", "url: " + interstitialUrl);
-		
+
 		mAsyncRequest = new AsyncRequest(interstitialUrl, this);
 		mAsyncRequest.execute();
 
@@ -258,10 +258,24 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 		if (mAsyncRequest != null && !mAsyncRequest.isCancelled()) {
 			mAsyncRequest.cancel(false);
 		}
-		if (mProgressDialog != null && mProgressDialog.isShowing()) {
-			mProgressDialog.dismiss();
-		}
+		dismissProgressDialog();
 		mAsyncRequest = null;
+	}
+
+	private void dismissProgressDialog() {
+		if (mProgressDialog != null && mProgressDialog.isShowing()) {
+			Activity ownerActivity = mProgressDialog.getOwnerActivity();
+			if (ownerActivity != null && !ownerActivity.isFinishing()) {
+				try {
+					mProgressDialog.dismiss();
+				} catch (IllegalArgumentException e) {
+					Log.w(LOG_TAG, "Exception thrown when closing progress dialog. "
+							+ " Changing configurations: "
+							+ ownerActivity.getChangingConfigurations(), e);
+				}
+			}
+		}
+		mProgressDialog = null;
 	}
 
 	/**
@@ -303,9 +317,7 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 				+ request.getHttpStatusCode() + ", did trigger exception: "
 				+ request.didRequestTriggerException());
 
-		if (mProgressDialog != null && mProgressDialog.isShowing()) {
-			mProgressDialog.dismiss();
-		}
+		dismissProgressDialog();
 
 		if (request.hasSucessfulStatusCode()) {
 			sInterstitialAvailableResponseCount++;

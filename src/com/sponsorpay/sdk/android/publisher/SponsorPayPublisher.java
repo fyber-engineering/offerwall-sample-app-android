@@ -23,6 +23,7 @@ import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadi
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
+import com.sponsorpay.sdk.android.publisher.unlock.ItemIdValidator;
 import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
 import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
 
@@ -201,6 +202,11 @@ public class SponsorPayPublisher {
 	public static final int DEFAULT_OFFERWALL_REQUEST_CODE = 0xFF;
 
 	/**
+	 * The default request code needed for starting the Unlock Offer Wall activity.
+	 */
+	public static final int DEFAULT_UNLOCK_OFFERWALL_REQUEST_CODE = 0xFE;
+
+	/**
 	 * <p>
 	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}.
 	 * </p>
@@ -310,6 +316,31 @@ public class SponsorPayPublisher {
 
 		if (shouldStayOpen != null)
 			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
+
+		if (overrideAppId != null)
+			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
+
+		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP, getCustomParameters(customParams));
+
+		return intent;
+	}
+
+	public static Intent getIntentForUnlockOfferWallActivity(Context context, String userId,
+			String unlockItemId, String overrideAppId, HashMap<String, String> customParams) {
+
+		ItemIdValidator itemIdValidator = new ItemIdValidator(unlockItemId);
+		if (!itemIdValidator.validate()) {
+			throw new RuntimeException("The provided Unlock Item ID is not valid. "
+					+ itemIdValidator.getValidationDescription());
+		}
+
+		Intent intent = new Intent(context, OfferWallActivity.class);
+		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, userId);
+
+		intent.putExtra(OfferWallActivity.EXTRA_OFFERWALL_TYPE,
+				OfferWallActivity.OFFERWALL_TYPE_UNLOCK);
+		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_ID_KEY,
+				unlockItemId);
 
 		if (overrideAppId != null)
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
@@ -639,9 +670,9 @@ public class SponsorPayPublisher {
 
 		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, userId, userListener,
 				hostInfo, securityToken);
-		
+
 		uc.setCustomParameters(getCustomParameters(customParams));
-		
+
 		uc.fetchItemsStatus();
 	}
 

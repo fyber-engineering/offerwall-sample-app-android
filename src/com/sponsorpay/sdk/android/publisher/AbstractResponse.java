@@ -2,6 +2,8 @@ package com.sponsorpay.sdk.android.publisher;
 
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.sponsorpay.sdk.android.SignatureTools;
 import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerAbstractResponse;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
@@ -38,8 +40,9 @@ public abstract class AbstractResponse {
 		ERROR_INVALID_RESPONSE_SIGNATURE,
 
 		/**
-		 * The server returned an error. Use {@link CurrencyServerAbstractResponse#getErrorCode()} and
-		 * {@link CurrencyServerAbstractResponse#getErrorMessage()} to extract more details about this error.
+		 * The server returned an error. Use {@link CurrencyServerAbstractResponse#getErrorCode()}
+		 * and {@link CurrencyServerAbstractResponse#getErrorMessage()} to extract more details
+		 * about this error.
 		 */
 		SERVER_RETURNED_ERROR,
 
@@ -90,7 +93,7 @@ public abstract class AbstractResponse {
 	 * Implement to invoke the response-type-specific on error callback notification.
 	 */
 	public abstract void invokeOnErrorCallback();
-	
+
 	/**
 	 * Sets the raw response data.
 	 * 
@@ -101,22 +104,25 @@ public abstract class AbstractResponse {
 	 * @param responseSignature
 	 *            Signature of the response extracted from the response headers.
 	 */
-	public void setResponseData(int responseStatusCode, String responseBody, String responseSignature) {
+	public void setResponseData(int responseStatusCode, String responseBody,
+			String responseSignature) {
 		mResponseStatusCode = responseStatusCode;
 		mResponseBody = responseBody;
 		mResponseSignature = responseSignature;
 	}
 
 	/**
-	 * Verify calculate the signature of the response with the provided security token and compare it against the
-	 * server-provided response signature.
+	 * Verify calculate the signature of the response with the provided security token and compare
+	 * it against the server-provided response signature.
 	 * 
 	 * @param securityToken
 	 *            Security token which will be used to calculate the signature.
-	 * @return true if the calculated signature matches the server-provided signature. false otherwise.
+	 * @return true if the calculated signature matches the server-provided signature. false
+	 *         otherwise.
 	 */
 	public boolean verifySignature(String securityToken) {
-		String generatedSignature = SignatureTools.generateSignatureForString(mResponseBody, securityToken);
+		String generatedSignature = SignatureTools.generateSignatureForString(mResponseBody,
+				securityToken);
 		if (!(generatedSignature.equals(mResponseSignature))) {
 			mErrorType = RequestErrorType.ERROR_INVALID_RESPONSE_SIGNATURE;
 			return false;
@@ -134,8 +140,8 @@ public abstract class AbstractResponse {
 	}
 
 	/**
-	 * Parses a response containing a non-successful HTTP status code. Tries to extract the error code and error message
-	 * from the response body.
+	 * Parses a response containing a non-successful HTTP status code. Tries to extract the error
+	 * code and error message from the response body.
 	 */
 	public void parseErrorResponse() {
 		try {
@@ -144,13 +150,15 @@ public abstract class AbstractResponse {
 			mErrorMessage = responseBodyAsJsonObject.getString(ERROR_MESSAGE_KEY);
 			mErrorType = RequestErrorType.SERVER_RETURNED_ERROR;
 		} catch (Exception e) {
+			Log.w(getClass().getSimpleName(),
+					"An exception was triggered while parsing error response", e);
 			mErrorType = RequestErrorType.ERROR_OTHER;
 		}
 	}
 
 	/**
-	 * Performs a second-stage error checking, parses the response and invokes the relevant method of the listener
-	 * registered with {@link #setResponseListener(SPCurrencyServerListener)}.
+	 * Performs a second-stage error checking, parses the response and invokes the relevant method
+	 * of the listener registered with {@link #setResponseListener(SPCurrencyServerListener)}.
 	 * 
 	 * @param securityToken
 	 *            Security token used to verify the authenticity of the response.
@@ -171,7 +179,7 @@ public abstract class AbstractResponse {
 				invokeOnErrorCallback();
 		}
 	}
-	
+
 	/**
 	 * Gets the error condition in which this request / response has resulted.
 	 * 

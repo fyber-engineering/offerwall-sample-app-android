@@ -29,27 +29,27 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 	public SponsorPayUnlockConnector(Context context, String userId,
 			SPUnlockResponseListener userListener, HostInfo hostInfo, String securityToken) {
 		super(context, userId, hostInfo, securityToken);
-		// TODO Auto-generated constructor stub
+
+		mUserListener = userListener;
 	}
 
 	public void fetchItemsStatus() {
 		String[] requestUrlExtraKeys = new String[] { URL_PARAM_KEY_TIMESTAMP };
 		String[] requestUrlExtraValues = new String[] { getCurrentUnixTimestampAsString() };
-		
+
 		Map<String, String> extraKeysValues = UrlBuilder.mapKeysToValues(requestUrlExtraKeys,
 				requestUrlExtraValues);
 
 		if (mCustomParameters != null) {
 			extraKeysValues.putAll(mCustomParameters);
 		}
-		
+
 		String requestUrl = UrlBuilder.buildUrl(SP_UNLOCK_SERVER_BASE_URL
-				+ SP_UNLOCK_REQUEST_RESOURCE, mUserId, mHostInfo, extraKeysValues,
-				mSecurityToken);
-		
-		Log.d(getClass().getSimpleName(),
-				"Delta of coins request will be sent to URL + params: " + requestUrl);
-		
+				+ SP_UNLOCK_REQUEST_RESOURCE, mUserId, mHostInfo, extraKeysValues, mSecurityToken);
+
+		Log.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
+				+ requestUrl);
+
 		AsyncRequest requestTask = new AsyncRequest(requestUrl, this);
 		requestTask.execute();
 	}
@@ -60,7 +60,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 				"SP Unlock server Response, status code: %d, response body: %s, signature: %s",
 				requestTask.getHttpStatusCode(), requestTask.getResponseBody(), requestTask
 						.getResponseSignature()));
-		
+
 		UnlockedItemsResponse response = new UnlockedItemsResponse();
 		if (requestTask.didRequestThrowError()) {
 			response.setErrorType(RequestErrorType.ERROR_NO_INTERNET_CONNECTION);
@@ -68,7 +68,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 			response.setResponseData(requestTask.getHttpStatusCode(),
 					requestTask.getResponseBody(), requestTask.getResponseSignature());
 		}
-		
+
 		response.setResponseListener(this);
 		response.parseAndCallListener(mSecurityToken);
 	}

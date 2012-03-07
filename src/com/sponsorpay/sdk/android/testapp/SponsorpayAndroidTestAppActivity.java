@@ -53,6 +53,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private static final String SECURITY_TOKEN_PREFS_KEY = "SECURITY_TOKEN";
 	private static final String DELAY_PREFS_KEY = "DELAY";
 	private static final String CURRENCY_NAME_PREFS_KEY = "CURRENCY_NAME";
+	private static final String UNLOCK_ITEM_ID_PREFS_KEY = "UNLOCK_ITEM_ID";
 	private static final String USE_STAGING_URLS_PREFS_KEY = "USE_STAGING_URLS";
 
 	private static final int DEFAULT_DELAY_MIN = 15;
@@ -71,6 +72,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private String mSecurityToken;
 	private int mCallDelay;
 	private String mCurrencyName;
+	private String mUnlockItemId;
 
 	private EditText mAppIdField;
 	private EditText mUserIdField;
@@ -80,6 +82,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private EditText mSecurityTokenField;
 	private EditText mDelayField;
 	private EditText mCurrencyNameField;
+	private EditText mUnlockItemIdField;
 
 	private CheckBox mUseStagingUrlsCheckBox;
 
@@ -111,6 +114,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mSecurityTokenField = (EditText) findViewById(R.id.security_token_field);
 		mDelayField = (EditText) findViewById(R.id.delay_field);
 		mCurrencyNameField = (EditText) findViewById(R.id.currency_name_field);
+		mUnlockItemIdField = (EditText) findViewById(R.id.unlock_item_id_field);
 
 		mUseStagingUrlsCheckBox = (CheckBox) findViewById(R.id.use_staging_urls_checkbox);
 
@@ -205,6 +209,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		prefsEditor.putString(SECURITY_TOKEN_PREFS_KEY, mSecurityToken);
 		prefsEditor.putInt(DELAY_PREFS_KEY, mCallDelay);
 		prefsEditor.putString(CURRENCY_NAME_PREFS_KEY, mCurrencyName);
+		prefsEditor.putString(UNLOCK_ITEM_ID_PREFS_KEY, mUnlockItemId);
 
 		prefsEditor.putBoolean(USE_STAGING_URLS_PREFS_KEY, mUseStagingUrlsCheckBox.isChecked());
 
@@ -228,6 +233,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mSecurityToken = prefs.getString(SECURITY_TOKEN_PREFS_KEY, DEFAULT_SECURITY_TOKEN_VALUE);
 		mCallDelay = prefs.getInt(DELAY_PREFS_KEY, DEFAULT_DELAY_MIN);
 		mCurrencyName = prefs.getString(CURRENCY_NAME_PREFS_KEY, "");
+		mUnlockItemId = prefs.getString(UNLOCK_ITEM_ID_PREFS_KEY, "");
 
 		setValuesInFields();
 
@@ -287,6 +293,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mCallDelay = parsedInt;
 
 		mCurrencyName = mCurrencyNameField.getText().toString();
+		mUnlockItemId = mUnlockItemIdField.getText().toString();
 
 		SponsorPayAdvertiser.setShouldUseStagingUrls(mUseStagingUrlsCheckBox.isChecked());
 		SponsorPayPublisher.setShouldUseStagingUrls(mUseStagingUrlsCheckBox.isChecked());
@@ -304,6 +311,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mSecurityTokenField.setText(mSecurityToken);
 		mDelayField.setText(String.format("%d", mCallDelay));
 		mCurrencyNameField.setText(mCurrencyName);
+		mUnlockItemIdField.setText(mUnlockItemId);
 	}
 
 	/**
@@ -314,11 +322,36 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	public void onLaunchOfferwallClick(View v) {
 		fetchValuesFromFields();
 
-		startActivityForResult(
-		/* Pass in a User ID */
-		SponsorPayPublisher.getIntentForOfferWallActivity(getApplicationContext(), mUserId,
-				mShouldStayOpen, mOverridenAppId),
-				SponsorPayPublisher.DEFAULT_OFFERWALL_REQUEST_CODE);
+		try {
+			startActivityForResult(
+			/* Pass in a User ID */
+			SponsorPayPublisher.getIntentForOfferWallActivity(getApplicationContext(), mUserId,
+					mShouldStayOpen, mOverridenAppId),
+					SponsorPayPublisher.DEFAULT_OFFERWALL_REQUEST_CODE);
+		} catch (RuntimeException ex) {
+			showCancellableAlertBox("Exception from SDK", ex.getMessage());
+			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
+					ex);
+		}
+	}
+
+	/**
+	 * Triggered when the user clicks on the launch unlock offer wall button.
+	 * 
+	 * @param v
+	 */
+	public void onLaunchUnlockOfferwallClick(View v) {
+		fetchValuesFromFields();
+
+		try {
+			startActivityForResult(SponsorPayPublisher.getIntentForUnlockOfferWallActivity(
+					getApplicationContext(), mUserId, mUnlockItemId, mOverridenAppId, null),
+					SponsorPayPublisher.DEFAULT_UNLOCK_OFFERWALL_REQUEST_CODE);
+		} catch (RuntimeException ex) {
+			showCancellableAlertBox("Exception from SDK", ex.getMessage());
+			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
+					ex);
+		}
 	}
 
 	/**

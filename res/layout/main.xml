@@ -154,6 +154,27 @@
                 android:onClick="onLaunchOfferwallClick"
                 android:text="@string/launch_offerwall" />
 
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <EditText
+                    android:id="@+id/unlock_item_id_field"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/item_id"
+                    android:imeOptions="actionNext"
+                    android:singleLine="true" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:onClick="onLaunchUnlockOfferwallClick"
+                    android:text="@string/launch_unlock_offerwall" />
+            </LinearLayout>
+
             <EditText
                 android:id="@+id/background_url_field"
                 android:layout_width="fill_parent"
@@ -193,7 +214,7 @@
                 android:layout_height="wrap_content"
                 android:onClick="onRequestNewCoinsClick"
                 android:text="@string/request_new_coins" />
-            
+
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -23,8 +23,8 @@ import com.sponsorpay.sdk.android.HttpResponseParser;
 /**
  * <p>
  * Requests and loads a resource using the HTTP GET method in the background. Will call the
- * {@link AsyncRequest.AsyncRequestResultListener} registered in the constructor in the same thread which
- * triggered the request / loading process. Uses the Android {@link AsyncTask} mechanism.
+ * {@link AsyncRequest.AsyncRequestResultListener} registered in the constructor in the same thread
+ * which triggered the request / loading process. Uses the Android {@link AsyncTask} mechanism.
  * </p>
  */
 public class AsyncRequest extends AsyncTask<Void, Void, Void> {
@@ -56,7 +56,7 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 * Custom SponsorPay HTTP header containing the signature of the response.
 	 */
 	private static final String SIGNATURE_HEADER = "X-Sponsorpay-Response-Signature";
-	
+
 	/**
 	 * URL for the request that will be performed in the background.
 	 */
@@ -76,21 +76,21 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 * Server's response signature, extracted of the {@value #SIGNATURE_HEADER} header.
 	 */
 	private String mResponseSignature;
-	
+
 	/**
 	 * Cookies returned by the server.
 	 */
 	private String[] mCookieStrings;
 
 	/**
-	 * Registered {@link AsyncRequestResultListener} to be notified of the request's results when they become
-	 * available.
+	 * Registered {@link AsyncRequestResultListener} to be notified of the request's results when
+	 * they become available.
 	 */
 	private AsyncRequestResultListener mResultListener;
 
 	/**
-	 * Stores an error thrown when launching the request, usually caused by a network
-	 * connectivity problem.
+	 * Stores an error thrown when launching the request, usually caused by a network connectivity
+	 * problem.
 	 */
 	private Throwable mThrownRequestError;
 
@@ -99,8 +99,8 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 * @param requestUrl
 	 *            URL to send the backgorund request to.
 	 * @param listener
-	 *            {@link AsyncRequestResultListener} to be notified of the request's results when they become
-	 *            available.
+	 *            {@link AsyncRequestResultListener} to be notified of the request's results when
+	 *            they become available.
 	 */
 	public AsyncRequest(String requestUrl, AsyncRequestResultListener listener) {
 		mRequestUrl = requestUrl;
@@ -140,11 +140,11 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 
 			// Populate result cookies with values of cookieHeaders
 			if (cookieHeaders.length > 0) {
-				
+
 				if (shouldLogVerbosely)
 					Log.v(LOG_TAG, String.format("Got following cookies from server (url: %s):",
 							mRequestUrl));
-				
+
 				mCookieStrings = new String[cookieHeaders.length];
 				for (int i = 0; i < cookieHeaders.length; i++) {
 					mCookieStrings[i] = cookieHeaders[i].getValue();
@@ -196,6 +196,23 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		return mCookieStrings;
 	}
 
+	public boolean hasCookies() {
+		Boolean retval;
+		
+		if (mCookieStrings == null || mCookieStrings.length == 0) {
+			retval = false;
+		} else {
+			String firstCookieString = mCookieStrings[0];
+			if (firstCookieString == null || "".equals(firstCookieString)) {
+				retval = false;
+			} else {
+				retval = true;
+			}
+		}
+		
+		return retval;
+	}
+
 	/**
 	 * Gets the response body returned by the server.
 	 */
@@ -213,20 +230,20 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	public String getResponseSignature() {
 		return mResponseSignature;
 	}
-	
+
 	/**
-	 * Returns the local error thrown when trying to send the request. An exception typically
-	 * means that there was a problem connecting to the network, but checking the type of the
-	 * returned error can give a more accurate cause for the error.
+	 * Returns the local error thrown when trying to send the request. An exception typically means
+	 * that there was a problem connecting to the network, but checking the type of the returned
+	 * error can give a more accurate cause for the error.
 	 */
 	public boolean didRequestThrowError() {
 		return (mThrownRequestError != null);
 	}
 
 	/**
-	 * Returns the local error thrown when trying to send the request. An exception typically
-	 * means that there was a problem connecting to the network, but checking the type of the
-	 * returned error can give a more accurate cause for the error.
+	 * Returns the local error thrown when trying to send the request. An exception typically means
+	 * that there was a problem connecting to the network, but checking the type of the returned
+	 * error can give a more accurate cause for the error.
 	 */
 	public Throwable getRequestThrownError() {
 		return mThrownRequestError;

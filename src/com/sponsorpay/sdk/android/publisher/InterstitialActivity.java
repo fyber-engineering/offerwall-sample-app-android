@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
  * <p>
  * Will retrieve the interstitial's initial html content from the {@link #EXTRA_INITIAL_CONTENT_KEY}
  * encoded into the calling intent, and will load dependent content referenced with relative links
- * using the base URL encoded as {@link #EXTRA_BASE_DOMAIN_KEY} into the calling intent. The http
+ * using the base URL encoded as {@link #EXTRA_BASE_URL_KEY} into the calling intent. The http
  * cookie(s) to use will be retrieved from the String array encoded as extra
  * {@link #EXTRA_COOKIESTRINGS_KEY}
  * </p>
@@ -47,7 +47,7 @@ public class InterstitialActivity extends Activity {
 	public static final String EXTRA_SHOULD_STAY_OPEN_KEY = "EXTRA_SHOULD_REMAIN_OPEN_KEY";
 	public static final String EXTRA_INITIAL_CONTENT_KEY = "EXTRA_INITIAL_CONTENT_KEY";
 
-	public static final String EXTRA_BASE_DOMAIN_KEY = "EXTRA_INITIAL_BASE_URL";
+	public static final String EXTRA_BASE_URL_KEY = "EXTRA_INITIAL_BASE_URL";
 	public static final String EXTRA_COOKIESTRINGS_KEY = "EXTRA_COOKIESTRINGS";
 
 	private static final int BIGGER_SCREEN_SHORT_SIDE_RESOLUTION_DP = 480;
@@ -68,7 +68,7 @@ public class InterstitialActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		String initialInterstitialContent = getIntent().getStringExtra(EXTRA_INITIAL_CONTENT_KEY);
-		String baseDomain = getIntent().getStringExtra(EXTRA_BASE_DOMAIN_KEY);
+		String baseUrl = getIntent().getStringExtra(EXTRA_BASE_URL_KEY);
 		String[] cookieStrings = getIntent().getStringArrayExtra(EXTRA_COOKIESTRINGS_KEY);
 
 		/*
@@ -104,9 +104,9 @@ public class InterstitialActivity extends Activity {
 				mShouldStayOpen));
 
 		// Add into the CookieManager used by the web view the cookies received as encoded extras.
-		SponsorPayPublisher.setCookiesIntoCookieManagerInstance(cookieStrings, baseDomain, this);
+		SponsorPayPublisher.setCookiesIntoCookieManagerInstance(cookieStrings, baseUrl, this);
 
-		mWebView.loadDataWithBaseURL(baseDomain, initialInterstitialContent, "text/html", "utf-8",
+		mWebView.loadDataWithBaseURL(baseUrl, initialInterstitialContent, "text/html", "utf-8",
 				null);
 
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);

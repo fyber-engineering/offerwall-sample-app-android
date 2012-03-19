@@ -25,9 +25,6 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	private static final String OFFERBANNER_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile";
 	private static final String OFFERBANNER_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile";
 
-	private static final String OFFERBANNER_PRODUCTION_DOMAIN = "http://iframe.sponsorpay.com";
-	private static final String OFFERBANNER_STAGING_DOMAIN = "http://staging.iframe.sponsorpay.com";
-
 	private static final String URL_PARAM_OFFERBANNER_KEY = "banner";
 
 	private static final String STATE_OFFSET_COUNT_KEY = "OFFERBANNER_AVAILABLE_RESPONSE_COUNT";
@@ -61,12 +58,6 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * BaseUrl of the resource from which the ad will be requested.
 	 */
 	private String mBaseUrl;
-
-	/**
-	 * Base domain of the request URL which will be passed to the WebView which displays the
-	 * returned banner to load associated resources (like images).
-	 */
-	private String mBaseDomain;
 
 	/**
 	 * Currency Name to be sent in the request.
@@ -139,13 +130,12 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 
 		if (SponsorPayPublisher.shouldUseStagingUrls()) {
 			mBaseUrl = OFFERBANNER_STAGING_BASE_URL;
-			mBaseDomain = OFFERBANNER_STAGING_DOMAIN;
 		} else {
 			mBaseUrl = OFFERBANNER_PRODUCTION_BASE_URL;
-			mBaseDomain = OFFERBANNER_PRODUCTION_DOMAIN;
 		}
 
-		String offerBannerUrl = UrlBuilder.buildUrl(mBaseUrl, mUserId.toString(), mHostInfo, extraKeysValues);
+		String offerBannerUrl = UrlBuilder.buildUrl(mBaseUrl, mUserId.toString(), mHostInfo,
+				extraKeysValues);
 
 		Log.i(OfferBanner.LOG_TAG, "Offer Banner Request URL: " + offerBannerUrl);
 
@@ -162,8 +152,9 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 		Log.i(OfferBanner.LOG_TAG, "onAsyncRequestComplete, returned status code: "
 				+ request.getHttpStatusCode());
 		if (mAsyncRequest.hasSucessfulStatusCode()) {
-			OfferBanner banner = new OfferBanner(mContext, mBaseDomain, mAsyncRequest
-					.getResponseBody(), mAsyncRequest.getCookieStrings(), mOfferBannerAdShape);
+			OfferBanner banner = new OfferBanner(mContext, mAsyncRequest.getRequestUrl(),
+					mAsyncRequest.getResponseBody(), mAsyncRequest.getCookieStrings(),
+					mOfferBannerAdShape);
 
 			incrementPersistedBannerOffset();
 

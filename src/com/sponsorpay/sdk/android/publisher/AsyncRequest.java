@@ -23,13 +23,13 @@ import com.sponsorpay.sdk.android.HttpResponseParser;
 /**
  * <p>
  * Requests and loads a resource using the HTTP GET method in the background. Will call the
- * {@link AsyncRequest.ResultListener} registered in the constructor in the same thread which
- * triggered the request / loading process. Uses the Android {@link AsyncTask} mechanism.
+ * {@link AsyncRequest.AsyncRequestResultListener} registered in the constructor in the same thread
+ * which triggered the request / loading process. Uses the Android {@link AsyncTask} mechanism.
  * </p>
  */
 public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 
-	public interface ResultListener {
+	public interface AsyncRequestResultListener {
 		void onAsyncRequestComplete(AsyncRequest request);
 	}
 
@@ -53,6 +53,11 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	private static String USER_AGENT_HEADER_VALUE = "Android";
 
 	/**
+	 * Custom SponsorPay HTTP header containing the signature of the response.
+	 */
+	private static final String SIGNATURE_HEADER = "X-Sponsorpay-Response-Signature";
+
+	/**
 	 * URL for the request that will be performed in the background.
 	 */
 	private String mRequestUrl;
@@ -68,31 +73,36 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	private String mResponseBody;
 
 	/**
+	 * Server's response signature, extracted of the {@value #SIGNATURE_HEADER} header.
+	 */
+	private String mResponseSignature;
+
+	/**
 	 * Cookies returned by the server.
 	 */
 	private String[] mCookieStrings;
 
 	/**
-	 * Registered {@link ResultListener} to be notified of the request's results when they become
-	 * available.
+	 * Registered {@link AsyncRequestResultListener} to be notified of the request's results when
+	 * they become available.
 	 */
-	private ResultListener mResultListener;
+	private AsyncRequestResultListener mResultListener;
 
 	/**
-	 * Stores an exception triggered when launching the request, usually caused by network
-	 * connectivity problem.
+	 * Stores an error thrown when launching the request, usually caused by a network connectivity
+	 * problem.
 	 */
-	private Exception mRequestException;
+	private Throwable mThrownRequestError;
 
 	/**
 	 * 
 	 * @param requestUrl
 	 *            URL to send the backgorund request to.
 	 * @param listener
-	 *            {@link ResultListener} to be notified of the request's results when they become
-	 *            available.
+	 *            {@link AsyncRequestResultListener} to be notified of the request's results when
+	 *            they become available.
 	 */
-	public AsyncRequest(String requestUrl, ResultListener listener) {
+	public AsyncRequest(String requestUrl, AsyncRequestResultListener listener) {
 		mRequestUrl = requestUrl;
 		mResultListener = listener;
 	}
@@ -117,22 +127,24 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 
 		HttpClient client = new DefaultHttpClient();
 
-		mRequestException = null;
+		mThrownRequestError = null;
 
 		try {
 			HttpResponse response = client.execute(request);
 			mStatusCode = response.getStatusLine().getStatusCode();
 			mResponseBody = HttpResponseParser.extractResponseString(response);
-
+			Header[] responseSignatureHeaders = response.getHeaders(SIGNATURE_HEADER);
+			mResponseSignature = responseSignatureHeaders.length > 0 ? responseSignatureHeaders[0]
+					.getValue() : "";
 			Header[] cookieHeaders = response.getHeaders("Set-Cookie");
 
 			// Populate result cookies with values of cookieHeaders
 			if (cookieHeaders.length > 0) {
-				
+
 				if (shouldLogVerbosely)
 					Log.v(LOG_TAG, String.format("Got following cookies from server (url: %s):",
 							mRequestUrl));
-				
+
 				mCookieStrings = new String[cookieHeaders.length];
 				for (int i = 0; i < cookieHeaders.length; i++) {
 					mCookieStrings[i] = cookieHeaders[i].getValue();
@@ -140,9 +152,9 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 						Log.v(LOG_TAG, mCookieStrings[i]);
 				}
 			}
-		} catch (Exception e) {
-			Log.e(LOG_TAG, "Exception triggered when executing request: " + e);
-			mRequestException = e;
+		} catch (Throwable t) {
+			Log.e(LOG_TAG, "Exception triggered when executing request: " + t);
+			mThrownRequestError = t;
 		}
 		return null;
 	}
@@ -184,6 +196,23 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		return mCookieStrings;
 	}
 
+	public boolean hasCookies() {
+		Boolean retval;
+		
+		if (mCookieStrings == null || mCookieStrings.length == 0) {
+			retval = false;
+		} else {
+			String firstCookieString = mCookieStrings[0];
+			if (firstCookieString == null || "".equals(firstCookieString)) {
+				retval = false;
+			} else {
+				retval = true;
+			}
+		}
+		
+		return retval;
+	}
+
 	/**
 	 * Gets the response body returned by the server.
 	 */
@@ -198,22 +227,26 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		return mStatusCode;
 	}
 
-	/**
-	 * Returns whether a local exception was triggered when trying to send the request. An exception
-	 * typically means that there was a problem connecting to the network, but checking the type of
-	 * the exception returned by {@link #getRequestTriggeredException()} is recommended.
-	 */
-	public boolean didRequestTriggerException() {
-		return (mRequestException != null);
+	public String getResponseSignature() {
+		return mResponseSignature;
 	}
 
 	/**
-	 * Returns the local exception triggered when trying to send the request. An exception typically
-	 * means that there was a problem connecting to the network, but checking the type of the
-	 * returned exception can give a more accurate cause for the error.
+	 * Returns the local error thrown when trying to send the request. An exception typically means
+	 * that there was a problem connecting to the network, but checking the type of the returned
+	 * error can give a more accurate cause for the error.
 	 */
-	public Exception getRequestTriggeredException() {
-		return mRequestException;
+	public boolean didRequestThrowError() {
+		return (mThrownRequestError != null);
+	}
+
+	/**
+	 * Returns the local error thrown when trying to send the request. An exception typically means
+	 * that there was a problem connecting to the network, but checking the type of the returned
+	 * error can give a more accurate cause for the error.
+	 */
+	public Throwable getRequestThrownError() {
+		return mThrownRequestError;
 	}
 
 	/**

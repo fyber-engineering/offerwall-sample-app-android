@@ -70,6 +70,15 @@ public class InterstitialActivity extends Activity {
 		String initialInterstitialContent = getIntent().getStringExtra(EXTRA_INITIAL_CONTENT_KEY);
 		String baseDomain = getIntent().getStringExtra(EXTRA_BASE_DOMAIN_KEY);
 		String[] cookieStrings = getIntent().getStringArrayExtra(EXTRA_COOKIESTRINGS_KEY);
+
+		/*
+		 * If the Interstitial Activity is launched but no cookies have been passed to it, silently
+		 * fail and close the Interstitial instead of letting an exception be thrown.
+		 */
+		if (cookieStrings == null || cookieStrings.length == 0) {
+			finish();
+		}
+		
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY, mShouldStayOpen);
 		mWebView = new WebView(InterstitialActivity.this);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);

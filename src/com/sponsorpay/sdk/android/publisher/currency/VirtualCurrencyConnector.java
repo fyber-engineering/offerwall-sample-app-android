@@ -8,34 +8,28 @@ package com.sponsorpay.sdk.android.publisher.currency;
 
 import java.util.Map;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import com.sponsorpay.sdk.android.HostInfo;
-import com.sponsorpay.sdk.android.HttpResponseParser;
-import com.sponsorpay.sdk.android.UrlBuilder;
-import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.publisher.AbstractConnector;
+import com.sponsorpay.sdk.android.publisher.AsyncRequest;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 
 /**
  * <p>
  * Provides services to access SponsorPay's Virtual Currency Server.
  * </p>
  */
-public class VirtualCurrencyConnector implements SPCurrencyServerListener {
-
+public class VirtualCurrencyConnector extends AbstractConnector implements SPCurrencyServerListener {
 	/*
 	 * VCS API Resource URLs.
 	 */
-	private static final String VIRTUAL_CURRENCY_SERVER_BASE_URL = "http://api.sponsorpay.com/vcs/v1/";
+	private static final String VIRTUAL_CURRENCY_SERVER_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/vcs/v1/";
+	private static final String VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL = "http://api.sponsorpay.com/vcs/v1/";
 	private static final String CURRENCY_DELTA_REQUEST_RESOURCE = "new_credit.json";
 
 	/*
@@ -43,7 +37,6 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 */
 	private static final String URL_PARAM_KEY_LAST_TRANSACTION_ID = "ltid";
 	private static final String URL_PARAM_VALUE_NO_TRANSACTION = "NO_TRANSACTION";
-	private static final String URL_PARAM_KEY_TIMESTAMP = "timestamp";
 
 	/**
 	 * Key for the String containing the latest known transaction ID, which is saved as state in the
@@ -54,33 +47,7 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR = "_";
 
 	/**
-	 * Android application context.
-	 */
-	private Context mContext;
-
-	/**
-	 * ID of the user for whom the requests will be made.
-	 */
-	private String mUserId;
-
-	/**
-	 * {@link HostInfo} containing data about the host device and application, including its
-	 * application ID.
-	 */
-	private HostInfo mHostInfo;
-
-	/**
-	 * Security token used to sign requests to the server and verify its responses.
-	 */
-	private String mSecurityToken;
-
-	/**
-	 * Map of custom key/values to add to the parameters on the requests.
-	 */
-	private Map<String, String> mCustomParameters;
-
-	/**
-	 * {@link SPCurrencyServerListener} registered by the developer code to be notified of the
+	 * {@link SPCurrencyServerListener} registered by the developer's code to be notified of the
 	 * result of requests to the Virtual Currency Server.
 	 */
 	private SPCurrencyServerListener mUserListener;
@@ -97,21 +64,7 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 * {@link AsyncTask} used to perform the HTTP requests on a background thread and be notified of
 	 * its results on the calling thread.
 	 */
-	private class CurrencyServerRequestAsyncTask extends AsyncTask<Void, Void, Void> {
-		/**
-		 * Custom SponsorPay HTTP header containing the signature of the response.
-		 */
-		private static final String SIGNATURE_HEADER = "X-Sponsorpay-Response-Signature";
-
-		/**
-		 * Tightly coupled host {@link VirtualCurrencyConnector}.
-		 */
-		private VirtualCurrencyConnector mVcc;
-
-		/**
-		 * URL for the request which will be performed in the background.
-		 */
-		private String mRequestUrl;
+	private class CurrencyServerRequestAsyncTask extends AsyncRequest {
 
 		/**
 		 * Type of the request which will be performed in the background.
@@ -119,84 +72,21 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 		public RequestType requestType;
 
 		/**
-		 * Status code of the server's response.
-		 */
-		public int statusCode;
-
-		/**
-		 * Server's response body.
-		 */
-		public String responseBody;
-
-		/**
-		 * Server's response signature, extracted of the {@value #SIGNATURE_HEADER} header.
-		 */
-		public String signature;
-
-		/**
-		 * Whether the request triggered a local exception, usually denoting a network connectivity
-		 * problem.
-		 */
-		public boolean didTriggerException;
-
-		/**
 		 * Initializes a new instance whose {@link #execute()} still needs to be invoked to trigger
 		 * the request.
 		 * 
-		 * @param vcc
-		 *            Host {@link VirtualCurrencyConnector}
 		 * @param requestType
 		 *            Type of the request to be performed. See {@link RequestType}.
 		 * @param requestUrl
 		 *            Url of the request to be performed.
+		 * @param listener
+		 *            Listener which will be notified of the results of the request / response on
+		 *            the thread which called {@link #execute()}.
 		 */
-		public CurrencyServerRequestAsyncTask(VirtualCurrencyConnector vcc,
-				RequestType requestType, String requestUrl) {
-			mVcc = vcc;
-			mRequestUrl = requestUrl;
+		public CurrencyServerRequestAsyncTask(RequestType requestType, String requestUrl,
+				AsyncRequestResultListener listener) {
+			super(requestUrl, listener);
 			CurrencyServerRequestAsyncTask.this.requestType = requestType;
-		}
-
-		/**
-		 * Performs the request in the background. Called by the parent {@link AsyncTask} when
-		 * {@link #execute(Void...)} is invoked.
-		 * 
-		 * @param
-		 * @return
-		 */
-		@Override
-		protected Void doInBackground(Void... params) {
-			HttpUriRequest request = new HttpGet(mRequestUrl);
-			HttpClient client = new DefaultHttpClient();
-
-			didTriggerException = false;
-
-			try {
-				HttpResponse response = client.execute(request);
-				statusCode = response.getStatusLine().getStatusCode();
-				responseBody = HttpResponseParser.extractResponseString(response);
-				Header[] responseSignatureHeaders = response.getHeaders(SIGNATURE_HEADER);
-				signature = responseSignatureHeaders.length > 0 ? responseSignatureHeaders[0]
-						.getValue() : "";
-
-			} catch (Throwable t) {
-				Log.e(CurrencyServerRequestAsyncTask.class.getSimpleName(),
-						"Error thrown when executing request: " + t);
-				didTriggerException = true;
-			}
-			return null;
-		}
-
-		/**
-		 * Called in the original thread when a response from the server is available. Notifies the
-		 * host {@link VirtualCurrencyConnector}.
-		 * 
-		 * @param result
-		 */
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			mVcc.onCurrencyServerResponse(CurrencyServerRequestAsyncTask.this);
 		}
 	}
 
@@ -207,7 +97,7 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 *            Android application context.
 	 * @param userId
 	 *            ID of the user for whom the requests will be made.
-	 * @param listener
+	 * @param userListener
 	 *            {@link SPCurrencyServerListener} registered by the developer code to be notified
 	 *            of the result of requests to the Virtual Currency Server.
 	 * @param hostInfo
@@ -219,21 +109,11 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
 	public VirtualCurrencyConnector(Context context, String userId,
-			SPCurrencyServerListener listener, HostInfo hostInfo, String securityToken) {
-		mContext = context;
-		mUserId = userId;
-		mHostInfo = hostInfo;
-		mSecurityToken = securityToken;
-		mUserListener = listener;
+			SPCurrencyServerListener userListener, HostInfo hostInfo, String securityToken) {
+		super(context, userId, hostInfo, securityToken);
+		mUserListener = userListener;
 	}
 
-	/**
-	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
-	 */
-	public void setCustomParameters(Map<String, String> customParams) {
-		mCustomParameters = customParams;
-	}
-	
 	/**
 	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
 	 * virtual currency for a given user since the last time this method was called. The response
@@ -258,21 +138,24 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 		String[] requestUrlExtraValues = new String[] { transactionId,
 				getCurrentUnixTimestampAsString() };
 
-		Map<String, String> extraKeysValues = UrlBuilder.mapKeysToValues(
-				requestUrlExtraKeys, requestUrlExtraValues);
-		
+		Map<String, String> extraKeysValues = UrlBuilder.mapKeysToValues(requestUrlExtraKeys,
+				requestUrlExtraValues);
+
 		if (mCustomParameters != null) {
 			extraKeysValues.putAll(mCustomParameters);
 		}
-		
-		String requestUrl = UrlBuilder.buildUrl(VIRTUAL_CURRENCY_SERVER_BASE_URL
-				+ CURRENCY_DELTA_REQUEST_RESOURCE, mUserId, mHostInfo, extraKeysValues, mSecurityToken);
 
-		Log.d(VirtualCurrencyConnector.class.getSimpleName(),
-				"Delta of coins request will be sent to URL + params: " + requestUrl);
+		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? VIRTUAL_CURRENCY_SERVER_STAGING_BASE_URL
+				: VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL;
+
+		String requestUrl = UrlBuilder.buildUrl(baseUrl + CURRENCY_DELTA_REQUEST_RESOURCE, mUserId
+				.toString(), mHostInfo, extraKeysValues, mSecurityToken);
+
+		Log.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
+				+ requestUrl);
 
 		CurrencyServerRequestAsyncTask requestTask = new CurrencyServerRequestAsyncTask(
-				VirtualCurrencyConnector.this, RequestType.DELTA_COINS, requestUrl);
+				RequestType.DELTA_COINS, requestUrl, this);
 
 		requestTask.execute();
 	}
@@ -285,19 +168,23 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 * @param requestTask
 	 *            The calling {@link CurrencyServerRequestAsyncTask} with the response data.
 	 */
-	private void onCurrencyServerResponse(CurrencyServerRequestAsyncTask requestTask) {
-		Log.d(VirtualCurrencyConnector.class.getSimpleName(), String.format(
+	@Override
+	public void onAsyncRequestComplete(AsyncRequest request) {
+		CurrencyServerRequestAsyncTask requestTask = (CurrencyServerRequestAsyncTask) request;
+
+		Log.d(getClass().getSimpleName(), String.format(
 				"Currency Server Response, status code: %d, response body: %s, signature: %s",
-				requestTask.statusCode, requestTask.responseBody, requestTask.signature));
+				requestTask.getHttpStatusCode(), requestTask.getResponseBody(), requestTask
+						.getResponseSignature()));
 
 		CurrencyServerAbstractResponse response;
 
-		if (requestTask.didTriggerException) {
+		if (requestTask.didRequestThrowError()) {
 			response = new RequestErrorResponse();
 		} else {
 			response = CurrencyServerAbstractResponse.getParsingInstance(requestTask.requestType);
-			response.setResponseData(requestTask.statusCode, requestTask.responseBody,
-					requestTask.signature);
+			response.setResponseData(requestTask.getHttpStatusCode(),
+					requestTask.getResponseBody(), requestTask.getResponseSignature());
 		}
 
 		response.setResponseListener(this);
@@ -314,9 +201,10 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	private void saveLatestTransactionIdForCurrentUser(String transactionId) {
 		SharedPreferences prefs = mContext.getSharedPreferences(
 				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(
-				generatePreferencesLatestTransactionIdKey(mUserId, mHostInfo.getAppId()),
-				transactionId).commit();
+		prefs.edit()
+				.putString(
+						generatePreferencesLatestTransactionIdKey(mUserId.toString(), mHostInfo
+								.getAppId()), transactionId).commit();
 	}
 
 	private static String generatePreferencesLatestTransactionIdKey(String appId, String userId) {
@@ -331,7 +219,7 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 	 * @return The retrieved transaction ID or null.
 	 */
 	private String fetchLatestTransactionIdForCurrentAppAndUser() {
-		String retval = fetchLatestTransactionId(mContext, mHostInfo.getAppId(), mUserId);
+		String retval = fetchLatestTransactionId(mContext, mHostInfo.getAppId(), mUserId.toString());
 		// Log.i(getClass().getSimpleName(),
 		// String.format("fetchLatestTransactionIdForCurrentAppAndUser will return %s", retval));
 		return retval;
@@ -356,16 +244,6 @@ public class VirtualCurrencyConnector implements SPCurrencyServerListener {
 		// String.format("fetchLatestTransactionId(context, appId: %s, userId: %s) = %s", appId,
 		// userId, retval));
 		return retval;
-	}
-
-	/**
-	 * Gets the current UNIX timestamp (in seconds) for the outbound requests.
-	 * 
-	 * @return
-	 */
-	private static String getCurrentUnixTimestampAsString() {
-		final int MILLISECONDS_IN_SECOND = 1000;
-		return String.valueOf(System.currentTimeMillis() / MILLISECONDS_IN_SECOND);
 	}
 
 	/**

@@ -9,6 +9,7 @@ package com.sponsorpay.sdk.android.publisher;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -67,15 +68,21 @@ public abstract class OfferWebClient extends WebViewClient {
 
 	@Override
 	public boolean shouldOverrideUrlLoading(WebView view, String url) {
+		Log.i(LOG_TAG, "shouldOverrideUrlLoading called with url: " + url);
+
 		if (url.startsWith(SPONSORPAY_EXIT_SCHEMA)) {
+			
 			// ?status=<statusCode>&url=<url>)url is optional)
 			int resultCode = parseSponsorPayExitUrlForResultCode(url);
 			String targetUrl = parseSponsorPayExitUrlForTargetUrl(url);
 
+			Log.i(LOG_TAG, "Overriding. Target Url: " + targetUrl);
+			
 			onSponsorPayExitScheme(resultCode, targetUrl);
 
 			return true;
 		} else {
+			Log.i(LOG_TAG, "Not overriding");
 			return false;
 		}
 	}

@@ -6,6 +6,7 @@
 
 package com.sponsorpay.sdk.android.publisher.currency;
 
+
 /**
  * <p>
  * Interface to be implemented by parties interested in the results of requests to the SponsorPay Virtual Currency

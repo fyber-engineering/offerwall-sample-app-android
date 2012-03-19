@@ -138,6 +138,7 @@ public class UrlBuilder {
 		if (userId != null) {
 			keyValueParams.put(USERID_KEY, userId);
 		}
+		
 		keyValueParams.put(UDID_KEY, hostInfo.getUDID());
 		keyValueParams.put(APPID_KEY, String.valueOf(hostInfo.getAppId()));
 		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());

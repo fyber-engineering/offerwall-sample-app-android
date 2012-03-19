@@ -20,7 +20,7 @@ import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
  * Requests a new offer banner to the SponsorPay server and notifies the registered
  * {@link SPOfferBannerListener} of the result of the request.
  */
-public class OfferBannerRequest implements AsyncRequest.ResultListener {
+public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListener {
 
 	private static final String OFFERBANNER_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile";
 	private static final String OFFERBANNER_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile";
@@ -45,7 +45,7 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 	/**
 	 * User ID to include in the request.
 	 */
-	private String mUserId;
+	private UserId mUserId;
 
 	/**
 	 * {@link AdShape} whose description will be sent to the server in the request.
@@ -107,12 +107,12 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 
 		mContext = context;
 		mListener = listener;
-		mUserId = userId;
+		mUserId = UserId.make(context, userId);
 		mOfferBannerAdShape = offerBannerAdShape;
 		mHostInfo = hostInfo;
 		mCurrencyName = currencyName;
 		mCustomParams = customParams;
-		
+
 		requestOfferBanner();
 	}
 
@@ -145,7 +145,7 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 			mBaseDomain = OFFERBANNER_PRODUCTION_DOMAIN;
 		}
 
-		String offerBannerUrl = UrlBuilder.buildUrl(mBaseUrl, mUserId, mHostInfo, extraKeysValues);
+		String offerBannerUrl = UrlBuilder.buildUrl(mBaseUrl, mUserId.toString(), mHostInfo, extraKeysValues);
 
 		Log.i(OfferBanner.LOG_TAG, "Offer Banner Request URL: " + offerBannerUrl);
 
@@ -168,7 +168,7 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 			incrementPersistedBannerOffset();
 
 			mListener.onSPOfferBannerAvailable(banner);
-		} else if (mAsyncRequest.didRequestTriggerException()) {
+		} else if (mAsyncRequest.didRequestThrowError()) {
 			mListener.onSPOfferBannerRequestError(this);
 		} else {
 			mListener.onSPOfferBannerNotAvailable(this);
@@ -227,15 +227,34 @@ public class OfferBannerRequest implements AsyncRequest.ResultListener {
 	}
 
 	/**
-	 * Returns the local exception triggered when trying to send the request. An exception typically
-	 * means that there was a problem connecting to the network, but checking the type of the
-	 * returned exception can give a more accurate cause for the error.
+	 * Returns the local error thrown when trying to send the request. An exception typically means
+	 * that there was a problem connecting to the network, but checking the type of the returned
+	 * error can give a more accurate cause for the error.
+	 * 
+	 * @deprecated Use getRequestThrownError() instead, which returns a Throwable instance or null.
+	 *             This method will be removed in a future release.
 	 */
 	public Exception getRequestException() {
+		Exception retval = null;
+
 		if (mAsyncRequest != null) {
-			return mAsyncRequest.getRequestTriggeredException();
-		} else {
-			return null;
+			Throwable requestError = mAsyncRequest.getRequestThrownError();
+			if (requestError != null && Exception.class.isAssignableFrom(requestError.getClass()))
+				retval = (Exception) requestError;
 		}
+
+		return retval;
+	}
+
+	/**
+	 * Returns the local error thrown when trying to send the request. An exception typically means
+	 * that there was a problem connecting to the network, but checking the type of the returned
+	 * error can give a more accurate cause for the error.
+	 */
+	public Throwable getRequestThrownError() {
+		if (mAsyncRequest != null)
+			return mAsyncRequest.getRequestThrownError();
+		else
+			return null;
 	}
 }

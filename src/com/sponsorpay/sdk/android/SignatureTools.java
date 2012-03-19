@@ -72,23 +72,26 @@ public class SignatureTools {
 	 */
 	public static String generateSignatureForString(String text, String secretToken) {
 		String textPlusKey = text + secretToken;
+		
+		return generateSHA1ForString(textPlusKey);
+	}
 
+	public static String generateSHA1ForString(String text) {
 		String digestString = NO_SHA1_RESULT;
-
+		
 		try {
 			MessageDigest sha1 = MessageDigest.getInstance(SHA1_ALGORITHM);
-			byte[] digestBytes = sha1.digest(textPlusKey.getBytes());
+			byte[] digestBytes = sha1.digest(text.getBytes());
 			digestString = byteArray2Hex(digestBytes);
 		} catch (NoSuchAlgorithmException e) {
 			Log.e("UrlBuilder", "SHA1 algorithm not available.");
 			e.printStackTrace();
 		}
-
+		
 		return digestString;
-
 	}
-
-	private static String byteArray2Hex(byte[] hash) {
+	
+	public static String byteArray2Hex(byte[] hash) {
 		Formatter formatter = new Formatter();
 		for (byte b : hash) {
 			formatter.format("%02x", b);

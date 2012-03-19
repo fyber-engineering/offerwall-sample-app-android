@@ -31,7 +31,9 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifi
  * </p>
  */
 public class OfferWallActivity extends Activity {
-	private boolean SHOULD_STAY_OPEN_DEFAULT = true;
+	public static final String EXTRA_OFFERWALL_TYPE = "EXTRA_OFFERWALL_TEMPLATE_KEY";
+	public static final String OFFERWALL_TYPE_MOBILE = "OFFERWALL_TYPE_MOBILE";
+	public static final String OFFERWALL_TYPE_UNLOCK = "OFFERWALL_TYPE_UNLOCK";
 
 	/**
 	 * Key for extracting the current user ID from the extras bundle.
@@ -62,25 +64,19 @@ public class OfferWallActivity extends Activity {
 	public static final int RESULT_CODE_NO_STATUS_CODE = -10;
 
 	/**
-	 * Sponsorpay's URL to contact within the web view
-	 */
-	private static final String OFFERWALL_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile?";
-	private static final String OFFERWALL_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile?";
-
-	/**
 	 * Full-size web view within the activity
 	 */
-	private WebView mWebView;
+	protected WebView mWebView;
 
 	/**
 	 * The user ID (after extracting it from the extra)
 	 */
-	private String mUserId;
+	protected UserId mUserId;
 
 	/**
 	 * Information about the hosting application and device.
 	 */
-	private HostInfo mHostInfo;
+	protected HostInfo mHostInfo;
 
 	/**
 	 * Whether this activity should stay open or close when the user is redirected outside the
@@ -91,7 +87,7 @@ public class OfferWallActivity extends Activity {
 	/**
 	 * Map of custom key/values to add to the parameters on the OfferWall request URL.
 	 */
-	private Map<String, String> mCustomKeysValues;
+	protected Map<String, String> mCustomKeysValues;
 
 	/**
 	 * Loading progress dialog.
@@ -103,6 +99,8 @@ public class OfferWallActivity extends Activity {
 	 */
 	private AlertDialog mErrorDialog;
 
+	private OfferWallTemplate mTemplate;
+
 	/**
 	 * Overriden from {@link Activity}. Upon activity start, extract the user ID from the extra,
 	 * create the web view and setup the interceptor for the web view exit-request.
@@ -110,7 +108,6 @@ public class OfferWallActivity extends Activity {
 	 * @param savedInstanceState
 	 *            Android's savedInstanceState
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -126,22 +123,9 @@ public class OfferWallActivity extends Activity {
 
 		mHostInfo = new HostInfo(getApplicationContext());
 
-		// Get data from extras
-		mUserId = getIntent().getStringExtra(EXTRA_USERID_KEY);
+		instantiateTemplate();
 
-		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY,
-				SHOULD_STAY_OPEN_DEFAULT);
-
-		Serializable inflatedKvMap = getIntent().getSerializableExtra(EXTRA_KEYS_VALUES_MAP);
-		if (inflatedKvMap instanceof HashMap<?, ?>) {
-			mCustomKeysValues = (HashMap<String, String>) inflatedKvMap;
-		}
-
-		String overridenAppId = getIntent().getStringExtra(EXTRA_OVERRIDEN_APP_ID);
-
-		if (overridenAppId != null && !overridenAppId.equals("")) {
-			mHostInfo.setOverriddenAppId(overridenAppId);
-		}
+		fetchPassedExtras();
 
 		mWebView = new WebView(OfferWallActivity.this);
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
@@ -181,6 +165,39 @@ public class OfferWallActivity extends Activity {
 		});
 	}
 
+	private void instantiateTemplate() {
+		String templateName = getIntent().getStringExtra(EXTRA_OFFERWALL_TYPE);
+
+		if (OFFERWALL_TYPE_UNLOCK.equals(templateName)) {
+			mTemplate = new UnlockOfferWallTemplate();
+		} else {
+			mTemplate = new MobileOfferWallTemplate();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void fetchPassedExtras() {
+		// Get data from extras
+		String passedUserId = getIntent().getStringExtra(EXTRA_USERID_KEY);
+		mUserId = UserId.make(getApplicationContext(), passedUserId);
+
+		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY,
+				mTemplate.shouldStayOpenByDefault());
+
+		Serializable inflatedKvMap = getIntent().getSerializableExtra(EXTRA_KEYS_VALUES_MAP);
+		if (inflatedKvMap instanceof HashMap<?, ?>) {
+			mCustomKeysValues = (HashMap<String, String>) inflatedKvMap;
+		}
+
+		String overridenAppId = getIntent().getStringExtra(EXTRA_OVERRIDEN_APP_ID);
+
+		if (overridenAppId != null && !overridenAppId.equals("")) {
+			mHostInfo.setOverriddenAppId(overridenAppId);
+		}
+
+		mTemplate.fetchAdditionalExtras();
+	}
+
 	@Override
 	protected void onPause() {
 		if (mErrorDialog != null) {
@@ -200,16 +217,20 @@ public class OfferWallActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		String offerWallBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? OFFERWALL_STAGING_BASE_URL
-				: OFFERWALL_PRODUCTION_BASE_URL;
+
 		try {
-			String offerwallUrl = UrlBuilder.buildUrl(offerWallBaseUrl, mUserId, mHostInfo,
-					mCustomKeysValues, null);
+			String offerwallUrl = generateUrl();
 			Log.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
 			mWebView.loadUrl(offerwallUrl);
 		} catch (RuntimeException ex) {
 			showErrorDialog(ex.getMessage());
 		}
+	}
+
+	private String generateUrl() {
+		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
+		String baseUrl = mTemplate.getBaseUrl();
+		return UrlBuilder.buildUrl(baseUrl, mUserId.toString(), mHostInfo, mCustomKeysValues, null);
 	}
 
 	/**
@@ -256,5 +277,89 @@ public class OfferWallActivity extends Activity {
 					"Couldn't show error dialog. Not displayed error message is: " + errorMessage,
 					e);
 		}
+	}
+
+	public abstract class OfferWallTemplate {
+		public abstract void fetchAdditionalExtras();
+
+		public abstract String getBaseUrl();
+
+		public abstract Map<String, String> addAdditionalParameters(Map<String, String> params);
+
+		public abstract boolean shouldStayOpenByDefault();
+	}
+
+	public class MobileOfferWallTemplate extends OfferWallTemplate {
+		/**
+		 * Sponsorpay's URL to contact within the web view
+		 */
+		private static final String OFFERWALL_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile?";
+		private static final String OFFERWALL_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile?";
+
+		@Override
+		public void fetchAdditionalExtras() {
+
+		}
+
+		@Override
+		public String getBaseUrl() {
+			return SponsorPayPublisher.shouldUseStagingUrls() ? OFFERWALL_STAGING_BASE_URL
+					: OFFERWALL_PRODUCTION_BASE_URL;
+		}
+
+		@Override
+		public Map<String, String> addAdditionalParameters(Map<String, String> params) {
+			return params;
+		}
+
+		@Override
+		public boolean shouldStayOpenByDefault() {
+			return true;
+		}
+
+	}
+
+	public class UnlockOfferWallTemplate extends OfferWallTemplate {
+		/**
+		 * Sponsorpay's URL to contact within the web view
+		 */
+		private static final String UNLOCK_OFFERWALL_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/unlock?";
+		private static final String UNLOCK_OFFERWALL_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/unlock?";
+
+		/**
+		 * Key for extracting the value of {@link #mUnlockItemId} from the extras bundle.
+		 */
+		public static final String EXTRA_UNLOCK_ITEM_ID_KEY = "EXTRA_UNLOCK_ITEM_ID_KEY";
+
+		public static final String PARAM_UNLOCK_ITEM_ID_KEY = "itemid";
+
+		private String mUnlockItemId;
+
+		@Override
+		public void fetchAdditionalExtras() {
+			mUnlockItemId = getIntent().getStringExtra(EXTRA_UNLOCK_ITEM_ID_KEY);
+		}
+
+		@Override
+		public String getBaseUrl() {
+			return SponsorPayPublisher.shouldUseStagingUrls() ? UNLOCK_OFFERWALL_STAGING_BASE_URL
+					: UNLOCK_OFFERWALL_PRODUCTION_BASE_URL;
+		}
+
+		@Override
+		public Map<String, String> addAdditionalParameters(Map<String, String> params) {
+			if (params == null) {
+				params = new HashMap<String, String>();
+			}
+			params.put(PARAM_UNLOCK_ITEM_ID_KEY, mUnlockItemId);
+
+			return params;
+		}
+
+		@Override
+		public boolean shouldStayOpenByDefault() {
+			return false;
+		}
+
 	}
 }

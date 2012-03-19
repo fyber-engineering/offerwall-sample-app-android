@@ -23,6 +23,9 @@ import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadi
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
+import com.sponsorpay.sdk.android.publisher.unlock.ItemIdValidator;
+import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
+import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
 
 /**
  * Provides convenience calls to load and show the mobile Offer Wall and the mobile Interstitial.
@@ -199,6 +202,11 @@ public class SponsorPayPublisher {
 	public static final int DEFAULT_OFFERWALL_REQUEST_CODE = 0xFF;
 
 	/**
+	 * The default request code needed for starting the Unlock Offer Wall activity.
+	 */
+	public static final int DEFAULT_UNLOCK_OFFERWALL_REQUEST_CODE = 0xFE;
+
+	/**
 	 * <p>
 	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}.
 	 * </p>
@@ -317,6 +325,39 @@ public class SponsorPayPublisher {
 		return intent;
 	}
 
+	public static Intent getIntentForUnlockOfferWallActivity(Context context, String userId,
+			String unlockItemId, String unlockItemName) {
+
+		return getIntentForUnlockOfferWallActivity(context, userId, unlockItemId, unlockItemName,
+				null, null);
+	}
+
+	public static Intent getIntentForUnlockOfferWallActivity(Context context, String userId,
+			String unlockItemId, String unlockItemName, String overrideAppId,
+			HashMap<String, String> customParams) {
+
+		ItemIdValidator itemIdValidator = new ItemIdValidator(unlockItemId);
+		if (!itemIdValidator.validate()) {
+			throw new RuntimeException("The provided Unlock Item ID is not valid. "
+					+ itemIdValidator.getValidationDescription());
+		}
+
+		Intent intent = new Intent(context, OfferWallActivity.class);
+		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, userId);
+
+		intent.putExtra(OfferWallActivity.EXTRA_OFFERWALL_TYPE,
+				OfferWallActivity.OFFERWALL_TYPE_UNLOCK);
+		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_ID_KEY,
+				unlockItemId);
+
+		if (overrideAppId != null)
+			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
+
+		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP, getCustomParameters(customParams));
+
+		return intent;
+	}
+
 	/**
 	 * Starts the mobile interstitial request / loading / showing process.
 	 * 
@@ -415,13 +456,13 @@ public class SponsorPayPublisher {
 		if (loadingTimeoutSecs > 0) {
 			il.setLoadingTimeoutSecs(loadingTimeoutSecs);
 		}
-		
+
 		Map<String, String> extraParams = getCustomParameters(customParams);
-		
+
 		if (extraParams != null) {
 			il.setCustomParameters(extraParams);
 		}
-		
+
 		il.startLoading();
 	}
 
@@ -497,7 +538,7 @@ public class SponsorPayPublisher {
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName) {
-		
+
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
 				backgroundUrl, skinName, 0, null, null);
 	}
@@ -526,7 +567,7 @@ public class SponsorPayPublisher {
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
-		
+
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, null,
 				null, 0, null, null);
 	}
@@ -622,8 +663,31 @@ public class SponsorPayPublisher {
 				hostInfo, securityToken);
 
 		vcc.setCustomParameters(getCustomParameters(customParams));
-		
+
 		vcc.fetchDeltaOfCoins();
+	}
+
+	public static void requestUnlockItemsStatus(Context context, String userId,
+			SPUnlockResponseListener listener, String securityToken) {
+
+		requestUnlockItemsStatus(context, userId, listener, securityToken, null, null);
+	}
+
+	public static void requestUnlockItemsStatus(Context context, String userId,
+			SPUnlockResponseListener listener, String securityToken, String applicationId,
+			Map<String, String> customParams) {
+
+		HostInfo hostInfo = new HostInfo(context);
+
+		if (applicationId != null)
+			hostInfo.setOverriddenAppId(applicationId);
+
+		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, userId, listener,
+				hostInfo, securityToken);
+
+		uc.setCustomParameters(getCustomParameters(customParams));
+
+		uc.fetchItemsStatus();
 	}
 
 	/**

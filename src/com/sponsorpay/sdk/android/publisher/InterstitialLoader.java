@@ -48,7 +48,7 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifi
  * events in the life of the interstitial.
  * </p>
  */
-public class InterstitialLoader implements AsyncRequest.ResultListener {
+public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListener {
 	/**
 	 * Interface to be implemented by parties interested in being notified of interesting events in
 	 * the life of the interstitial.
@@ -108,7 +108,7 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 	 * {@link InterstitialActivity} and to attach the loading progress dialog to.
 	 */
 	private Activity mCallingActivity;
-	private String mUserId;
+	private UserId mUserId;
 	private HostInfo mHostInfo;
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 	private Map<String, String> mCustomParams;
@@ -146,10 +146,10 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 			InterstitialLoadingStatusListener loadingStatusListener) {
 
 		mCallingActivity = callingActivity;
-		mUserId = userId;
+		mUserId = UserId.make(callingActivity.getApplicationContext(), userId);
 		mHostInfo = hostInfo;
 		mLoadingStatusListener = loadingStatusListener;
-		
+
 		mHandler = new Handler();
 	}
 
@@ -159,7 +159,7 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 	public void setCustomParameters(Map<String, String> customParams) {
 		mCustomParams = customParams;
 	}
-	
+
 	/**
 	 * Can be set to the absolute URL of an image to use as background graphic for the interstitial.
 	 * Must include the protocol scheme (http:// or https://) at the beginning of the URL. Leave it
@@ -220,30 +220,28 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 		cancelInterstitialLoading();
 
 		String[] interstitialUrlExtraKeys = new String[] { URL_PARAM_INTERSTITIAL_KEY,
-				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY,
-				UrlBuilder.URL_PARAM_OFFSET_KEY };
+				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, UrlBuilder.URL_PARAM_OFFSET_KEY };
 		String[] interstitialUrlExtraValues = new String[] { UrlBuilder.URL_PARAM_VALUE_ON,
-				UrlBuilder.URL_PARAM_VALUE_ON,
-				String.valueOf(sInterstitialAvailableResponseCount) };
+				UrlBuilder.URL_PARAM_VALUE_ON, String.valueOf(sInterstitialAvailableResponseCount) };
 
-		Map<String, String> keysValues =
-				UrlBuilder.mapKeysToValues(interstitialUrlExtraKeys, interstitialUrlExtraValues);
+		Map<String, String> keysValues = UrlBuilder.mapKeysToValues(interstitialUrlExtraKeys,
+				interstitialUrlExtraValues);
 
 		if (mSkinName != null && !"".equals(mSkinName))
 			keysValues.put(URL_PARAM_SKIN_KEY, mSkinName);
 
 		if (mBackgroundUrl != null && !"".equals(mBackgroundUrl))
 			keysValues.put(URL_PARAM_BACKGROUND_KEY, mBackgroundUrl);
-		
+
 		if (mCustomParams != null) {
 			keysValues.putAll(mCustomParams);
 		}
-				
+
 		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
 				: INTERSTITIAL_PRODUCTION_BASE_URL;
 
-		String interstitialUrl = UrlBuilder.buildUrl(interstitialBaseUrl, mUserId, mHostInfo,
-				keysValues);
+		String interstitialUrl = UrlBuilder.buildUrl(interstitialBaseUrl, mUserId.toString(),
+				mHostInfo, keysValues);
 
 		Log.i("interstitial", "url: " + interstitialUrl);
 
@@ -252,6 +250,7 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 
 		if (mCancelLoadingOnTimeOut != null) {
 			mHandler.removeCallbacks(mCancelLoadingOnTimeOut);
+			mCancelLoadingOnTimeOut = null;
 		}
 
 		mCancelLoadingOnTimeOut = new Runnable() {
@@ -340,18 +339,29 @@ public class InterstitialLoader implements AsyncRequest.ResultListener {
 	public void onAsyncRequestComplete(AsyncRequest request) {
 		Log.v(LOG_TAG, "Interstitial request completed with status code: "
 				+ request.getHttpStatusCode() + ", did trigger exception: "
-				+ request.didRequestTriggerException());
+				+ request.didRequestThrowError());
+
+		if (mCancelLoadingOnTimeOut != null) {
+			mHandler.removeCallbacks(mCancelLoadingOnTimeOut);
+			mCancelLoadingOnTimeOut = null;
+		}
 
 		dismissProgressDialog();
 
-		if (request.hasSucessfulStatusCode()) {
+		/*
+		 * In the rare event the request for the Interstitial returns a response which indicates
+		 * that the Interstitial is available but contains no cookie headers, treat it like an
+		 * Interstitial Not Available case and don't show the Interstitial Activity.
+		 */
+		if (request.hasSucessfulStatusCode() && request.hasCookies()) {
 			sInterstitialAvailableResponseCount++;
 			if (mLoadingStatusListener != null) {
 				mLoadingStatusListener.onWillShowInterstitial();
 			}
+
 			launchInterstitialActivity(request);
-			// showInterstitialOverlay(request);
-		} else if (request.didRequestTriggerException()) {
+
+		} else if (request.didRequestThrowError()) {
 			if (mLoadingStatusListener != null) {
 				mLoadingStatusListener.onInterstitialRequestError();
 			}

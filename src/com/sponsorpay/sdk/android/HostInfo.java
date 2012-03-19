@@ -6,6 +6,7 @@
 
 package com.sponsorpay.sdk.android;
 
+import java.lang.reflect.Field;
 import java.util.Locale;
 
 import android.content.Context;
@@ -28,6 +29,27 @@ public class HostInfo {
 	 * Prefix appended to the OS version to identify the Android platform.
 	 */
 	private static final String ANDROID_OS_PREFIX = "Android OS ";
+
+	private static boolean sSimulateNoReadPhoneStatePermission = false;
+	private static boolean sSimulateNoAccessWifiStatePermission = false;
+	private static boolean sSimulateInvalidAndroidId = false;
+	private static boolean sSimulateNoHardwareSerialNumber = false;
+
+	public static void setSimulateNoReadPhoneStatePermission(boolean value) {
+		sSimulateNoReadPhoneStatePermission = value;
+	}
+
+	public static void setSimulateNoAccessWifiStatePermission(boolean value) {
+		sSimulateNoAccessWifiStatePermission = value;
+	}
+
+	public static void setSimulateInvalidAndroidId(boolean value) {
+		sSimulateInvalidAndroidId = value;
+	}
+
+	public static void setSimulateNoHardwareSerialNumber(boolean value) {
+		sSimulateNoHardwareSerialNumber = value;
+	}
 
 	/**
 	 * The unique device ID.
@@ -58,6 +80,8 @@ public class HostInfo {
 	 * MAC Address of the WiFi Adapter
 	 */
 	private String mWifiMacAddress;
+
+	private String mHardwareSerialNumber;
 
 	/**
 	 * The SponsorPay's App ID Key that is used in the AndroidManifest.xml file.
@@ -101,6 +125,28 @@ public class HostInfo {
 		return mPhoneVersion;
 	}
 
+	public String getHardwareSerialNumber() {
+		if (mHardwareSerialNumber == null) {
+			if (!sSimulateNoHardwareSerialNumber) {
+				Field serialField = null;
+				try {
+					serialField = android.os.Build.class.getField("SERIAL");
+					Object serialValue = serialField.get(null);
+					if (serialValue != null && serialValue.getClass().equals(String.class)) {
+						mHardwareSerialNumber = (String) serialValue;
+					}
+				} catch (Exception e) {
+					// Probably running on an older version of Android which doesn't include this
+					// field
+					mHardwareSerialNumber = "";
+				}
+			} else {
+				mHardwareSerialNumber = "";
+			}
+		}
+		return mHardwareSerialNumber;
+	}
+
 	/**
 	 * Get the default locale set by the user
 	 * 
@@ -134,16 +180,19 @@ public class HostInfo {
 	public HostInfo(Context context) {
 		mContext = context;
 
-		// Get access to the Telephony Services
-		TelephonyManager tManager = (TelephonyManager) context
-				.getSystemService(Context.TELEPHONY_SERVICE);
-
-		try {
-			mUDID = tManager.getDeviceId();
-		} catch (SecurityException e) {
+		if (!sSimulateNoReadPhoneStatePermission) {
+			// Get access to the Telephony Services
+			TelephonyManager tManager = (TelephonyManager) context
+					.getSystemService(Context.TELEPHONY_SERVICE);
+			try {
+				mUDID = tManager.getDeviceId();
+			} catch (SecurityException e) {
+				mUDID = "";
+			}
+		} else {
 			mUDID = "";
 		}
-		
+
 		// Get the default locale
 		mLanguageSetting = Locale.getDefault().toString();
 
@@ -154,21 +203,26 @@ public class HostInfo {
 		mPhoneVersion = android.os.Build.MANUFACTURER + "_" + android.os.Build.MODEL;
 
 		// Android ID
-		mAndroidId = Secure.getString(mContext.getContentResolver(), Secure.ANDROID_ID);
+		if (!sSimulateInvalidAndroidId) {
+			mAndroidId = Secure.getString(mContext.getContentResolver(), Secure.ANDROID_ID);
 
-		if (mAndroidId == null) {
+			if (mAndroidId == null) {
+				mAndroidId = "";
+			}
+		} else {
 			mAndroidId = "";
 		}
 
-		try {
-			// MAC address of WiFi adapter
-			WifiManager wifiMan = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-			WifiInfo wifiInf = wifiMan.getConnectionInfo();
-			mWifiMacAddress = wifiInf.getMacAddress();
-		} catch (RuntimeException re) {
-		}
-
-		if (mWifiMacAddress == null) {
+		if (!sSimulateNoAccessWifiStatePermission) {
+			try {
+				// MAC address of WiFi adapter
+				WifiManager wifiMan = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+				WifiInfo wifiInf = wifiMan.getConnectionInfo();
+				mWifiMacAddress = wifiInf.getMacAddress();
+			} catch (RuntimeException re) {
+				mWifiMacAddress = "";
+			}
+		} else {
 			mWifiMacAddress = "";
 		}
 	}

@@ -71,7 +71,7 @@ public class OfferWallActivity extends Activity {
 	/**
 	 * The user ID (after extracting it from the extra)
 	 */
-	protected String mUserId;
+	protected UserId mUserId;
 
 	/**
 	 * Information about the hosting application and device.
@@ -178,7 +178,8 @@ public class OfferWallActivity extends Activity {
 	@SuppressWarnings("unchecked")
 	protected void fetchPassedExtras() {
 		// Get data from extras
-		mUserId = getIntent().getStringExtra(EXTRA_USERID_KEY);
+		String passedUserId = getIntent().getStringExtra(EXTRA_USERID_KEY);
+		mUserId = UserId.make(getApplicationContext(), passedUserId);
 
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY,
 				mTemplate.shouldStayOpenByDefault());
@@ -193,7 +194,7 @@ public class OfferWallActivity extends Activity {
 		if (overridenAppId != null && !overridenAppId.equals("")) {
 			mHostInfo.setOverriddenAppId(overridenAppId);
 		}
-		
+
 		mTemplate.fetchAdditionalExtras();
 	}
 
@@ -229,7 +230,7 @@ public class OfferWallActivity extends Activity {
 	private String generateUrl() {
 		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
 		String baseUrl = mTemplate.getBaseUrl();
-		return UrlBuilder.buildUrl(baseUrl, mUserId, mHostInfo, mCustomKeysValues, null);
+		return UrlBuilder.buildUrl(baseUrl, mUserId.toString(), mHostInfo, mCustomKeysValues, null);
 	}
 
 	/**
@@ -294,7 +295,7 @@ public class OfferWallActivity extends Activity {
 		 */
 		private static final String OFFERWALL_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile?";
 		private static final String OFFERWALL_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile?";
-		
+
 		@Override
 		public void fetchAdditionalExtras() {
 
@@ -317,7 +318,7 @@ public class OfferWallActivity extends Activity {
 		}
 
 	}
-	
+
 	public class UnlockOfferWallTemplate extends OfferWallTemplate {
 		/**
 		 * Sponsorpay's URL to contact within the web view
@@ -329,11 +330,11 @@ public class OfferWallActivity extends Activity {
 		 * Key for extracting the value of {@link #mUnlockItemId} from the extras bundle.
 		 */
 		public static final String EXTRA_UNLOCK_ITEM_ID_KEY = "EXTRA_UNLOCK_ITEM_ID_KEY";
-		
+
 		public static final String PARAM_UNLOCK_ITEM_ID_KEY = "itemid";
 
 		private String mUnlockItemId;
-		
+
 		@Override
 		public void fetchAdditionalExtras() {
 			mUnlockItemId = getIntent().getStringExtra(EXTRA_UNLOCK_ITEM_ID_KEY);
@@ -351,7 +352,7 @@ public class OfferWallActivity extends Activity {
 				params = new HashMap<String, String>();
 			}
 			params.put(PARAM_UNLOCK_ITEM_ID_KEY, mUnlockItemId);
-			
+
 			return params;
 		}
 

@@ -23,7 +23,7 @@ public abstract class AbstractConnector implements AsyncRequestResultListener {
 	/**
 	 * ID of the user for whom the requests will be made.
 	 */
-	protected String mUserId;
+	protected UserId mUserId;
 	
 	/**
 	 * {@link HostInfo} containing data about the host device and application, including its
@@ -43,7 +43,7 @@ public abstract class AbstractConnector implements AsyncRequestResultListener {
 	
 	protected AbstractConnector(Context context, String userId, HostInfo hostInfo, String securityToken) {
 		mContext = context;
-		mUserId = userId;
+		mUserId = UserId.make(context, userId);
 		mHostInfo = hostInfo;
 		mSecurityToken = securityToken;
 	}

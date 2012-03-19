@@ -9,6 +9,7 @@ import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse.RequestErrorType;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
 
@@ -17,7 +18,8 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 	/*
 	 * API Resource URLs.
 	 */
-	private static final String SP_UNLOCK_SERVER_BASE_URL = "http://api.sponsorpay.com/vcs/v1/";
+	private static final String SP_UNLOCK_SERVER_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/vcs/v1/";
+	private static final String SP_UNLOCK_SERVER_PRODUCTION_BASE_URL = "http://api.sponsorpay.com/vcs/v1/";
 	private static final String SP_UNLOCK_REQUEST_RESOURCE = "items.json";
 
 	/**
@@ -44,11 +46,14 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 			extraKeysValues.putAll(mCustomParameters);
 		}
 
-		String requestUrl = UrlBuilder.buildUrl(SP_UNLOCK_SERVER_BASE_URL
-				+ SP_UNLOCK_REQUEST_RESOURCE, mUserId, mHostInfo, extraKeysValues, mSecurityToken);
+		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? SP_UNLOCK_SERVER_STAGING_BASE_URL
+				: SP_UNLOCK_SERVER_PRODUCTION_BASE_URL;
 
-		Log.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
-				+ requestUrl);
+		String requestUrl = UrlBuilder.buildUrl(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mUserId
+				.toString(), mHostInfo, extraKeysValues, mSecurityToken);
+
+		Log.d(getClass().getSimpleName(),
+				"Unlock items status request will be sent to URL + params: " + requestUrl);
 
 		AsyncRequest requestTask = new AsyncRequest(requestUrl, this);
 		requestTask.execute();

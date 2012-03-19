@@ -28,7 +28,8 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	/*
 	 * VCS API Resource URLs.
 	 */
-	private static final String VIRTUAL_CURRENCY_SERVER_BASE_URL = "http://api.sponsorpay.com/vcs/v1/";
+	private static final String VIRTUAL_CURRENCY_SERVER_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/vcs/v1/";
+	private static final String VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL = "http://api.sponsorpay.com/vcs/v1/";
 	private static final String CURRENCY_DELTA_REQUEST_RESOURCE = "new_credit.json";
 
 	/*
@@ -144,12 +145,14 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 			extraKeysValues.putAll(mCustomParameters);
 		}
 
-		String requestUrl = UrlBuilder.buildUrl(VIRTUAL_CURRENCY_SERVER_BASE_URL
-				+ CURRENCY_DELTA_REQUEST_RESOURCE, mUserId, mHostInfo, extraKeysValues,
-				mSecurityToken);
+		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? VIRTUAL_CURRENCY_SERVER_STAGING_BASE_URL
+				: VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL;
 
-		Log.d(getClass().getSimpleName(),
-				"Delta of coins request will be sent to URL + params: " + requestUrl);
+		String requestUrl = UrlBuilder.buildUrl(baseUrl + CURRENCY_DELTA_REQUEST_RESOURCE, mUserId
+				.toString(), mHostInfo, extraKeysValues, mSecurityToken);
+
+		Log.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
+				+ requestUrl);
 
 		CurrencyServerRequestAsyncTask requestTask = new CurrencyServerRequestAsyncTask(
 				RequestType.DELTA_COINS, requestUrl, this);
@@ -198,9 +201,10 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	private void saveLatestTransactionIdForCurrentUser(String transactionId) {
 		SharedPreferences prefs = mContext.getSharedPreferences(
 				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-		prefs.edit().putString(
-				generatePreferencesLatestTransactionIdKey(mUserId, mHostInfo.getAppId()),
-				transactionId).commit();
+		prefs.edit()
+				.putString(
+						generatePreferencesLatestTransactionIdKey(mUserId.toString(), mHostInfo
+								.getAppId()), transactionId).commit();
 	}
 
 	private static String generatePreferencesLatestTransactionIdKey(String appId, String userId) {
@@ -215,7 +219,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * @return The retrieved transaction ID or null.
 	 */
 	private String fetchLatestTransactionIdForCurrentAppAndUser() {
-		String retval = fetchLatestTransactionId(mContext, mHostInfo.getAppId(), mUserId);
+		String retval = fetchLatestTransactionId(mContext, mHostInfo.getAppId(), mUserId.toString());
 		// Log.i(getClass().getSimpleName(),
 		// String.format("fetchLatestTransactionIdForCurrentAppAndUser will return %s", retval));
 		return retval;

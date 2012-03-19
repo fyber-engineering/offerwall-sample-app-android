@@ -19,7 +19,7 @@ public class UnlockedItemsResponse extends AbstractResponse {
 	private static final String UNLOCKED_KEY = "unlocked";
 
 	private Map<String, Item> mReturnedItems;
-	
+
 	/**
 	 * Listener which will be notified after parsing the response. Every response type may call a
 	 * different listener method.
@@ -36,10 +36,10 @@ public class UnlockedItemsResponse extends AbstractResponse {
 		mListener = listener;
 	}
 
-	public Map<String, Item>getItems() {
+	public Map<String, Item> getItems() {
 		return mReturnedItems;
 	}
-	
+
 	@Override
 	public void parseSuccessfulResponse() {
 		try {
@@ -53,7 +53,7 @@ public class UnlockedItemsResponse extends AbstractResponse {
 				parsedItem.name = itemAsJsonObject.getString(ITEM_NAME_KEY);
 				parsedItem.unlocked = itemAsJsonObject.getBoolean(UNLOCKED_KEY);
 				parsedItem.timestamp = itemAsJsonObject.getLong(TIMESTAMP_KEY);
-				
+
 				mReturnedItems.put(parsedItem.name, parsedItem);
 			}
 			mErrorType = RequestErrorType.NO_ERROR;
@@ -79,12 +79,12 @@ public class UnlockedItemsResponse extends AbstractResponse {
 	void setErrorType(RequestErrorType errorType) {
 		mErrorType = errorType;
 	}
-	
+
 	public static class Item {
 		private String id, name;
 		private long timestamp;
 		private boolean unlocked;
-	
+
 		public String getId() {
 			return id;
 		}
@@ -92,19 +92,19 @@ public class UnlockedItemsResponse extends AbstractResponse {
 		public String getName() {
 			return name;
 		}
-		
+
 		public long getTimestamp() {
 			return timestamp;
 		}
-		
+
 		public boolean isUnlocked() {
 			return unlocked;
 		}
-		
+
 		@Override
 		public String toString() {
-			return String.format("Item ID: %s, name: %s, unlocked: %s, timestamp:%l",
-					id, name, unlocked ? "true" : "false", timestamp);
+			return String.format("Item ID: %s, name: %s, unlocked: %s, timestamp:%d", id, name,
+					unlocked ? "true" : "false", timestamp);
 		}
 	}
 }

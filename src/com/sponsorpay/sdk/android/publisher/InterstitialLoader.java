@@ -108,7 +108,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * {@link InterstitialActivity} and to attach the loading progress dialog to.
 	 */
 	private Activity mCallingActivity;
-	private String mUserId;
+	private UserId mUserId;
 	private HostInfo mHostInfo;
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 	private Map<String, String> mCustomParams;
@@ -146,7 +146,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 			InterstitialLoadingStatusListener loadingStatusListener) {
 
 		mCallingActivity = callingActivity;
-		mUserId = userId;
+		mUserId = UserId.make(callingActivity.getApplicationContext(), userId);
 		mHostInfo = hostInfo;
 		mLoadingStatusListener = loadingStatusListener;
 
@@ -240,8 +240,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
 				: INTERSTITIAL_PRODUCTION_BASE_URL;
 
-		String interstitialUrl = UrlBuilder.buildUrl(interstitialBaseUrl, mUserId, mHostInfo,
-				keysValues);
+		String interstitialUrl = UrlBuilder.buildUrl(interstitialBaseUrl, mUserId.toString(),
+				mHostInfo, keysValues);
 
 		Log.i("interstitial", "url: " + interstitialUrl);
 
@@ -326,12 +326,12 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		Log.v(LOG_TAG, "Interstitial request completed with status code: "
 				+ request.getHttpStatusCode() + ", did trigger exception: "
 				+ request.didRequestThrowError());
-		
+
 		if (mCancelLoadingOnTimeOut != null) {
 			mHandler.removeCallbacks(mCancelLoadingOnTimeOut);
 			mCancelLoadingOnTimeOut = null;
 		}
-		
+
 		if (mProgressDialog != null && mProgressDialog.isShowing()) {
 			mProgressDialog.dismiss();
 		}

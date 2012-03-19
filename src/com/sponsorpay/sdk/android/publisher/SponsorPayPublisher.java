@@ -326,7 +326,15 @@ public class SponsorPayPublisher {
 	}
 
 	public static Intent getIntentForUnlockOfferWallActivity(Context context, String userId,
-			String unlockItemId, String overrideAppId, HashMap<String, String> customParams) {
+			String unlockItemId, String unlockItemName) {
+
+		return getIntentForUnlockOfferWallActivity(context, userId, unlockItemId, unlockItemName,
+				null, null);
+	}
+
+	public static Intent getIntentForUnlockOfferWallActivity(Context context, String userId,
+			String unlockItemId, String unlockItemName, String overrideAppId,
+			HashMap<String, String> customParams) {
 
 		ItemIdValidator itemIdValidator = new ItemIdValidator(unlockItemId);
 		if (!itemIdValidator.validate()) {
@@ -660,7 +668,13 @@ public class SponsorPayPublisher {
 	}
 
 	public static void requestUnlockItemsStatus(Context context, String userId,
-			SPUnlockResponseListener userListener, String securityToken, String applicationId,
+			SPUnlockResponseListener listener, String securityToken) {
+
+		requestUnlockItemsStatus(context, userId, listener, securityToken, null, null);
+	}
+
+	public static void requestUnlockItemsStatus(Context context, String userId,
+			SPUnlockResponseListener listener, String securityToken, String applicationId,
 			Map<String, String> customParams) {
 
 		HostInfo hostInfo = new HostInfo(context);
@@ -668,7 +682,7 @@ public class SponsorPayPublisher {
 		if (applicationId != null)
 			hostInfo.setOverriddenAppId(applicationId);
 
-		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, userId, userListener,
+		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, userId, listener,
 				hostInfo, securityToken);
 
 		uc.setCustomParameters(getCustomParameters(customParams));

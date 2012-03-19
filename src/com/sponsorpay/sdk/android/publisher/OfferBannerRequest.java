@@ -45,7 +45,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	/**
 	 * User ID to include in the request.
 	 */
-	private String mUserId;
+	private UserId mUserId;
 
 	/**
 	 * {@link AdShape} whose description will be sent to the server in the request.
@@ -107,7 +107,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 
 		mContext = context;
 		mListener = listener;
-		mUserId = userId;
+		mUserId = UserId.make(context, userId);
 		mOfferBannerAdShape = offerBannerAdShape;
 		mHostInfo = hostInfo;
 		mCurrencyName = currencyName;
@@ -145,7 +145,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 			mBaseDomain = OFFERBANNER_PRODUCTION_DOMAIN;
 		}
 
-		String offerBannerUrl = UrlBuilder.buildUrl(mBaseUrl, mUserId, mHostInfo, extraKeysValues);
+		String offerBannerUrl = UrlBuilder.buildUrl(mBaseUrl, mUserId.toString(), mHostInfo, extraKeysValues);
 
 		Log.i(OfferBanner.LOG_TAG, "Offer Banner Request URL: " + offerBannerUrl);
 

@@ -300,7 +300,7 @@ public class SponsorPayPublisher {
 	 * @param shouldStayOpen
 	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets
 	 *            redirected out of the app. False to close the Offer Wall.
-	 * @param overrideAppId
+	 * @param overridingAppId
 	 *            An app ID which will override the one included in the manifest.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
@@ -309,7 +309,7 @@ public class SponsorPayPublisher {
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
-			Boolean shouldStayOpen, String overrideAppId, HashMap<String, String> customParams) {
+			Boolean shouldStayOpen, String overridingAppId, HashMap<String, String> customParams) {
 
 		Intent intent = new Intent(context, OfferWallActivity.class);
 		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, userId);
@@ -317,10 +317,10 @@ public class SponsorPayPublisher {
 		if (shouldStayOpen != null)
 			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
 
-		if (overrideAppId != null)
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
+		if (overridingAppId != null)
+			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overridingAppId);
 
-		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP, getCustomParameters(customParams));
+		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
 
 		return intent;
 	}
@@ -351,9 +351,9 @@ public class SponsorPayPublisher {
 				unlockItemId);
 
 		if (overrideAppId != null)
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
+			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overrideAppId);
 
-		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP, getCustomParameters(customParams));
+		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
 
 		return intent;
 	}

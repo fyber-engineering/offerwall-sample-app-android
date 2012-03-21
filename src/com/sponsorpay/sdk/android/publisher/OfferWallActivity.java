@@ -49,20 +49,22 @@ public class OfferWallActivity extends Activity {
 	 * Key for extracting the App ID from the extras bundle. If no app id is provided it will be
 	 * retrieved from the application manifest.
 	 */
-	public static final String EXTRA_OVERRIDEN_APP_ID = "EXTRA_OVERRIDEN_APP_ID";
+	public static final String EXTRA_OVERRIDING_APP_ID_KEY = "EXTRA_OVERRIDING_APP_ID";
 
 	/**
 	 * Key for extracting a map of custom key/values to add to the parameters on the OfferWall
 	 * request URL from the extras bundle.
 	 */
-	public static final String EXTRA_KEYS_VALUES_MAP = "EXTRA_KEY_VALUES_MAP";
+	public static final String EXTRA_KEYS_VALUES_MAP_KEY = "EXTRA_KEY_VALUES_MAP";
 
+	public static final String EXTRA_OVERRIDING_URL_KEY = "EXTRA_OVERRIDING_URL_KEY";
+	
 	/**
 	 * The result code that is returned when the Offer Wall's parsed exit scheme does not contain a
 	 * status code.
 	 */
 	public static final int RESULT_CODE_NO_STATUS_CODE = -10;
-
+	
 	/**
 	 * Full-size web view within the activity
 	 */
@@ -101,8 +103,10 @@ public class OfferWallActivity extends Activity {
 
 	private OfferWallTemplate mTemplate;
 
+	private String mOverridingURL;
+	
 	/**
-	 * Overriden from {@link Activity}. Upon activity start, extract the user ID from the extra,
+	 * Overridden from {@link Activity}. Upon activity start, extract the user ID from the extra,
 	 * create the web view and setup the interceptor for the web view exit-request.
 	 * 
 	 * @param savedInstanceState
@@ -184,17 +188,19 @@ public class OfferWallActivity extends Activity {
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY,
 				mTemplate.shouldStayOpenByDefault());
 
-		Serializable inflatedKvMap = getIntent().getSerializableExtra(EXTRA_KEYS_VALUES_MAP);
+		Serializable inflatedKvMap = getIntent().getSerializableExtra(EXTRA_KEYS_VALUES_MAP_KEY);
 		if (inflatedKvMap instanceof HashMap<?, ?>) {
 			mCustomKeysValues = (HashMap<String, String>) inflatedKvMap;
 		}
 
-		String overridenAppId = getIntent().getStringExtra(EXTRA_OVERRIDEN_APP_ID);
+		String overridingAppId = getIntent().getStringExtra(EXTRA_OVERRIDING_APP_ID_KEY);
 
-		if (overridenAppId != null && !overridenAppId.equals("")) {
-			mHostInfo.setOverriddenAppId(overridenAppId);
+		if (overridingAppId != null && !overridingAppId.equals("")) {
+			mHostInfo.setOverriddenAppId(overridingAppId);
 		}
 
+		mOverridingURL = getIntent().getStringExtra(EXTRA_OVERRIDING_URL_KEY);
+		
 		mTemplate.fetchAdditionalExtras();
 	}
 
@@ -212,14 +218,15 @@ public class OfferWallActivity extends Activity {
 	}
 
 	/**
-	 * Overriden from {@link Activity}. Loads or reloads the contents of the offer wall webview.
+	 * Overridden from {@link Activity}. Loads or reloads the contents of the offer wall webview.
 	 */
 	@Override
 	protected void onResume() {
 		super.onResume();
 
 		try {
-			String offerwallUrl = generateUrl();
+			String offerwallUrl = determineUrl();
+				
 			Log.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
 			mWebView.loadUrl(offerwallUrl);
 		} catch (RuntimeException ex) {
@@ -227,6 +234,13 @@ public class OfferWallActivity extends Activity {
 		}
 	}
 
+	private String determineUrl() {
+		if (mOverridingURL != null && !mOverridingURL.equals(""))
+			return mOverridingURL;
+		else
+			return generateUrl();
+	}
+	
 	private String generateUrl() {
 		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
 		String baseUrl = mTemplate.getBaseUrl();

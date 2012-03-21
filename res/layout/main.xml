@@ -147,6 +147,30 @@
                 android:layout_height="wrap_content"
                 android:text="Use staging URLs" />
 
+            <CheckBox
+                android:id="@+id/simulate_no_phone_state_permission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simulate no READ PHONE STATE permission (no access to IMEI)" />
+
+            <CheckBox
+                android:id="@+id/simulate_no_wifi_state_permission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simulate no ACCESS WIFI STATE permission (no access to WiFi MAC Address)" />
+
+            <CheckBox
+                android:id="@+id/simulate_invalid_android_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simulate invalid Android ID" />
+
+            <CheckBox
+                android:id="@+id/simulate_no_hw_serial_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simulate no Hardware Serial Number" />
+
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

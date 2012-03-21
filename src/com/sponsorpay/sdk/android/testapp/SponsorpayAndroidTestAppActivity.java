@@ -5,23 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
-import com.sponsorpay.sdk.android.publisher.AbstractResponse;
-import com.sponsorpay.sdk.android.publisher.OfferBanner;
-import com.sponsorpay.sdk.android.publisher.OfferBannerRequest;
-import com.sponsorpay.sdk.android.publisher.SPOfferBannerListener;
-import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
-import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
-import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
-import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerAbstractResponse;
-import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerDeltaOfCoinsResponse;
-import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
-import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
-import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
-import com.sponsorpay.sdk.android.publisher.unlock.UnlockedItemsResponse;
-import com.sponsorpay.sdk.android.testapp.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -30,15 +13,38 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.format.DateFormat;
 import android.text.method.KeyListener;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.SponsorPay;
+import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
+import com.sponsorpay.sdk.android.publisher.AbstractResponse;
+import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
+import com.sponsorpay.sdk.android.publisher.OfferBanner;
+import com.sponsorpay.sdk.android.publisher.OfferBannerRequest;
+import com.sponsorpay.sdk.android.publisher.SPOfferBannerListener;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerAbstractResponse;
+import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerDeltaOfCoinsResponse;
+import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
+import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
+import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
+import com.sponsorpay.sdk.android.publisher.unlock.UnlockedItemsResponse;
 
 /**
  * Example activity in order to show the usage of Sponsorpay Android SDK.
@@ -57,14 +63,14 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private static final String USE_STAGING_URLS_PREFS_KEY = "USE_STAGING_URLS";
 
 	private static final int DEFAULT_DELAY_MIN = 15;
-	private static final String DEFAULT_SECURITY_TOKEN_VALUE = "b6acfc0227c82edb41f118d638e3c1d4e9ce0189";
+	private static final String DEFAULT_SECURITY_TOKEN_VALUE = "test";
 
 	/**
 	 * Shared preferences file name. Stores the values entered into the UI fields.
 	 */
 	private static final String PREFERENCES_FILE_NAME = "SponsorPayTestAppState";
 
-	private String mOverridenAppId;
+	private String mOverridingAppId;
 	private String mUserId;
 	private boolean mShouldStayOpen;
 	private String mBackgroundUrl;
@@ -77,6 +83,12 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private EditText mAppIdField;
 	private EditText mUserIdField;
 	private CheckBox mKeepOfferwallOpenCheckBox;
+
+	private CheckBox mSimulateNoPhoneStatePermissionCheckBox;
+	private CheckBox mSimulateNoWifiStatePermissionCheckBox;
+	private CheckBox mSimulateInvalidAndroidIdCheckBox;
+	private CheckBox mSimulateNoSerialNumberCheckBox;
+
 	private EditText mSkinNameField;
 	private EditText mBackgroundUrlField;
 	private EditText mSecurityTokenField;
@@ -100,12 +112,18 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.main);
+
+		bindViews();
+		setCustomErrorMessages();
 
 		((TextView) findViewById(R.id.sdk_version_string)).setText("SponsorPay Android SDK v. "
 				+ SponsorPay.RELEASE_VERSION_STRING);
 
+		mShouldSendAdvertiserCallbackOnResume = true;
+	}
+
+	protected void bindViews() {
 		mAppIdField = (EditText) findViewById(R.id.app_id_field);
 		mUserIdField = (EditText) findViewById(R.id.user_id_field);
 		mKeepOfferwallOpenCheckBox = (CheckBox) findViewById(R.id.keep_offerwall_open_checkbox);
@@ -117,17 +135,24 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mUnlockItemIdField = (EditText) findViewById(R.id.unlock_item_id_field);
 
 		mUseStagingUrlsCheckBox = (CheckBox) findViewById(R.id.use_staging_urls_checkbox);
+		mSimulateNoPhoneStatePermissionCheckBox = (CheckBox) findViewById(R.id.simulate_no_phone_state_permission);
+		mSimulateNoWifiStatePermissionCheckBox = (CheckBox) findViewById(R.id.simulate_no_wifi_state_permission);
+		mSimulateInvalidAndroidIdCheckBox = (CheckBox) findViewById(R.id.simulate_invalid_android_id);
+		mSimulateNoSerialNumberCheckBox = (CheckBox) findViewById(R.id.simulate_no_hw_serial_number);
 
 		mBannerContainer = (LinearLayout) findViewById(R.id.banner_container);
-
-		setCustomErrorMessages();
 
 		mCustomKeyValuesForRequest = new HashMap<String, String>();
 		mCustomKeyField = (EditText) findViewById(R.id.custom_key_field);
 		mCustomValueField = (EditText) findViewById(R.id.custom_value_field);
 
-		mCustomKeyField.setKeyListener(new KeyListener() {
+		mKeyValuesList = (TextView) findViewById(R.id.key_values_list);
 
+		setListenersInViews();
+	}
+
+	protected void setListenersInViews() {
+		mCustomKeyField.setKeyListener(new KeyListener() {
 			@Override
 			public boolean onKeyUp(View view, Editable text, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -158,7 +183,6 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		});
 
 		mCustomValueField.setKeyListener(new KeyListener() {
-
 			@Override
 			public boolean onKeyUp(View view, Editable text, int keyCode, KeyEvent event) {
 				if (keyCode == KeyEvent.KEYCODE_ENTER) {
@@ -189,8 +213,24 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 			}
 		});
 
-		mKeyValuesList = (TextView) findViewById(R.id.key_values_list);
-		mShouldSendAdvertiserCallbackOnResume = true;
+		OnCheckedChangeListener simCheckboxesChangeListener = new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (buttonView == mSimulateNoPhoneStatePermissionCheckBox)
+					HostInfo.setSimulateNoReadPhoneStatePermission(isChecked);
+				else if (buttonView == mSimulateNoWifiStatePermissionCheckBox)
+					HostInfo.setSimulateNoAccessWifiStatePermission(isChecked);
+				else if (buttonView == mSimulateInvalidAndroidIdCheckBox)
+					HostInfo.setSimulateInvalidAndroidId(isChecked);
+				else if (buttonView == mSimulateNoSerialNumberCheckBox)
+					HostInfo.setSimulateNoHardwareSerialNumber(isChecked);
+			}
+		};
+
+		mSimulateNoPhoneStatePermissionCheckBox.setOnCheckedChangeListener(simCheckboxesChangeListener);
+		mSimulateNoWifiStatePermissionCheckBox.setOnCheckedChangeListener(simCheckboxesChangeListener);
+		mSimulateInvalidAndroidIdCheckBox.setOnCheckedChangeListener(simCheckboxesChangeListener);
+		mSimulateNoSerialNumberCheckBox.setOnCheckedChangeListener(simCheckboxesChangeListener);
 	}
 
 	@Override
@@ -201,7 +241,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		SharedPreferences prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE);
 		Editor prefsEditor = prefs.edit();
 
-		prefsEditor.putString(APP_ID_PREFS_KEY, mOverridenAppId);
+		prefsEditor.putString(APP_ID_PREFS_KEY, mOverridingAppId);
 		prefsEditor.putString(USER_ID_PREFS_KEY, mUserId);
 		prefsEditor.putBoolean(KEEP_OFFERWALL_OPEN_PREFS_KEY, mShouldStayOpen);
 		prefsEditor.putString(BACKGROUND_URL_PREFS_KEY, mBackgroundUrl);
@@ -225,7 +265,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		// Recover the state of the UI fields from the app preferences.
 		SharedPreferences prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE);
 
-		mOverridenAppId = prefs.getString(APP_ID_PREFS_KEY, "");
+		mOverridingAppId = prefs.getString(APP_ID_PREFS_KEY, "");
 		mUserId = prefs.getString(USER_ID_PREFS_KEY, "");
 		mShouldStayOpen = prefs.getBoolean(KEEP_OFFERWALL_OPEN_PREFS_KEY, true);
 		mBackgroundUrl = prefs.getString(BACKGROUND_URL_PREFS_KEY, "");
@@ -240,7 +280,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
 
 		if (mShouldSendAdvertiserCallbackOnResume) {
-			if (mOverridenAppId != null && !mOverridenAppId.equals(""))
+			if (mOverridingAppId != null && !mOverridingAppId.equals(""))
 				sendAdvertiserCallback();
 			else
 				Log.w(SponsorpayAndroidTestAppActivity.class.getSimpleName(),
@@ -264,7 +304,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	 * Fetches user provided values from the state of the UI text fields and text boxes.
 	 */
 	private void fetchValuesFromFields() {
-		mOverridenAppId = mAppIdField.getText().toString();
+		mOverridingAppId = mAppIdField.getText().toString();
 		mUserId = mUserIdField.getText().toString();
 		mShouldStayOpen = mKeepOfferwallOpenCheckBox.isChecked();
 
@@ -303,7 +343,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	 * Sets values in the state of the UI text fields and text boxes.
 	 */
 	private void setValuesInFields() {
-		mAppIdField.setText(mOverridenAppId);
+		mAppIdField.setText(mOverridingAppId);
 		mUserIdField.setText(mUserId);
 		mKeepOfferwallOpenCheckBox.setChecked(mShouldStayOpen);
 		mSkinNameField.setText(mSkinName);
@@ -326,7 +366,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 			startActivityForResult(
 			/* Pass in a User ID */
 			SponsorPayPublisher.getIntentForOfferWallActivity(getApplicationContext(), mUserId,
-					mShouldStayOpen, mOverridenAppId),
+					mShouldStayOpen, mOverridingAppId),
 					SponsorPayPublisher.DEFAULT_OFFERWALL_REQUEST_CODE);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
@@ -345,7 +385,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 
 		try {
 			startActivityForResult(SponsorPayPublisher.getIntentForUnlockOfferWallActivity(
-					getApplicationContext(), mUserId, mUnlockItemId, mOverridenAppId, null),
+					getApplicationContext(), mUserId, mUnlockItemId, null, mOverridingAppId, null),
 					SponsorPayPublisher.DEFAULT_UNLOCK_OFFERWALL_REQUEST_CODE);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
@@ -361,7 +401,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		fetchValuesFromFields();
 
 		try {
-			SponsorPayAdvertiser.register(getApplicationContext(), mOverridenAppId);
+			SponsorPayAdvertiser.register(getApplicationContext(), mOverridingAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
@@ -387,7 +427,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		fetchValuesFromFields();
 		try {
 			SponsorPayAdvertiser.registerWithDelay(getApplicationContext(), mCallDelay,
-					mOverridenAppId);
+					mOverridingAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
@@ -431,7 +471,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 									"onWillShowInterstitial");
 						}
 
-					}, mShouldStayOpen, mBackgroundUrl, mSkinName, 0, mOverridenAppId);
+					}, mShouldStayOpen, mBackgroundUrl, mSkinName, 0, mOverridingAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
@@ -450,7 +490,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		fetchValuesFromFields();
 
 		final String usedTransactionId = VirtualCurrencyConnector.fetchLatestTransactionId(
-				getApplicationContext(), mOverridenAppId, mUserId);
+				getApplicationContext(), mOverridingAppId, mUserId);
 
 		SPCurrencyServerListener requestListener = new SPCurrencyServerListener() {
 
@@ -473,7 +513,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 
 		try {
 			SponsorPayPublisher.requestNewCoins(getApplicationContext(), mUserId, requestListener,
-					null, mSecurityToken, mOverridenAppId);
+					null, mSecurityToken, mOverridingAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
@@ -502,13 +542,56 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 			@Override
 			public void onSPUnlockItemsStatusResponseReceived(UnlockedItemsResponse response) {
 				Map<String, UnlockedItemsResponse.Item> items = response.getItems();
-				showCancellableAlertBox("Response From SponsorPay Unlock Server", items.toString());
+
+				UnlockedItemsResponse.Item[] values = new UnlockedItemsResponse.Item[items.size()];
+				values = items.values().toArray(values);
+
+				ArrayAdapter<UnlockedItemsResponse.Item> adapter = new ArrayAdapter<UnlockedItemsResponse.Item>(
+						getApplicationContext(), R.layout.unlock_list_item, R.id.item_name, values) {
+
+					@Override
+					public View getView(int position, View convertView, ViewGroup parent) {
+						View view = super.getView(position, convertView, parent);
+
+						TextView itemId = (TextView) view.findViewById(R.id.item_id);
+						TextView itemName = (TextView) view.findViewById(R.id.item_name);
+						TextView itemUnlocked = (TextView) view.findViewById(R.id.item_unlocked);
+						TextView itemUnlockTimestamp = (TextView) view
+								.findViewById(R.id.item_unlock_timestamp);
+
+						itemId.setText(getItem(position).getId());
+						itemName.setText(getItem(position).getName());
+						itemUnlocked.setText(getItem(position).isUnlocked() ? "Unlocked"
+								: "Not unlocked");
+
+						if (getItem(position).isUnlocked()) {
+							final long millisecondsInSecond = 1000;
+							CharSequence formattedDate = DateFormat.format("MMM dd, yyyy h:mmaa",
+									getItem(position).getTimestamp() * millisecondsInSecond);
+
+							itemUnlockTimestamp.setText(formattedDate);
+						} else {
+							itemUnlockTimestamp.setText("---");
+						}
+						return view;
+					}
+				};
+
+				ListView listView = new ListView(getApplicationContext());
+				listView.setAdapter(adapter);
+
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(
+						SponsorpayAndroidTestAppActivity.this);
+				dialogBuilder.setTitle("Response From SponsorPay Unlock Server").setView(listView)
+						.setCancelable(true);
+				dialogBuilder.show();
+
 			}
 		};
 
 		try {
 			SponsorPayPublisher.requestUnlockItemsStatus(getApplicationContext(), mUserId,
-					listener, mSecurityToken, mOverridenAppId, null);
+					listener, mSecurityToken, mOverridingAppId, null);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
@@ -522,7 +605,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		Log.i(getClass().getSimpleName(), "Requesting banner");
 		try {
 			SponsorPayPublisher.requestOfferBanner(getApplicationContext(), mUserId, this, null,
-					mCurrencyName, mOverridenAppId);
+					mCurrencyName, mOverridingAppId);
 			scrollToBottom();
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());

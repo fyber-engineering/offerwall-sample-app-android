@@ -147,12 +147,57 @@
                 android:layout_height="wrap_content"
                 android:text="Use staging URLs" />
 
+            <CheckBox
+                android:id="@+id/simulate_no_phone_state_permission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simulate no READ PHONE STATE permission (no access to IMEI)" />
+
+            <CheckBox
+                android:id="@+id/simulate_no_wifi_state_permission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simulate no ACCESS WIFI STATE permission (no access to WiFi MAC Address)" />
+
+            <CheckBox
+                android:id="@+id/simulate_invalid_android_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simulate invalid Android ID" />
+
+            <CheckBox
+                android:id="@+id/simulate_no_hw_serial_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simulate no Hardware Serial Number" />
+
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="25dp"
                 android:onClick="onLaunchOfferwallClick"
                 android:text="@string/launch_offerwall" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <EditText
+                    android:id="@+id/unlock_item_id_field"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/item_id"
+                    android:imeOptions="actionNext"
+                    android:singleLine="true" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="25dp"
+                    android:onClick="onLaunchUnlockOfferwallClick"
+                    android:text="@string/launch_unlock_offerwall" />
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/background_url_field"
@@ -193,6 +238,12 @@
                 android:layout_height="wrap_content"
                 android:onClick="onRequestNewCoinsClick"
                 android:text="@string/request_new_coins" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRequestSPUnlockItemsClick"
+                android:text="@string/request_sp_unlock_items" />
         </LinearLayout>
 
         <LinearLayout

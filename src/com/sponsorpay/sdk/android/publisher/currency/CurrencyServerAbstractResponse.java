@@ -39,7 +39,7 @@ public abstract class CurrencyServerAbstractResponse extends AbstractResponse {
 	 * Invokes the {@link SPCurrencyServerListener#onSPCurrencyServerError(CurrencyServerAbstractResponse)} of the
 	 * registered callback.
 	 */
-	public void invokeOnErrorCallback() {
+	public void onErrorTriggered() {
 		if (mListener != null) {
 			mListener.onSPCurrencyServerError(this);
 		}

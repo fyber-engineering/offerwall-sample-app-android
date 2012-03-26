@@ -81,6 +81,9 @@ public class HostInfo {
 	 */
 	private String mWifiMacAddress;
 
+	/**
+	 * Device's hardware serial number, reported by versions of Android >=2.3
+	 */
 	private String mHardwareSerialNumber;
 
 	/**
@@ -125,6 +128,9 @@ public class HostInfo {
 		return mPhoneVersion;
 	}
 
+	/**
+	 * Fetches the device's hardware serial number, reported by versions of Android >=2.3
+	 */
 	public String getHardwareSerialNumber() {
 		if (mHardwareSerialNumber == null) {
 			if (!sSimulateNoHardwareSerialNumber) {

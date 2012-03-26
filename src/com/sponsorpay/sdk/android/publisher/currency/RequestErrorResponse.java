@@ -33,7 +33,7 @@ public class RequestErrorResponse extends CurrencyServerAbstractResponse {
 	 * Empty implementation.
 	 */
 	@Override
-	public void invokeOnSuccessCallback() {
+	public void onSuccessfulResponseParsed() {
 	}
 
 }

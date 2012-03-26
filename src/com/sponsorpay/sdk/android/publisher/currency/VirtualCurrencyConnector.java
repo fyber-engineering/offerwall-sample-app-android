@@ -105,8 +105,6 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 *            its application ID.
 	 * @param securityToken
 	 *            Security token used to sign requests to the server and verify its responses.
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the request URL.
 	 */
 	public VirtualCurrencyConnector(Context context, String userId,
 			SPCurrencyServerListener userListener, HostInfo hostInfo, String securityToken) {

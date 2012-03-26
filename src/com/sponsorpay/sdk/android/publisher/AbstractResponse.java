@@ -5,9 +5,14 @@ import org.json.JSONObject;
 import android.util.Log;
 
 import com.sponsorpay.sdk.android.SignatureTools;
-import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerAbstractResponse;
-import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 
+/**
+ * <p>
+ * Encloses a basic response received from the SponsorPay API and methods to perform parsing of
+ * the returned JSON-encoded data.
+ * </p>
+ * 
+ */
 public abstract class AbstractResponse {
 	/*
 	 * JSON keys used to enclose error information.
@@ -40,8 +45,8 @@ public abstract class AbstractResponse {
 		ERROR_INVALID_RESPONSE_SIGNATURE,
 
 		/**
-		 * The server returned an error. Use {@link CurrencyServerAbstractResponse#getErrorCode()}
-		 * and {@link CurrencyServerAbstractResponse#getErrorMessage()} to extract more details
+		 * The server returned an error. Use {@link #getErrorCode()}
+		 * and {@link #getErrorMessage()} to extract more details
 		 * about this error.
 		 */
 		SERVER_RETURNED_ERROR,
@@ -87,12 +92,12 @@ public abstract class AbstractResponse {
 	/**
 	 * Implement to invoke the response-type-specific on success callback notification.
 	 */
-	public abstract void invokeOnSuccessCallback();
+	public abstract void onSuccessfulResponseParsed();
 
 	/**
 	 * Implement to invoke the response-type-specific on error callback notification.
 	 */
-	public abstract void invokeOnErrorCallback();
+	public abstract void onErrorTriggered();
 
 	/**
 	 * Sets the raw response data.
@@ -158,25 +163,25 @@ public abstract class AbstractResponse {
 
 	/**
 	 * Performs a second-stage error checking, parses the response and invokes the relevant method
-	 * of the listener registered with {@link #setResponseListener(SPCurrencyServerListener)}.
+	 * of the registered listener.
 	 * 
 	 * @param securityToken
 	 *            Security token used to verify the authenticity of the response.
 	 */
 	public void parseAndCallListener(String securityToken) {
 		if (mErrorType == RequestErrorType.ERROR_NO_INTERNET_CONNECTION) {
-			invokeOnErrorCallback();
+			onErrorTriggered();
 		} else if (hasErrorStatusCode()) {
 			parseErrorResponse();
-			invokeOnErrorCallback();
+			onErrorTriggered();
 		} else if (!verifySignature(securityToken)) {
-			invokeOnErrorCallback();
+			onErrorTriggered();
 		} else {
 			parseSuccessfulResponse();
 			if (mErrorType == RequestErrorType.NO_ERROR)
-				invokeOnSuccessCallback();
+				onSuccessfulResponseParsed();
 			else
-				invokeOnErrorCallback();
+				onErrorTriggered();
 		}
 	}
 

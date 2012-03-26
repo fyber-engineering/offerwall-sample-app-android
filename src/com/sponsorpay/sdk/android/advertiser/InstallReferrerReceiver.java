@@ -7,6 +7,11 @@ import android.net.UrlQuerySanitizer;
 import android.os.Bundle;
 import android.util.Log;
 
+/**
+ * Listens to the broadcast sent by the Android Market app when the host application is installed
+ * and extracts from it the value corresponding to the install subID which is used to track
+ * the completion of an offer.
+ */
 public class InstallReferrerReceiver extends BroadcastReceiver {
 	private static final String EXTRAS_KEY_REFERRER = "referrer";
 	private static final String CONTENT_PARAM_KEY = "utm_content";

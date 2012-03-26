@@ -7,12 +7,18 @@ import android.content.Context;
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest.AsyncRequestResultListener;
 
+/**
+ * Abstract class defining some common functionality for contacting the SponsorPay's API.
+ */
 public abstract class AbstractConnector implements AsyncRequestResultListener {
 	/**
 	 * Parameter key used to transmit the timestamp of the request.
 	 */
 	protected static final String URL_PARAM_KEY_TIMESTAMP = "timestamp";
 
+	/**
+	 * URL of the SponsorPay's API resource to contact.
+	 */
 	protected String remoteResourceUrl;
 	
 	/**

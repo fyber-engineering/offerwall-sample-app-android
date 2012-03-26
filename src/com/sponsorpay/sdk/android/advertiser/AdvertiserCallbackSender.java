@@ -32,7 +32,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	private static final int SUCCESFUL_HTTP_STATUS_CODE = 200;
 
 	/**
-	 * The API resource URL to contact when talking to the Sponsorpay Advertiser API
+	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
 	 */
 	private static final String API_PRODUCTION_RESOURCE_URL = "http://service.sponsorpay.com/installs/v2";
 	private static final String API_STAGING_RESOURCE_URL = "http://staging.sws.sponsorpay.com/installs/v2";
@@ -43,6 +43,9 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 */
 	private static final String SUCCESSFUL_ANSWER_RECEIVED_KEY = "answer_received";
 
+	/**
+	 * SubID URL parameter key
+	 */
 	private static final String INSTALL_SUBID_KEY = "subid";
 
 	/**
@@ -66,6 +69,9 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 */
 	private boolean mWasAlreadySuccessful = false;
 
+	/**
+	 * Install subID to report on the advertiser callback
+	 */
 	private String mInstallSubId;
 
 	/**
@@ -122,6 +128,10 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 		mCustomParams = customParams;
 	}
 
+	/**
+	 * Sets the install subID to report on the advertiser callback.
+	 * @param subIdValue The install subID received on the app instalation.
+	 */
 	public void setInstallSubId(String subIdValue) {
 		Log.d(AdvertiserCallbackSender.class.getSimpleName(), "SubID value set to " + subIdValue);
 		mInstallSubId = subIdValue;

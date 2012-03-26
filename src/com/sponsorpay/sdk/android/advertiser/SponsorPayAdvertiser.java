@@ -84,6 +84,9 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 */
 	private Context mContext;
 
+	/**
+	 * Keep track of the persisted state of the Advertiser part of the SDK
+	 */
 	private SponsorPayAdvertiserState mPersistedState;
 
 	/**

@@ -9,6 +9,13 @@ import org.json.JSONObject;
 
 import com.sponsorpay.sdk.android.publisher.AbstractResponse;
 
+/**
+ * <p>
+ * Encloses a basic response received from the SponsorPay Unlock Server and methods to perform
+ * parsing of the returned JSON-encoded data.
+ * </p>
+ * 
+ */
 public class UnlockedItemsResponse extends AbstractResponse {
 	/*
 	 * JSON keys used to enclose data from a successful response.
@@ -36,6 +43,12 @@ public class UnlockedItemsResponse extends AbstractResponse {
 		mListener = listener;
 	}
 
+	/**
+	 * Gets a dictionary of SponsorPay Unlock items as received from the server, where the keys are
+	 * each of the item IDs.
+	 * 
+	 * @return
+	 */
 	public Map<String, Item> getItems() {
 		return mReturnedItems;
 	}
@@ -63,14 +76,14 @@ public class UnlockedItemsResponse extends AbstractResponse {
 	}
 
 	@Override
-	public void invokeOnSuccessCallback() {
+	public void onSuccessfulResponseParsed() {
 		if (mListener != null) {
 			mListener.onSPUnlockItemsStatusResponseReceived(this);
 		}
 	}
 
 	@Override
-	public void invokeOnErrorCallback() {
+	public void onErrorTriggered() {
 		if (mListener != null) {
 			mListener.onSPUnlockRequestError(this);
 		}
@@ -80,23 +93,39 @@ public class UnlockedItemsResponse extends AbstractResponse {
 		mErrorType = errorType;
 	}
 
+	/**
+	 * Encloses an SponsorPay Unlock Item and its status as received by the server.
+	 * 
+	 */
 	public static class Item {
 		private String id, name;
 		private long timestamp;
 		private boolean unlocked;
 
+		/**
+		 * Returns the Unlock Item ID
+		 */
 		public String getId() {
 			return id;
 		}
 
+		/**
+		 * Returns the Unlock Item name
+		 */
 		public String getName() {
 			return name;
 		}
 
+		/**
+		 * Returns the timestamp of the unlock if the item has been unlocked.
+		 */
 		public long getTimestamp() {
 			return timestamp;
 		}
 
+		/**
+		 * Returns whether the item has been unlocked.
+		 */
 		public boolean isUnlocked() {
 			return unlocked;
 		}

@@ -66,7 +66,7 @@ public class CurrencyServerDeltaOfCoinsResponse extends CurrencyServerAbstractRe
 	 * callback method of the registered listener.
 	 */
 	@Override
-	public void invokeOnSuccessCallback() {
+	public void onSuccessfulResponseParsed() {
 		if (mListener != null) {
 			mListener.onSPCurrencyDeltaReceived(this);
 		}

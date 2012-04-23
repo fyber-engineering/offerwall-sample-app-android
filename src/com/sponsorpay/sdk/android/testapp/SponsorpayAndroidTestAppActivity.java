@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.SponsorPay;
+import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse;
 import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
@@ -51,6 +52,7 @@ import com.sponsorpay.sdk.android.publisher.unlock.UnlockedItemsResponse;
  */
 public class SponsorpayAndroidTestAppActivity extends Activity implements SPOfferBannerListener {
 
+	private static final String OVERRIDING_URL_PREFS_KEY = "OVERRIDING_URL";
 	private static final String APP_ID_PREFS_KEY = "APP_ID";
 	private static final String USER_ID_PREFS_KEY = "USER_ID";
 	private static final String KEEP_OFFERWALL_OPEN_PREFS_KEY = "KEEP_OFFERWALL_OPEN";
@@ -71,6 +73,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private static final String PREFERENCES_FILE_NAME = "SponsorPayTestAppState";
 
 	private String mOverridingAppId;
+	private String mOverridingUrl;
 	private String mUserId;
 	private boolean mShouldStayOpen;
 	private String mBackgroundUrl;
@@ -80,6 +83,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private String mCurrencyName;
 	private String mUnlockItemId;
 
+	private EditText mOverridingUrlField;
 	private EditText mAppIdField;
 	private EditText mUserIdField;
 	private CheckBox mKeepOfferwallOpenCheckBox;
@@ -124,6 +128,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	}
 
 	protected void bindViews() {
+		mOverridingUrlField = (EditText) findViewById(R.id.overriding_url_field);
 		mAppIdField = (EditText) findViewById(R.id.app_id_field);
 		mUserIdField = (EditText) findViewById(R.id.user_id_field);
 		mKeepOfferwallOpenCheckBox = (CheckBox) findViewById(R.id.keep_offerwall_open_checkbox);
@@ -227,8 +232,10 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 			}
 		};
 
-		mSimulateNoPhoneStatePermissionCheckBox.setOnCheckedChangeListener(simCheckboxesChangeListener);
-		mSimulateNoWifiStatePermissionCheckBox.setOnCheckedChangeListener(simCheckboxesChangeListener);
+		mSimulateNoPhoneStatePermissionCheckBox
+				.setOnCheckedChangeListener(simCheckboxesChangeListener);
+		mSimulateNoWifiStatePermissionCheckBox
+				.setOnCheckedChangeListener(simCheckboxesChangeListener);
 		mSimulateInvalidAndroidIdCheckBox.setOnCheckedChangeListener(simCheckboxesChangeListener);
 		mSimulateNoSerialNumberCheckBox.setOnCheckedChangeListener(simCheckboxesChangeListener);
 	}
@@ -242,6 +249,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		Editor prefsEditor = prefs.edit();
 
 		prefsEditor.putString(APP_ID_PREFS_KEY, mOverridingAppId);
+		prefsEditor.putString(OVERRIDING_URL_PREFS_KEY, mOverridingUrl);
 		prefsEditor.putString(USER_ID_PREFS_KEY, mUserId);
 		prefsEditor.putBoolean(KEEP_OFFERWALL_OPEN_PREFS_KEY, mShouldStayOpen);
 		prefsEditor.putString(BACKGROUND_URL_PREFS_KEY, mBackgroundUrl);
@@ -266,6 +274,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		SharedPreferences prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE);
 
 		mOverridingAppId = prefs.getString(APP_ID_PREFS_KEY, "");
+		mOverridingUrl = prefs.getString(OVERRIDING_URL_PREFS_KEY, "");
 		mUserId = prefs.getString(USER_ID_PREFS_KEY, "");
 		mShouldStayOpen = prefs.getBoolean(KEEP_OFFERWALL_OPEN_PREFS_KEY, true);
 		mBackgroundUrl = prefs.getString(BACKGROUND_URL_PREFS_KEY, "");
@@ -305,6 +314,10 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	 */
 	private void fetchValuesFromFields() {
 		mOverridingAppId = mAppIdField.getText().toString();
+		
+		mOverridingUrl = mOverridingUrlField.getText().toString();
+		SponsorPayPublisher.setOverridingWebViewUrl(mOverridingUrl);
+		
 		mUserId = mUserIdField.getText().toString();
 		mShouldStayOpen = mKeepOfferwallOpenCheckBox.isChecked();
 
@@ -344,6 +357,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	 */
 	private void setValuesInFields() {
 		mAppIdField.setText(mOverridingAppId);
+		mOverridingUrlField.setText(mOverridingUrl);
 		mUserIdField.setText(mUserId);
 		mKeepOfferwallOpenCheckBox.setChecked(mShouldStayOpen);
 		mSkinNameField.setText(mSkinName);
@@ -716,5 +730,14 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mMessageView.setText(String.format(getString(R.string.banner_request_error),
 				errorDescription));
 		mBannerContainer.addView(mMessageView);
+	}
+
+	public void appendDefaultParamsToUrlField(View v) {
+		fetchValuesFromFields();
+		HostInfo hostInfo = new HostInfo(getApplicationContext());
+		hostInfo.setOverriddenAppId(mOverridingAppId);
+		mOverridingUrl = UrlBuilder.buildUrl(mOverridingUrl, mUserId, hostInfo,
+				mCustomKeyValuesForRequest, mSecurityToken);
+		setValuesInFields();
 	}
 }

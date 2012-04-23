@@ -103,7 +103,7 @@ public class OfferWallActivity extends Activity {
 
 	private OfferWallTemplate mTemplate;
 
-	private String mOverridingURL;
+	private String mOverridingUrl;
 	
 	/**
 	 * Overridden from {@link Activity}. Upon activity start, extract the user ID from the extra,
@@ -199,7 +199,7 @@ public class OfferWallActivity extends Activity {
 			mHostInfo.setOverriddenAppId(overridingAppId);
 		}
 
-		mOverridingURL = getIntent().getStringExtra(EXTRA_OVERRIDING_URL_KEY);
+		mOverridingUrl = getIntent().getStringExtra(EXTRA_OVERRIDING_URL_KEY);
 		
 		mTemplate.fetchAdditionalExtras();
 	}
@@ -235,8 +235,8 @@ public class OfferWallActivity extends Activity {
 	}
 
 	private String determineUrl() {
-		if (mOverridingURL != null && !mOverridingURL.equals(""))
-			return mOverridingURL;
+		if (mOverridingUrl != null && !mOverridingUrl.equals(""))
+			return mOverridingUrl;
 		else
 			return generateUrl();
 	}

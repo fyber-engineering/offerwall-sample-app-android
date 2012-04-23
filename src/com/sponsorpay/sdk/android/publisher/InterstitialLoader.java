@@ -110,6 +110,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 	private Map<String, String> mCustomParams;
 
+	private String mOverridingUrl;
+	
 	private String mBackgroundUrl = "";
 	private String mSkinName = SKIN_NAME_DEFAULT;
 	private boolean mShouldStayOpen = SHOULD_INTERSTITIAL_REMAIN_OPEN_DEFAULT;
@@ -157,6 +159,10 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		mCustomParams = customParams;
 	}
 
+	public void setOverridingUrl(String overridingUrl) {
+		mOverridingUrl = overridingUrl;
+	}
+	
 	/**
 	 * Can be set to the absolute URL of an image to use as background graphic for the interstitial.
 	 * Must include the protocol scheme (http:// or https://) at the beginning of the URL. Leave it
@@ -216,7 +222,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	public void startLoading() {
 		cancelInterstitialLoading();
 
-		String interstitialUrl = buildUrl();
+		String interstitialUrl = determineUrl();
 
 		Log.i("interstitial", "url: " + interstitialUrl);
 
@@ -246,6 +252,13 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		mProgressDialog.setMessage(SponsorPayPublisher
 				.getUIString(UIStringIdentifier.LOADING_INTERSTITIAL));
 		mProgressDialog.show();
+	}
+
+	private String determineUrl() {
+		if (mOverridingUrl != null && !"".equals(mOverridingUrl))
+			return mOverridingUrl;
+		else
+			return buildUrl();
 	}
 
 	private String buildUrl() {

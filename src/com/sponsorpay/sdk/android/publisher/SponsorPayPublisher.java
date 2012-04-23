@@ -196,6 +196,12 @@ public class SponsorPayPublisher {
 		return sShouldUseStagingUrls;
 	}
 
+	private static String sOverridingWebViewUrl;
+	
+	public static void setOverridingWebViewUrl(String url) {
+		sOverridingWebViewUrl = url;
+	}
+	
 	/**
 	 * The default request code needed for starting the Offer Wall activity.
 	 */
@@ -320,8 +326,11 @@ public class SponsorPayPublisher {
 		if (overridingAppId != null)
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overridingAppId);
 
+		if (sOverridingWebViewUrl != null)
+			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
+		
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
-
+		
 		return intent;
 	}
 
@@ -353,6 +362,9 @@ public class SponsorPayPublisher {
 		if (overrideAppId != null)
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overrideAppId);
 
+		if (sOverridingWebViewUrl != null)
+			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
+		
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
 
 		return intent;
@@ -463,6 +475,10 @@ public class SponsorPayPublisher {
 			il.setCustomParameters(extraParams);
 		}
 
+		if (sOverridingWebViewUrl != null) {
+			il.setOverridingUrl(sOverridingWebViewUrl);
+		}
+		
 		il.startLoading();
 	}
 
@@ -760,7 +776,11 @@ public class SponsorPayPublisher {
 		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, userId, hostInfo,
 				listener, offerBannerAdShape, currencyName, getCustomParameters(customParams));
 
-		// bannerRequest starts loading immediately
+		if (sOverridingWebViewUrl != null) {
+			bannerRequest.setOverridingUrl(sOverridingWebViewUrl);
+		}
+		
+		bannerRequest.requestOfferBanner();
 
 		return bannerRequest;
 	}

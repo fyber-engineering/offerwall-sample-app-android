@@ -67,7 +67,7 @@ public class UnlockedItemsResponse extends AbstractResponse {
 				parsedItem.unlocked = itemAsJsonObject.getBoolean(UNLOCKED_KEY);
 				parsedItem.timestamp = itemAsJsonObject.getLong(TIMESTAMP_KEY);
 
-				mReturnedItems.put(parsedItem.name, parsedItem);
+				mReturnedItems.put(parsedItem.id, parsedItem);
 			}
 			mErrorType = RequestErrorType.NO_ERROR;
 		} catch (JSONException e) {

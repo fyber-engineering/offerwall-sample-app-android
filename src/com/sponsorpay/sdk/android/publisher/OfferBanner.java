@@ -123,19 +123,19 @@ public class OfferBanner {
 	 */
 	public View getBannerView(final Activity hostActivity) {
 		if (mOfferBannerView == null) {
-			WebView webView = new WebView(mContext);
+			WebView webView = new WebView(mContext.getApplicationContext());
 			webView.loadDataWithBaseURL(mBaseUrl, mHtmlContent, "text/html", "utf-8", null);
 			int width = SponsorPayPublisher.convertDevicePixelsIntoPixelsMeasurement(mShape.getWidth(), mContext);
 			int height = SponsorPayPublisher.convertDevicePixelsIntoPixelsMeasurement(mShape.getHeight(), mContext);
 			webView.setLayoutParams(new LayoutParams(width, height));
 
-			webView.setWebViewClient(new OfferWebClient() {
+			webView.setWebViewClient(new OfferWebClient(hostActivity) {
 				@Override
 				protected void onSponsorPayExitScheme(int resultCode, String targetUrl) {
-					launchActivityWithUrl(hostActivity, targetUrl);
+					launchActivityWithUrl(targetUrl);
 				}
 			});
-
+			
 			SponsorPayPublisher.setCookiesIntoCookieManagerInstance(mCookies, mBaseUrl, mContext);
 
 			mOfferBannerView = webView;

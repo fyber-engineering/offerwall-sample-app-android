@@ -80,7 +80,7 @@ public class InterstitialActivity extends Activity {
 		}
 		
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY, mShouldStayOpen);
-		mWebView = new WebView(InterstitialActivity.this);
+		mWebView = new WebView(getApplicationContext());
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 
 		ViewGroup.LayoutParams interstitialSize = generateLayoutParamsForCurrentDisplay();
@@ -114,8 +114,14 @@ public class InterstitialActivity extends Activity {
 		getWindow().getAttributes().dimAmount = 0.0F;
 		getWindow().setBackgroundDrawable(generateBackgroundDrawable());
 	}
+	
+	@Override
+	protected void onDestroy() {
+		mWebView.destroy();
+		super.onDestroy();
+	}
 
-	private static Drawable generateBackgroundDrawable() {
+	static Drawable generateBackgroundDrawable() {
 		float[] cornerRadii = new float[] { BACKGROUND_DRAWABLE_CORNER_RADIUS,
 				BACKGROUND_DRAWABLE_CORNER_RADIUS, BACKGROUND_DRAWABLE_CORNER_RADIUS,
 				BACKGROUND_DRAWABLE_CORNER_RADIUS, BACKGROUND_DRAWABLE_CORNER_RADIUS,

@@ -6,6 +6,8 @@
 
 package com.sponsorpay.sdk.android.publisher;
 
+import java.lang.ref.WeakReference;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -30,6 +32,16 @@ public abstract class OfferWebClient extends WebViewClient {
 	 */
 	public static final int RESULT_CODE_NO_STATUS_CODE = -10;
 
+	private WeakReference<Activity>  mHostActivityRef;
+
+	public OfferWebClient(Activity hostActivity) {
+		mHostActivityRef = new WeakReference<Activity>(hostActivity);
+	}
+	
+	protected Activity getHostActivity() {
+		return mHostActivityRef.get();
+	}
+	
 	/**
 	 * Extracts the provided URL from the exit scheme
 	 * 
@@ -87,13 +99,19 @@ public abstract class OfferWebClient extends WebViewClient {
 		}
 	}
 
-	protected boolean launchActivityWithUrl(Activity launcherActivity, String url) {
-		if (url == null)
+	protected boolean launchActivityWithUrl(String url) {
+		Activity hostActivity = getHostActivity();
+		if (null == hostActivity) {
 			return false;
+		}
+		if (url == null) {
+			return false;
+		}
+		
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_VIEW);
 		intent.setData(Uri.parse(url));
-		launcherActivity.startActivity(intent);
+		hostActivity.startActivity(intent);
 		// TODO: handle activity not found case (throws an ActivityNotFoundException)
 		return true;
 	}

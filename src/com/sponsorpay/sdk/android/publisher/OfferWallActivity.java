@@ -127,7 +127,7 @@ public class OfferWallActivity extends Activity {
 
 		fetchPassedExtras();
 
-		mWebView = new WebView(OfferWallActivity.this);
+		mWebView = new WebView(getApplicationContext());
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 		setContentView(mWebView);
 
@@ -227,6 +227,12 @@ public class OfferWallActivity extends Activity {
 		}
 	}
 
+	@Override
+	protected void onDestroy() {
+		mWebView.destroy();
+		super.onDestroy();
+	}
+	
 	private String generateUrl() {
 		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
 		String baseUrl = mTemplate.getBaseUrl();

@@ -60,6 +60,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private static final String DELAY_PREFS_KEY = "DELAY";
 	private static final String CURRENCY_NAME_PREFS_KEY = "CURRENCY_NAME";
 	private static final String UNLOCK_ITEM_ID_PREFS_KEY = "UNLOCK_ITEM_ID";
+	private static final String UNLOCK_ITEM_NAME_PREFS_KEY = "UNLOCK_ITEM_NAME";
 	private static final String USE_STAGING_URLS_PREFS_KEY = "USE_STAGING_URLS";
 
 	private static final int DEFAULT_DELAY_MIN = 15;
@@ -79,7 +80,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private int mCallDelay;
 	private String mCurrencyName;
 	private String mUnlockItemId;
-
+	private String mUnlockItemName;
+	
 	private EditText mAppIdField;
 	private EditText mUserIdField;
 	private CheckBox mKeepOfferwallOpenCheckBox;
@@ -95,6 +97,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 	private EditText mDelayField;
 	private EditText mCurrencyNameField;
 	private EditText mUnlockItemIdField;
+	private EditText mUnlockItemNameField;
 
 	private CheckBox mUseStagingUrlsCheckBox;
 
@@ -133,7 +136,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mDelayField = (EditText) findViewById(R.id.delay_field);
 		mCurrencyNameField = (EditText) findViewById(R.id.currency_name_field);
 		mUnlockItemIdField = (EditText) findViewById(R.id.unlock_item_id_field);
-
+		mUnlockItemNameField = (EditText) findViewById(R.id.unlock_item_name_field);
+		
 		mUseStagingUrlsCheckBox = (CheckBox) findViewById(R.id.use_staging_urls_checkbox);
 		mSimulateNoPhoneStatePermissionCheckBox = (CheckBox) findViewById(R.id.simulate_no_phone_state_permission);
 		mSimulateNoWifiStatePermissionCheckBox = (CheckBox) findViewById(R.id.simulate_no_wifi_state_permission);
@@ -250,11 +254,20 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		prefsEditor.putInt(DELAY_PREFS_KEY, mCallDelay);
 		prefsEditor.putString(CURRENCY_NAME_PREFS_KEY, mCurrencyName);
 		prefsEditor.putString(UNLOCK_ITEM_ID_PREFS_KEY, mUnlockItemId);
+		prefsEditor.putString(UNLOCK_ITEM_NAME_PREFS_KEY, mUnlockItemName);
 
 		prefsEditor.putBoolean(USE_STAGING_URLS_PREFS_KEY, mUseStagingUrlsCheckBox.isChecked());
 
 		prefsEditor.commit();
 
+		//View bannerView = mBannerContainer.getChildAt(0);
+//		if (WebView.class.isAssignableFrom(bannerView.getClass())) {
+//			((WebView)bannerView).destroy();
+//			Log.d("WebViewLifeCycle", "Will destroy bannerView");
+//		} else {
+//			Log.d("WebViewLifeCycle", "Won't destroy bannerView");
+//		}
+		
 		super.onPause();
 	}
 
@@ -274,6 +287,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mCallDelay = prefs.getInt(DELAY_PREFS_KEY, DEFAULT_DELAY_MIN);
 		mCurrencyName = prefs.getString(CURRENCY_NAME_PREFS_KEY, "");
 		mUnlockItemId = prefs.getString(UNLOCK_ITEM_ID_PREFS_KEY, "");
+		mUnlockItemName = prefs.getString(UNLOCK_ITEM_NAME_PREFS_KEY, "");
 
 		setValuesInFields();
 
@@ -334,7 +348,8 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 
 		mCurrencyName = mCurrencyNameField.getText().toString();
 		mUnlockItemId = mUnlockItemIdField.getText().toString();
-
+		mUnlockItemName = mUnlockItemNameField.getText().toString();
+		
 		SponsorPayAdvertiser.setShouldUseStagingUrls(mUseStagingUrlsCheckBox.isChecked());
 		SponsorPayPublisher.setShouldUseStagingUrls(mUseStagingUrlsCheckBox.isChecked());
 	}
@@ -352,6 +367,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 		mDelayField.setText(String.format("%d", mCallDelay));
 		mCurrencyNameField.setText(mCurrencyName);
 		mUnlockItemIdField.setText(mUnlockItemId);
+		mUnlockItemNameField.setText(mUnlockItemName);
 	}
 
 	/**
@@ -385,7 +401,7 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 
 		try {
 			startActivityForResult(SponsorPayPublisher.getIntentForUnlockOfferWallActivity(
-					getApplicationContext(), mUserId, mUnlockItemId, null, mOverridingAppId, null),
+					getApplicationContext(), mUserId, mUnlockItemId, mUnlockItemName, mOverridingAppId, null),
 					SponsorPayPublisher.DEFAULT_UNLOCK_OFFERWALL_REQUEST_CODE);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
@@ -541,6 +557,31 @@ public class SponsorpayAndroidTestAppActivity extends Activity implements SPOffe
 
 			@Override
 			public void onSPUnlockItemsStatusResponseReceived(UnlockedItemsResponse response) {
+				
+				Log.i("SPPlugin","inside item response");
+				Map<String, UnlockedItemsResponse.Item> map = response.getItems();
+				
+				Log.i("SPPlugin","got map with "+map.size());
+				
+				java.util.Set<String> set = map.keySet();
+				
+				Object [] strings =  set.toArray();
+				for (int i =0;i<strings.length;i++){
+					Log.i("SPPlugin",strings[i].toString());
+				}
+				
+				UnlockedItemsResponse.Item item = map.get("SFTEST_ITEM_1");
+				if (item!=null){			
+					Log.i("SPPlugin","item id is "+item.getId()+" "+item.getName());
+					if (item.isUnlocked()){
+						Log.i("SPPlugin","item is open");
+					}else{
+						Log.i("SPPlugin","item is locked");
+					}
+				}else{
+					Log.i("SPPlugin","item is empty");
+				}
+				
 				Map<String, UnlockedItemsResponse.Item> items = response.getItems();
 
 				UnlockedItemsResponse.Item[] values = new UnlockedItemsResponse.Item[items.size()];

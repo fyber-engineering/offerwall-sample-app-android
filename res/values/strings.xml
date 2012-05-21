@@ -5,7 +5,8 @@
     <string name="hello">SponsorPay Publisher SDK Test App</string>
     <string name="launch_offerwall">Launch Offer Wall</string>
     <string name="launch_unlock_offerwall">Launch Unlock Offer Wall</string>
-    <string name="item_id">Item ID</string>
+    <string name="unlock_item_id">Item ID</string>
+    <string name="unlock_item_name">Unlock Item Name</string>    
     <string name="launch_interstitial">Launch Interstitial</string>
     <string name="request_new_coins">Request New Coins For User</string>
     <string name="request_sp_unlock_items">Request SponsorPay Unlock Items</string>

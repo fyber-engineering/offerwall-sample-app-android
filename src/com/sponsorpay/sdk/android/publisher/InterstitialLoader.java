@@ -88,9 +88,6 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private static final String INTERSTITIAL_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile";
 	private static final String INTERSTITIAL_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile";
 
-	private static final String INTERSTITIAL_PRODUCTION_DOMAIN = "http://iframe.sponsorpay.com";
-	private static final String INTERSTITIAL_STAGING_DOMAIN = "http://staging.iframe.sponsorpay.com";
-
 	private static final String URL_PARAM_INTERSTITIAL_KEY = "interstitial";
 
 	private static final String URL_PARAM_SKIN_KEY = "skin";
@@ -113,6 +110,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 	private Map<String, String> mCustomParams;
 
+	private String mOverridingUrl;
+	
 	private String mBackgroundUrl = "";
 	private String mSkinName = SKIN_NAME_DEFAULT;
 	private boolean mShouldStayOpen = SHOULD_INTERSTITIAL_REMAIN_OPEN_DEFAULT;
@@ -160,6 +159,10 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		mCustomParams = customParams;
 	}
 
+	public void setOverridingUrl(String overridingUrl) {
+		mOverridingUrl = overridingUrl;
+	}
+	
 	/**
 	 * Can be set to the absolute URL of an image to use as background graphic for the interstitial.
 	 * Must include the protocol scheme (http:// or https://) at the beginning of the URL. Leave it
@@ -219,29 +222,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	public void startLoading() {
 		cancelInterstitialLoading();
 
-		String[] interstitialUrlExtraKeys = new String[] { URL_PARAM_INTERSTITIAL_KEY,
-				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, UrlBuilder.URL_PARAM_OFFSET_KEY };
-		String[] interstitialUrlExtraValues = new String[] { UrlBuilder.URL_PARAM_VALUE_ON,
-				UrlBuilder.URL_PARAM_VALUE_ON, String.valueOf(sInterstitialAvailableResponseCount) };
-
-		Map<String, String> keysValues = UrlBuilder.mapKeysToValues(interstitialUrlExtraKeys,
-				interstitialUrlExtraValues);
-
-		if (mSkinName != null && !"".equals(mSkinName))
-			keysValues.put(URL_PARAM_SKIN_KEY, mSkinName);
-
-		if (mBackgroundUrl != null && !"".equals(mBackgroundUrl))
-			keysValues.put(URL_PARAM_BACKGROUND_KEY, mBackgroundUrl);
-
-		if (mCustomParams != null) {
-			keysValues.putAll(mCustomParams);
-		}
-
-		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
-				: INTERSTITIAL_PRODUCTION_BASE_URL;
-
-		String interstitialUrl = UrlBuilder.buildUrl(interstitialBaseUrl, mUserId.toString(),
-				mHostInfo, keysValues);
+		String interstitialUrl = determineUrl();
 
 		Log.i("interstitial", "url: " + interstitialUrl);
 
@@ -271,6 +252,38 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		mProgressDialog.setMessage(SponsorPayPublisher
 				.getUIString(UIStringIdentifier.LOADING_INTERSTITIAL));
 		mProgressDialog.show();
+	}
+
+	private String determineUrl() {
+		if (mOverridingUrl != null && !"".equals(mOverridingUrl))
+			return mOverridingUrl;
+		else
+			return buildUrl();
+	}
+
+	private String buildUrl() {
+		String[] interstitialUrlExtraKeys = new String[] { URL_PARAM_INTERSTITIAL_KEY,
+				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, UrlBuilder.URL_PARAM_OFFSET_KEY };
+		String[] interstitialUrlExtraValues = new String[] { UrlBuilder.URL_PARAM_VALUE_ON,
+				UrlBuilder.URL_PARAM_VALUE_ON, String.valueOf(sInterstitialAvailableResponseCount) };
+
+		Map<String, String> keysValues = UrlBuilder.mapKeysToValues(interstitialUrlExtraKeys,
+				interstitialUrlExtraValues);
+
+		if (mSkinName != null && !"".equals(mSkinName))
+			keysValues.put(URL_PARAM_SKIN_KEY, mSkinName);
+
+		if (mBackgroundUrl != null && !"".equals(mBackgroundUrl))
+			keysValues.put(URL_PARAM_BACKGROUND_KEY, mBackgroundUrl);
+
+		if (mCustomParams != null) {
+			keysValues.putAll(mCustomParams);
+		}
+
+		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
+				: INTERSTITIAL_PRODUCTION_BASE_URL;
+
+		return UrlBuilder.buildUrl(interstitialBaseUrl, mUserId.toString(), mHostInfo, keysValues);
 	}
 
 	/**
@@ -318,10 +331,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		interstitialIntent.putExtra(InterstitialActivity.EXTRA_SHOULD_STAY_OPEN_KEY,
 				mShouldStayOpen);
 
-		String interstitialDomain = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_DOMAIN
-				: INTERSTITIAL_PRODUCTION_DOMAIN;
-		interstitialIntent.putExtra(InterstitialActivity.EXTRA_BASE_DOMAIN_KEY, interstitialDomain);
-
+		interstitialIntent.putExtra(InterstitialActivity.EXTRA_BASE_URL_KEY, request.getRequestUrl());
+		
 		mCallingActivity.startActivity(interstitialIntent);
 	}
 

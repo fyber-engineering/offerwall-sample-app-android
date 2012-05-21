@@ -231,6 +231,10 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		return mResponseSignature;
 	}
 
+	public String getRequestUrl() {
+		return mRequestUrl;
+	}
+	
 	/**
 	 * Returns the local error thrown when trying to send the request. An exception typically means
 	 * that there was a problem connecting to the network, but checking the type of the returned

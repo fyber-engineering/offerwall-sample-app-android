@@ -349,7 +349,9 @@ public class SponsorPayPublisher {
 				OfferWallActivity.OFFERWALL_TYPE_UNLOCK);
 		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_ID_KEY,
 				unlockItemId);
-
+		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
+				unlockItemName);
+		
 		if (overrideAppId != null)
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDEN_APP_ID, overrideAppId);
 

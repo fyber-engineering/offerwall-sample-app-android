@@ -337,13 +337,22 @@ public class OfferWallActivity extends Activity {
 		 */
 		public static final String EXTRA_UNLOCK_ITEM_ID_KEY = "EXTRA_UNLOCK_ITEM_ID_KEY";
 
+		/**
+		 * Key for extracting the value of {@link #mUnlockItemName} from the extras bundle.
+		 */
+		public static final String EXTRA_UNLOCK_ITEM_NAME_KEY = "EXTRA_UNLOCK_ITEM_NAME_KEY";
+		
 		public static final String PARAM_UNLOCK_ITEM_ID_KEY = "itemid";
+		public static final String PARAM_UNLOCK_ITEM_NAME_KEY = "itemName";
 
+		
 		private String mUnlockItemId;
-
+		private String mUnlockItemName;
+		
 		@Override
 		public void fetchAdditionalExtras() {
 			mUnlockItemId = getIntent().getStringExtra(EXTRA_UNLOCK_ITEM_ID_KEY);
+			mUnlockItemName = getIntent().getStringExtra(EXTRA_UNLOCK_ITEM_NAME_KEY);
 		}
 
 		@Override
@@ -358,6 +367,10 @@ public class OfferWallActivity extends Activity {
 				params = new HashMap<String, String>();
 			}
 			params.put(PARAM_UNLOCK_ITEM_ID_KEY, mUnlockItemId);
+						
+			if (null != mUnlockItemName && !"".equals(mUnlockItemName)) {
+				params.put(PARAM_UNLOCK_ITEM_NAME_KEY, mUnlockItemName);
+			}
 
 			return params;
 		}

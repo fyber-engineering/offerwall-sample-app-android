@@ -357,7 +357,7 @@ public class OfferWallActivity extends Activity {
 		public static final String EXTRA_UNLOCK_ITEM_NAME_KEY = "EXTRA_UNLOCK_ITEM_NAME_KEY";
 		
 		public static final String PARAM_UNLOCK_ITEM_ID_KEY = "itemid";
-		public static final String PARAM_UNLOCK_ITEM_NAME_KEY = "itemName";
+		public static final String PARAM_UNLOCK_ITEM_NAME_KEY = "item_name";
 
 		
 		private String mUnlockItemId;

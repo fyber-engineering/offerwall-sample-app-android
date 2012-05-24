@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="15dp" >
+
+	<Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onAdvertiserClick"
+        android:text="@string/advertiser" />
+        
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onLaunchOfferwallClick"
+        android:text="@string/launch_offerwall" />
+    
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onInterstitialClick"
+        android:text="@string/interstitial" />
+    
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onBannersClick"
+        android:text="@string/banners" />
+    
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onItemsClick"
+        android:text="@string/items" />   
+    
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onRequestNewCoinsClick"
+        android:text="@string/request_new_coins" />
+
+</LinearLayout>

@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">Sponsorpay Android Test App</string>
-    <string name="hello">SponsorPay Publisher SDK Test App</string>
     <string name="launch_offerwall">Launch Offer Wall</string>
     <string name="launch_unlock_offerwall">Launch Unlock Offer Wall</string>
     <string name="unlock_item_id">Item ID</string>
@@ -15,5 +14,11 @@
     <string name="banner_not_available">Offer Banner not available [http status code: %1$d]</string>
     <string name="banner_request_error">Banner request error: [%1$s]</string>
     <string name="banner_request_error_unknown_host">No connection to the Internet or unknown host</string>
+    <string name="advertiser">Advertiser</string>
+    <string name="interstitial">Interstitial</string>
+    <string name="banners">Banners</string>
+    <string name="items">Items</string>
+    <string name="settings">Settings</string>
+    <string name="back">Back</string>
 
 </resources>

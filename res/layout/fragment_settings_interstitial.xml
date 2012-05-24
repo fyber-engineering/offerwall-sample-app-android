@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+    
+    <include layout="@layout/abstract_fragment_settings_menubar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/settings_menu_bottom_margin"/>
+    
+    <EditText
+        android:id="@+id/background_url_field"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Background URL"
+        android:imeOptions="actionNext"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/skin_name_field"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Skin Name"
+        android:imeOptions="actionDone"
+        android:singleLine="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onLaunchInsterstitialClick"
+        android:text="@string/launch_interstitial" />
+
+
+</LinearLayout>

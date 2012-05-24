@@ -30,10 +30,10 @@ public class HostInfo {
 	 */
 	private static final String ANDROID_OS_PREFIX = "Android OS ";
 
-	private static boolean sSimulateNoReadPhoneStatePermission = false;
-	private static boolean sSimulateNoAccessWifiStatePermission = false;
-	private static boolean sSimulateInvalidAndroidId = false;
-	private static boolean sSimulateNoHardwareSerialNumber = false;
+	protected static boolean sSimulateNoReadPhoneStatePermission = false;
+	protected static boolean sSimulateNoAccessWifiStatePermission = false;
+	protected static boolean sSimulateInvalidAndroidId = false;
+	protected static boolean sSimulateNoHardwareSerialNumber = false;
 
 	public static void setSimulateNoReadPhoneStatePermission(boolean value) {
 		sSimulateNoReadPhoneStatePermission = value;

@@ -65,7 +65,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	private Map<String, String> mCustomParams;
 
 	private String mOverridingUrl;
-	
+
 	/**
 	 * {@link AsyncRequest} used to send the request in the background.
 	 */
@@ -105,7 +105,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	public void setOverridingUrl(String overridingUrl) {
 		mOverridingUrl = overridingUrl;
 	}
-	
+
 	/**
 	 * Generates the request URL and loads it on the background.
 	 */
@@ -124,7 +124,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, UrlBuilder.URL_PARAM_OFFSET_KEY };
 		String[] offerBannerUrlExtraValues = new String[] { UrlBuilder.URL_PARAM_VALUE_ON,
 				UrlBuilder.URL_PARAM_VALUE_ON, String.valueOf(fetchPersistedBannerOffset()) };
-		
+
 		Map<String, String> extraKeysValues = UrlBuilder.mapKeysToValues(offerBannerUrlExtraKeys,
 				offerBannerUrlExtraValues);
 
@@ -135,26 +135,26 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 		if (mCustomParams != null) {
 			extraKeysValues.putAll(mCustomParams);
 		}
-		
+
 		String baseUrl;
-		
+
 		if (SponsorPayPublisher.shouldUseStagingUrls()) {
 			baseUrl = OFFERBANNER_STAGING_BASE_URL;
 		} else {
 			baseUrl = OFFERBANNER_PRODUCTION_BASE_URL;
 		}
-		
-		return UrlBuilder.buildUrl(baseUrl, mUserId.toString(), mHostInfo,
-				extraKeysValues);
+
+		return UrlBuilder.newBuilder(baseUrl, mHostInfo).setUserId(mUserId.toString())
+				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 	}
-	
+
 	private String determineUrl() {
 		if (mOverridingUrl != null && !"".equals(mOverridingUrl))
 			return mOverridingUrl;
 		else
 			return buildUrl();
 	}
-	
+
 	/**
 	 * Called by the {@link #mAsyncRequest} instance when the background request's results are
 	 * available. Will notify the registered {@link SPOfferBannerListener}.

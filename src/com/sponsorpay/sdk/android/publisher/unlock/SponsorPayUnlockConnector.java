@@ -73,8 +73,9 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? SP_UNLOCK_SERVER_STAGING_BASE_URL
 				: SP_UNLOCK_SERVER_PRODUCTION_BASE_URL;
 
-		String requestUrl = UrlBuilder.buildUrl(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mUserId
-				.toString(), mHostInfo, extraKeysValues, mSecurityToken);
+		String requestUrl = UrlBuilder.newBuilder(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mHostInfo)
+				.setUserId(mUserId.toString()).addExtraKeysValues(extraKeysValues).setSecretKey(
+						mSecurityToken).buildUrl();
 
 		Log.d(getClass().getSimpleName(),
 				"Unlock items status request will be sent to URL + params: " + requestUrl);

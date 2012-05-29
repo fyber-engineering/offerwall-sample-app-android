@@ -130,7 +130,9 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 
 	/**
 	 * Sets the install subID to report on the advertiser callback.
-	 * @param subIdValue The install subID received on the app instalation.
+	 * 
+	 * @param subIdValue
+	 *            The install subID received on the app instalation.
 	 */
 	public void setInstallSubId(String subIdValue) {
 		Log.d(AdvertiserCallbackSender.class.getSimpleName(), "SubID value set to " + subIdValue);
@@ -174,7 +176,8 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 		if (mCustomParams != null)
 			extraParams.putAll(mCustomParams);
 
-		String callbackUrl = UrlBuilder.buildUrl(baseUrl, mHostInfo, extraParams);
+		String callbackUrl = UrlBuilder.newBuilder(baseUrl, mHostInfo).addExtraKeysValues(
+				extraParams).buildUrl();
 
 		Log.d(AdvertiserCallbackSender.class.getSimpleName(),
 				"Advertiser callback will be sent to: " + callbackUrl);

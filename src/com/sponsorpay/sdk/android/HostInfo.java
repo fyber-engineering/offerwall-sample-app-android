@@ -17,6 +17,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 import android.provider.Settings.Secure;
 
 /**
@@ -30,6 +32,19 @@ public class HostInfo {
 	 */
 	private static final String ANDROID_OS_PREFIX = "Android OS ";
 
+	private static final String SCREEN_DENSITY_CATEGORY_VALUE_LOW = "LOW";
+
+	private static final String SCREEN_DENSITY_CATEGORY_VALUE_MEDIUM = "MEDIUM";
+
+	private static final String SCREEN_DENSITY_CATEGORY_VALUE_HIGH = "HIGH";
+
+	private static final String SCREEN_DENSITY_CATEGORY_VALUE_EXTRA_HIGH = "EXTRA_HIGH";
+
+	private static final String SCREEN_DENSITY_CATEGORY_VALUE_TV = "TV";
+
+	private static final String UNDEFINED_VALUE = "undefined";
+
+	
 	protected static boolean sSimulateNoReadPhoneStatePermission = false;
 	protected static boolean sSimulateNoAccessWifiStatePermission = false;
 	protected static boolean sSimulateInvalidAndroidId = false;
@@ -100,6 +115,24 @@ public class HostInfo {
 	 * Android application context, used to retrieve the rest of the properties.
 	 */
 	private Context mContext;
+
+	private DisplayMetrics mDisplayMetrics;
+
+	private String mScreenDensityCategory;
+	private int mScreenWidth;
+	private int mScreenHeight;
+	private float mScreenDensityX;
+	private float mScreenDensityY;
+
+	private DisplayMetrics getDisplayMetrics() {
+		if (null == mDisplayMetrics) {
+			mDisplayMetrics = new DisplayMetrics();
+			WindowManager windowManager = (WindowManager) mContext
+					.getSystemService(Context.WINDOW_SERVICE);
+			windowManager.getDefaultDisplay().getMetrics(mDisplayMetrics);
+		}
+		return mDisplayMetrics;
+	}
 
 	/**
 	 * Get the unique device ID
@@ -304,5 +337,83 @@ public class HostInfo {
 	 */
 	public void setOverriddenAppId(String appId) {
 		mAppId = appId;
+	}
+
+	public String getScreenDensityCategory() {
+		if (null == mScreenDensityCategory) {
+			int densityCategoryDpi = getDisplayMetrics().densityDpi;
+
+			switch (densityCategoryDpi) {
+			case DisplayMetrics.DENSITY_MEDIUM:
+				mScreenDensityCategory = SCREEN_DENSITY_CATEGORY_VALUE_MEDIUM;
+				break;
+			case DisplayMetrics.DENSITY_HIGH:
+				mScreenDensityCategory = SCREEN_DENSITY_CATEGORY_VALUE_HIGH;
+				break;
+			case DisplayMetrics.DENSITY_LOW:
+				mScreenDensityCategory = SCREEN_DENSITY_CATEGORY_VALUE_LOW;
+				break;
+			default:
+				mScreenDensityCategory = getScreenDensityCategoryFromModernAndroidDevice(densityCategoryDpi);
+			}
+		}
+		return mScreenDensityCategory;
+	}
+
+	private String getScreenDensityCategoryFromModernAndroidDevice(int densityCategoryDpi) {
+		String[] remainingScreenDensityCategoryStaticFieldNames = { "DENSITY_XHIGH", "DENSITY_TV" };
+		String[] correspondingScreenDensityCategoryStringValues = { SCREEN_DENSITY_CATEGORY_VALUE_EXTRA_HIGH, SCREEN_DENSITY_CATEGORY_VALUE_TV };
+
+		int iterationLimit = Math.min(remainingScreenDensityCategoryStaticFieldNames.length,
+				correspondingScreenDensityCategoryStringValues.length);
+
+		String densityCategory = null;
+		
+		for (int i = 0; i < iterationLimit; i++) {
+			try {
+				Field eachField = DisplayMetrics.class
+						.getField(remainingScreenDensityCategoryStaticFieldNames[i]);
+				int thisFieldvalue = eachField.getInt(null);
+				if (densityCategoryDpi == thisFieldvalue) {
+					densityCategory = correspondingScreenDensityCategoryStringValues[i];
+				}
+			} catch (Exception e) {
+				// Assumed field doesn't exist in the version of Android the host is running
+			}
+			
+			if (null != densityCategory) {
+				break;
+			}
+		}
+		
+		return null == densityCategory ? UNDEFINED_VALUE : densityCategory;
+	}
+	
+	public String getScreenWidth() {
+		if (0 == mScreenWidth) {
+			mScreenWidth = getDisplayMetrics().widthPixels;
+		}
+		return String.format("%d", mScreenWidth);
+	}
+	
+	public String getScreenHeight() {
+		if (0 == mScreenHeight) {
+			mScreenHeight = getDisplayMetrics().heightPixels;
+		}
+		return String.format("%d", mScreenHeight);
+	}
+	
+	public String getScreenDensityX() {
+		if (0 == mScreenDensityX) {
+			mScreenDensityX = getDisplayMetrics().xdpi;
+		}
+		return String.format("%d", Math.round(mScreenDensityX));
+	}
+	
+	public String getScreenDensityY() {
+		if (0 == mScreenDensityY) {
+			mScreenDensityY = getDisplayMetrics().ydpi;
+		}
+		return String.format("%d", Math.round(mScreenDensityY));
 	}
 }

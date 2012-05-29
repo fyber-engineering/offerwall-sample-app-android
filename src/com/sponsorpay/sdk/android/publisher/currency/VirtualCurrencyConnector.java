@@ -146,8 +146,9 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? VIRTUAL_CURRENCY_SERVER_STAGING_BASE_URL
 				: VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL;
 
-		String requestUrl = UrlBuilder.buildUrl(baseUrl + CURRENCY_DELTA_REQUEST_RESOURCE, mUserId
-				.toString(), mHostInfo, extraKeysValues, mSecurityToken);
+		String requestUrl = UrlBuilder.newBuilder(baseUrl + CURRENCY_DELTA_REQUEST_RESOURCE,
+				mHostInfo).setUserId(mUserId.toString()).addExtraKeysValues(extraKeysValues)
+				.setSecretKey(mSecurityToken).buildUrl();
 
 		Log.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
 				+ requestUrl);

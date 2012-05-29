@@ -58,13 +58,13 @@ public class OfferWallActivity extends Activity {
 	public static final String EXTRA_KEYS_VALUES_MAP_KEY = "EXTRA_KEY_VALUES_MAP";
 
 	public static final String EXTRA_OVERRIDING_URL_KEY = "EXTRA_OVERRIDING_URL_KEY";
-	
+
 	/**
 	 * The result code that is returned when the Offer Wall's parsed exit scheme does not contain a
 	 * status code.
 	 */
 	public static final int RESULT_CODE_NO_STATUS_CODE = -10;
-	
+
 	/**
 	 * Full-size web view within the activity
 	 */
@@ -104,7 +104,7 @@ public class OfferWallActivity extends Activity {
 	private OfferWallTemplate mTemplate;
 
 	private String mOverridingUrl;
-	
+
 	/**
 	 * Overridden from {@link Activity}. Upon activity start, extract the user ID from the extra,
 	 * create the web view and setup the interceptor for the web view exit-request.
@@ -153,6 +153,11 @@ public class OfferWallActivity extends Activity {
 			public void onReceivedError(WebView view, int errorCode, String description,
 					String failingUrl) {
 				// super.onReceivedError(view, errorCode, description, failingUrl);
+				Log.e(getClass().getSimpleName(), String.format(
+						"OfferWall WebView triggered an error. "
+								+ "Error code: %d, error description: %s. Failing URL: %s",
+						errorCode, description, failingUrl));
+
 				UIStringIdentifier error;
 
 				switch (errorCode) {
@@ -200,7 +205,7 @@ public class OfferWallActivity extends Activity {
 		}
 
 		mOverridingUrl = getIntent().getStringExtra(EXTRA_OVERRIDING_URL_KEY);
-		
+
 		mTemplate.fetchAdditionalExtras();
 	}
 
@@ -226,10 +231,12 @@ public class OfferWallActivity extends Activity {
 
 		try {
 			String offerwallUrl = determineUrl();
-				
+
 			Log.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
 			mWebView.loadUrl(offerwallUrl);
 		} catch (RuntimeException ex) {
+			Log.e(getClass().getSimpleName(),
+					"An exception occurred when launching the Offer Wall", ex);
 			showErrorDialog(ex.getMessage());
 		}
 	}
@@ -246,11 +253,12 @@ public class OfferWallActivity extends Activity {
 		else
 			return generateUrl();
 	}
-	
+
 	private String generateUrl() {
 		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
 		String baseUrl = mTemplate.getBaseUrl();
-		return UrlBuilder.buildUrl(baseUrl, mUserId.toString(), mHostInfo, mCustomKeysValues, null);
+		return UrlBuilder.newBuilder(baseUrl, mHostInfo).setUserId(mUserId.toString())
+				.addExtraKeysValues(mCustomKeysValues).addScreenMetrics().buildUrl();
 	}
 
 	/**
@@ -355,14 +363,13 @@ public class OfferWallActivity extends Activity {
 		 * Key for extracting the value of {@link #mUnlockItemName} from the extras bundle.
 		 */
 		public static final String EXTRA_UNLOCK_ITEM_NAME_KEY = "EXTRA_UNLOCK_ITEM_NAME_KEY";
-		
+
 		public static final String PARAM_UNLOCK_ITEM_ID_KEY = "itemid";
 		public static final String PARAM_UNLOCK_ITEM_NAME_KEY = "item_name";
 
-		
 		private String mUnlockItemId;
 		private String mUnlockItemName;
-		
+
 		@Override
 		public void fetchAdditionalExtras() {
 			mUnlockItemId = getIntent().getStringExtra(EXTRA_UNLOCK_ITEM_ID_KEY);
@@ -381,7 +388,7 @@ public class OfferWallActivity extends Activity {
 				params = new HashMap<String, String>();
 			}
 			params.put(PARAM_UNLOCK_ITEM_ID_KEY, mUnlockItemId);
-						
+
 			if (null != mUnlockItemName && !"".equals(mUnlockItemName)) {
 				params.put(PARAM_UNLOCK_ITEM_NAME_KEY, mUnlockItemName);
 			}

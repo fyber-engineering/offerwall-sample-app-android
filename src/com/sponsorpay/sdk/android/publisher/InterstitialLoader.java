@@ -111,7 +111,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private Map<String, String> mCustomParams;
 
 	private String mOverridingUrl;
-	
+
 	private String mBackgroundUrl = "";
 	private String mSkinName = SKIN_NAME_DEFAULT;
 	private boolean mShouldStayOpen = SHOULD_INTERSTITIAL_REMAIN_OPEN_DEFAULT;
@@ -162,7 +162,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	public void setOverridingUrl(String overridingUrl) {
 		mOverridingUrl = overridingUrl;
 	}
-	
+
 	/**
 	 * Can be set to the absolute URL of an image to use as background graphic for the interstitial.
 	 * Must include the protocol scheme (http:// or https://) at the beginning of the URL. Leave it
@@ -283,7 +283,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
 				: INTERSTITIAL_PRODUCTION_BASE_URL;
 
-		return UrlBuilder.buildUrl(interstitialBaseUrl, mUserId.toString(), mHostInfo, keysValues);
+		return UrlBuilder.newBuilder(interstitialBaseUrl, mHostInfo).setUserId(mUserId.toString())
+				.addExtraKeysValues(keysValues).addScreenMetrics().buildUrl();
 	}
 
 	/**
@@ -331,8 +332,9 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		interstitialIntent.putExtra(InterstitialActivity.EXTRA_SHOULD_STAY_OPEN_KEY,
 				mShouldStayOpen);
 
-		interstitialIntent.putExtra(InterstitialActivity.EXTRA_BASE_URL_KEY, request.getRequestUrl());
-		
+		interstitialIntent.putExtra(InterstitialActivity.EXTRA_BASE_URL_KEY, request
+				.getRequestUrl());
+
 		mCallingActivity.startActivity(interstitialIntent);
 	}
 

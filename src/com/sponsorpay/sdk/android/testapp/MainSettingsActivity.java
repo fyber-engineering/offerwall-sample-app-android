@@ -22,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
@@ -200,9 +201,17 @@ public class MainSettingsActivity extends Activity {
 	 * @param v
 	 */
 	public void onAddCustomParameterClick(View v) {
+
+		if (StringUtils.nullOrEmpty(mCustomKeyField.getText().toString())) {
+			Toast.makeText(getApplicationContext(),
+					"Key field must contain a valid value", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
 		mCustomKeyValuesForRequest.put(mCustomKeyField.getText().toString(), mCustomValueField
 				.getText().toString());
 
+		// is this necessary? the object instance is the same
 		SponsorPayAdvertiser.setCustomParameters(mCustomKeyValuesForRequest);
 		SponsorPayPublisher.setCustomParameters(mCustomKeyValuesForRequest);
 
@@ -219,7 +228,10 @@ public class MainSettingsActivity extends Activity {
 	 */
 	public void onClearCustomParametersClick(View v) {
 		mCustomKeyValuesForRequest.clear();
-
+		
+//		mCustomKeyField.setText(StringUtils.EMPTY_STRING);
+//		mCustomValueField.setText(StringUtils.EMPTY_STRING);
+		
 		SponsorPayAdvertiser.setCustomParameters(mCustomKeyValuesForRequest);
 		SponsorPayPublisher.setCustomParameters(mCustomKeyValuesForRequest);
 
@@ -241,7 +253,6 @@ public class MainSettingsActivity extends Activity {
 		mKeyValuesList.setText(text);
 	}
 	
-	
 	@Override
 	protected void onDestroy() {
 		Intent intent = new Intent();
@@ -249,6 +260,7 @@ public class MainSettingsActivity extends Activity {
 		setIntent(intent);
 		super.onDestroy();
 	}
+	
 	@Override
 	protected void onPause() {
 		// Save the state of the UI fields into the app preferences.
@@ -290,6 +302,8 @@ public class MainSettingsActivity extends Activity {
 	 */
 	private void setValuesInFields() {
 		mOverridingUrlField.setText(mOverridingUrl);
+		SponsorPayPublisher.setOverridingWebViewUrl(mOverridingUrl);
+		
 		mKeepOfferwallOpenCheckBox.setChecked(mShouldStayOpen);
 
 		mSimulateNoPhoneStatePermissionCheckBox.setChecked(ExtendedHostInfo

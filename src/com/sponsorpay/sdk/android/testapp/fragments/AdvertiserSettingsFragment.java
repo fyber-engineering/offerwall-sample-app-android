@@ -27,6 +27,7 @@ public class AdvertiserSettingsFragment extends AbstractSettingsFragment {
 		if (mAuxOverridingId != null) {
 			sendCallback(mAuxOverridingId);
 			mAuxOverridingId = null;
+			getFragmentManager().popBackStack();
 		}
 	}
 	

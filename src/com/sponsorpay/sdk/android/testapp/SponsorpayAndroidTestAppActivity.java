@@ -92,10 +92,13 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	}
 
 	private void createLauncherFragment() {
-		FragmentTransaction transaction = getSupportFragmentManager()
-				.beginTransaction();
-		transaction.add(R.id.fragment_placeholder, new LauncherFragment());
-		transaction.commit();
+		Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_placeholder);
+		if (fragment == null) {
+			FragmentTransaction transaction = getSupportFragmentManager()
+					.beginTransaction();
+			transaction.add(R.id.fragment_placeholder, new LauncherFragment());
+			transaction.commit();
+		}
 	}
 
 	protected void bindViews() {
@@ -111,8 +114,14 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		mSettingsButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivityForResult(new Intent(getApplicationContext(),
-						MainSettingsActivity.class),
+				fetchValuesFromFields();
+				Intent intent = new Intent(getApplicationContext(),
+						MainSettingsActivity.class);
+				intent.putExtra(MainSettingsActivity.PREFERENCES_EXTRA, PREFERENCES_FILE_NAME);
+				intent.putExtra(MainSettingsActivity.OVERRIDING_APP_ID_EXTRA, mOverridingAppId);
+				intent.putExtra(MainSettingsActivity.USER_ID_EXTRA, mUserId);
+				intent.putExtra(MainSettingsActivity.SECURITY_TOKEN_EXTRA, mSecurityToken);
+				startActivityForResult(intent,
 						MAIN_SETTINGS_ACTIVITY_CODE);
 			}
 		});
@@ -421,7 +430,9 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 //		transaction.setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
 		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 
+		newFragment.setRetainInstance(true);
 		transaction.replace(R.id.fragment_placeholder, newFragment);
+		
 		transaction.addToBackStack(null);
 
 		// Commit the transaction

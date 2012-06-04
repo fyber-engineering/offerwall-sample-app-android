@@ -177,7 +177,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 			extraParams.putAll(mCustomParams);
 
 		String callbackUrl = UrlBuilder.newBuilder(baseUrl, mHostInfo).addExtraKeysValues(
-				extraParams).buildUrl();
+				extraParams).addScreenMetrics().buildUrl();
 
 		Log.d(AdvertiserCallbackSender.class.getSimpleName(),
 				"Advertiser callback will be sent to: " + callbackUrl);

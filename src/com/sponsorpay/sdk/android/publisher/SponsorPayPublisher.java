@@ -682,7 +682,7 @@ public class SponsorPayPublisher {
 
 		vcc.setCustomParameters(getCustomParameters(customParams));
 
-		vcc.fetchDeltaOfCoins();
+		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
 	}
 
 	public static void requestUnlockItemsStatus(Context context, String userId,

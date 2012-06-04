@@ -158,7 +158,7 @@ public class UrlBuilder {
 			Map<String, String> extraKeysValues, String secretKey) {
 
 		return newBuilder(resourceUrl, hostInfo).setUserId(userId).addExtraKeysValues(extraKeysValues).setSecretKey(
-				secretKey).buildUrl();
+				secretKey).addScreenMetrics().buildUrl();
 	}
 
 	/**

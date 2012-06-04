@@ -118,7 +118,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * will be delivered to one of the registered listener's callback methods.
 	 */
 	public void fetchDeltaOfCoins() {
-		fetchDeltaOfCoinsForCurrentUserSinceTransactionId(fetchLatestTransactionIdForCurrentAppAndUser());
+		fetchDeltaOfCoinsForCurrentUserSinceTransactionId(null);
 	}
 
 	/**
@@ -130,7 +130,10 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 *            The transaction ID used as excluded lower limit to calculate the delta of coins.
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId) {
-
+		if (null == transactionId) {
+			transactionId = fetchLatestTransactionIdForCurrentAppAndUser();
+		}
+		
 		String[] requestUrlExtraKeys = new String[] { URL_PARAM_KEY_LAST_TRANSACTION_ID,
 				URL_PARAM_KEY_TIMESTAMP };
 		String[] requestUrlExtraValues = new String[] { transactionId,
@@ -148,7 +151,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 
 		String requestUrl = UrlBuilder.newBuilder(baseUrl + CURRENCY_DELTA_REQUEST_RESOURCE,
 				mHostInfo).setUserId(mUserId.toString()).addExtraKeysValues(extraKeysValues)
-				.setSecretKey(mSecurityToken).buildUrl();
+				.setSecretKey(mSecurityToken).addScreenMetrics().buildUrl();
 
 		Log.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
 				+ requestUrl);

@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
+import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiserState;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.testapp.utils.StringUtils;
 
@@ -237,7 +238,22 @@ public class MainSettingsActivity extends Activity {
 
 		updateCustomParametersList();
 	}
+	
+	public void onClearApplicationDataClick(View view) {
+		SharedPreferences prefs = getSharedPreferences(
+				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
+		Editor prefsEditor = prefs.edit();
+		prefsEditor.clear();
+		prefsEditor.commit();
 
+		prefs = getSharedPreferences(
+				SponsorPayAdvertiserState.PREFERENCES_FILE_NAME,
+				Context.MODE_PRIVATE);
+		prefsEditor = prefs.edit();
+		prefsEditor.clear();
+		prefsEditor.commit();
+	}
+ 
 	private void updateCustomParametersList() {
 		String text = StringUtils.EMPTY_STRING;
 
@@ -320,8 +336,10 @@ public class MainSettingsActivity extends Activity {
 		fetchValuesFromFields();
 		HostInfo hostInfo = new HostInfo(getApplicationContext());
 		hostInfo.setOverriddenAppId(mOverridingAppId);
-		mOverridingUrl = UrlBuilder.buildUrl(mOverridingUrl, mUserId, hostInfo,
-				mCustomKeyValuesForRequest, mSecurityToken);
+		mOverridingUrl = UrlBuilder.newBuilder(mOverridingUrl, hostInfo)
+				.setUserId(mUserId)
+				.addExtraKeysValues(mCustomKeyValuesForRequest)
+				.setSecretKey(mSecurityToken).buildUrl();
 		setValuesInFields();
 	}
 	

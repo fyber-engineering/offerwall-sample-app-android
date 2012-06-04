@@ -138,6 +138,11 @@
                 android:layout_below="@id/custom_value_field"
                 android:layout_toLeftOf="@id/clear_custom_parameters_button" />
         </RelativeLayout>
+        
+        <Button android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Clear Application Data"
+            android:onClick="onClearApplicationDataClick"/>
     </LinearLayout>
 
 </ScrollView>

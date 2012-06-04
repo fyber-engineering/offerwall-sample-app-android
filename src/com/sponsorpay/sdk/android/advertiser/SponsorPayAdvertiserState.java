@@ -13,7 +13,7 @@ public class SponsorPayAdvertiserState {
 	 * each consecutive invocation of {@link #register()}, to keep track of whether we have already
 	 * successfully contacted the Advertiser API.
 	 */
-	private static final String PREFERENCES_FILE_NAME = "SponsorPayAdvertiserState";
+	public static final String PREFERENCES_FILE_NAME = "SponsorPayAdvertiserState";
 
 	/**
 	 * The key to store in the preferences file the flag which determines if we have already

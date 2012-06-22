@@ -39,7 +39,9 @@ public class ActivityOfferWebClient extends OfferWebClient {
 			willCloseHostActivity = true;
 		} else {
 			willCloseHostActivity = !mShouldHostActivityStayOpen;
-			launchActivityWithUrl(targetUrl);
+			if (!launchActivityWithUrl(targetUrl)) {
+				return;
+			}
 		}
 
 		Log.i(OfferWebClient.LOG_TAG, "Should stay open: " + mShouldHostActivityStayOpen

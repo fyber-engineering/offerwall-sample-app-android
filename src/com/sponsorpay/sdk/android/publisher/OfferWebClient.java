@@ -9,11 +9,19 @@ package com.sponsorpay.sdk.android.publisher;
 import java.lang.ref.WeakReference;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.view.WindowManager.BadTokenException;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.sponsorpay.sdk.android.IntentHelper;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 
 /**
  * {@link WebViewClient} implementing common functionality for {@link WebView} instances displaying
@@ -110,11 +118,52 @@ public abstract class OfferWebClient extends WebViewClient {
 		
 		Intent intent = new Intent();
 		intent.setAction(Intent.ACTION_VIEW);
-		intent.setData(Uri.parse(url));
-		hostActivity.startActivity(intent);
-		// TODO: handle activity not found case (throws an ActivityNotFoundException)
+		Uri uri = Uri.parse(url);
+		intent.setData(uri);
+		try {
+			hostActivity.startActivity(intent);
+		} catch (ActivityNotFoundException e) {
+			if (uri.getScheme().equalsIgnoreCase("market") && !IntentHelper.isIntentAvailable(getHostActivity(),
+					Intent.ACTION_VIEW, 
+					// dummy search to validate Play Store application
+					Uri.parse("market://search?q=pname:com.google"))) {
+				Log.e(LOG_TAG, "Play Store is not installed on this device...");
+				showDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE));
+			}
+			// else - do nothing...
+			// https://www.pivotaltracker.com/story/show/25385855
+			return false;
+		}
 		return true;
 	}
 
 	protected abstract void onSponsorPayExitScheme(int resultCode, String targetUrl);
+	
+	// copied from OfferWallActivity. Consider refactoring
+	protected void showDialog(String errorMessage) {
+		String errorDialogTitle = SponsorPayPublisher
+				.getUIString(UIStringIdentifier.ERROR_DIALOG_TITLE);
+		String dismissButtonCaption = SponsorPayPublisher
+				.getUIString(UIStringIdentifier.DISMISS_ERROR_DIALOG);
+
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getHostActivity());
+		dialogBuilder.setTitle(errorDialogTitle);
+		dialogBuilder.setMessage(errorMessage);
+		dialogBuilder.setNegativeButton(dismissButtonCaption, new OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		AlertDialog dialog = dialogBuilder.create();
+		dialog.setOwnerActivity(getHostActivity());
+		try {
+			dialog.show();
+		} catch (BadTokenException e) {
+			Log.e(getClass().getSimpleName(),
+					"Couldn't show error dialog. Not displayed error message is: " + errorMessage,
+					e);
+		}
+	}
+	
 }

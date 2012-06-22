@@ -37,7 +37,7 @@ public class SponsorPayPublisher {
 	 * Enumeration identifying the different messages which can be displayed in the user interface.
 	 */
 	public enum UIStringIdentifier {
-		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, ERROR_LOADING_OFFERWALL, ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, LOADING_INTERSTITIAL, LOADING_OFFERWALL
+		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, ERROR_LOADING_OFFERWALL, ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, LOADING_INTERSTITIAL, LOADING_OFFERWALL, ERROR_PLAY_STORE_UNAVAILABLE
 	};
 
 	/**
@@ -70,6 +70,7 @@ public class SponsorPayPublisher {
 				"An error happened when loading the offer wall (no internet connection)");
 		sUIStrings.put(UIStringIdentifier.LOADING_INTERSTITIAL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.LOADING_OFFERWALL, "Loading...");
+		sUIStrings.put(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE, "You don't have the Google Play Store application on your device to complete App Install offers.");
 	}
 
 	/**

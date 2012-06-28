@@ -130,8 +130,7 @@ public abstract class OfferWebClient extends WebViewClient {
 				Log.e(LOG_TAG, "Play Store is not installed on this device...");
 				showDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE));
 			}
-			// else - do nothing...
-			// https://www.pivotaltracker.com/story/show/25385855
+			// else - fail silently
 			return false;
 		}
 		return true;

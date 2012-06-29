@@ -10,11 +10,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.WebView;
@@ -231,5 +233,17 @@ public class InterstitialActivity extends Activity {
 			mWebView.setLayoutParams(interstitialSize);
 			mWebViewContainer.addView(mWebView);
 		}
+	}
+	
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent ev) {
+	    Rect dialogBounds = new Rect();
+	    getWindow().getDecorView().getHitRect(dialogBounds);
+
+	    if (!dialogBounds.contains((int) ev.getX(), (int) ev.getY())) {
+	        // Tapped outside the activity bounds
+	    	return true; // event was consumed, ignore event (don't finish the activity on ICS or newer)
+	    }
+	    return super.dispatchTouchEvent(ev);
 	}
 }

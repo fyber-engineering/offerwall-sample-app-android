@@ -28,8 +28,8 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	/*
 	 * VCS API Resource URLs.
 	 */
-	private static final String VIRTUAL_CURRENCY_SERVER_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/vcs/v1/";
-	private static final String VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL = "http://api.sponsorpay.com/vcs/v1/";
+	private static final String VIRTUAL_CURRENCY_SERVER_STAGING_BASE_URL = "https://staging.iframe.sponsorpay.com/vcs/v1/";
+	private static final String VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL = "https://api.sponsorpay.com/vcs/v1/";
 	private static final String CURRENCY_DELTA_REQUEST_RESOURCE = "new_credit.json";
 
 	/*

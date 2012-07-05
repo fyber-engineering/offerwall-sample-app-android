@@ -25,8 +25,8 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifi
  * the results and shows the {@link InterstitialActivity} if and ad is returned.
  * </p>
  * <p>
- * Shows a progress dialog on top of the calling activity while it contacts the SponsorPayÕs servers
- * to determine whether thereÕs an interstitial available.
+ * Shows a progress dialog on top of the calling activity while it contacts the SponsorPayï¿½s servers
+ * to determine whether thereï¿½s an interstitial available.
  * </p>
  * <p>
  * If an ad is available, it will continue showing the loading progress dialog while the ad contents
@@ -55,13 +55,13 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 */
 	public interface InterstitialLoadingStatusListener {
 		/**
-		 * Invoked when SponsorPayÕs backend has returned an ad. The {@link InterstitialActivity} is
+		 * Invoked when SponsorPayï¿½s backend has returned an ad. The {@link InterstitialActivity} is
 		 * about to be shown.
 		 */
 		void onWillShowInterstitial();
 
 		/**
-		 * Invoked when a response has been received from SponsorPayÕs backend indicating that no
+		 * Invoked when a response has been received from SponsorPayï¿½s backend indicating that no
 		 * interstitial ad is available for this particular request.
 		 */
 		void onNoInterstitialAvailable();
@@ -85,8 +85,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private static final int LOADING_TIMEOUT_SECONDS_DEFAULT = 5;
 	private static final String SKIN_NAME_DEFAULT = "DEFAULT";
 
-	private static final String INTERSTITIAL_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile";
-	private static final String INTERSTITIAL_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile";
+	private static final String INTERSTITIAL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/mobile";
+	private static final String INTERSTITIAL_STAGING_BASE_URL = "https://staging.iframe.sponsorpay.com/mobile";
 
 	private static final String URL_PARAM_INTERSTITIAL_KEY = "interstitial";
 

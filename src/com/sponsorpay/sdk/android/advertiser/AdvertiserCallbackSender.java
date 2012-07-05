@@ -34,8 +34,8 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	/**
 	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
 	 */
-	private static final String API_PRODUCTION_RESOURCE_URL = "http://service.sponsorpay.com/installs/v2";
-	private static final String API_STAGING_RESOURCE_URL = "http://staging.sws.sponsorpay.com/installs/v2";
+	private static final String API_PRODUCTION_RESOURCE_URL = "https://service.sponsorpay.com/installs/v2";
+	private static final String API_STAGING_RESOURCE_URL = "https://staging.sws.sponsorpay.com/installs/v2";
 
 	/**
 	 * The key for encoding the parameter corresponding to whether a previous invocation of the

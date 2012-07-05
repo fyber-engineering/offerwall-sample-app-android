@@ -321,8 +321,8 @@ public class OfferWallActivity extends Activity {
 		/**
 		 * Sponsorpay's URL to contact within the web view
 		 */
-		private static final String OFFERWALL_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile?";
-		private static final String OFFERWALL_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile?";
+		private static final String OFFERWALL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/mobile?";
+		private static final String OFFERWALL_STAGING_BASE_URL = "https://staging.iframe.sponsorpay.com/mobile?";
 
 		@Override
 		public void fetchAdditionalExtras() {
@@ -351,8 +351,8 @@ public class OfferWallActivity extends Activity {
 		/**
 		 * Sponsorpay's URL to contact within the web view
 		 */
-		private static final String UNLOCK_OFFERWALL_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/unlock?";
-		private static final String UNLOCK_OFFERWALL_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/unlock?";
+		private static final String UNLOCK_OFFERWALL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/unlock?";
+		private static final String UNLOCK_OFFERWALL_STAGING_BASE_URL = "https://staging.iframe.sponsorpay.com/unlock?";
 
 		/**
 		 * Key for extracting the value of {@link #mUnlockItemId} from the extras bundle.

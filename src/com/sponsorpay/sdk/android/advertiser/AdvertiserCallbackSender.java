@@ -12,13 +12,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import com.sponsorpay.sdk.android.HostInfo;
-import com.sponsorpay.sdk.android.UrlBuilder;
 
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.utils.SPHttpClient;
 
 /**
  * Runs in the background the Advertiser Callback HTTP request.
@@ -208,7 +208,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 		String callbackUrl = params[0];
 
 		mHttpRequest = new HttpGet(callbackUrl);
-		mHttpClient = new DefaultHttpClient();
+		mHttpClient = SPHttpClient.getHttpClient();
 
 		try {
 			mHttpResponse = mHttpClient.execute(mHttpRequest);

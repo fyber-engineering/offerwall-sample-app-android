@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android Publisher SDK
+ *
+ * Copyright 2011 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.utils;
 
 import java.io.IOException;

@@ -22,6 +22,8 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
+import android.os.Build;
+
 public class SPHttpClient {
 
 	private static SPHttpClient INSTANCE = new SPHttpClient();
@@ -33,32 +35,38 @@ public class SPHttpClient {
 	private HttpClient client;
 	
 	private HttpClient getClient() {
-		if (client != null) {
-			return client;
-		} else {
-		    try {
+		if (client == null) {
+			if (Build.VERSION.SDK_INT < 11) {
+				try {
 
-		    	KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-		    	trustStore.load(null, null);
-		    	
-		    	SSLSocketFactory sf = new SPSSLSocketFactory(trustStore);
-		    	sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-		    	
-		    	HttpParams params = new BasicHttpParams();
-		    	HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-		    	HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
-		    	
-		    	SchemeRegistry registry = new SchemeRegistry();
-		    	registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-		    	registry.register(new Scheme("https", sf, 443));
-		    	
-		    	ClientConnectionManager ccm = new ThreadSafeClientConnManager(params, registry);
+					KeyStore trustStore = KeyStore.getInstance(KeyStore
+							.getDefaultType());
+					trustStore.load(null, null);
 
-		        return new DefaultHttpClient(ccm, params);
-		    } catch (Exception e) {
-		        return new DefaultHttpClient();
-		    }
+					SSLSocketFactory sf = new SPSSLSocketFactory(trustStore);
+					sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+					HttpParams params = new BasicHttpParams();
+					HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+					HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
+
+					SchemeRegistry registry = new SchemeRegistry();
+					registry.register(new Scheme("http", PlainSocketFactory
+							.getSocketFactory(), 80));
+					registry.register(new Scheme("https", sf, 443));
+
+					ClientConnectionManager ccm = new ThreadSafeClientConnManager(
+							params, registry);
+
+					client = new DefaultHttpClient(ccm, params);
+				} catch (Exception e) {
+					client = new DefaultHttpClient();
+				}
+			} else {
+				client = new DefaultHttpClient();
+			}
 		}
+		return client;
 	}
 	
 	

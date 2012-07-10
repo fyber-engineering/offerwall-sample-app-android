@@ -13,11 +13,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Handler;
-import android.util.Log;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
@@ -25,8 +25,8 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifi
  * the results and shows the {@link InterstitialActivity} if and ad is returned.
  * </p>
  * <p>
- * Shows a progress dialog on top of the calling activity while it contacts the SponsorPayÕs servers
- * to determine whether thereÕs an interstitial available.
+ * Shows a progress dialog on top of the calling activity while it contacts the SponsorPayï¿½s servers
+ * to determine whether thereï¿½s an interstitial available.
  * </p>
  * <p>
  * If an ad is available, it will continue showing the loading progress dialog while the ad contents
@@ -55,13 +55,13 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 */
 	public interface InterstitialLoadingStatusListener {
 		/**
-		 * Invoked when SponsorPayÕs backend has returned an ad. The {@link InterstitialActivity} is
+		 * Invoked when SponsorPayï¿½s backend has returned an ad. The {@link InterstitialActivity} is
 		 * about to be shown.
 		 */
 		void onWillShowInterstitial();
 
 		/**
-		 * Invoked when a response has been received from SponsorPayÕs backend indicating that no
+		 * Invoked when a response has been received from SponsorPayï¿½s backend indicating that no
 		 * interstitial ad is available for this particular request.
 		 */
 		void onNoInterstitialAvailable();
@@ -224,7 +224,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 
 		String interstitialUrl = determineUrl();
 
-		Log.i("interstitial", "url: " + interstitialUrl);
+		SponsorPayLogger.i("interstitial", "url: " + interstitialUrl);
 
 		mAsyncRequest = new AsyncRequest(interstitialUrl, this);
 		mAsyncRequest.execute();
@@ -307,7 +307,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 				try {
 					mProgressDialog.dismiss();
 				} catch (IllegalArgumentException e) {
-					Log.w(LOG_TAG, "Exception thrown when closing progress dialog. "
+					SponsorPayLogger.w(LOG_TAG, "Exception thrown when closing progress dialog. "
 							+ " Changing configurations: "
 							+ ownerActivity.getChangingConfigurations(), e);
 				}
@@ -350,7 +350,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 */
 	@Override
 	public void onAsyncRequestComplete(AsyncRequest request) {
-		Log.v(LOG_TAG, "Interstitial request completed with status code: "
+		SponsorPayLogger.v(LOG_TAG, "Interstitial request completed with status code: "
 				+ request.getHttpStatusCode() + ", did trigger exception: "
 				+ request.didRequestThrowError());
 

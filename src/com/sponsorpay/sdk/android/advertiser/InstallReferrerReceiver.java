@@ -5,7 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.UrlQuerySanitizer;
 import android.os.Bundle;
-import android.util.Log;
+
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * Listens to the broadcast sent by the Android Market app when the host application is installed
@@ -24,7 +25,7 @@ public class InstallReferrerReceiver extends BroadcastReceiver {
 			referrer = extras.getString(EXTRAS_KEY_REFERRER);
 		}
 
-		Log.i(getClass().getSimpleName(), "Received install referrer. Persisting data. "
+		SponsorPayLogger.i(getClass().getSimpleName(), "Received install referrer. Persisting data. "
 				+ "Package name: " + context.getPackageName() + ". Install referrer: " + referrer);
 
 		UrlQuerySanitizer referralParameters = new UrlQuerySanitizer();
@@ -33,7 +34,7 @@ public class InstallReferrerReceiver extends BroadcastReceiver {
 		referralParameters.parseQuery(referrer);
 		String contentParameterSubId = referralParameters.getValue(CONTENT_PARAM_KEY);
 
-		Log.i(getClass().getSimpleName(), "SubID extracted from received referrer: "
+		SponsorPayLogger.i(getClass().getSimpleName(), "SubID extracted from received referrer: "
 				+ contentParameterSubId);
 
 		SponsorPayAdvertiserState persistentState = new SponsorPayAdvertiserState(context);

@@ -2,9 +2,8 @@ package com.sponsorpay.sdk.android.publisher;
 
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.sponsorpay.sdk.android.SignatureTools;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
@@ -155,7 +154,7 @@ public abstract class AbstractResponse {
 			mErrorMessage = responseBodyAsJsonObject.getString(ERROR_MESSAGE_KEY);
 			mErrorType = RequestErrorType.SERVER_RETURNED_ERROR;
 		} catch (Exception e) {
-			Log.w(getClass().getSimpleName(),
+			SponsorPayLogger.w(getClass().getSimpleName(),
 					"An exception was triggered while parsing error response", e);
 			mErrorType = RequestErrorType.ERROR_OTHER;
 		}

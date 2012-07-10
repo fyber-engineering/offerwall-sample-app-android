@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
-import android.util.Log;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
@@ -84,7 +84,7 @@ public class SignatureTools {
 			byte[] digestBytes = sha1.digest(text.getBytes());
 			digestString = byteArray2Hex(digestBytes);
 		} catch (NoSuchAlgorithmException e) {
-			Log.e("UrlBuilder", "SHA1 algorithm not available.");
+			SponsorPayLogger.e("UrlBuilder", "SHA1 algorithm not available.");
 			e.printStackTrace();
 		}
 		

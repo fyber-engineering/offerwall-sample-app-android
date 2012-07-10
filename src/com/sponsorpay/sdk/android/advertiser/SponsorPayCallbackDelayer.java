@@ -10,9 +10,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sponsorpay.sdk.android.HostInfo;
-import com.sponsorpay.sdk.android.UrlBuilder;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -20,7 +17,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.SystemClock;
-import android.util.Log;
+
+import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * Enables triggering the advertiser's callback with a delay. Uses the Android alarm mechanism
@@ -71,7 +71,7 @@ public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 	public static void callWithDelay(Context context, String appId, long delayMinutes,
 			HashMap<String, String> customParams) {
 
-		Log.d(SponsorPayCallbackDelayer.class.toString(), "callWithDelay called");
+		SponsorPayLogger.d(SponsorPayCallbackDelayer.class.toString(), "callWithDelay called");
 
 		// if HostInfo must launch a RuntimeException due to an invalid App ID value, let it do that
 		// immediately --instead of after the delay-- and on the calling thread:
@@ -114,7 +114,7 @@ public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d(this.getClass().toString(), "Calling SponsorPayAdvertiser.register");
+		SponsorPayLogger.d(this.getClass().toString(), "Calling SponsorPayAdvertiser.register");
 
 		Map<String, String> customParams = null;
 

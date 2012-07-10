@@ -15,13 +15,13 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.view.WindowManager.BadTokenException;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.sponsorpay.sdk.android.IntentHelper;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * {@link WebViewClient} implementing common functionality for {@link WebView} instances displaying
@@ -88,7 +88,7 @@ public abstract class OfferWebClient extends WebViewClient {
 
 	@Override
 	public boolean shouldOverrideUrlLoading(WebView view, String url) {
-		Log.i(LOG_TAG, "shouldOverrideUrlLoading called with url: " + url);
+		SponsorPayLogger.i(LOG_TAG, "shouldOverrideUrlLoading called with url: " + url);
 
 		if (url.startsWith(SPONSORPAY_EXIT_SCHEMA)) {
 			
@@ -96,13 +96,13 @@ public abstract class OfferWebClient extends WebViewClient {
 			int resultCode = parseSponsorPayExitUrlForResultCode(url);
 			String targetUrl = parseSponsorPayExitUrlForTargetUrl(url);
 
-			Log.i(LOG_TAG, "Overriding. Target Url: " + targetUrl);
+			SponsorPayLogger.i(LOG_TAG, "Overriding. Target Url: " + targetUrl);
 			
 			onSponsorPayExitScheme(resultCode, targetUrl);
 
 			return true;
 		} else {
-			Log.i(LOG_TAG, "Not overriding");
+			SponsorPayLogger.i(LOG_TAG, "Not overriding");
 			return false;
 		}
 	}
@@ -127,7 +127,7 @@ public abstract class OfferWebClient extends WebViewClient {
 					Intent.ACTION_VIEW, 
 					// dummy search to validate Play Store application
 					Uri.parse("market://search?q=pname:com.google"))) {
-				Log.e(LOG_TAG, "Play Store is not installed on this device...");
+				SponsorPayLogger.e(LOG_TAG, "Play Store is not installed on this device...");
 				showDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE));
 			}
 			// else - fail silently
@@ -159,7 +159,7 @@ public abstract class OfferWebClient extends WebViewClient {
 		try {
 			dialog.show();
 		} catch (BadTokenException e) {
-			Log.e(getClass().getSimpleName(),
+			SponsorPayLogger.e(getClass().getSimpleName(),
 					"Couldn't show error dialog. Not displayed error message is: " + errorMessage,
 					e);
 		}

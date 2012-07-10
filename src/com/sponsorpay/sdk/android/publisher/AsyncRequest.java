@@ -5,7 +5,6 @@
  */
 
 package com.sponsorpay.sdk.android.publisher;
-
 import java.util.Locale;
 
 import org.apache.http.Header;
@@ -16,9 +15,9 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.sponsorpay.sdk.android.HttpResponseParser;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
@@ -120,9 +119,11 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		request.addHeader(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE);
 
 		String acceptLanguageHeaderValue = makeAcceptLanguageHeaderValue();
-		if (shouldLogVerbosely)
-			Log.i(getClass().getSimpleName(), "acceptLanguageHeaderValue: "
+		if (shouldLogVerbosely) {
+			SponsorPayLogger.i(getClass().getSimpleName(), "acceptLanguageHeaderValue: "
 					+ acceptLanguageHeaderValue);
+		}
+		
 		request.addHeader(ACCEPT_LANGUAGE_HEADER_NAME, acceptLanguageHeaderValue);
 
 		HttpClient client = new DefaultHttpClient();
@@ -130,6 +131,7 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		mThrownRequestError = null;
 
 		try {
+			
 			HttpResponse response = client.execute(request);
 			mStatusCode = response.getStatusLine().getStatusCode();
 			mResponseBody = HttpResponseParser.extractResponseString(response);
@@ -142,23 +144,24 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 			if (cookieHeaders.length > 0) {
 
 				if (shouldLogVerbosely)
-					Log.v(LOG_TAG, String.format("Got following cookies from server (url: %s):",
+					SponsorPayLogger.v(LOG_TAG, String.format("Got following cookies from server (url: %s):",
 							mRequestUrl));
 
 				mCookieStrings = new String[cookieHeaders.length];
 				for (int i = 0; i < cookieHeaders.length; i++) {
 					mCookieStrings[i] = cookieHeaders[i].getValue();
 					if (shouldLogVerbosely)
-						Log.v(LOG_TAG, mCookieStrings[i]);
+						SponsorPayLogger.v(LOG_TAG, mCookieStrings[i]);
 				}
 			}
 		} catch (Throwable t) {
-			Log.e(LOG_TAG, "Exception triggered when executing request: " + t);
+			SponsorPayLogger.e(LOG_TAG, "Exception triggered when executing request: " + t);
 			mThrownRequestError = t;
 		}
 		return null;
 	}
-
+	
+	
 	/**
 	 * Returns a value for the HTTP Accept-Language header based on the current locale set up for
 	 * the device.

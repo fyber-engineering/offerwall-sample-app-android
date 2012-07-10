@@ -13,7 +13,6 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
@@ -26,6 +25,7 @@ import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
 import com.sponsorpay.sdk.android.publisher.unlock.ItemIdValidator;
 import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
 import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * Provides convenience calls to load and show the mobile Offer Wall and the mobile Interstitial.
@@ -817,12 +817,12 @@ public class SponsorPayPublisher {
 
 		instance = CookieManager.getInstance();
 
-		Log.v(AsyncRequest.LOG_TAG, "Setting the following cookies into CookieManager instance "
+		SponsorPayLogger.v(AsyncRequest.LOG_TAG, "Setting the following cookies into CookieManager instance "
 				+ instance + " for base URL " + baseUrl + ": ");
 
 		for (String cookieString : cookies) {
 			instance.setCookie(baseUrl, cookieString);
-			Log.v(AsyncRequest.LOG_TAG, cookieString);
+			SponsorPayLogger.v(AsyncRequest.LOG_TAG, cookieString);
 		}
 	}
 

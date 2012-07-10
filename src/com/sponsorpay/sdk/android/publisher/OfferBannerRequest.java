@@ -10,11 +10,11 @@ import java.util.Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * Requests a new offer banner to the SponsorPay server and notifies the registered
@@ -113,7 +113,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 
 		String offerBannerUrl = determineUrl();
 
-		Log.i(OfferBanner.LOG_TAG, "Offer Banner Request URL: " + offerBannerUrl);
+		SponsorPayLogger.i(OfferBanner.LOG_TAG, "Offer Banner Request URL: " + offerBannerUrl);
 
 		mAsyncRequest = new AsyncRequest(offerBannerUrl, this);
 		mAsyncRequest.execute();
@@ -161,7 +161,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 */
 	@Override
 	public void onAsyncRequestComplete(AsyncRequest request) {
-		Log.i(OfferBanner.LOG_TAG, "onAsyncRequestComplete, returned status code: "
+		SponsorPayLogger.i(OfferBanner.LOG_TAG, "onAsyncRequestComplete, returned status code: "
 				+ request.getHttpStatusCode());
 		if (mAsyncRequest.hasSucessfulStatusCode()) {
 			OfferBanner banner = new OfferBanner(mContext, mAsyncRequest.getRequestUrl(),

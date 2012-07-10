@@ -34,6 +34,7 @@ import com.sponsorpay.sdk.android.testapp.fragments.InterstitialSettingsFragment
 import com.sponsorpay.sdk.android.testapp.fragments.ItemsSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.LauncherFragment;
 import com.sponsorpay.sdk.android.testapp.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * Example activity in order to show the usage of Sponsorpay Android SDK.
@@ -89,6 +90,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 				+ SponsorPay.RELEASE_VERSION_STRING);
 
 		mShouldSendAdvertiserCallbackOnResume = true;
+		SponsorPayLogger.enableLogging(true);
 	}
 
 	private void createLauncherFragment() {

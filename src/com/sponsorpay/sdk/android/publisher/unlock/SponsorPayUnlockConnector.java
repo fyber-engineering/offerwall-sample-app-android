@@ -3,15 +3,15 @@ package com.sponsorpay.sdk.android.publisher.unlock;
 import java.util.Map;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse;
-import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse.RequestErrorType;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
@@ -23,7 +23,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 	/*
 	 * API Resource URLs.
 	 */
-	private static final String SP_UNLOCK_SERVER_STAGING_BASE_URL = "https://staging.iframe.sponsorpay.com/vcs/v1/";
+	private static final String SP_UNLOCK_SERVER_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/vcs/v1/";
 	private static final String SP_UNLOCK_SERVER_PRODUCTION_BASE_URL = "https://api.sponsorpay.com/vcs/v1/";
 	private static final String SP_UNLOCK_REQUEST_RESOURCE = "items.json";
 
@@ -77,7 +77,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 				.setUserId(mUserId.toString()).addExtraKeysValues(extraKeysValues).setSecretKey(
 						mSecurityToken).addScreenMetrics().buildUrl();
 
-		Log.d(getClass().getSimpleName(),
+		SponsorPayLogger.d(getClass().getSimpleName(),
 				"Unlock items status request will be sent to URL + params: " + requestUrl);
 
 		AsyncRequest requestTask = new AsyncRequest(requestUrl, this);
@@ -86,7 +86,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 
 	@Override
 	public void onAsyncRequestComplete(AsyncRequest requestTask) {
-		Log.d(getClass().getSimpleName(), String.format(
+		SponsorPayLogger.d(getClass().getSimpleName(), String.format(
 				"SP Unlock server Response, status code: %d, response body: %s, signature: %s",
 				requestTask.getHttpStatusCode(), requestTask.getResponseBody(), requestTask
 						.getResponseSignature()));

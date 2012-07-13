@@ -14,11 +14,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * Runs in the background the Advertiser Callback HTTP request.
@@ -135,7 +135,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 *            The install subID received on the app instalation.
 	 */
 	public void setInstallSubId(String subIdValue) {
-		Log.d(AdvertiserCallbackSender.class.getSimpleName(), "SubID value set to " + subIdValue);
+		SponsorPayLogger.d(AdvertiserCallbackSender.class.getSimpleName(), "SubID value set to " + subIdValue);
 		mInstallSubId = subIdValue;
 	}
 
@@ -179,7 +179,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 		String callbackUrl = UrlBuilder.newBuilder(baseUrl, mHostInfo).addExtraKeysValues(
 				extraParams).addScreenMetrics().buildUrl();
 
-		Log.d(AdvertiserCallbackSender.class.getSimpleName(),
+		SponsorPayLogger.d(AdvertiserCallbackSender.class.getSimpleName(),
 				"Advertiser callback will be sent to: " + callbackUrl);
 
 		return callbackUrl;
@@ -223,11 +223,11 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 				returnValue = false;
 			}
 
-			Log.d(AdvertiserCallbackSender.class.getSimpleName(), "Server returned status code: "
+			SponsorPayLogger.d(AdvertiserCallbackSender.class.getSimpleName(), "Server returned status code: "
 					+ responseStatusCode);
 		} catch (Exception e) {
 			returnValue = false;
-			Log.e(AdvertiserCallbackSender.class.getSimpleName(),
+			SponsorPayLogger.e(AdvertiserCallbackSender.class.getSimpleName(),
 					"An exception occurred when trying to send advertiser callback: " + e);
 		}
 		return returnValue;

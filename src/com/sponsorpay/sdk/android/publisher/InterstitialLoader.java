@@ -13,11 +13,11 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Handler;
-import android.util.Log;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
@@ -86,7 +86,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private static final String SKIN_NAME_DEFAULT = "DEFAULT";
 
 	private static final String INTERSTITIAL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/mobile";
-	private static final String INTERSTITIAL_STAGING_BASE_URL = "https://staging.iframe.sponsorpay.com/mobile";
+	private static final String INTERSTITIAL_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/mobile";
 
 	private static final String URL_PARAM_INTERSTITIAL_KEY = "interstitial";
 
@@ -224,7 +224,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 
 		String interstitialUrl = determineUrl();
 
-		Log.i("interstitial", "url: " + interstitialUrl);
+		SponsorPayLogger.i("interstitial", "url: " + interstitialUrl);
 
 		mAsyncRequest = new AsyncRequest(interstitialUrl, this);
 		mAsyncRequest.execute();
@@ -307,7 +307,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 				try {
 					mProgressDialog.dismiss();
 				} catch (IllegalArgumentException e) {
-					Log.w(LOG_TAG, "Exception thrown when closing progress dialog. "
+					SponsorPayLogger.w(LOG_TAG, "Exception thrown when closing progress dialog. "
 							+ " Changing configurations: "
 							+ ownerActivity.getChangingConfigurations(), e);
 				}
@@ -350,7 +350,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 */
 	@Override
 	public void onAsyncRequestComplete(AsyncRequest request) {
-		Log.v(LOG_TAG, "Interstitial request completed with status code: "
+		SponsorPayLogger.v(LOG_TAG, "Interstitial request completed with status code: "
 				+ request.getHttpStatusCode() + ", did trigger exception: "
 				+ request.didRequestThrowError());
 

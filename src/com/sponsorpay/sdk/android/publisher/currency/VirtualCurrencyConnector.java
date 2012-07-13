@@ -11,13 +11,13 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
@@ -153,7 +153,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 				mHostInfo).setUserId(mUserId.toString()).addExtraKeysValues(extraKeysValues)
 				.setSecretKey(mSecurityToken).addScreenMetrics().buildUrl();
 
-		Log.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
+		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
 				+ requestUrl);
 
 		CurrencyServerRequestAsyncTask requestTask = new CurrencyServerRequestAsyncTask(
@@ -174,7 +174,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	public void onAsyncRequestComplete(AsyncRequest request) {
 		CurrencyServerRequestAsyncTask requestTask = (CurrencyServerRequestAsyncTask) request;
 
-		Log.d(getClass().getSimpleName(), String.format(
+		SponsorPayLogger.d(getClass().getSimpleName(), String.format(
 				"Currency Server Response, status code: %d, response body: %s, signature: %s",
 				requestTask.getHttpStatusCode(), requestTask.getResponseBody(), requestTask
 						.getResponseSignature()));
@@ -222,7 +222,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 */
 	private String fetchLatestTransactionIdForCurrentAppAndUser() {
 		String retval = fetchLatestTransactionId(mContext, mHostInfo.getAppId(), mUserId.toString());
-		// Log.i(getClass().getSimpleName(),
+		// SponsorPayLogger.i(getClass().getSimpleName(),
 		// String.format("fetchLatestTransactionIdForCurrentAppAndUser will return %s", retval));
 		return retval;
 	}
@@ -242,7 +242,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 		String retval = prefs.getString(generatePreferencesLatestTransactionIdKey(userId, appId),
 				URL_PARAM_VALUE_NO_TRANSACTION);
-		// Log.i(VirtualCurrencyConnector.class.getSimpleName(),
+		// SponsorPayLogger.i(VirtualCurrencyConnector.class.getSimpleName(),
 		// String.format("fetchLatestTransactionId(context, appId: %s, userId: %s) = %s", appId,
 		// userId, retval));
 		return retval;

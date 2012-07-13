@@ -7,8 +7,9 @@
 package com.sponsorpay.sdk.android.publisher;
 
 import android.app.Activity;
-import android.util.Log;
 import android.webkit.WebView;
+
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * {@link OfferWebClient} defining common functionality for {@link WebView} instances displaying
@@ -44,7 +45,7 @@ public class ActivityOfferWebClient extends OfferWebClient {
 			}
 		}
 
-		Log.i(OfferWebClient.LOG_TAG, "Should stay open: " + mShouldHostActivityStayOpen
+		SponsorPayLogger.i(OfferWebClient.LOG_TAG, "Should stay open: " + mShouldHostActivityStayOpen
 				+ ", will close activity: " + willCloseHostActivity);
 
 		if (willCloseHostActivity)

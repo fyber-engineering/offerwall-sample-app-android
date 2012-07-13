@@ -14,10 +14,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.sponsorpay.sdk.android.HttpResponseParser;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
@@ -120,7 +120,7 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 
 		String acceptLanguageHeaderValue = makeAcceptLanguageHeaderValue();
 		if (shouldLogVerbosely) {
-			Log.i(getClass().getSimpleName(), "acceptLanguageHeaderValue: "
+			SponsorPayLogger.i(getClass().getSimpleName(), "acceptLanguageHeaderValue: "
 					+ acceptLanguageHeaderValue);
 		}
 		
@@ -144,18 +144,18 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 			if (cookieHeaders.length > 0) {
 
 				if (shouldLogVerbosely)
-					Log.v(LOG_TAG, String.format("Got following cookies from server (url: %s):",
+					SponsorPayLogger.v(LOG_TAG, String.format("Got following cookies from server (url: %s):",
 							mRequestUrl));
 
 				mCookieStrings = new String[cookieHeaders.length];
 				for (int i = 0; i < cookieHeaders.length; i++) {
 					mCookieStrings[i] = cookieHeaders[i].getValue();
 					if (shouldLogVerbosely)
-						Log.v(LOG_TAG, mCookieStrings[i]);
+						SponsorPayLogger.v(LOG_TAG, mCookieStrings[i]);
 				}
 			}
 		} catch (Throwable t) {
-			Log.e(LOG_TAG, "Exception triggered when executing request: " + t);
+			SponsorPayLogger.e(LOG_TAG, "Exception triggered when executing request: " + t);
 			mThrownRequestError = t;
 		}
 		return null;

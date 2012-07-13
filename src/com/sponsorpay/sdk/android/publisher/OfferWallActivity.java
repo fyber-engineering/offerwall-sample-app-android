@@ -16,7 +16,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager.BadTokenException;
 import android.webkit.WebView;
@@ -24,6 +23,7 @@ import android.webkit.WebView;
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
@@ -153,7 +153,7 @@ public class OfferWallActivity extends Activity {
 			public void onReceivedError(WebView view, int errorCode, String description,
 					String failingUrl) {
 				// super.onReceivedError(view, errorCode, description, failingUrl);
-				Log.e(getClass().getSimpleName(), String.format(
+				SponsorPayLogger.e(getClass().getSimpleName(), String.format(
 						"OfferWall WebView triggered an error. "
 								+ "Error code: %d, error description: %s. Failing URL: %s",
 						errorCode, description, failingUrl));
@@ -232,10 +232,10 @@ public class OfferWallActivity extends Activity {
 		try {
 			String offerwallUrl = determineUrl();
 
-			Log.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
+			SponsorPayLogger.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
 			mWebView.loadUrl(offerwallUrl);
 		} catch (RuntimeException ex) {
-			Log.e(getClass().getSimpleName(),
+			SponsorPayLogger.e(getClass().getSimpleName(),
 					"An exception occurred when launching the Offer Wall", ex);
 			showErrorDialog(ex.getMessage());
 		}
@@ -301,7 +301,7 @@ public class OfferWallActivity extends Activity {
 		try {
 			mErrorDialog.show();
 		} catch (BadTokenException e) {
-			Log.e(getClass().getSimpleName(),
+			SponsorPayLogger.e(getClass().getSimpleName(),
 					"Couldn't show error dialog. Not displayed error message is: " + errorMessage,
 					e);
 		}
@@ -322,7 +322,7 @@ public class OfferWallActivity extends Activity {
 		 * Sponsorpay's URL to contact within the web view
 		 */
 		private static final String OFFERWALL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/mobile?";
-		private static final String OFFERWALL_STAGING_BASE_URL = "https://staging.iframe.sponsorpay.com/mobile?";
+		private static final String OFFERWALL_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/mobile?";
 
 		@Override
 		public void fetchAdditionalExtras() {
@@ -352,7 +352,7 @@ public class OfferWallActivity extends Activity {
 		 * Sponsorpay's URL to contact within the web view
 		 */
 		private static final String UNLOCK_OFFERWALL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/unlock?";
-		private static final String UNLOCK_OFFERWALL_STAGING_BASE_URL = "https://staging.iframe.sponsorpay.com/unlock?";
+		private static final String UNLOCK_OFFERWALL_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/unlock?";
 
 		/**
 		 * Key for extracting the value of {@link #mUnlockItemId} from the extras bundle.

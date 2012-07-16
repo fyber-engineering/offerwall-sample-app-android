@@ -232,7 +232,24 @@ public class SponsorPayPublisher {
 		return getIntentForOfferWallActivity(context, userId, null, null, null);
 	}
 	
-	//FIXME
+	/**
+	 * <p>
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}.
+	 * </p>
+	 * <p>
+	 * Will retrieve the publisher application id from the application manifest.
+	 * </p>
+	 * 
+	 * @param context
+	 *            The publisher application context.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.	 
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
+	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId, String currencyName) {
 		return getIntentForOfferWallActivity(context, userId, null, currencyName, null, null);
 	}
@@ -263,7 +280,29 @@ public class SponsorPayPublisher {
 		return getIntentForOfferWallActivity(context, userId, shouldStayOpen, null, null);
 	}
 	
-	//FIXME
+	/**
+	 * <p>
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the
+	 * caller specify the behavior of the Offer Wall once the user gets redirected out of the
+	 * application by clicking on an offer.
+	 * </p>
+	 * <p>
+	 * Will retrieve the publisher application id from the application manifest.
+	 * </p>
+	 * 
+	 * @param context
+	 *            The publisher application context.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.	
+	 * @param shouldStayOpen
+	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets
+	 *            redirected out of the app. False to close the Offer Wall.
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
+	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
 			 String currencyName,  boolean shouldStayOpen) {
 		
@@ -300,7 +339,33 @@ public class SponsorPayPublisher {
 		return getIntentForOfferWallActivity(context, userId, shouldStayOpen, null, overrideAppId, null);
 	}
 	
-	//FIXME
+	/**
+	 * <p>
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the
+	 * caller specify the behavior of the Offer Wall once the user gets redirected out of the
+	 * application by clicking on an offer.
+	 * </p>
+	 * 
+	 * <p>
+	 * Will use the provided publisher application id instead of trying to retrieve it from the
+	 * application manifest.
+	 * </p>
+	 * 
+	 * @param context
+	 *            The publisher application context.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param shouldStayOpen
+	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets
+	 *            redirected out of the app. False to close the Offer Wall.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.	
+	 * @param overrideAppId
+	 *            An app ID which will override the one included in the manifest.
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
+	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
 			boolean shouldStayOpen, String currencyName, String overrideAppId) {
 		
@@ -360,7 +425,8 @@ public class SponsorPayPublisher {
 	 *            redirected out of the app. False to close the Offer Wall.
 	 * @param currencyName
 	 *            The name of the currency employed by your application. Provide null if you don't
-	 *            use a custom currency name.	 * @param overridingAppId
+	 *            use a custom currency name.	 
+	 * @param overridingAppId
 	 *            An app ID which will override the one included in the manifest.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
@@ -725,7 +791,38 @@ public class SponsorPayPublisher {
 				backgroundUrl, skinName, 0, null, null, null);
 	}
 	
-	//FIXME 
+	/**
+	 * Starts the mobile interstitial request / loading / showing process using a default value for
+	 * loadingTimeoutSecs and retrieving the application id from the Android Manifest.
+	 * 
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on
+	 *            top of it and if an ad is returned, the calling activity will be used to launch
+	 *            the {@link InterstitialActivity} in order to show the ad.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
+	 *            the interstitial lifecycle.
+	 * @param shouldStayOpen
+	 *            Used to specify the behavior of the interstitial once the user clicks on the
+	 *            presented ad and is redirected outside the host publisher app. The default
+	 *            behavior is to close the interstitial and let the user go back to the activity
+	 *            that called the interstitial when they come back to the app. If you want the
+	 *            interstitial not to close until the user does it explicitly, set this parameter to
+	 *            true.
+	 * @param backgroundUrl
+	 *            Can be set to the absolute URL of an image to use as background graphic for the
+	 *            interstitial. Must include the protocol scheme (http:// or https://) at the
+	 *            beginning of the URL. Leave it null for no custom background.
+	 * @param skinName
+	 *            Used to specify the name of a custom skin or template for the requested
+	 *            interstitial. Leaving it null will make the interstitial fall back to the DEFAULT
+	 *            template.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.	
+	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName, String currencyName) {
@@ -762,8 +859,31 @@ public class SponsorPayPublisher {
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, null,
 				null, 0, null, null, null);
 	}
-	
-	//FIXME
+	/**
+	 * Starts the mobile interstitial request / loading / showing process using default values for
+	 * backgroundUrl, skinName, loadingTimeoutSecs and retrieving the application id from the
+	 * Android Manifest.
+	 * 
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on
+	 *            top of it and if an ad is returned, the calling activity will be used to launch
+	 *            the {@link InterstitialActivity} in order to show the ad.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
+	 *            the interstitial lifecycle.
+	 * @param shouldStayOpen
+	 *            Used to specify the behavior of the interstitial once the user clicks on the
+	 *            presented ad and is redirected outside the host publisher app. The default
+	 *            behavior is to close the interstitial and let the user go back to the activity
+	 *            that called the interstitial when they come back to the app. If you want the
+	 *            interstitial not to close until the user does it explicitly, set this parameter to
+	 *            true.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.	
+	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String currencyName) {
 		
@@ -792,8 +912,24 @@ public class SponsorPayPublisher {
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, null, null, null, 0,
 				null, null, null);
 	}
-	
-	//FIXME
+	/**
+	 * Starts the mobile interstitial request / loading / showing process using default values for
+	 * shouldStayOpen, backgroundUrl, skinName, loadingTimeoutSecs and retrieving the application id
+	 * from the Android Manifest.
+	 * 
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on
+	 *            top of it and if an ad is returned, the calling activity will be used to launch
+	 *            the {@link InterstitialActivity} in order to show the ad.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
+	 *            the interstitial lifecycle.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.	
+	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, String currencyName) {
 		

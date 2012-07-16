@@ -242,7 +242,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 			/* Pass in a User ID */
 			SponsorPayPublisher.getIntentForOfferWallActivity(
 					getApplicationContext(), mUserId, mShouldStayOpen,
-					mOverridingAppId),
+					mCurrencyName, mOverridingAppId),
 					SponsorPayPublisher.DEFAULT_OFFERWALL_REQUEST_CODE);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
@@ -326,7 +326,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 
 		if (fragment instanceof InterstitialSettingsFragment) {
 			((InterstitialSettingsFragment) fragment).launchInsterstitial(mUserId,
-					mShouldStayOpen, mOverridingAppId);
+					mShouldStayOpen, mCurrencyName, mOverridingAppId);
 		}
 	}
 

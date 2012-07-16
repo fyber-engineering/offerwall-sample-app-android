@@ -79,7 +79,7 @@ public class InterstitialSettingsFragment extends AbstractSettingsFragment {
 	}
 
 	public void launchInsterstitial(String userId, Boolean shouldStayOpen,
-			String overridingAppId) {
+			String currencyName, String overridingAppId) {
 		fetchValuesFromFields();
 		try {
 
@@ -113,7 +113,7 @@ public class InterstitialSettingsFragment extends AbstractSettingsFragment {
 						}
 
 					}, shouldStayOpen, mBackgroundUrl, mSkinName, 0,
-					overridingAppId);
+					currencyName, overridingAppId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(),

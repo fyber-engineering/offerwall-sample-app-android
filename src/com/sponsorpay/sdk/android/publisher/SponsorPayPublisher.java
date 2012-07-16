@@ -231,6 +231,11 @@ public class SponsorPayPublisher {
 	public static Intent getIntentForOfferWallActivity(Context context, String userId) {
 		return getIntentForOfferWallActivity(context, userId, null, null, null);
 	}
+	
+	//FIXME
+	public static Intent getIntentForOfferWallActivity(Context context, String userId, String currencyName) {
+		return getIntentForOfferWallActivity(context, userId, null, currencyName, null, null);
+	}
 
 	/**
 	 * <p>
@@ -256,6 +261,13 @@ public class SponsorPayPublisher {
 			boolean shouldStayOpen) {
 
 		return getIntentForOfferWallActivity(context, userId, shouldStayOpen, null, null);
+	}
+	
+	//FIXME
+	public static Intent getIntentForOfferWallActivity(Context context, String userId,
+			 String currencyName,  boolean shouldStayOpen) {
+		
+		return getIntentForOfferWallActivity(context, userId, shouldStayOpen, currencyName, null, null);
 	}
 
 	/**
@@ -285,7 +297,14 @@ public class SponsorPayPublisher {
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
 			boolean shouldStayOpen, String overrideAppId) {
 
-		return getIntentForOfferWallActivity(context, userId, shouldStayOpen, overrideAppId, null);
+		return getIntentForOfferWallActivity(context, userId, shouldStayOpen, null, overrideAppId, null);
+	}
+	
+	//FIXME
+	public static Intent getIntentForOfferWallActivity(Context context, String userId,
+			boolean shouldStayOpen, String currencyName, String overrideAppId) {
+		
+		return getIntentForOfferWallActivity(context, userId, shouldStayOpen, currencyName, overrideAppId, null);
 	}
 
 	/**
@@ -307,7 +326,41 @@ public class SponsorPayPublisher {
 	 * @param shouldStayOpen
 	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets
 	 *            redirected out of the app. False to close the Offer Wall.
-	 * @param overridingAppId
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * 
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
+	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 */
+	public static Intent getIntentForOfferWallActivity(Context context,
+			String userId, Boolean shouldStayOpen, String overridingAppId,
+			HashMap<String, String> customParams) {
+		return getIntentForOfferWallActivity(context, userId, shouldStayOpen,
+				null, overridingAppId, customParams);
+	}
+	
+	/**
+	 * <p>
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the
+	 * caller specify the behavior of the Offer Wall once the user gets redirected out of the
+	 * application by clicking on an offer.
+	 * </p>
+	 * 
+	 * <p>
+	 * Will use the provided publisher application id instead of trying to retrieve it from the
+	 * application manifest.
+	 * </p>
+	 * 
+	 * @param context
+	 *            The publisher application context.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param shouldStayOpen
+	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets
+	 *            redirected out of the app. False to close the Offer Wall.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.	 * @param overridingAppId
 	 *            An app ID which will override the one included in the manifest.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
@@ -315,23 +368,32 @@ public class SponsorPayPublisher {
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
 	 */
-	public static Intent getIntentForOfferWallActivity(Context context, String userId,
-			Boolean shouldStayOpen, String overridingAppId, HashMap<String, String> customParams) {
+	public static Intent getIntentForOfferWallActivity(Context context,
+			String userId, Boolean shouldStayOpen, String currencyName,
+			String overridingAppId, HashMap<String, String> customParams) {
 
 		Intent intent = new Intent(context, OfferWallActivity.class);
 		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, userId);
 
-		if (shouldStayOpen != null)
+		if (shouldStayOpen != null) {
 			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
+		}
 
-		if (overridingAppId != null)
+		if (overridingAppId != null) {
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overridingAppId);
+		}
+		
+		if (currencyName != null && !currencyName.trim().equals("")) {
+			intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
+		}
 
-		if (sOverridingWebViewUrl != null)
+		if (sOverridingWebViewUrl != null) {
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
-		
-		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
-		
+		}
+
+		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY,
+				getCustomParameters(customParams));
+
 		return intent;
 	}
 
@@ -362,11 +424,13 @@ public class SponsorPayPublisher {
 		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
 				unlockItemName);
 		
-		if (overrideAppId != null)
+		if (overrideAppId != null) {
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overrideAppId);
+		}
 
-		if (sOverridingWebViewUrl != null)
+		if (sOverridingWebViewUrl != null) {
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
+		}
 		
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
 
@@ -411,7 +475,51 @@ public class SponsorPayPublisher {
 			String backgroundUrl, String skinName, int loadingTimeoutSecs, String overriddenAppId) {
 
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
-				backgroundUrl, skinName, loadingTimeoutSecs, overriddenAppId, null);
+				backgroundUrl, skinName, loadingTimeoutSecs, null, overriddenAppId, null);
+	}
+	
+	/**
+	 * Starts the mobile interstitial request / loading / showing process.
+	 * 
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on
+	 *            top of it and if an ad is returned, the calling activity will be used to launch
+	 *            the {@link InterstitialActivity} in order to show the ad.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
+	 *            the interstitial lifecycle.
+	 * @param shouldStayOpen
+	 *            Used to specify the behavior of the interstitial once the user clicks on the
+	 *            presented ad and is redirected outside the host publisher app. The default
+	 *            behavior is to close the interstitial and let the user go back to the activity
+	 *            that called the interstitial when they come back to the app. If you want the
+	 *            interstitial not to close until the user does it explicitly, set this parameter to
+	 *            true.
+	 * @param backgroundUrl
+	 *            Can be set to the absolute URL of an image to use as background graphic for the
+	 *            interstitial. Must include the protocol scheme (http:// or https://) at the
+	 *            beginning of the URL. Leave it null for no custom background.
+	 * @param skinName
+	 *            Used to specify the name of a custom skin or template for the requested
+	 *            interstitial. Leaving it null will make the interstitial fall back to the DEFAULT
+	 *            template.
+	 * @param loadingTimeoutSecs
+	 *            Sets the maximum amount of time the interstitial should take to load. If you set
+	 *            it to 0 or a negative number, it will fall back to the default value of 5 seconds.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param overriddenAppId
+	 *            An app ID which will override the one included in the manifest.
+	 */
+	public static void loadShowInterstitial(Activity callingActivity, String userId,
+			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
+			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName, String overriddenAppId) {
+		
+		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
+				backgroundUrl, skinName, loadingTimeoutSecs, currencyName, overriddenAppId, null);
 	}
 
 	/**
@@ -449,29 +557,84 @@ public class SponsorPayPublisher {
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
+	public static void loadShowInterstitial(Activity callingActivity,
+			String userId,
+			InterstitialLoadingStatusListener loadingStatusListener,
+			Boolean shouldStayOpen, String backgroundUrl, String skinName,
+			int loadingTimeoutSecs, String overriddenAppId,
+			Map<String, String> customParams) {
+		loadShowInterstitial(callingActivity, userId, loadingStatusListener,
+				shouldStayOpen, backgroundUrl, skinName, loadingTimeoutSecs,
+				null, overriddenAppId, customParams);
+	}
+	 
+	/**
+	 * Starts the mobile interstitial request / loading / showing process.
+	 * 
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on
+	 *            top of it and if an ad is returned, the calling activity will be used to launch
+	 *            the {@link InterstitialActivity} in order to show the ad.
+	 * @param userId
+	 *            The current user ID of the host application.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
+	 *            the interstitial lifecycle.
+	 * @param shouldStayOpen
+	 *            Used to specify the behavior of the interstitial once the user clicks on the
+	 *            presented ad and is redirected outside the host publisher app. The default
+	 *            behavior is to close the interstitial and let the user go back to the activity
+	 *            that called the interstitial when they come back to the app. If you want the
+	 *            interstitial not to close until the user does it explicitly, set this parameter to
+	 *            true.
+	 * @param backgroundUrl
+	 *            Can be set to the absolute URL of an image to use as background graphic for the
+	 *            interstitial. Must include the protocol scheme (http:// or https://) at the
+	 *            beginning of the URL. Leave it null for no custom background.
+	 * @param skinName
+	 *            Used to specify the name of a custom skin or template for the requested
+	 *            interstitial. Leaving it null will make the interstitial fall back to the DEFAULT
+	 *            template.
+	 * @param loadingTimeoutSecs
+	 *            Sets the maximum amount of time the interstitial should take to load. If you set
+	 *            it to 0 or a negative number, it will fall back to the default value of 5 seconds.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param overriddenAppId
+	 *            An app ID which will override the one included in the manifest.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
-			String backgroundUrl, String skinName, int loadingTimeoutSecs, String overriddenAppId,
-			Map<String, String> customParams) {
+			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName, 
+			String overriddenAppId, Map<String, String> customParams) {
 
 		HostInfo hostInfo = new HostInfo(callingActivity);
 
-		if (overriddenAppId != null)
+		if (overriddenAppId != null) {
 			hostInfo.setOverriddenAppId(overriddenAppId);
+		}
 
 		InterstitialLoader il = new InterstitialLoader(callingActivity, userId, hostInfo,
 				loadingStatusListener);
 
-		if (shouldStayOpen != null)
+		if (shouldStayOpen != null) {
 			il.setShouldStayOpen(shouldStayOpen);
-		if (backgroundUrl != null)
+		}
+		if (backgroundUrl != null) {
 			il.setBackgroundUrl(backgroundUrl);
-		if (skinName != null)
+		}
+		if (skinName != null) {
 			il.setSkinName(skinName);
+		}
 		if (loadingTimeoutSecs > 0) {
 			il.setLoadingTimeoutSecs(loadingTimeoutSecs);
 		}
-
+		if (currencyName != null && !currencyName.trim().equals("")) {
+			il.setCurrencyName(currencyName);
+		}
 		Map<String, String> extraParams = getCustomParameters(customParams);
 
 		if (extraParams != null) {
@@ -522,7 +685,7 @@ public class SponsorPayPublisher {
 			String backgroundUrl, String skinName, int loadingTimeoutSecs) {
 
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
-				backgroundUrl, skinName, loadingTimeoutSecs, null, null);
+				backgroundUrl, skinName, loadingTimeoutSecs, null, null, null);
 	}
 
 	/**
@@ -559,7 +722,16 @@ public class SponsorPayPublisher {
 			String backgroundUrl, String skinName) {
 
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
-				backgroundUrl, skinName, 0, null, null);
+				backgroundUrl, skinName, 0, null, null, null);
+	}
+	
+	//FIXME 
+	public static void loadShowInterstitial(Activity callingActivity, String userId,
+			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
+			String backgroundUrl, String skinName, String currencyName) {
+		
+		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen,
+				backgroundUrl, skinName, 0, currencyName, null, null);
 	}
 
 	/**
@@ -588,7 +760,15 @@ public class SponsorPayPublisher {
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
 
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, null,
-				null, 0, null, null);
+				null, 0, null, null, null);
+	}
+	
+	//FIXME
+	public static void loadShowInterstitial(Activity callingActivity, String userId,
+			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String currencyName) {
+		
+		loadShowInterstitial(callingActivity, userId, loadingStatusListener, shouldStayOpen, null,
+				null, 0, currencyName,  null, null);
 	}
 
 	/**
@@ -610,7 +790,15 @@ public class SponsorPayPublisher {
 			InterstitialLoadingStatusListener loadingStatusListener) {
 
 		loadShowInterstitial(callingActivity, userId, loadingStatusListener, null, null, null, 0,
-				null, null);
+				null, null, null);
+	}
+	
+	//FIXME
+	public static void loadShowInterstitial(Activity callingActivity, String userId,
+			InterstitialLoadingStatusListener loadingStatusListener, String currencyName) {
+		
+		loadShowInterstitial(callingActivity, userId, loadingStatusListener, null, null, null, 0,
+				currencyName, null, null);
 	}
 
 	/**

@@ -59,6 +59,8 @@ public class OfferWallActivity extends Activity {
 
 	public static final String EXTRA_OVERRIDING_URL_KEY = "EXTRA_OVERRIDING_URL_KEY";
 
+	public static final String EXTRA_CURRENCY_NAME_KEY = "EXTRA_CURRENCY_NAME_KEY";
+
 	/**
 	 * The result code that is returned when the Offer Wall's parsed exit scheme does not contain a
 	 * status code.
@@ -104,6 +106,8 @@ public class OfferWallActivity extends Activity {
 	private OfferWallTemplate mTemplate;
 
 	private String mOverridingUrl;
+	
+	private String mCurrencyName;
 
 	/**
 	 * Overridden from {@link Activity}. Upon activity start, extract the user ID from the extra,
@@ -203,6 +207,12 @@ public class OfferWallActivity extends Activity {
 		if (overridingAppId != null && !overridingAppId.equals("")) {
 			mHostInfo.setOverriddenAppId(overridingAppId);
 		}
+		
+		String currencyName = getIntent().getStringExtra(EXTRA_CURRENCY_NAME_KEY);
+		
+		if (currencyName != null && !currencyName.trim().equals("")) {
+			mCurrencyName = currencyName;
+		}
 
 		mOverridingUrl = getIntent().getStringExtra(EXTRA_OVERRIDING_URL_KEY);
 
@@ -248,14 +258,21 @@ public class OfferWallActivity extends Activity {
 	}
 
 	private String determineUrl() {
-		if (mOverridingUrl != null && !mOverridingUrl.equals(""))
+		if (mOverridingUrl != null && !mOverridingUrl.equals("")) {
 			return mOverridingUrl;
-		else
+		} else {
 			return generateUrl();
+		}
 	}
 
 	private String generateUrl() {
 		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
+		if (mCurrencyName != null && !mCurrencyName.trim().equals("")) {
+			if (mCustomKeysValues == null) {
+				mCustomKeysValues = new HashMap<String, String>();
+			}
+			mCustomKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
+		}
 		String baseUrl = mTemplate.getBaseUrl();
 		return UrlBuilder.newBuilder(baseUrl, mHostInfo).setUserId(mUserId.toString())
 				.addExtraKeysValues(mCustomKeysValues).addScreenMetrics().buildUrl();

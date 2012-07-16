@@ -116,6 +116,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private String mSkinName = SKIN_NAME_DEFAULT;
 	private boolean mShouldStayOpen = SHOULD_INTERSTITIAL_REMAIN_OPEN_DEFAULT;
 	private int mLoadingTimeoutSecs = LOADING_TIMEOUT_SECONDS_DEFAULT;
+	private String mCurrencyName;
 
 	private AsyncRequest mAsyncRequest;
 	private Runnable mCancelLoadingOnTimeOut;
@@ -125,6 +126,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * Loading progress dialog.
 	 */
 	private ProgressDialog mProgressDialog;
+
 
 	/**
 	 * Initializes a new IntestitialLoader instance.
@@ -209,6 +211,18 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	}
 
 	/**
+	 * Sets the currency name that should be sent in the request.
+	 * If null si provided, then the defualt one is used.
+	 * 
+	 * @param currencyName
+	 *            Currency Name to be sent in the request.
+	 */
+	public void setCurrencyName(String currencyName) {
+		mCurrencyName = currencyName;
+	}
+	
+
+	/**
 	 * <p>
 	 * Triggers the loading of the interstitial with the configured parameters.
 	 * </p>
@@ -278,6 +292,10 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 
 		if (mCustomParams != null) {
 			keysValues.putAll(mCustomParams);
+		}
+		
+		if (mCurrencyName != null && !mCurrencyName.trim().equals("")) {
+			keysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
 		}
 
 		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
@@ -384,4 +402,5 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 			}
 		}
 	}
+
 }

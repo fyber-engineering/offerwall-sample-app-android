@@ -22,8 +22,8 @@ import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
  */
 public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListener {
 
-	private static final String OFFERBANNER_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile";
-	private static final String OFFERBANNER_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile";
+	private static final String OFFERBANNER_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/mobile";
+	private static final String OFFERBANNER_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/mobile";
 
 	private static final String URL_PARAM_OFFERBANNER_KEY = "banner";
 

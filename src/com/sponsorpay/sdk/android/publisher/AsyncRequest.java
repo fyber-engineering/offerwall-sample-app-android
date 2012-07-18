@@ -12,11 +12,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.os.AsyncTask;
 
 import com.sponsorpay.sdk.android.HttpResponseParser;
+import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
@@ -126,8 +126,8 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		
 		request.addHeader(ACCEPT_LANGUAGE_HEADER_NAME, acceptLanguageHeaderValue);
 
-		HttpClient client = new DefaultHttpClient();
-
+		HttpClient client = SPHttpClient.getHttpClient();
+		
 		mThrownRequestError = null;
 
 		try {

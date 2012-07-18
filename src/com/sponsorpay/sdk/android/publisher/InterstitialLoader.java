@@ -85,8 +85,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private static final int LOADING_TIMEOUT_SECONDS_DEFAULT = 5;
 	private static final String SKIN_NAME_DEFAULT = "DEFAULT";
 
-	private static final String INTERSTITIAL_PRODUCTION_BASE_URL = "http://iframe.sponsorpay.com/mobile";
-	private static final String INTERSTITIAL_STAGING_BASE_URL = "http://staging.iframe.sponsorpay.com/mobile";
+	private static final String INTERSTITIAL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/mobile";
+	private static final String INTERSTITIAL_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/mobile";
 
 	private static final String URL_PARAM_INTERSTITIAL_KEY = "interstitial";
 

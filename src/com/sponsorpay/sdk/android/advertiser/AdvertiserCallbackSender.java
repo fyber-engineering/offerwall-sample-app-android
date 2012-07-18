@@ -12,12 +12,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.os.AsyncTask;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
@@ -34,8 +34,8 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	/**
 	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
 	 */
-	private static final String API_PRODUCTION_RESOURCE_URL = "http://service.sponsorpay.com/installs/v2";
-	private static final String API_STAGING_RESOURCE_URL = "http://staging.sws.sponsorpay.com/installs/v2";
+	private static final String API_PRODUCTION_RESOURCE_URL = "https://service.sponsorpay.com/installs/v2";
+	private static final String API_STAGING_RESOURCE_URL = "https://staging.sws.sponsorpay.com/installs/v2";
 
 	/**
 	 * The key for encoding the parameter corresponding to whether a previous invocation of the
@@ -208,7 +208,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 		String callbackUrl = params[0];
 
 		mHttpRequest = new HttpGet(callbackUrl);
-		mHttpClient = new DefaultHttpClient();
+		mHttpClient = SPHttpClient.getHttpClient();
 
 		try {
 			mHttpResponse = mHttpClient.execute(mHttpRequest);

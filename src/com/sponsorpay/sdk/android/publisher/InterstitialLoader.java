@@ -12,7 +12,6 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Handler;
 
 import com.sponsorpay.sdk.android.HostInfo;
@@ -239,10 +238,6 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 
 		String interstitialUrl = determineUrl();
 
-//		// workaround for HTTPS in webviews on Android 2.1
-//		if (Build.VERSION.SDK_INT < 8) {
-//			interstitialUrl = interstitialUrl.replaceAll("https:", "http:");
-//		}
 		SponsorPayLogger.i("interstitial", "url: " + interstitialUrl);
 
 		mAsyncRequest = new AsyncRequest(interstitialUrl, this);

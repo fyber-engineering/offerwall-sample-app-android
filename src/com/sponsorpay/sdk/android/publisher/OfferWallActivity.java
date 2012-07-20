@@ -325,23 +325,15 @@ public class OfferWallActivity extends Activity {
 	}
 
 	public abstract class OfferWallTemplate {
+		
 		public abstract void fetchAdditionalExtras();
 
 		public abstract String getBaseUrl();
-//		{
-//			String baseUrl = getUrl();
-			// workaround for HTTPS in webviews on Android 2.1
-//			if (Build.VERSION.SDK_INT < 8) {
-//				baseUrl = baseUrl.replaceAll("https:", "http:");
-//			};
-//			return baseUrl;
-//		}
-
-//		public abstract String getUrl();
 		
 		public abstract Map<String, String> addAdditionalParameters(Map<String, String> params);
 
 		public abstract boolean shouldStayOpenByDefault();
+	
 	}
 
 	public class MobileOfferWallTemplate extends OfferWallTemplate {

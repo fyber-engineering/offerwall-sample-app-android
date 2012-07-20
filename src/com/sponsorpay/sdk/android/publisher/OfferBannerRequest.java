@@ -10,11 +10,13 @@ import java.util.Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Requests a new offer banner to the SponsorPay server and notifies the registered
@@ -143,16 +145,22 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 		} else {
 			baseUrl = OFFERBANNER_PRODUCTION_BASE_URL;
 		}
+		
+//		// workaround for HTTPS in webviews on Android 2.1
+//		if (Build.VERSION.SDK_INT < 8) {
+//			baseUrl = baseUrl.replaceAll("https:", "http:");
+//		}
 
 		return UrlBuilder.newBuilder(baseUrl, mHostInfo).setUserId(mUserId.toString())
 				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 	}
 
 	private String determineUrl() {
-		if (mOverridingUrl != null && !"".equals(mOverridingUrl))
+		if (StringUtils.notNullNorEmpty(mOverridingUrl)) {
 			return mOverridingUrl;
-		else
+		} else {
 			return buildUrl();
+		}
 	}
 
 	/**

@@ -24,6 +24,7 @@ import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -106,7 +107,7 @@ public class OfferWallActivity extends Activity {
 	private OfferWallTemplate mTemplate;
 
 	private String mOverridingUrl;
-	
+
 	private String mCurrencyName;
 
 	/**
@@ -152,7 +153,7 @@ public class OfferWallActivity extends Activity {
 				}
 				super.onPageFinished(view, url);
 			}
-
+			
 			@Override
 			public void onReceivedError(WebView view, int errorCode, String description,
 					String failingUrl) {
@@ -238,7 +239,6 @@ public class OfferWallActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
 		try {
 			String offerwallUrl = determineUrl();
 
@@ -258,7 +258,7 @@ public class OfferWallActivity extends Activity {
 	}
 
 	private String determineUrl() {
-		if (mOverridingUrl != null && !mOverridingUrl.equals("")) {
+		if (StringUtils.notNullNorEmpty(mOverridingUrl)) {
 			return mOverridingUrl;
 		} else {
 			return generateUrl();
@@ -328,7 +328,17 @@ public class OfferWallActivity extends Activity {
 		public abstract void fetchAdditionalExtras();
 
 		public abstract String getBaseUrl();
+//		{
+//			String baseUrl = getUrl();
+			// workaround for HTTPS in webviews on Android 2.1
+//			if (Build.VERSION.SDK_INT < 8) {
+//				baseUrl = baseUrl.replaceAll("https:", "http:");
+//			};
+//			return baseUrl;
+//		}
 
+//		public abstract String getUrl();
+		
 		public abstract Map<String, String> addAdditionalParameters(Map<String, String> params);
 
 		public abstract boolean shouldStayOpenByDefault();

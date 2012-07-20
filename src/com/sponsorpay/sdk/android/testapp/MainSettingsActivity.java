@@ -29,7 +29,7 @@ import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiserState;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
-import com.sponsorpay.sdk.android.testapp.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class MainSettingsActivity extends Activity {
 	

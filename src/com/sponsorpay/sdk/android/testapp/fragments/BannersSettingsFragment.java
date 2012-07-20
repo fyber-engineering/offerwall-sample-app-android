@@ -17,7 +17,7 @@ import com.sponsorpay.sdk.android.publisher.SPOfferBannerListener;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.testapp.R;
 import com.sponsorpay.sdk.android.testapp.SponsorpayAndroidTestAppActivity;
-import com.sponsorpay.sdk.android.testapp.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class BannersSettingsFragment extends AbstractSettingsFragment implements
 		SPOfferBannerListener {

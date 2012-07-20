@@ -23,7 +23,7 @@ import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
 import com.sponsorpay.sdk.android.publisher.unlock.UnlockedItemsResponse;
 import com.sponsorpay.sdk.android.testapp.R;
 import com.sponsorpay.sdk.android.testapp.SponsorpayAndroidTestAppActivity;
-import com.sponsorpay.sdk.android.testapp.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class ItemsSettingsFragment extends AbstractSettingsFragment {
 	

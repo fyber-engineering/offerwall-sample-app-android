@@ -33,8 +33,8 @@ import com.sponsorpay.sdk.android.testapp.fragments.BannersSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.InterstitialSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.ItemsSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.LauncherFragment;
-import com.sponsorpay.sdk.android.testapp.utils.StringUtils;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Example activity in order to show the usage of Sponsorpay Android SDK.

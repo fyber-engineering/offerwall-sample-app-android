@@ -18,6 +18,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager.BadTokenException;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 import com.sponsorpay.sdk.android.HostInfo;
@@ -117,7 +118,6 @@ public class OfferWallActivity extends Activity {
 	 * @param savedInstanceState
 	 *            Android's savedInstanceState
 	 */
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -145,14 +145,6 @@ public class OfferWallActivity extends Activity {
 
 		mWebView.setWebViewClient(new ActivityOfferWebClient(OfferWallActivity.this,
 				mShouldStayOpen) {
-			@Override
-			public void onPageFinished(WebView view, String url) {
-				if (mProgressDialog != null) {
-					mProgressDialog.dismiss();
-					mProgressDialog = null;
-				}
-				super.onPageFinished(view, url);
-			}
 			
 			@Override
 			public void onReceivedError(WebView view, int errorCode, String description,
@@ -177,6 +169,19 @@ public class OfferWallActivity extends Activity {
 				showErrorDialog(error);
 			}
 		});
+		
+		
+		mWebView.setWebChromeClient(new WebChromeClient() {
+			@Override
+			public void onProgressChanged(WebView view, int newProgress) {
+				if (newProgress > 50 && mProgressDialog != null) {
+					mProgressDialog.dismiss();
+					mProgressDialog = null;
+				}
+				super.onProgressChanged(view, newProgress);
+			}
+		});
+
 	}
 
 	private void instantiateTemplate() {

@@ -96,6 +96,8 @@ public class SignatureTools {
 		for (byte b : hash) {
 			formatter.format("%02x", b);
 		}
-		return formatter.toString();
+		String hexValue = formatter.toString();
+		formatter.close();
+		return hexValue;
 	}
 }

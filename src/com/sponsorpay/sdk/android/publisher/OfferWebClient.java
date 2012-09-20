@@ -45,8 +45,6 @@ public abstract class OfferWebClient extends WebViewClient {
 
 	private WeakReference<Activity>  mHostActivityRef;
 	
-	private boolean mClickOccurred = false;
-
 	public OfferWebClient(Activity hostActivity) {
 		mHostActivityRef = new WeakReference<Activity>(hostActivity);
 	}
@@ -127,7 +125,6 @@ public abstract class OfferWebClient extends WebViewClient {
 		intent.setData(uri);
 		try {
 			hostActivity.startActivity(intent);
-			mClickOccurred = true;
 		} catch (ActivityNotFoundException e) {
 			if (uri.getScheme().equalsIgnoreCase("market") && !IntentHelper.isIntentAvailable(getHostActivity(),
 					Intent.ACTION_VIEW, 
@@ -170,11 +167,6 @@ public abstract class OfferWebClient extends WebViewClient {
 					e);
 		}
 	}
-	
-	protected boolean hasClickOccurred() {
-		return mClickOccurred;
-	}
-	
 	
     public void onReceivedSslError(WebView view, SslErrorHandler handler,
             SslError error) {

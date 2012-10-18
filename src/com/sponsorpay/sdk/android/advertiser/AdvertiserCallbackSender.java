@@ -149,7 +149,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 
 	/**
 	 * Triggers the callback request that contacts the Sponsorpay Advertiser API. If and when a
-	 * succesful response is received from the server, the {@link APIResultListener} registered
+	 * successful response is received from the server, the {@link APIResultListener} registered
 	 * through the constructor {@link #AsyncAPICaller(AdvertiserHostInfo, APIResultListener)} will
 	 * be notified.
 	 */
@@ -216,7 +216,9 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 			// We're not parsing the response, just making sure that a successful status code has
 			// been received.
 			int responseStatusCode = mHttpResponse.getStatusLine().getStatusCode();
-
+			
+			mHttpResponse.getEntity().consumeContent();
+			
 			if (responseStatusCode == SUCCESFUL_HTTP_STATUS_CODE) {
 				returnValue = true;
 			} else {

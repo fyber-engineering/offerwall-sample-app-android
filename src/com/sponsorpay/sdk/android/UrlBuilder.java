@@ -8,7 +8,10 @@ package com.sponsorpay.sdk.android;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 import android.net.Uri;
 
@@ -169,10 +172,9 @@ public class UrlBuilder {
 	 */
 	public static void validateKeyValueParams(Map<String, String> kvParams) {
 		if (kvParams != null) {
-			Set<String> extraKeySet = kvParams.keySet();
-			for (String k : extraKeySet) {
-				String v = kvParams.get(k);
-				if (k == null || "".equals(k) || v == null || "".equals(v)) {
+			for (Entry<String, String> entry : kvParams.entrySet()) {
+				if (StringUtils.nullOrEmpty(entry.getKey())
+						|| StringUtils.nullOrEmpty(entry.getValue())) {
 					throw new IllegalArgumentException(
 							"SponsorPay SDK: Custom Parameters cannot have an empty or null"
 									+ " Key or Value.");
@@ -204,7 +206,7 @@ public class UrlBuilder {
 			String k = keys[i];
 			String v = values[i];
 
-			if (k == null || "".equals(k) || v == null || "".equals(v)) {
+			if (StringUtils.nullOrEmpty(k) || StringUtils.nullOrEmpty(v)) {
 				throw new IllegalArgumentException("SponsorPay SDK: When specifying Custom"
 						+ " Parameters using two arrays of Keys and Values, none of their"
 						+ " elements can be empty or null.");

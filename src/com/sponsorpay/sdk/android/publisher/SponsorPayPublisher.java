@@ -26,6 +26,7 @@ import com.sponsorpay.sdk.android.publisher.unlock.ItemIdValidator;
 import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
 import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Provides convenience calls to load and show the mobile Offer Wall and the mobile Interstitial.
@@ -81,8 +82,9 @@ public class SponsorPayPublisher {
 	 * @return The message string.
 	 */
 	public static String getUIString(UIStringIdentifier identifier) {
-		if (sUIStrings == null)
+		if (sUIStrings == null) {
 			initUIStrings();
+		}
 
 		return sUIStrings.get(identifier);
 	}
@@ -96,8 +98,9 @@ public class SponsorPayPublisher {
 	 *            Custom text for the message.
 	 */
 	public static void setCustomUIString(UIStringIdentifier identifier, String message) {
-		if (sUIStrings == null)
+		if (sUIStrings == null) {
 			initUIStrings();
+		}
 
 		sUIStrings.put(identifier, message);
 	}
@@ -445,11 +448,11 @@ public class SponsorPayPublisher {
 			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
 		}
 
-		if (overridingAppId != null) {
+		if (StringUtils.notNullNorEmpty(overridingAppId)) {
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overridingAppId);
 		}
 		
-		if (currencyName != null && !currencyName.trim().equals("")) {
+		if (StringUtils.notNullNorEmpty(currencyName)) {
 			intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
 		}
 
@@ -490,7 +493,7 @@ public class SponsorPayPublisher {
 		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
 				unlockItemName);
 		
-		if (overrideAppId != null) {
+		if (StringUtils.notNullNorEmpty(overrideAppId)) {
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overrideAppId);
 		}
 
@@ -679,7 +682,7 @@ public class SponsorPayPublisher {
 
 		HostInfo hostInfo = new HostInfo(callingActivity);
 
-		if (overriddenAppId != null) {
+		if (StringUtils.notNullNorEmpty(overriddenAppId)) {
 			hostInfo.setOverriddenAppId(overriddenAppId);
 		}
 
@@ -689,16 +692,16 @@ public class SponsorPayPublisher {
 		if (shouldStayOpen != null) {
 			il.setShouldStayOpen(shouldStayOpen);
 		}
-		if (backgroundUrl != null) {
+		if (StringUtils.notNullNorEmpty(backgroundUrl)) {
 			il.setBackgroundUrl(backgroundUrl);
 		}
-		if (skinName != null) {
+		if (StringUtils.notNullNorEmpty(skinName)) {
 			il.setSkinName(skinName);
 		}
 		if (loadingTimeoutSecs > 0) {
 			il.setLoadingTimeoutSecs(loadingTimeoutSecs);
 		}
-		if (currencyName != null && !currencyName.trim().equals("")) {
+		if (StringUtils.notNullNorEmpty(currencyName)) {
 			il.setCurrencyName(currencyName);
 		}
 		Map<String, String> extraParams = getCustomParameters(customParams);
@@ -999,8 +1002,9 @@ public class SponsorPayPublisher {
 
 		HostInfo hostInfo = new HostInfo(context);
 
-		if (applicationId != null)
+		if (StringUtils.notNullNorEmpty(applicationId)) {
 			hostInfo.setOverriddenAppId(applicationId);
+		}
 
 		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, userId, listener,
 				hostInfo, securityToken);
@@ -1022,8 +1026,9 @@ public class SponsorPayPublisher {
 
 		HostInfo hostInfo = new HostInfo(context);
 
-		if (applicationId != null)
+		if (StringUtils.notNullNorEmpty(applicationId)) {
 			hostInfo.setOverriddenAppId(applicationId);
+		}
 
 		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, userId, listener,
 				hostInfo, securityToken);
@@ -1093,8 +1098,9 @@ public class SponsorPayPublisher {
 			String currencyName, String applicationId, Map<String, String> customParams) {
 		HostInfo hostInfo = new HostInfo(context);
 
-		if (applicationId != null)
+		if (StringUtils.notNullNorEmpty(applicationId)) {
 			hostInfo.setOverriddenAppId(applicationId);
+		}
 
 		if (offerBannerAdShape == null) {
 			offerBannerAdShape = sDefaultOfferBannerAdShape;

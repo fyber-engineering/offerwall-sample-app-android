@@ -18,6 +18,7 @@ import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -269,10 +270,11 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	}
 
 	private String determineUrl() {
-		if (mOverridingUrl != null && !"".equals(mOverridingUrl))
+		if (StringUtils.notNullNorEmpty(mOverridingUrl)) {
 			return mOverridingUrl;
-		else
+		} else {
 			return buildUrl();
+		}
 	}
 
 	private String buildUrl() {
@@ -284,17 +286,19 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		Map<String, String> keysValues = UrlBuilder.mapKeysToValues(interstitialUrlExtraKeys,
 				interstitialUrlExtraValues);
 
-		if (mSkinName != null && !"".equals(mSkinName))
+		if (StringUtils.notNullNorEmpty(mSkinName )) {
 			keysValues.put(URL_PARAM_SKIN_KEY, mSkinName);
+		}
 
-		if (mBackgroundUrl != null && !"".equals(mBackgroundUrl))
+		if (StringUtils.notNullNorEmpty(mBackgroundUrl)) {
 			keysValues.put(URL_PARAM_BACKGROUND_KEY, mBackgroundUrl);
+		}
 
 		if (mCustomParams != null) {
 			keysValues.putAll(mCustomParams);
 		}
 		
-		if (mCurrencyName != null && !mCurrencyName.trim().equals("")) {
+		if (StringUtils.notNullNorEmpty(mCurrencyName)) {
 			keysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
 		}
 

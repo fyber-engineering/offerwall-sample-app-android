@@ -19,6 +19,7 @@ import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Runs in the background the Advertiser Callback HTTP request.
@@ -170,11 +171,13 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 				new String[] { SUCCESSFUL_ANSWER_RECEIVED_KEY },
 				new String[] { mWasAlreadySuccessful ? "1" : "0" });
 
-		if (mInstallSubId != null && !"".equals(mInstallSubId))
+		if (StringUtils.notNullNorEmpty(mInstallSubId)) {
 			extraParams.put(INSTALL_SUBID_KEY, mInstallSubId);
+		}
 
-		if (mCustomParams != null)
+		if (mCustomParams != null) {
 			extraParams.putAll(mCustomParams);
+		}
 
 		String callbackUrl = UrlBuilder.newBuilder(baseUrl, mHostInfo).addExtraKeysValues(
 				extraParams).addScreenMetrics().buildUrl();

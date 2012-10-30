@@ -210,13 +210,13 @@ public class OfferWallActivity extends Activity {
 
 		String overridingAppId = getIntent().getStringExtra(EXTRA_OVERRIDING_APP_ID_KEY);
 
-		if (overridingAppId != null && !overridingAppId.equals("")) {
+		if (StringUtils.notNullNorEmpty(overridingAppId)) {
 			mHostInfo.setOverriddenAppId(overridingAppId);
 		}
 		
 		String currencyName = getIntent().getStringExtra(EXTRA_CURRENCY_NAME_KEY);
 		
-		if (currencyName != null && !currencyName.trim().equals("")) {
+		if (StringUtils.notNullNorEmpty(currencyName)) {
 			mCurrencyName = currencyName;
 		}
 
@@ -413,7 +413,7 @@ public class OfferWallActivity extends Activity {
 			}
 			params.put(PARAM_UNLOCK_ITEM_ID_KEY, mUnlockItemId);
 
-			if (null != mUnlockItemName && !"".equals(mUnlockItemName)) {
+			if (StringUtils.notNullNorEmpty(mUnlockItemName)) {
 				params.put(PARAM_UNLOCK_ITEM_NAME_KEY, mUnlockItemName);
 			}
 

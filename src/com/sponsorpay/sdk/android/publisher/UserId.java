@@ -10,6 +10,7 @@ import android.content.SharedPreferences.Editor;
 
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.SignatureTools;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class UserId {
 	public static final String STATE_GENERATED_USERID_KEY = "STATE_GENERATED_USERID_KEY";
@@ -42,7 +43,7 @@ public class UserId {
 
 	public static UserId make(Context context, String userIdValue) {
 		UserId instance;
-		if (userIdValue != null && !userIdValue.equals("")) {
+		if (StringUtils.notNullNorEmpty(userIdValue)) {
 			instance = new UserId(userIdValue);
 		} else {
 			instance = new UserId(context);
@@ -116,12 +117,10 @@ public class UserId {
 
 		public static boolean isValidId(String id) {
 			// Check for null string
-			if (id == null)
-				return false;
-
 			// Check for empty or whitespace only string
-			if (id.trim().equals(""))
+			if (StringUtils.nullOrEmpty(id)) {
 				return false;
+			}
 
 			// Check for the integer number 0
 			Integer androidIdAsInteger = null;
@@ -130,8 +129,9 @@ public class UserId {
 			} catch (NumberFormatException e) {
 				// The string didn't have a valid integer format. Test for zero doesn't apply.
 			}
-			if (androidIdAsInteger != null && androidIdAsInteger.intValue() == 0)
+			if (androidIdAsInteger != null && androidIdAsInteger.intValue() == 0) {
 				return false;
+			}
 
 			return true;
 		}
@@ -140,12 +140,15 @@ public class UserId {
 			StringBuilder builder = new StringBuilder();
 
 			if (mTelephonyDeviceId != null || mAndroidId != null || mHardwareSerialNumber != null) {
-				if (mTelephonyDeviceId != null)
+				if (mTelephonyDeviceId != null) {
 					builder.append(mTelephonyDeviceId);
-				if (mAndroidId != null)
+				}
+				if (mAndroidId != null) {
 					builder.append(mAndroidId);
-				if (mHardwareSerialNumber != null)
+				}
+				if (mHardwareSerialNumber != null) {
 					builder.append(mHardwareSerialNumber);
+				}
 			} else {
 				builder.append(UUID.randomUUID());
 			}

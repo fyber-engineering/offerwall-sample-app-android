@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import com.sponsorpay.sdk.android.HttpResponseParser;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -137,21 +138,23 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 			mResponseBody = HttpResponseParser.extractResponseString(response);
 			Header[] responseSignatureHeaders = response.getHeaders(SIGNATURE_HEADER);
 			mResponseSignature = responseSignatureHeaders.length > 0 ? responseSignatureHeaders[0]
-					.getValue() : "";
+					.getValue() : StringUtils.EMPTY_STRING;
 			Header[] cookieHeaders = response.getHeaders("Set-Cookie");
 
 			// Populate result cookies with values of cookieHeaders
 			if (cookieHeaders.length > 0) {
 
-				if (shouldLogVerbosely)
+				if (shouldLogVerbosely) {
 					SponsorPayLogger.v(LOG_TAG, String.format("Got following cookies from server (url: %s):",
 							mRequestUrl));
+				}
 
 				mCookieStrings = new String[cookieHeaders.length];
 				for (int i = 0; i < cookieHeaders.length; i++) {
 					mCookieStrings[i] = cookieHeaders[i].getValue();
-					if (shouldLogVerbosely)
+					if (shouldLogVerbosely) {
 						SponsorPayLogger.v(LOG_TAG, mCookieStrings[i]);
+					}
 				}
 			}
 		} catch (Throwable t) {
@@ -172,7 +175,7 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		String acceptLanguageLocaleValue = preferredLanguage;
 		final String englishLanguageCode = Locale.ENGLISH.getLanguage();
 
-		if (preferredLanguage == null || preferredLanguage.equals("")) {
+		if (StringUtils.nullOrEmpty(preferredLanguage)) {
 			acceptLanguageLocaleValue = englishLanguageCode;
 		} else if (!englishLanguageCode.equals(preferredLanguage)) {
 			acceptLanguageLocaleValue += String.format(", %s;q=0.8", englishLanguageCode);
@@ -206,7 +209,7 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 			retval = false;
 		} else {
 			String firstCookieString = mCookieStrings[0];
-			if (firstCookieString == null || "".equals(firstCookieString)) {
+			if (StringUtils.nullOrEmpty(firstCookieString)) {
 				retval = false;
 			} else {
 				retval = true;

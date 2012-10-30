@@ -244,8 +244,9 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 
 		if (mAsyncRequest != null) {
 			Throwable requestError = mAsyncRequest.getRequestThrownError();
-			if (requestError != null && Exception.class.isAssignableFrom(requestError.getClass()))
+			if (requestError != null && Exception.class.isAssignableFrom(requestError.getClass())) {
 				retval = (Exception) requestError;
+			}
 		}
 
 		return retval;
@@ -257,9 +258,10 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * error can give a more accurate cause for the error.
 	 */
 	public Throwable getRequestThrownError() {
-		if (mAsyncRequest != null)
+		if (mAsyncRequest != null) {
 			return mAsyncRequest.getRequestThrownError();
-		else
+		} else {
 			return null;
+		}
 	}
 }

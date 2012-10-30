@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import com.sponsorpay.sdk.android.SignatureTools;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -177,10 +178,11 @@ public abstract class AbstractResponse {
 			onErrorTriggered();
 		} else {
 			parseSuccessfulResponse();
-			if (mErrorType == RequestErrorType.NO_ERROR)
+			if (mErrorType == RequestErrorType.NO_ERROR) {
 				onSuccessfulResponseParsed();
-			else
+			} else {
 				onErrorTriggered();
+			}
 		}
 	}
 
@@ -199,7 +201,7 @@ public abstract class AbstractResponse {
 	 * @return
 	 */
 	public String getErrorCode() {
-		return mErrorCode != null ? mErrorCode : "";
+		return mErrorCode != null ? mErrorCode : StringUtils.EMPTY_STRING;
 	}
 
 	/**
@@ -208,6 +210,6 @@ public abstract class AbstractResponse {
 	 * @return
 	 */
 	public String getErrorMessage() {
-		return mErrorMessage != null ? mErrorMessage : "";
+		return mErrorMessage != null ? mErrorMessage : StringUtils.EMPTY_STRING;
 	}
 }

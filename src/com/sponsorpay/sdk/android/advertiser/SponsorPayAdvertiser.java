@@ -14,6 +14,7 @@ import android.content.Context;
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.advertiser.AdvertiserCallbackSender.APIResultListener;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -107,11 +108,11 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	private static HashMap<String, String> getCustomParameters(Map<String, String> passedParameters) {
 		HashMap<String, String> retval;
 
-		if (passedParameters != null)
+		if (passedParameters != null) {
 			retval = new HashMap<String, String>(passedParameters);
-		else if (sCustomParameters != null)
+		} else if (sCustomParameters != null) {
 			retval = new HashMap<String, String>(sCustomParameters);
-		else {
+		} else {
 			retval = null;
 		}
 
@@ -240,7 +241,7 @@ public class SponsorPayAdvertiser implements APIResultListener {
 		/* Collect data about the device */
 		mHostInfo = new HostInfo(mContext);
 
-		if (overrideAppId != null && !overrideAppId.equals("")) {
+		if (StringUtils.notNullNorEmpty(overrideAppId)) {
 			// Override App ID
 			mHostInfo.setOverriddenAppId(overrideAppId);
 		}

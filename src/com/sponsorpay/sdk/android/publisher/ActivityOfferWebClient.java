@@ -48,7 +48,8 @@ public class ActivityOfferWebClient extends OfferWebClient {
 		SponsorPayLogger.i(OfferWebClient.LOG_TAG, "Should stay open: " + mShouldHostActivityStayOpen
 				+ ", will close activity: " + willCloseHostActivity);
 
-		if (willCloseHostActivity)
+		if (willCloseHostActivity) {
 			hostActivity.finish();
+		}
 	}
 }

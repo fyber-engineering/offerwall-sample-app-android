@@ -21,6 +21,7 @@ import android.os.SystemClock;
 import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Enables triggering the advertiser's callback with a delay. Uses the Android alarm mechanism
@@ -75,7 +76,7 @@ public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 
 		// if HostInfo must launch a RuntimeException due to an invalid App ID value, let it do that
 		// immediately --instead of after the delay-- and on the calling thread:
-		if (appId == null || appId.equals("")) {
+		if (StringUtils.nullOrEmpty(appId)) {
 			HostInfo hostInfo = new HostInfo(context);
 			hostInfo.getAppId();
 		}

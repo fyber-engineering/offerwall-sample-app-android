@@ -3,6 +3,8 @@ package com.sponsorpay.sdk.android.publisher.unlock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.sponsorpay.sdk.android.utils.StringUtils;
+
 public class ItemIdValidator {
 	private String mValue;
 	private Pattern mCompiledPattern;
@@ -21,7 +23,7 @@ public class ItemIdValidator {
 	}
 
 	public boolean validate() {
-		if (mValue == null || "".equals(mValue)) {
+		if (StringUtils.nullOrEmpty(mValue)) {
 			return false;
 		}
 

@@ -1,53 +1,74 @@
 package com.sponsorpay.sdk.android.session;
 
-import java.util.HashMap;
 import java.util.UUID;
+
+import android.content.Context;
+
+import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.publisher.UserId;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class SPSession {
 
-	private final UUID mToken = UUID.randomUUID();
+	private final String mSessionToken;
 	
 	private final String mAppId;
 	private final String mUserId;
-	private final String mSecurityToken;
-	
-	private final HashMap<String, String> mParameters;
-	
-	public SPSession(String appId, String userId, String securityToken,
-			HashMap<String, String> parameters) {
-		mAppId = appId;
-		mUserId = userId;
+	private String mSecurityToken;
+	private final HostInfo mHostInfo;
+
+	public SPSession(String appId, String userId, String securityToken, Context context) {
 		mSecurityToken = securityToken;
-		mParameters = parameters;
-	}
-	
-	// TODO read from asset property file
-//	public SPSession() {
-//		mAppId = StringUtils.EMPTY_STRING;
-//		mUserId = StringUtils.EMPTY_STRING;
-//		mSecurityToken = StringUtils.EMPTY_STRING;
-//		mParameters = null;
-//	}
-	
-	public String getUrl() {
-		return "";
-	}
-	
-	
-	@Override
-	public int hashCode() {
-		return mToken.hashCode();
-	}
-	
-	@Override
-	public boolean equals(Object o) {
-		if (o == this) {
-			return true;
+		mHostInfo = new HostInfo(context);
+		// to be removed when we no longer support appid in manifest
+		if (StringUtils.notNullNorEmpty(appId)) {
+			mAppId = appId;
+			mHostInfo.setOverriddenAppId(appId);
+	 	} else {
+	 		mAppId = mHostInfo.getAppId();
+	 	}
+		mSessionToken = getSessionToken(mAppId, userId);
+		if (StringUtils.nullOrEmpty(userId)) {
+			mUserId = UserId.make(context, userId).toString();
+		} else {
+			mUserId = userId;
 		}
-		if (o instanceof SPSession) {
-			return o.hashCode() == hashCode();
-		}
-		return false;
 	}
+	
+	public String getSessionToken() {
+		return mSessionToken;
+	}
+
+	public String getAppId() {
+		return mAppId;
+	}
+
+	public String getUserId() {
+		return mUserId;
+	}
+
+	public String getSecurityToken() {
+		return mSecurityToken;
+	}
+	
+	public void setSecurityToken(String securityToken) {
+		mSecurityToken = securityToken;
+	}
+	
+	public HostInfo getHostInfo() {
+		return mHostInfo;
+	}
+	
+	public static String getSessionToken(String appId, String userId) {
+		if (StringUtils.nullOrEmpty(appId)) {
+			throw new IllegalArgumentException("AppID cannot be null!");
+		}
+		if (StringUtils.nullOrEmpty(userId)) {
+			userId = StringUtils.EMPTY_STRING;
+		}
+		String token = appId + "-" + userId;
+		return UUID.nameUUIDFromBytes(token.getBytes()).toString();
+	}
+	
 	
 }

@@ -14,9 +14,10 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Handler;
 
-import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.session.SPSession;
+import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -106,8 +107,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * {@link InterstitialActivity} and to attach the loading progress dialog to.
 	 */
 	private Activity mCallingActivity;
-	private UserId mUserId;
-	private HostInfo mHostInfo;
+//	private String mUserId;
+//	private HostInfo mHostInfo;
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 	private Map<String, String> mCustomParams;
 
@@ -128,6 +129,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 */
 	private ProgressDialog mProgressDialog;
 
+	private SPSession mSession;
+
 
 	/**
 	 * Initializes a new IntestitialLoader instance.
@@ -144,12 +147,16 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the result URL.
 	 */
-	public InterstitialLoader(Activity callingActivity, String userId, HostInfo hostInfo,
+	public InterstitialLoader(Activity callingActivity, String sessionToken,
 			InterstitialLoadingStatusListener loadingStatusListener) {
 
+		//FIXME documentation!!
 		mCallingActivity = callingActivity;
-		mUserId = UserId.make(callingActivity.getApplicationContext(), userId);
-		mHostInfo = hostInfo;
+		
+		mSession = SPSessionManager.INSTANCE.getSession(sessionToken);
+		
+//		mUserId = session.getUserId();
+//		mHostInfo = session.getHostInfo();
 		mLoadingStatusListener = loadingStatusListener;
 
 		mHandler = new Handler();
@@ -305,7 +312,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
 				: INTERSTITIAL_PRODUCTION_BASE_URL;
 
-		return UrlBuilder.newBuilder(interstitialBaseUrl, mHostInfo).setUserId(mUserId.toString())
+		return UrlBuilder.newBuilder(interstitialBaseUrl, mSession)
 				.addExtraKeysValues(keysValues).addScreenMetrics().buildUrl();
 	}
 

@@ -21,9 +21,10 @@ import android.view.WindowManager.BadTokenException;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
-import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.session.SPSession;
+import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -37,21 +38,24 @@ public class OfferWallActivity extends Activity {
 	public static final String OFFERWALL_TYPE_MOBILE = "OFFERWALL_TYPE_MOBILE";
 	public static final String OFFERWALL_TYPE_UNLOCK = "OFFERWALL_TYPE_UNLOCK";
 
-	/**
-	 * Key for extracting the current user ID from the extras bundle.
-	 */
-	public static final String EXTRA_USERID_KEY = "EXTRA_USERID_KEY";
+	
+	public static final String EXTRA_SESSION_TOKEN_KEY = "EXTRA_SESSION_TOKEN_KEY";
+	
+//	/**
+//	 * Key for extracting the current user ID from the extras bundle.
+//	 */
+//	public static final String EXTRA_USERID_KEY = "EXTRA_USERID_KEY";
 
 	/**
 	 * Key for extracting the value of {@link #mShouldStayOpen} from the extras bundle.
 	 */
 	public static final String EXTRA_SHOULD_STAY_OPEN_KEY = "EXTRA_SHOULD_REMAIN_OPEN_KEY";
 
-	/**
-	 * Key for extracting the App ID from the extras bundle. If no app id is provided it will be
-	 * retrieved from the application manifest.
-	 */
-	public static final String EXTRA_OVERRIDING_APP_ID_KEY = "EXTRA_OVERRIDING_APP_ID";
+//	/**
+//	 * Key for extracting the App ID from the extras bundle. If no app id is provided it will be
+//	 * retrieved from the application manifest.
+//	 */
+//	public static final String EXTRA_OVERRIDING_APP_ID_KEY = "EXTRA_OVERRIDING_APP_ID";
 
 	/**
 	 * Key for extracting a map of custom key/values to add to the parameters on the OfferWall
@@ -75,14 +79,14 @@ public class OfferWallActivity extends Activity {
 	protected WebView mWebView;
 
 	/**
-	 * The user ID (after extracting it from the extra)
+	 * The user ID 
 	 */
-	protected UserId mUserId;
+//	protected String mUserId;
 
 	/**
 	 * Information about the hosting application and device.
 	 */
-	protected HostInfo mHostInfo;
+//	protected HostInfo mHostInfo;
 
 	/**
 	 * Whether this activity should stay open or close when the user is redirected outside the
@@ -110,6 +114,7 @@ public class OfferWallActivity extends Activity {
 	private String mOverridingUrl;
 
 	private String mCurrencyName;
+	private SPSession mSession;
 
 	/**
 	 * Overridden from {@link Activity}. Upon activity start, extract the user ID from the extra,
@@ -130,7 +135,7 @@ public class OfferWallActivity extends Activity {
 				.getUIString(UIStringIdentifier.LOADING_OFFERWALL));
 		mProgressDialog.show();
 
-		mHostInfo = new HostInfo(getApplicationContext());
+//		mHostInfo = new HostInfo(getApplicationContext());
 
 		instantiateTemplate();
 
@@ -197,9 +202,17 @@ public class OfferWallActivity extends Activity {
 	@SuppressWarnings("unchecked")
 	protected void fetchPassedExtras() {
 		// Get data from extras
-		String passedUserId = getIntent().getStringExtra(EXTRA_USERID_KEY);
-		mUserId = UserId.make(getApplicationContext(), passedUserId);
+//		String passedUserId = getIntent().getStringExtra(EXTRA_USERID_KEY);
+//		mUserId = UserId.make(getApplicationContext(), passedUserId);
 
+		String sessionToken = getIntent().getStringExtra(EXTRA_SESSION_TOKEN_KEY);
+		
+		mSession = SPSessionManager.INSTANCE.getSession(sessionToken);
+		
+//		mHostInfo = session.getHostInfo();
+//		
+//		mUserId = session.getUserId();
+		
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY,
 				mTemplate.shouldStayOpenByDefault());
 
@@ -208,11 +221,11 @@ public class OfferWallActivity extends Activity {
 			mCustomKeysValues = (HashMap<String, String>) inflatedKvMap;
 		}
 
-		String overridingAppId = getIntent().getStringExtra(EXTRA_OVERRIDING_APP_ID_KEY);
-
-		if (StringUtils.notNullNorEmpty(overridingAppId)) {
-			mHostInfo.setOverriddenAppId(overridingAppId);
-		}
+//		String overridingAppId = getIntent().getStringExtra(EXTRA_OVERRIDING_APP_ID_KEY);
+//
+//		if (StringUtils.notNullNorEmpty(overridingAppId)) {
+//			mHostInfo.setOverriddenAppId(overridingAppId);
+//		}
 		
 		String currencyName = getIntent().getStringExtra(EXTRA_CURRENCY_NAME_KEY);
 		
@@ -279,7 +292,7 @@ public class OfferWallActivity extends Activity {
 			mCustomKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
 		}
 		String baseUrl = mTemplate.getBaseUrl();
-		return UrlBuilder.newBuilder(baseUrl, mHostInfo).setUserId(mUserId.toString())
+		return UrlBuilder.newBuilder(baseUrl, mSession)
 				.addExtraKeysValues(mCustomKeysValues).addScreenMetrics().buildUrl();
 	}
 

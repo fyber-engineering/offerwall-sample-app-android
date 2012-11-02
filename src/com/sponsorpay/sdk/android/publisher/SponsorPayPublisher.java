@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
-import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
@@ -25,6 +24,8 @@ import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
 import com.sponsorpay.sdk.android.publisher.unlock.ItemIdValidator;
 import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
 import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
+import com.sponsorpay.sdk.android.session.SPSession;
+import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -230,6 +231,7 @@ public class SponsorPayPublisher {
 	 *            The current user ID of the host application.
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 * @deprecated bla bal bal
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId) {
 		return getIntentForOfferWallActivity(context, userId, null, null, null);
@@ -252,6 +254,7 @@ public class SponsorPayPublisher {
 	 *            use a custom currency name.	 
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 * @deprecated bla bal bal
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId, String currencyName) {
 		return getIntentForOfferWallActivity(context, userId, null, currencyName, null, null);
@@ -276,6 +279,7 @@ public class SponsorPayPublisher {
 	 *            redirected out of the app. False to close the Offer Wall.
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 * @deprecated bla bal bal
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
 			boolean shouldStayOpen) {
@@ -305,6 +309,7 @@ public class SponsorPayPublisher {
 	 *            redirected out of the app. False to close the Offer Wall.
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 * @deprecated bla bal bal
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
 			 String currencyName,  boolean shouldStayOpen) {
@@ -335,6 +340,7 @@ public class SponsorPayPublisher {
 	 *            An app ID which will override the one included in the manifest.
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 * @deprecated bla bal bal
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
 			boolean shouldStayOpen, String overrideAppId) {
@@ -368,6 +374,7 @@ public class SponsorPayPublisher {
 	 *            An app ID which will override the one included in the manifest.
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 * @deprecated bla bal bal
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, String userId,
 			boolean shouldStayOpen, String currencyName, String overrideAppId) {
@@ -399,6 +406,7 @@ public class SponsorPayPublisher {
 	 * 
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 * @deprecated bla bal bal
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context,
 			String userId, Boolean shouldStayOpen, String overridingAppId,
@@ -436,21 +444,48 @@ public class SponsorPayPublisher {
 	 * 
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 * 
+	 * @deprecated this method will disappear in a future release of the SDK.
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context,
 			String userId, Boolean shouldStayOpen, String currencyName,
 			String overridingAppId, HashMap<String, String> customParams) {
+		String sessionToken = SPSessionManager.INSTANCE.getSession(overridingAppId, userId, null, context);
+		return getIntentForOfferWallActivity(context, shouldStayOpen, sessionToken, currencyName, customParams);
+	}
+	
+	public static Intent getIntentForOfferWallActivity(Context context,
+			Boolean shouldStayOpen) {
+		String sessionToken =  SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
+		return getIntentForOfferWallActivity(context, shouldStayOpen, sessionToken, null, null);
+	}
+
+	public static Intent getIntentForOfferWallActivity(Context context,
+			Boolean shouldStayOpen, String currencyName,
+			HashMap<String, String> customParams) {
+		String sessionToken =  SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
+		return getIntentForOfferWallActivity(context, shouldStayOpen, sessionToken, currencyName, customParams);
+	}
+	
+	public static Intent getIntentForOfferWallActivity(Context context,
+			Boolean shouldStayOpen, String sessionToken, String currencyName,
+			HashMap<String, String> customParams) {
+
+		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
+
 
 		Intent intent = new Intent(context, OfferWallActivity.class);
-		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, userId);
+		intent.putExtra(OfferWallActivity.EXTRA_SESSION_TOKEN_KEY, session.getSessionToken());
+//		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, session.getUserId());
 
 		if (shouldStayOpen != null) {
 			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
 		}
 
-		if (StringUtils.notNullNorEmpty(overridingAppId)) {
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overridingAppId);
-		}
+//		String overridingAppId = session.getAppId();
+//		if (StringUtils.notNullNorEmpty(overridingAppId )) {
+//			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overridingAppId);
+//		}
 		
 		if (StringUtils.notNullNorEmpty(currencyName)) {
 			intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
@@ -466,25 +501,61 @@ public class SponsorPayPublisher {
 		return intent;
 	}
 
+	/**
+	 * 
+	 * @param context
+	 * @param userId
+	 * @param unlockItemId
+	 * @param unlockItemName
+	 * @return
+	 * @deprecated bla bal bal
+	 */
 	public static Intent getIntentForUnlockOfferWallActivity(Context context, String userId,
 			String unlockItemId, String unlockItemName) {
-
 		return getIntentForUnlockOfferWallActivity(context, userId, unlockItemId, unlockItemName,
 				null, null);
 	}
 
+	/**
+	 * 
+	 * @param context
+	 * @param userId
+	 * @param unlockItemId
+	 * @param unlockItemName
+	 * @param overrideAppId
+	 * @param customParams
+	 * @return
+	 * @deprecated this method will be removed in a future release of the SDK. 
+	 */
 	public static Intent getIntentForUnlockOfferWallActivity(Context context, String userId,
 			String unlockItemId, String unlockItemName, String overrideAppId,
 			HashMap<String, String> customParams) {
-
+		String sessionToken = SPSessionManager.INSTANCE.getSession(overrideAppId, userId, null, context);
+		return getIntentForUnlockOfferWallActivity(context,
+				sessionToken, unlockItemId, unlockItemName, customParams);
+	}
+	
+	
+	public static Intent getIntentForUnlockOfferWallActivity(Context context,
+			String unlockItemId, String unlockItemName) {
+		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
+		return getIntentForUnlockOfferWallActivity(context,
+				sessionToken, unlockItemId, unlockItemName, null);
+	}
+	
+	public static Intent getIntentForUnlockOfferWallActivity(Context context, String sessionToken, 
+			String unlockItemId, String unlockItemName,	HashMap<String, String> customParams) {
+		
 		ItemIdValidator itemIdValidator = new ItemIdValidator(unlockItemId);
 		if (!itemIdValidator.validate()) {
 			throw new RuntimeException("The provided Unlock Item ID is not valid. "
 					+ itemIdValidator.getValidationDescription());
 		}
+		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
 
 		Intent intent = new Intent(context, OfferWallActivity.class);
-		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, userId);
+		intent.putExtra(OfferWallActivity.EXTRA_SESSION_TOKEN_KEY, session.getSessionToken());
+//		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, session.getUserId());
 
 		intent.putExtra(OfferWallActivity.EXTRA_OFFERWALL_TYPE,
 				OfferWallActivity.OFFERWALL_TYPE_UNLOCK);
@@ -493,9 +564,10 @@ public class SponsorPayPublisher {
 		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
 				unlockItemName);
 		
-		if (StringUtils.notNullNorEmpty(overrideAppId)) {
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overrideAppId);
-		}
+//		String overrideAppId = session.getAppId();
+//		if (StringUtils.notNullNorEmpty(overrideAppId )) {
+//			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overrideAppId);
+//		}
 
 		if (sOverridingWebViewUrl != null) {
 			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
@@ -538,6 +610,7 @@ public class SponsorPayPublisher {
 	 *            it to 0 or a negative number, it will fall back to the default value of 5 seconds.
 	 * @param overriddenAppId
 	 *            An app ID which will override the one included in the manifest.
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
@@ -582,6 +655,7 @@ public class SponsorPayPublisher {
 	 *            use a custom currency name.
 	 * @param overriddenAppId
 	 *            An app ID which will override the one included in the manifest.
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
@@ -625,6 +699,7 @@ public class SponsorPayPublisher {
 	 *            An app ID which will override the one included in the manifest.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity,
 			String userId,
@@ -674,19 +749,41 @@ public class SponsorPayPublisher {
 	 *            An app ID which will override the one included in the manifest.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName, 
 			String overriddenAppId, Map<String, String> customParams) {
+		String sessionToken = SPSessionManager.INSTANCE.getSession(
+				overriddenAppId, userId, null, callingActivity.getApplication());
+		loadShowInterstitial(sessionToken, callingActivity,
+				loadingStatusListener, shouldStayOpen, backgroundUrl, skinName,
+				loadingTimeoutSecs, currencyName, customParams);
+	}
+	
+	
+	public static void loadShowInterstitial(Activity callingActivity,  
+			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
+		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
+		loadShowInterstitial(sessionToken , callingActivity, loadingStatusListener, shouldStayOpen,
+				null, null,0, null, null);
+	}
+	
+	public static void loadShowInterstitial(String sessionToken, Activity callingActivity,  
+			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
+			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName,
+			Map<String, String> customParams) {
+		
 
-		HostInfo hostInfo = new HostInfo(callingActivity);
+//		HostInfo hostInfo = new HostInfo(callingActivity);
 
-		if (StringUtils.notNullNorEmpty(overriddenAppId)) {
-			hostInfo.setOverriddenAppId(overriddenAppId);
-		}
+//		String overriddenAppId = session.getAppId();
+//		if (StringUtils.notNullNorEmpty(overriddenAppId)) {
+//			hostInfo.setOverriddenAppId(overriddenAppId);
+//		}
 
-		InterstitialLoader il = new InterstitialLoader(callingActivity, userId, hostInfo,
+		InterstitialLoader il = new InterstitialLoader(callingActivity, sessionToken,
 				loadingStatusListener);
 
 		if (shouldStayOpen != null) {
@@ -716,6 +813,7 @@ public class SponsorPayPublisher {
 		
 		il.startLoading();
 	}
+	
 
 	/**
 	 * Starts the mobile interstitial request / loading / showing process retrieving the application
@@ -748,6 +846,7 @@ public class SponsorPayPublisher {
 	 * @param loadingTimeoutSecs
 	 *            Sets the maximum amount of time the interstitial should take to load. If you set
 	 *            it to 0 or a negative number, it will fall back to the default value of 5 seconds.
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
@@ -785,6 +884,7 @@ public class SponsorPayPublisher {
 	 *            Used to specify the name of a custom skin or template for the requested
 	 *            interstitial. Leaving it null will make the interstitial fall back to the DEFAULT
 	 *            template.
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
@@ -825,6 +925,7 @@ public class SponsorPayPublisher {
 	 * @param currencyName
 	 *            The name of the currency employed by your application. Provide null if you don't
 	 *            use a custom currency name.	
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
@@ -855,6 +956,7 @@ public class SponsorPayPublisher {
 	 *            that called the interstitial when they come back to the app. If you want the
 	 *            interstitial not to close until the user does it explicitly, set this parameter to
 	 *            true.
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
@@ -886,6 +988,7 @@ public class SponsorPayPublisher {
 	 * @param currencyName
 	 *            The name of the currency employed by your application. Provide null if you don't
 	 *            use a custom currency name.	
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen, String currencyName) {
@@ -908,6 +1011,7 @@ public class SponsorPayPublisher {
 	 * @param loadingStatusListener
 	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
 	 *            the interstitial lifecycle.
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener) {
@@ -932,6 +1036,7 @@ public class SponsorPayPublisher {
 	 * @param currencyName
 	 *            The name of the currency employed by your application. Provide null if you don't
 	 *            use a custom currency name.	
+	 * @deprecated bla bal bal
 	 */
 	public static void loadShowInterstitial(Activity callingActivity, String userId,
 			InterstitialLoadingStatusListener loadingStatusListener, String currencyName) {
@@ -962,6 +1067,7 @@ public class SponsorPayPublisher {
 	 * @param applicationId
 	 *            Application ID assigned by SponsorPay. Provide null to read the Application ID
 	 *            from the Application Manifest.
+	 * @deprecated bla bal bal
 	 */
 	public static void requestNewCoins(Context context, String userId,
 			SPCurrencyServerListener listener, String transactionId, String securityToken,
@@ -995,46 +1101,93 @@ public class SponsorPayPublisher {
 	 *            from the Application Manifest.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
+	 * @deprecated bla bal bal
 	 */
 	public static void requestNewCoins(Context context, String userId,
 			SPCurrencyServerListener listener, String transactionId, String securityToken,
 			String applicationId, Map<String, String> customParams) {
-
-		HostInfo hostInfo = new HostInfo(context);
-
-		if (StringUtils.notNullNorEmpty(applicationId)) {
-			hostInfo.setOverriddenAppId(applicationId);
-		}
-
-		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, userId, listener,
-				hostInfo, securityToken);
-
+		
+		String sessionToken = SPSessionManager.INSTANCE.getSession(applicationId, userId, securityToken, context);
+		requestNewCoins(context, sessionToken, listener, transactionId, customParams);
+	}
+	
+	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
+		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
+		requestNewCoins(context, sessionToken, listener, null, null);
+	}
+	
+	public static void requestNewCoins(Context context, String sessionToken,
+			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams) {
+		
+//		HostInfo hostInfo = new HostInfo(context);
+		
+//		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
+		
+		
+//		String applicationId = session.getAppId();
+//		if (StringUtils.notNullNorEmpty(applicationId )) {
+//			hostInfo.setOverriddenAppId(applicationId);
+//		}
+		
+		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, sessionToken, listener);
+		
 		vcc.setCustomParameters(getCustomParameters(customParams));
-
+		
 		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
 	}
-
+	/**
+	 * 
+	 * @param context
+	 * @param userId
+	 * @param listener
+	 * @param securityToken
+	 * @deprecated bla bal bal
+	 */
 	public static void requestUnlockItemsStatus(Context context, String userId,
 			SPUnlockResponseListener listener, String securityToken) {
 
 		requestUnlockItemsStatus(context, userId, listener, securityToken, null, null);
 	}
-
+	
+	/**
+	 * 
+	 * @param context
+	 * @param userId
+	 * @param listener
+	 * @param securityToken
+	 * @param applicationId
+	 * @param customParams
+	 * 
+	 * @deprecated bla bal bal
+	 */
 	public static void requestUnlockItemsStatus(Context context, String userId,
 			SPUnlockResponseListener listener, String securityToken, String applicationId,
 			Map<String, String> customParams) {
-
-		HostInfo hostInfo = new HostInfo(context);
-
-		if (StringUtils.notNullNorEmpty(applicationId)) {
-			hostInfo.setOverriddenAppId(applicationId);
-		}
-
-		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, userId, listener,
-				hostInfo, securityToken);
-
+		String sessionToken = SPSessionManager.INSTANCE.getSession(applicationId, userId, securityToken, context);
+		requestUnlockItemsStatus(context, sessionToken, listener, customParams);
+	}
+	
+	public static void requestUnlockItemsStatus(Context context, SPUnlockResponseListener listener) {
+		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
+		requestUnlockItemsStatus(context, sessionToken, listener, (Map<String, String>)null);
+	}
+	
+	public static void requestUnlockItemsStatus(Context context, String sessionToken,
+			SPUnlockResponseListener listener, Map<String, String> customParams) {
+		
+//		HostInfo hostInfo = new HostInfo(context);
+		
+//		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
+		
+//		String applicationId = session.getAppId();
+//		if (StringUtils.notNullNorEmpty(applicationId )) {
+//			hostInfo.setOverriddenAppId(applicationId);
+//		}
+		
+		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, sessionToken, listener);
+		
 		uc.setCustomParameters(getCustomParameters(customParams));
-
+		
 		uc.fetchItemsStatus();
 	}
 
@@ -1059,6 +1212,7 @@ public class SponsorPayPublisher {
 	 *            Your Application ID, or null to retrieve it from your application manifest.
 	 * @return An {@link OfferBannerRequest} instance which manages the request to the server on the
 	 *         background.
+	 * @deprecated bla bal bal
 	 */
 	public static OfferBannerRequest requestOfferBanner(Context context, String userId,
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
@@ -1092,29 +1246,54 @@ public class SponsorPayPublisher {
 	 * 
 	 * @return An {@link OfferBannerRequest} instance which manages the request to the server on the
 	 *         background.
+	 * @deprecated bla bal bal
 	 */
 	public static OfferBannerRequest requestOfferBanner(Context context, String userId,
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
 			String currencyName, String applicationId, Map<String, String> customParams) {
-		HostInfo hostInfo = new HostInfo(context);
-
-		if (StringUtils.notNullNorEmpty(applicationId)) {
-			hostInfo.setOverriddenAppId(applicationId);
-		}
-
+		String sessionToken = SPSessionManager.INSTANCE.getSession(applicationId, userId, null, context);
+		return requestOfferBanner(context, sessionToken, listener, offerBannerAdShape, currencyName, customParams);
+	}
+	
+	
+	public static OfferBannerRequest requestOfferBanner(Context context, SPOfferBannerListener listener) {
+		return requestOfferBanner(context, listener, null, null, (Map<String, String>)null);
+	}
+	
+	
+	public static OfferBannerRequest requestOfferBanner(Context context,
+			SPOfferBannerListener listener,	OfferBanner.AdShape offerBannerAdShape, 
+			String currencyName, Map<String, String> customParams) {
+		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
+		return requestOfferBanner(context, sessionToken, listener, null, null, (Map<String, String>)null);
+	}
+	
+	public static OfferBannerRequest requestOfferBanner(Context context, String sessionToken,
+			SPOfferBannerListener listener,	OfferBanner.AdShape offerBannerAdShape, 
+			String currencyName, Map<String, String> customParams) {
+		
+//		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
+		
+//		HostInfo hostInfo = new HostInfo(context);
+//		
+//		String applicationId = session.getAppId();
+//		if (StringUtils.notNullNorEmpty(applicationId)) {
+//			hostInfo.setOverriddenAppId(applicationId);
+//		}
+		
 		if (offerBannerAdShape == null) {
 			offerBannerAdShape = sDefaultOfferBannerAdShape;
 		}
-
-		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, userId, hostInfo,
+		
+		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, sessionToken,
 				listener, offerBannerAdShape, currencyName, getCustomParameters(customParams));
-
+		
 		if (sOverridingWebViewUrl != null) {
 			bannerRequest.setOverridingUrl(sOverridingWebViewUrl);
 		}
 		
 		bannerRequest.requestOfferBanner();
-
+		
 		return bannerRequest;
 	}
 

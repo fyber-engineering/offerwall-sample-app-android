@@ -48,9 +48,10 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 	 * @param securityToken
 	 *            Security token used to sign the requests and verify the server responses.
 	 */
-	public SponsorPayUnlockConnector(Context context, String userId,
-			SPUnlockResponseListener userListener, HostInfo hostInfo, String securityToken) {
-		super(context, userId, hostInfo, securityToken);
+	public SponsorPayUnlockConnector(Context context, String sessionToken, 
+			SPUnlockResponseListener userListener) {
+		//TODO documentation
+		super(context, sessionToken);
 
 		mUserListener = userListener;
 	}
@@ -73,9 +74,8 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? SP_UNLOCK_SERVER_STAGING_BASE_URL
 				: SP_UNLOCK_SERVER_PRODUCTION_BASE_URL;
 
-		String requestUrl = UrlBuilder.newBuilder(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mHostInfo)
-				.setUserId(mUserId.toString()).addExtraKeysValues(extraKeysValues).setSecretKey(
-						mSecurityToken).addScreenMetrics().buildUrl();
+		String requestUrl = UrlBuilder.newBuilder(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mSession)
+				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(getClass().getSimpleName(),
 				"Unlock items status request will be sent to URL + params: " + requestUrl);
@@ -100,7 +100,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 		}
 
 		response.setResponseListener(this);
-		response.parseAndCallListener(mSecurityToken);
+		response.parseAndCallListener(mSession.getSecurityToken());
 	}
 
 	/**

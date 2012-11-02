@@ -9,11 +9,11 @@ package com.sponsorpay.sdk.android;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-
-import com.sponsorpay.sdk.android.utils.StringUtils;
 
 import android.net.Uri;
+
+import com.sponsorpay.sdk.android.session.SPSession;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -86,83 +86,6 @@ public class UrlBuilder {
 	public static final String URL_PARAM_OFFSET_KEY = "offset";
 	public static final String URL_PARAM_CURRENCY_NAME_KEY = "currency";
 
-	/**
-	 * Builds a String URL with information gathered from the device and the specified parameters.
-	 * 
-	 * @param resourceUrl
-	 *            The base for the URL to be built and returned, including schema and host.
-	 * @param userId
-	 *            The user id parameter to encode in the result URL. It can be left to null and no
-	 *            user ID parameter key will be included in the request parameters.
-	 * @param hostInfo
-	 *            A {@link HostInfo} instance used to retrieve data about the application id and the
-	 *            host device.
-	 * @param extraKeysValues
-	 *            A map of extra key/value pairs to add to the result URL.
-	 * @return The built URL as a String with the provided parameters encoded.
-	 * 
-	 * @deprecated This method will be removed from a future SDK release. Get a UrlBuilder instance
-	 *             with {@link #newBuilder(String, HostInfo)} and use the instance methods
-	 *             {@link #setUserId(String)}, {@link #addExtraKeysValues(Map)} and
-	 *             {@link #buildUrl()} instead.
-	 */
-	public static String buildUrl(String resourceUrl, String userId, HostInfo hostInfo,
-			Map<String, String> extraKeysValues) {
-
-		return buildUrl(resourceUrl, userId, hostInfo, extraKeysValues, null);
-	}
-
-	/**
-	 * Builds a String URL with information gathered from the device and the specified parameters.
-	 * 
-	 * @param resourceUrl
-	 *            The base for the URL to be built and returned, including schema and host.
-	 * @param hostInfo
-	 *            A {@link HostInfo} instance used to retrieve data about the application id and the
-	 *            host device.
-	 * @param extraKeysValues
-	 *            A map of extra key/value pairs to add to the result URL.
-	 * @return The built URL as a String with the provided parameters encoded.
-	 * 
-	 * @deprecated This method will be removed from a future SDK release. Get a UrlBuilder instance
-	 *             with {@link #newBuilder(String, HostInfo)} and use the instance methods
-	 *             {@link #addExtraKeysValues(Map)}, and {@link #buildUrl()} instead.
-	 */
-	public static String buildUrl(String resourceUrl, HostInfo hostInfo,
-			Map<String, String> extraKeysValues) {
-
-		return buildUrl(resourceUrl, null, hostInfo, extraKeysValues, null);
-	}
-
-	/**
-	 * Builds a String URL with information gathered from the device and the specified parameters.
-	 * 
-	 * @param resourceUrl
-	 *            The base for the URL to be built and returned, including schema and host.
-	 * @param userId
-	 *            The user id parameter to encode in the result URL. It can be left to null and no
-	 *            user ID parameter key will be included in the request parameters.
-	 * @param hostInfo
-	 *            A {@link HostInfo} instance used to retrieve data about the application id and the
-	 *            host device.
-	 * @param extraKeysValues
-	 *            A map of extra key/value pairs to add to the result URL.
-	 * @param secretKey
-	 *            The publisher's secret token which will be used to sign the request. If left to
-	 *            null the request will be sent unsigned.
-	 * @return The built URL as a String with the provided parameters encoded.
-	 * 
-	 * @deprecated This method will be removed from a future SDK release. Get a UrlBuilder instance
-	 *             with {@link #newBuilder(String, HostInfo)} and use the instance methods
-	 *             {@link #setUserId(String)}, {@link #addExtraKeysValues(Map)},
-	 *             {@link #setSecretKey(String)} and {@link #buildUrl()} instead.
-	 */
-	public static String buildUrl(String resourceUrl, String userId, HostInfo hostInfo,
-			Map<String, String> extraKeysValues, String secretKey) {
-
-		return newBuilder(resourceUrl, hostInfo).setUserId(userId).addExtraKeysValues(extraKeysValues).setSecretKey(
-				secretKey).addScreenMetrics().buildUrl();
-	}
 
 	/**
 	 * Checks that the passed Map of key/value parameters doesn't contain empty or null keys or
@@ -219,18 +142,51 @@ public class UrlBuilder {
 	}
 
 	private String mResourceUrl;
+	/**
+	 * 	@deprecated 
+	 */
 	private HostInfo mHostInfo;
+	/**
+	 * 	@deprecated 
+	 */
 	private String mUserId;
-	private Map<String, String> mExtraKeysValues;
+	/**
+	 * 	@deprecated 
+	 */
 	private String mSecretKey;
+
+	private Map<String, String> mExtraKeysValues;
 
 	private boolean mShouldAddScreenMetrics;
 
+	private SPSession mSession;
+
+	private boolean mShouldAddUserId = true;
+
+	/**
+	 * 
+	 * @param resourceUrl
+	 * @param hostInfo
+	 * 
+	 * @deprecated bla bal blak
+	 */
 	protected UrlBuilder(String resourceUrl, HostInfo hostInfo) {
 		mResourceUrl = resourceUrl;
 		mHostInfo = hostInfo;
 	}
+	
+	protected UrlBuilder(String resourceUrl, SPSession session) {
+		mResourceUrl = resourceUrl;
+		mSession = session;
+	}
 
+	/**
+	 * 
+	 * @param userId
+	 * @return
+	 * 
+	 * @deprecated
+	 */
 	public UrlBuilder setUserId(String userId) {
 		mUserId = userId;
 		return this;
@@ -247,6 +203,12 @@ public class UrlBuilder {
 		return this;
 	}
 
+	/**
+	 * 
+	 * @param secretKey
+	 * @return
+	 * @deprecated blaksdkas 
+	 */
 	public UrlBuilder setSecretKey(String secretKey) {
 		mSecretKey = secretKey;
 		return this;
@@ -256,29 +218,45 @@ public class UrlBuilder {
 		mShouldAddScreenMetrics = true;
 		return this;
 	}
+	
+	public UrlBuilder sendUserId(boolean shouldSend) {
+		mShouldAddUserId = shouldSend;
+		return this;
+	}
 
 	public String buildUrl() {
 		HashMap<String, String> keyValueParams = new HashMap<String, String>();
 
-		if (mUserId != null) {
-			keyValueParams.put(USERID_KEY, mUserId);
+		if (mShouldAddUserId) {
+			if (mSession != null) {
+				keyValueParams.put(USERID_KEY, mSession.getUserId());
+			} else if (mUserId != null) {
+				keyValueParams.put(USERID_KEY, mUserId);
+			}
 		}
 
-		keyValueParams.put(UDID_KEY, mHostInfo.getUDID());
-		keyValueParams.put(APPID_KEY, String.valueOf(mHostInfo.getAppId()));
-		keyValueParams.put(OS_VERSION_KEY, mHostInfo.getOsVersion());
-		keyValueParams.put(PHONE_VERSION_KEY, mHostInfo.getPhoneVersion());
-		keyValueParams.put(LANGUAGE_KEY, mHostInfo.getLanguageSetting());
+		HostInfo hostInfo;
+		if (mSession != null) {
+			hostInfo = mSession.getHostInfo();
+		} else {
+			hostInfo = mHostInfo;
+		}
+		
+		keyValueParams.put(UDID_KEY, hostInfo.getUDID());
+		keyValueParams.put(APPID_KEY, String.valueOf(hostInfo.getAppId()));
+		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());
+		keyValueParams.put(PHONE_VERSION_KEY, hostInfo.getPhoneVersion());
+		keyValueParams.put(LANGUAGE_KEY, hostInfo.getLanguageSetting());
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
-		keyValueParams.put(ANDROID_ID_KEY, mHostInfo.getAndroidId());
-		keyValueParams.put(WIFI_MAC_ADDRESS_KEY, mHostInfo.getWifiMacAddress());
+		keyValueParams.put(ANDROID_ID_KEY, hostInfo.getAndroidId());
+		keyValueParams.put(WIFI_MAC_ADDRESS_KEY, hostInfo.getWifiMacAddress());
 
 		if (mShouldAddScreenMetrics) {
-			keyValueParams.put(SCREEN_WIDTH_KEY, mHostInfo.getScreenWidth());
-			keyValueParams.put(SCREEN_HEIGHT_KEY, mHostInfo.getScreenHeight());
-			keyValueParams.put(SCREEN_DENSITY_X_KEY, mHostInfo.getScreenDensityX());
-			keyValueParams.put(SCREEN_DENSITY_Y_KEY, mHostInfo.getScreenDensityY());
-			keyValueParams.put(SCREEN_DENSITY_CATEGORY_KEY, mHostInfo.getScreenDensityCategory());
+			keyValueParams.put(SCREEN_WIDTH_KEY, hostInfo.getScreenWidth());
+			keyValueParams.put(SCREEN_HEIGHT_KEY, hostInfo.getScreenHeight());
+			keyValueParams.put(SCREEN_DENSITY_X_KEY, hostInfo.getScreenDensityX());
+			keyValueParams.put(SCREEN_DENSITY_Y_KEY, hostInfo.getScreenDensityY());
+			keyValueParams.put(SCREEN_DENSITY_CATEGORY_KEY, hostInfo.getScreenDensityCategory());
 		}
 
 		if (mExtraKeysValues != null) {
@@ -289,15 +267,19 @@ public class UrlBuilder {
 		Uri uri = Uri.parse(mResourceUrl);
 		Uri.Builder builder = uri.buildUpon();
 
-		Set<String> keySet = keyValueParams.keySet();
-
-		for (String key : keySet) {
-			builder.appendQueryParameter(key, keyValueParams.get(key));
+		for (Entry<String, String> entry : keyValueParams.entrySet()) {
+			builder.appendQueryParameter(entry.getKey(), entry.getValue());
 		}
 
-		if (mSecretKey != null) {
+		String secretKey;
+		if(mSession != null) {
+			secretKey = mSession.getSecurityToken();
+		} else {
+			secretKey = mSecretKey;
+		}
+		if (StringUtils.notNullNorEmpty(secretKey)) {
 			builder.appendQueryParameter(URL_PARAM_SIGNATURE, SignatureTools
-					.generateSignatureForParameters(keyValueParams, mSecretKey));
+					.generateSignatureForParameters(keyValueParams, secretKey));
 		}
 
 		uri = builder.build();
@@ -305,7 +287,19 @@ public class UrlBuilder {
 		return uri.toString();
 	}
 
+	/**
+	 * 
+	 * @param resourceUrl
+	 * @param hostInfo
+	 * @return
+	 * 
+	 * @deprecated bla bal bal
+	 */
 	public static UrlBuilder newBuilder(String resourceUrl, HostInfo hostInfo) {
 		return new UrlBuilder(resourceUrl, hostInfo);
+	}
+	
+	public static UrlBuilder newBuilder(String resourceUrl, SPSession session) {
+		return new UrlBuilder(resourceUrl, session);
 	}
 }

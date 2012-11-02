@@ -106,9 +106,10 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * @param securityToken
 	 *            Security token used to sign requests to the server and verify its responses.
 	 */
-	public VirtualCurrencyConnector(Context context, String userId,
-			SPCurrencyServerListener userListener, HostInfo hostInfo, String securityToken) {
-		super(context, userId, hostInfo, securityToken);
+	public VirtualCurrencyConnector(Context context, String sessionToken,
+			SPCurrencyServerListener userListener) {
+		//TODO documentation
+		super(context, sessionToken);
 		mUserListener = userListener;
 	}
 
@@ -150,8 +151,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 				: VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL;
 
 		String requestUrl = UrlBuilder.newBuilder(baseUrl + CURRENCY_DELTA_REQUEST_RESOURCE,
-				mHostInfo).setUserId(mUserId.toString()).addExtraKeysValues(extraKeysValues)
-				.setSecretKey(mSecurityToken).addScreenMetrics().buildUrl();
+				mSession).addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
 				+ requestUrl);
@@ -190,7 +190,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		}
 
 		response.setResponseListener(this);
-		response.parseAndCallListener(mSecurityToken);
+		response.parseAndCallListener(mSession.getSecurityToken());
 	}
 
 	/**
@@ -205,8 +205,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 		prefs.edit()
 				.putString(
-						generatePreferencesLatestTransactionIdKey(mUserId.toString(), mHostInfo
-								.getAppId()), transactionId).commit();
+						generatePreferencesLatestTransactionIdKey(mSession.getAppId(), mSession.getUserId()), transactionId).commit();
 	}
 
 	private static String generatePreferencesLatestTransactionIdKey(String appId, String userId) {
@@ -221,7 +220,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * @return The retrieved transaction ID or null.
 	 */
 	private String fetchLatestTransactionIdForCurrentAppAndUser() {
-		String retval = fetchLatestTransactionId(mContext, mHostInfo.getAppId(), mUserId.toString());
+		String retval = fetchLatestTransactionId(mContext, mSession.getAppId(), mSession.getUserId());
 		// SponsorPayLogger.i(getClass().getSimpleName(),
 		// String.format("fetchLatestTransactionIdForCurrentAppAndUser will return %s", retval));
 		return retval;

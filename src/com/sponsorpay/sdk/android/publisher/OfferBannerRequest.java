@@ -11,9 +11,10 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
+import com.sponsorpay.sdk.android.session.SPSession;
+import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -43,7 +44,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	/**
 	 * User ID to include in the request.
 	 */
-	private UserId mUserId;
+//	private UserId mUserId;
 
 	/**
 	 * {@link AdShape} whose description will be sent to the server in the request.
@@ -53,7 +54,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	/**
 	 * {@link HostInfo} instance containing the Application ID and data about the device.
 	 */
-	private HostInfo mHostInfo;
+//	private HostInfo mHostInfo;
 
 	/**
 	 * Currency Name to be sent in the request.
@@ -71,7 +72,13 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * {@link AsyncRequest} used to send the request in the background.
 	 */
 	private AsyncRequest mAsyncRequest;
+	
+	
+	private SPSession mSession;
 
+	
+	
+	
 	/**
 	 * Initializes a new instance and sends the request immediately.
 	 * 
@@ -90,15 +97,17 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	public OfferBannerRequest(Context context, String userId, HostInfo hostInfo,
+	public OfferBannerRequest(Context context, String sessionToken, 
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
 			String currencyName, Map<String, String> customParams) {
-
+		//TODO documentation
+		
+		mSession = SPSessionManager.INSTANCE.getSession(sessionToken);
 		mContext = context;
 		mListener = listener;
-		mUserId = UserId.make(context, userId);
+//		mUserId = UserId.make(context, userId);
 		mOfferBannerAdShape = offerBannerAdShape;
-		mHostInfo = hostInfo;
+//		mHostInfo = hostInfo;
 		mCurrencyName = currencyName;
 		mCustomParams = customParams;
 	}
@@ -129,7 +138,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 		Map<String, String> extraKeysValues = UrlBuilder.mapKeysToValues(offerBannerUrlExtraKeys,
 				offerBannerUrlExtraValues);
 
-		if (mCurrencyName != null && !"".equals(mCurrencyName)) {
+		if (StringUtils.notNullNorEmpty(mCurrencyName)) {
 			extraKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
 		}
 
@@ -145,7 +154,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 			baseUrl = OFFERBANNER_PRODUCTION_BASE_URL;
 		}
 
-		return UrlBuilder.newBuilder(baseUrl, mHostInfo).setUserId(mUserId.toString())
+		return UrlBuilder.newBuilder(baseUrl, mSession)
 				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 	}
 

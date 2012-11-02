@@ -1,4 +1,4 @@
-package com.sponsorpay.sdk.android;
+package com.sponsorpay.sdk.android.utils;
 
 import java.util.List;
 

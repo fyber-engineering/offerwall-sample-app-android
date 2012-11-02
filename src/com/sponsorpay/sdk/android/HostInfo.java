@@ -9,6 +9,8 @@ package com.sponsorpay.sdk.android;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
+import com.sponsorpay.sdk.android.utils.StringUtils;
+
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -16,10 +18,10 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
-import android.provider.Settings.Secure;
 
 /**
  * Extracts device information from the host device in which the SDK runs and SponsorPay App ID
@@ -103,6 +105,8 @@ public class HostInfo {
 
 	/**
 	 * The SponsorPay's App ID Key that is used in the AndroidManifest.xml file.
+	 * 
+	 * @deprecated bla bal bal
 	 */
 	private static final String SPONSORPAY_APP_ID_KEY = "SPONSORPAY_APP_ID";
 
@@ -177,10 +181,10 @@ public class HostInfo {
 				} catch (Exception e) {
 					// Probably running on an older version of Android which doesn't include this
 					// field
-					mHardwareSerialNumber = "";
+					mHardwareSerialNumber = StringUtils.EMPTY_STRING;
 				}
 			} else {
-				mHardwareSerialNumber = "";
+				mHardwareSerialNumber = StringUtils.EMPTY_STRING;
 			}
 		}
 		return mHardwareSerialNumber;
@@ -226,10 +230,10 @@ public class HostInfo {
 			try {
 				mUDID = tManager.getDeviceId();
 			} catch (SecurityException e) {
-				mUDID = "";
+				mUDID = StringUtils.EMPTY_STRING;
 			}
 		} else {
-			mUDID = "";
+			mUDID = StringUtils.EMPTY_STRING;
 		}
 
 		// Get the default locale
@@ -246,10 +250,10 @@ public class HostInfo {
 			mAndroidId = Secure.getString(mContext.getContentResolver(), Secure.ANDROID_ID);
 
 			if (mAndroidId == null) {
-				mAndroidId = "";
+				mAndroidId = StringUtils.EMPTY_STRING;
 			}
 		} else {
-			mAndroidId = "";
+			mAndroidId = StringUtils.EMPTY_STRING;
 		}
 
 		if (!sSimulateNoAccessWifiStatePermission) {
@@ -259,10 +263,10 @@ public class HostInfo {
 				WifiInfo wifiInf = wifiMan.getConnectionInfo();
 				mWifiMacAddress = wifiInf.getMacAddress();
 			} catch (RuntimeException re) {
-				mWifiMacAddress = "";
+				mWifiMacAddress = StringUtils.EMPTY_STRING;
 			}
 		} else {
-			mWifiMacAddress = "";
+			mWifiMacAddress = StringUtils.EMPTY_STRING;
 		}
 	}
 
@@ -315,12 +319,12 @@ public class HostInfo {
 	 * mentioned method, this method will throw a RuntimeException.
 	 * </p>
 	 * 
-	 * @return The offer id previously set or defined in the manifest, or 0.
+	 * @return The offer id previously set or defined in the manifest, or throws a {@RuntimeException}.
 	 */
 	public String getAppId() {
-		if (mAppId == null || mAppId.equals("")) {
-			mAppId = getValueFromAppMetadata(SPONSORPAY_APP_ID_KEY);
-			if (mAppId == null || mAppId.equals("")) {
+		if (StringUtils.nullOrEmpty(mAppId)) {
+			mAppId = getAppIdFromManifest();
+			if (StringUtils.nullOrEmpty(mAppId)) {
 				throw new RuntimeException(
 						"SponsorPay SDK: no valid App ID has been provided. "
 								+ "Please set a valid App ID in your application manifest or provide one at runtime. "
@@ -328,6 +332,14 @@ public class HostInfo {
 			}
 		}
 		return mAppId;
+	}
+	/**
+	 * 
+	 * @return
+	 * @deprecated bla bal bal
+	 */
+	private String getAppIdFromManifest() {
+		return getValueFromAppMetadata(SPONSORPAY_APP_ID_KEY);
 	}
 
 	/**

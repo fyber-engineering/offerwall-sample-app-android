@@ -22,8 +22,8 @@ import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.sponsorpay.sdk.android.IntentHelper;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.utils.IntentHelper;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**

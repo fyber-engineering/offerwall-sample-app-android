@@ -15,8 +15,8 @@ import org.apache.http.client.methods.HttpUriRequest;
 
 import android.os.AsyncTask;
 
-import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.session.SPSession;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
@@ -100,11 +100,13 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 */
 	private APIResultListener mListener;
 
+	private SPSession mSession;
+
 	/**
 	 * Used to extract required information for the host application and device. This data will be
 	 * sent on the callback request.
 	 */
-	private HostInfo mHostInfo;
+//	private HostInfo mHostInfo;
 
 	/**
 	 * <p>
@@ -117,9 +119,10 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 * @param listener
 	 *            the callback listener
 	 */
-	public AdvertiserCallbackSender(HostInfo hostInfo, APIResultListener listener) {
+	public AdvertiserCallbackSender(SPSession session, APIResultListener listener) {
 		mListener = listener;
-		mHostInfo = hostInfo;
+//		mHostInfo = hostInfo;
+		mSession = session;
 	}
 
 	/**
@@ -179,8 +182,8 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 			extraParams.putAll(mCustomParams);
 		}
 
-		String callbackUrl = UrlBuilder.newBuilder(baseUrl, mHostInfo).addExtraKeysValues(
-				extraParams).addScreenMetrics().buildUrl();
+		String callbackUrl = UrlBuilder.newBuilder(baseUrl, mSession).addExtraKeysValues(
+				extraParams).sendUserId(false).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(AdvertiserCallbackSender.class.getSimpleName(),
 				"Advertiser callback will be sent to: " + callbackUrl);

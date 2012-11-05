@@ -18,12 +18,12 @@ public class SPSession {
 	private final HostInfo mHostInfo;
 
 	public SPSession(String appId, String userId, String securityToken, Context context) {
-		mSecurityToken = securityToken;
+		mSecurityToken = StringUtils.trim(securityToken);
 		mHostInfo = new HostInfo(context);
 		// to be removed when we no longer support appid in manifest
 		if (StringUtils.notNullNorEmpty(appId)) {
-			mAppId = appId;
-			mHostInfo.setOverriddenAppId(appId);
+			mAppId = StringUtils.trim(appId);
+			mHostInfo.setOverriddenAppId(mAppId);
 	 	} else {
 	 		mAppId = mHostInfo.getAppId();
 	 	}
@@ -68,6 +68,13 @@ public class SPSession {
 		}
 		String token = appId + "-" + userId;
 		return UUID.nameUUIDFromBytes(token.getBytes()).toString();
+	}
+	
+	@Override
+	public String toString() {
+		return String
+				.format("Session token - %\nAppId - %s\nUserId - %s\nSecurityToken - %s",
+						mSessionToken, mAppId, mUserId, mSecurityToken);
 	}
 	
 	

@@ -13,11 +13,8 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.view.Window;
-import android.view.WindowManager.BadTokenException;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
@@ -41,21 +38,10 @@ public class OfferWallActivity extends Activity {
 	
 	public static final String EXTRA_SESSION_TOKEN_KEY = "EXTRA_SESSION_TOKEN_KEY";
 	
-//	/**
-//	 * Key for extracting the current user ID from the extras bundle.
-//	 */
-//	public static final String EXTRA_USERID_KEY = "EXTRA_USERID_KEY";
-
 	/**
 	 * Key for extracting the value of {@link #mShouldStayOpen} from the extras bundle.
 	 */
 	public static final String EXTRA_SHOULD_STAY_OPEN_KEY = "EXTRA_SHOULD_REMAIN_OPEN_KEY";
-
-//	/**
-//	 * Key for extracting the App ID from the extras bundle. If no app id is provided it will be
-//	 * retrieved from the application manifest.
-//	 */
-//	public static final String EXTRA_OVERRIDING_APP_ID_KEY = "EXTRA_OVERRIDING_APP_ID";
 
 	/**
 	 * Key for extracting a map of custom key/values to add to the parameters on the OfferWall
@@ -77,16 +63,6 @@ public class OfferWallActivity extends Activity {
 	 * Full-size web view within the activity
 	 */
 	protected WebView mWebView;
-
-	/**
-	 * The user ID 
-	 */
-//	protected String mUserId;
-
-	/**
-	 * Information about the hosting application and device.
-	 */
-//	protected HostInfo mHostInfo;
 
 	/**
 	 * Whether this activity should stay open or close when the user is redirected outside the
@@ -114,7 +90,9 @@ public class OfferWallActivity extends Activity {
 	private String mOverridingUrl;
 
 	private String mCurrencyName;
+	
 	private SPSession mSession;
+	private ActivityOfferWebClient mActivityOfferWebClient;
 
 	/**
 	 * Overridden from {@link Activity}. Upon activity start, extract the user ID from the extra,
@@ -135,8 +113,6 @@ public class OfferWallActivity extends Activity {
 				.getUIString(UIStringIdentifier.LOADING_OFFERWALL));
 		mProgressDialog.show();
 
-//		mHostInfo = new HostInfo(getApplicationContext());
-
 		instantiateTemplate();
 
 		fetchPassedExtras();
@@ -148,13 +124,12 @@ public class OfferWallActivity extends Activity {
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setPluginsEnabled(true);
 
-		mWebView.setWebViewClient(new ActivityOfferWebClient(OfferWallActivity.this,
+		mActivityOfferWebClient = new ActivityOfferWebClient(OfferWallActivity.this,
 				mShouldStayOpen) {
 			
 			@Override
 			public void onReceivedError(WebView view, int errorCode, String description,
 					String failingUrl) {
-				// super.onReceivedError(view, errorCode, description, failingUrl);
 				SponsorPayLogger.e(getClass().getSimpleName(), String.format(
 						"OfferWall WebView triggered an error. "
 								+ "Error code: %d, error description: %s. Failing URL: %s",
@@ -173,7 +148,8 @@ public class OfferWallActivity extends Activity {
 				}
 				showErrorDialog(error);
 			}
-		});
+		};
+		mWebView.setWebViewClient(mActivityOfferWebClient);
 		
 		
 		mWebView.setWebChromeClient(new WebChromeClient() {
@@ -202,16 +178,9 @@ public class OfferWallActivity extends Activity {
 	@SuppressWarnings("unchecked")
 	protected void fetchPassedExtras() {
 		// Get data from extras
-//		String passedUserId = getIntent().getStringExtra(EXTRA_USERID_KEY);
-//		mUserId = UserId.make(getApplicationContext(), passedUserId);
-
 		String sessionToken = getIntent().getStringExtra(EXTRA_SESSION_TOKEN_KEY);
 		
-		mSession = SPSessionManager.INSTANCE.getSession(sessionToken);
-		
-//		mHostInfo = session.getHostInfo();
-//		
-//		mUserId = session.getUserId();
+		mSession = SPSessionManager.getSession(sessionToken);
 		
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY,
 				mTemplate.shouldStayOpenByDefault());
@@ -221,12 +190,6 @@ public class OfferWallActivity extends Activity {
 			mCustomKeysValues = (HashMap<String, String>) inflatedKvMap;
 		}
 
-//		String overridingAppId = getIntent().getStringExtra(EXTRA_OVERRIDING_APP_ID_KEY);
-//
-//		if (StringUtils.notNullNorEmpty(overridingAppId)) {
-//			mHostInfo.setOverriddenAppId(overridingAppId);
-//		}
-		
 		String currencyName = getIntent().getStringExtra(EXTRA_CURRENCY_NAME_KEY);
 		
 		if (StringUtils.notNullNorEmpty(currencyName)) {
@@ -265,14 +228,8 @@ public class OfferWallActivity extends Activity {
 		} catch (RuntimeException ex) {
 			SponsorPayLogger.e(getClass().getSimpleName(),
 					"An exception occurred when launching the Offer Wall", ex);
-			showErrorDialog(ex.getMessage());
+			mActivityOfferWebClient.showDialog(ex.getMessage());
 		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		mWebView.destroy();
-		super.onDestroy();
 	}
 
 	private String determineUrl() {
@@ -304,43 +261,9 @@ public class OfferWallActivity extends Activity {
 	 */
 	protected void showErrorDialog(UIStringIdentifier error) {
 		String errorMessage = SponsorPayPublisher.getUIString(error);
-		showErrorDialog(errorMessage);
+		mActivityOfferWebClient.showDialog(errorMessage);
 	}
 
-	/**
-	 * Displays an error dialog with the passed error message on top of the activity.
-	 * 
-	 * @param error
-	 *            Error message to show.
-	 */
-	protected void showErrorDialog(String error) {
-		String errorMessage = error;
-		String errorDialogTitle = SponsorPayPublisher
-				.getUIString(UIStringIdentifier.ERROR_DIALOG_TITLE);
-		String dismissButtonCaption = SponsorPayPublisher
-				.getUIString(UIStringIdentifier.DISMISS_ERROR_DIALOG);
-
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-		dialogBuilder.setTitle(errorDialogTitle);
-		dialogBuilder.setMessage(errorMessage);
-		dialogBuilder.setNegativeButton(dismissButtonCaption, new OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-				mErrorDialog = null;
-				finish();
-			}
-		});
-		mErrorDialog = dialogBuilder.create();
-		mErrorDialog.setOwnerActivity(this);
-		try {
-			mErrorDialog.show();
-		} catch (BadTokenException e) {
-			SponsorPayLogger.e(getClass().getSimpleName(),
-					"Couldn't show error dialog. Not displayed error message is: " + errorMessage,
-					e);
-		}
-	}
 
 	public abstract class OfferWallTemplate {
 		

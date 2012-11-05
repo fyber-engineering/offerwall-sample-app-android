@@ -103,12 +103,6 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	private SPSession mSession;
 
 	/**
-	 * Used to extract required information for the host application and device. This data will be
-	 * sent on the callback request.
-	 */
-//	private HostInfo mHostInfo;
-
-	/**
 	 * <p>
 	 * Constructor. Sets the request callback listener and stores the host information.
 	 * </p>
@@ -121,7 +115,6 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 */
 	public AdvertiserCallbackSender(SPSession session, APIResultListener listener) {
 		mListener = listener;
-//		mHostInfo = hostInfo;
 		mSession = session;
 	}
 

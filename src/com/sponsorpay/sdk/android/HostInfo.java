@@ -339,13 +339,14 @@ public class HostInfo {
 	 * @deprecated bla bal bal
 	 */
 	private String getAppIdFromManifest() {
-		return getValueFromAppMetadata(SPONSORPAY_APP_ID_KEY);
+		return StringUtils.trim(
+				getValueFromAppMetadata(SPONSORPAY_APP_ID_KEY));
 	}
 
 	/**
-	 * Set the offerId, overriding the one which would be read from the manifest.
+	 * Set the application ID, overriding the one which would be read from the manifest.
 	 * 
-	 * @param offerId
+	 * @param appId, the application ID
 	 */
 	public void setOverriddenAppId(String appId) {
 		mAppId = appId;

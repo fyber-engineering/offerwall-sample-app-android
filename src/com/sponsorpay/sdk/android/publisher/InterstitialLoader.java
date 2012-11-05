@@ -107,8 +107,6 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * {@link InterstitialActivity} and to attach the loading progress dialog to.
 	 */
 	private Activity mCallingActivity;
-//	private String mUserId;
-//	private HostInfo mHostInfo;
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 	private Map<String, String> mCustomParams;
 
@@ -153,10 +151,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		//FIXME documentation!!
 		mCallingActivity = callingActivity;
 		
-		mSession = SPSessionManager.INSTANCE.getSession(sessionToken);
+		mSession = SPSessionManager.getSession(sessionToken);
 		
-//		mUserId = session.getUserId();
-//		mHostInfo = session.getHostInfo();
 		mLoadingStatusListener = loadingStatusListener;
 
 		mHandler = new Handler();

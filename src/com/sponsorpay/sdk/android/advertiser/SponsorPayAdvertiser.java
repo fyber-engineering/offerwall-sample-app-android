@@ -71,19 +71,9 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	}
 
 	/**
-	 * {@link AdvertiserHostInfo} used to collect data related to the host device and application.
-	 */
-//	private HostInfo mHostInfo;
-
-	/**
 	 * {@link AdvertiserCallbackSender} used to call the Advertiser API asynchronously.
 	 */
 	private AdvertiserCallbackSender mAPICaller;
-
-	/**
-	 * Host app's Android application context.
-	 */
-//	private Context mContext;
 
 	/**
 	 * Keep track of the persisted state of the Advertiser part of the SDK
@@ -126,13 +116,16 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            The host application context.
 	 */
 	private SponsorPayAdvertiser(Context context) {
-//		mContext = context;
 		mPersistedState = new SponsorPayAdvertiserState(context);
 	}
+	
+	
+	//================================================================================
+	// Callbacks
+	//================================================================================
 
 	/**
-	 * Triggers the Advertiser callback. Will try to retrieve the Application ID from the value
-	 * defined in the host application's Android Manifest XML file.
+	 * Triggers the Advertiser callback. It will use the values hold on the current session.
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -140,6 +133,94 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	public static void register(Context context) {
 		register(context, (Map<String, String>)null);
 	}
+	
+	/**
+	 * Triggers the Advertiser callback. It will use the values hold on the current session..
+	 * 
+	 * @param context
+	 *            Host application context.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void register(Context context, Map<String, String> customParams) {
+		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
+		register(sessionToken, context, customParams);
+	}
+
+	/**
+	 * Triggers the Advertiser callback.
+	 * 
+	 * @param sessionToken
+	 * 			  the token id of session
+	 * @param context
+	 *            Host application context.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void register(String sessionToken, Context context, Map<String, String> customParams) {
+		getInstance(context);
+		
+		// The actual work is performed by the register() instance method.
+		mInstance.register(sessionToken, getCustomParameters(customParams));
+	}
+	
+	private static SponsorPayAdvertiser getInstance(Context context) {
+		if (mInstance == null) {
+			mInstance = new SponsorPayAdvertiser(context);
+		}
+		return mInstance;
+	}
+	
+	
+	/**
+	 * This method does the actual registration at the SponsorPay backend, performing the advertiser
+	 * callback, and including in it a parameter to signal if a successful response has been
+	 * received yet.
+	 * 
+	 * @param sessionToken
+	 *            The token id of the session to be used.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	private void register(String sessionToken, Map<String, String> customParams) {
+		
+		SPSession session = SPSessionManager.getSession(sessionToken);
+		/*
+		 * Check if we have called SponsorPay's API before and gotten a successful response.
+		 */
+		boolean gotSuccessfulResponseYet = mPersistedState
+				.getHasAdvertiserCallbackReceivedSuccessfulResponse();
+
+		/* Send asynchronous call to SponsorPay's API */
+		mAPICaller = new AdvertiserCallbackSender(session, this);
+
+		mAPICaller.setWasAlreadySuccessful(gotSuccessfulResponseYet);
+		mAPICaller.setInstallSubId(mPersistedState.getInstallSubId());
+		mAPICaller.setCustomParams(customParams);
+		
+		mAPICaller.trigger();
+	}
+
+	/**
+	 * This method is invoked when a response for the advertiser callback is received.
+	 * 
+	 * @param wasSuccessful
+	 *            Status flag to indicate if Advertiser API has been contacted successfully.
+	 */
+	public void onAPIResponse(boolean wasSuccessful) {
+		if (wasSuccessful) {
+			mPersistedState.setHasAdvertiserCallbackReceivedSuccessfulResponse(true);
+		}
+	}
+	
+	//================================================================================
+    // Deprecated Methods
+	//================================================================================
+
+	
+	//================================================================================
+	// Callbacks
+	//================================================================================
 
 	/**
 	 * Triggers the Advertiser callback. If passed a non-null and non-empty Application ID, it will
@@ -174,75 +255,16 @@ public class SponsorPayAdvertiser implements APIResultListener {
 
 		getInstance(context);
 
-		String sessionToken = SPSessionManager.INSTANCE.getSession(overrideAppId, null, null, context);
-		
-		// The actual work is performed by the register() instance method.
-		mInstance.register(sessionToken, getCustomParameters(customParams));
-	}
-
-	public static void register(Context context, Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
-		register(sessionToken, context);
-	}
-	public static void register(String sessionToken, Context context) {
-		register(sessionToken, context, null);
-	}
-	
-	public static void register(String sessionToken, Context context, Map<String, String> customParams) {
-		getInstance(context);
+		String sessionToken = SPSessionManager.getSession(overrideAppId, null, null, context);
 		
 		// The actual work is performed by the register() instance method.
 		mInstance.register(sessionToken, getCustomParameters(customParams));
 	}
 	
-	private static SponsorPayAdvertiser getInstance(Context context) {
-		if (mInstance == null) {
-			mInstance = new SponsorPayAdvertiser(context);
-		}
-		return mInstance;
-	}
+	//================================================================================
+	// Delayed callback
+	//================================================================================
 	
-	
-	/**
-	 * This method does the actual registration at the SponsorPay backend, performing the advertiser
-	 * callback, and including in it a parameter to signal if a successful response has been
-	 * received yet.
-	 * 
-	 * @param overrideAppId
-	 *            If left empty (""), will use the App ID value from the application manifest xml
-	 *            file. Otherwise, will use the specified App ID.
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the request URL.
-	 */
-	private void register(String sessionToken, Map<String, String> customParams) {
-		
-		//TODO documentation
-		
-		/* Collect data about the device */
-//		mHostInfo = new HostInfo(mContext);
-//
-//		if (StringUtils.notNullNorEmpty(overrideAppId)) {
-//			// Override App ID
-//			mHostInfo.setOverriddenAppId(overrideAppId);
-//		}
-
-		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
-		/*
-		 * Check if we have called SponsorPay's API before and gotten a successful response.
-		 */
-		boolean gotSuccessfulResponseYet = mPersistedState
-				.getHasAdvertiserCallbackReceivedSuccessfulResponse();
-
-		/* Send asynchronous call to SponsorPay's API */
-		mAPICaller = new AdvertiserCallbackSender(session, this);
-
-		mAPICaller.setWasAlreadySuccessful(gotSuccessfulResponseYet);
-		mAPICaller.setInstallSubId(mPersistedState.getInstallSubId());
-		mAPICaller.setCustomParams(customParams);
-		
-		mAPICaller.trigger();
-	}
-
 	/**
 	 * Triggers the Advertiser callback after the specified delay has passed. Will retrieve the App
 	 * ID from the value defined in the host application's Android Manifest XML file.
@@ -294,15 +316,6 @@ public class SponsorPayAdvertiser implements APIResultListener {
 				getCustomParameters(customParams));
 	}
 	
-	/**
-	 * This method is invoked when a response for the advertiser callback is received.
-	 * 
-	 * @param wasSuccessful
-	 *            Status flag to indicate if Advertiser API has been contacted successfully.
-	 */
-	public void onAPIResponse(boolean wasSuccessful) {
-		if (wasSuccessful) {
-			mPersistedState.setHasAdvertiserCallbackReceivedSuccessfulResponse(true);
-		}
-	}
+	
+	
 }

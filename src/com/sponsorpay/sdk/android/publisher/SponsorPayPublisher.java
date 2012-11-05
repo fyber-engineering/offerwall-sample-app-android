@@ -39,7 +39,9 @@ public class SponsorPayPublisher {
 	 * Enumeration identifying the different messages which can be displayed in the user interface.
 	 */
 	public enum UIStringIdentifier {
-		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, ERROR_LOADING_OFFERWALL, ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, LOADING_INTERSTITIAL, LOADING_OFFERWALL, ERROR_PLAY_STORE_UNAVAILABLE
+		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, 
+		ERROR_LOADING_OFFERWALL, ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, 
+		LOADING_INTERSTITIAL, LOADING_OFFERWALL, ERROR_PLAY_STORE_UNAVAILABLE
 	};
 
 	/**
@@ -217,6 +219,494 @@ public class SponsorPayPublisher {
 	 */
 	public static final int DEFAULT_UNLOCK_OFFERWALL_REQUEST_CODE = 0xFE;
 
+	
+	/**
+	 * Sets the provided cookie strings into the application's cookie manager for the given base
+	 * URL.
+	 * 
+	 * @param cookies
+	 *            An array of cookie strings.
+	 * @param baseUrl
+	 *            The base URL to set the cookies for.
+	 * @param context
+	 *            Android application context.
+	 */
+	public static void setCookiesIntoCookieManagerInstance(String[] cookies, String baseUrl,
+			Context context) {
+		if (cookies == null || cookies.length == 0) {
+			return;
+		}
+
+		CookieManager instance;
+
+		// CookieSyncManager.getInstance() has to be called before we get CookieManager's
+		try {
+			CookieSyncManager.getInstance();
+		} catch (IllegalStateException e) {
+			CookieSyncManager.createInstance(context);
+		}
+
+		instance = CookieManager.getInstance();
+
+		SponsorPayLogger.v(AsyncRequest.LOG_TAG, "Setting the following cookies into CookieManager instance "
+				+ instance + " for base URL " + baseUrl + ": ");
+
+		for (String cookieString : cookies) {
+			instance.setCookie(baseUrl, cookieString);
+			SponsorPayLogger.v(AsyncRequest.LOG_TAG, cookieString);
+		}
+	}
+
+	/**
+	 * Converts device pixels into screen pixels.
+	 */
+	public static int convertDevicePixelsIntoPixelsMeasurement(float dps, Context context) {
+		final float scale = context.getResources().getDisplayMetrics().density;
+		int pixels = (int) (dps * scale + 0.5f);
+		return pixels;
+	}
+	
+	//================================================================================
+	// OfferWall
+	//================================================================================
+	
+	/**
+	 * <p>
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the
+	 * caller specify the behavior of the Offer Wall once the user gets redirected out of the
+	 * application by clicking on an offer.
+	 * </p>
+	 * 
+	 * <p>
+	 * Will use the publisher application id and user id stored in the current session.
+	 * </p>
+	 * 
+	 * @param context
+	 *            The publisher application context.
+	 * @param shouldStayOpen
+	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets
+	 *            redirected out of the app. False to close the Offer Wall.
+	 * 
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
+	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 */
+	public static Intent getIntentForOfferWallActivity(Context context,	Boolean shouldStayOpen) {
+		String sessionToken =  SPSessionManager.getCurrentSession().getSessionToken();
+		return getIntentForOfferWallActivity(sessionToken, context, shouldStayOpen, null, null);
+	}
+
+	/**
+	 * <p>
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the
+	 * caller specify the behavior of the Offer Wall once the user gets redirected out of the
+	 * application by clicking on an offer.
+	 * </p>
+	 * 
+	 * <p>
+	 * Will use the publisher application id and user id stored in the current session.
+	 * </p>
+	 * 
+	 * @param context
+	 *            The publisher application context.
+	 * @param shouldStayOpen
+	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets
+	 *            redirected out of the app. False to close the Offer Wall.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.	 
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * 
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
+	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 */
+	public static Intent getIntentForOfferWallActivity(Context context, Boolean shouldStayOpen,
+			String currencyName, HashMap<String, String> customParams) {
+		String sessionToken =  SPSessionManager.getCurrentSession().getSessionToken();
+		return getIntentForOfferWallActivity(sessionToken, context, shouldStayOpen, currencyName, customParams);
+	}
+	
+	/**
+	 * <p>
+	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}. Lets the
+	 * caller specify the behavior of the Offer Wall once the user gets redirected out of the
+	 * application by clicking on an offer.
+	 * </p>
+	 * 
+	 * <p>
+	 * Will use the provided publisher application id and user id stored in the session identified 
+	 * by the token id.
+	 * </p>
+	 * 
+	 * @param sessionToken
+	 *            The token id of the session to be used.
+	 * @param context
+	 *            The publisher application context.
+	 * @param shouldStayOpen
+	 *            True if the Offer Wall should stay open after the user clicks on an offer and gets
+	 *            redirected out of the app. False to close the Offer Wall.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.	 
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * 
+	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
+	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
+	 */
+	public static Intent getIntentForOfferWallActivity(String sessionToken, Context context,
+			Boolean shouldStayOpen, String currencyName, HashMap<String, String> customParams) {
+
+		SPSession session = SPSessionManager.getSession(sessionToken);
+
+
+		Intent intent = new Intent(context, OfferWallActivity.class);
+		intent.putExtra(OfferWallActivity.EXTRA_SESSION_TOKEN_KEY, session.getSessionToken());
+
+		if (shouldStayOpen != null) {
+			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
+		}
+
+		if (StringUtils.notNullNorEmpty(currencyName)) {
+			intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
+		}
+
+		if (sOverridingWebViewUrl != null) {
+			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
+		}
+
+		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY,
+				getCustomParameters(customParams));
+
+		return intent;
+	}
+
+	//================================================================================
+	// Unlock OfferWall
+	//================================================================================
+	
+	public static Intent getIntentForUnlockOfferWallActivity(Context context,
+			String unlockItemId, String unlockItemName) {
+		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
+		return getIntentForUnlockOfferWallActivity(sessionToken, context,
+				unlockItemId, unlockItemName, null);
+	}
+	
+	public static Intent getIntentForUnlockOfferWallActivity(String sessionToken, Context context,
+			String unlockItemId, String unlockItemName,	HashMap<String, String> customParams) {
+		
+		ItemIdValidator itemIdValidator = new ItemIdValidator(unlockItemId);
+		if (!itemIdValidator.validate()) {
+			throw new RuntimeException("The provided Unlock Item ID is not valid. "
+					+ itemIdValidator.getValidationDescription());
+		}
+		SPSession session = SPSessionManager.getSession(sessionToken);
+
+		Intent intent = new Intent(context, OfferWallActivity.class);
+		intent.putExtra(OfferWallActivity.EXTRA_SESSION_TOKEN_KEY, session.getSessionToken());
+
+		intent.putExtra(OfferWallActivity.EXTRA_OFFERWALL_TYPE,
+				OfferWallActivity.OFFERWALL_TYPE_UNLOCK);
+		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_ID_KEY,
+				unlockItemId);
+		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
+				unlockItemName);
+
+		if (sOverridingWebViewUrl != null) {
+			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
+		}
+		
+		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
+
+		return intent;
+	}
+
+	//================================================================================
+	// Interstitial
+	//================================================================================
+	
+	/**
+	 * Starts the mobile interstitial request / loading / showing process using the current
+	 * session.
+	 * 
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on
+	 *            top of it and if an ad is returned, the calling activity will be used to launch
+	 *            the {@link InterstitialActivity} in order to show the ad.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
+	 *            the interstitial lifecycle.
+	 * @param shouldStayOpen
+	 *            Used to specify the behavior of the interstitial once the user clicks on the
+	 *            presented ad and is redirected outside the host publisher app. The default
+	 *            behavior is to close the interstitial and let the user go back to the activity
+	 *            that called the interstitial when they come back to the app. If you want the
+	 *            interstitial not to close until the user does it explicitly, set this parameter to
+	 *            true.
+	 * @param backgroundUrl
+	 *            Can be set to the absolute URL of an image to use as background graphic for the
+	 *            interstitial. Must include the protocol scheme (http:// or https://) at the
+	 *            beginning of the URL. Leave it null for no custom background.
+	 * @param skinName
+	 *            Used to specify the name of a custom skin or template for the requested
+	 *            interstitial. Leaving it null will make the interstitial fall back to the DEFAULT
+	 *            template.
+	 * @param loadingTimeoutSecs
+	 *            Sets the maximum amount of time the interstitial should take to load. If you set
+	 *            it to 0 or a negative number, it will fall back to the default value of 5 seconds.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void loadShowInterstitial(Activity callingActivity,  
+			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
+		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
+		loadShowInterstitial(sessionToken , callingActivity, loadingStatusListener, shouldStayOpen,
+				null, null,0, null, null);
+	}
+	
+	/**
+	 * Starts the mobile interstitial request / loading / showing process.
+	 * 
+	 * @param sessionToken
+	 *            The token id of the session to be used.
+	 * @param callingActivity
+	 *            The activity which requests the interstitial. A progress dialog will be shown on
+	 *            top of it and if an ad is returned, the calling activity will be used to launch
+	 *            the {@link InterstitialActivity} in order to show the ad.
+	 * @param loadingStatusListener
+	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
+	 *            the interstitial lifecycle.
+	 * @param shouldStayOpen
+	 *            Used to specify the behavior of the interstitial once the user clicks on the
+	 *            presented ad and is redirected outside the host publisher app. The default
+	 *            behavior is to close the interstitial and let the user go back to the activity
+	 *            that called the interstitial when they come back to the app. If you want the
+	 *            interstitial not to close until the user does it explicitly, set this parameter to
+	 *            true.
+	 * @param backgroundUrl
+	 *            Can be set to the absolute URL of an image to use as background graphic for the
+	 *            interstitial. Must include the protocol scheme (http:// or https://) at the
+	 *            beginning of the URL. Leave it null for no custom background.
+	 * @param skinName
+	 *            Used to specify the name of a custom skin or template for the requested
+	 *            interstitial. Leaving it null will make the interstitial fall back to the DEFAULT
+	 *            template.
+	 * @param loadingTimeoutSecs
+	 *            Sets the maximum amount of time the interstitial should take to load. If you set
+	 *            it to 0 or a negative number, it will fall back to the default value of 5 seconds.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void loadShowInterstitial(String sessionToken, Activity callingActivity,  
+			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
+			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName,
+			Map<String, String> customParams) {
+
+		InterstitialLoader il = new InterstitialLoader(callingActivity, sessionToken,
+				loadingStatusListener);
+
+		if (shouldStayOpen != null) {
+			il.setShouldStayOpen(shouldStayOpen);
+		}
+		if (StringUtils.notNullNorEmpty(backgroundUrl)) {
+			il.setBackgroundUrl(backgroundUrl);
+		}
+		if (StringUtils.notNullNorEmpty(skinName)) {
+			il.setSkinName(skinName);
+		}
+		if (loadingTimeoutSecs > 0) {
+			il.setLoadingTimeoutSecs(loadingTimeoutSecs);
+		}
+		if (StringUtils.notNullNorEmpty(currencyName)) {
+			il.setCurrencyName(currencyName);
+		}
+		Map<String, String> extraParams = getCustomParameters(customParams);
+
+		if (extraParams != null) {
+			il.setCustomParameters(extraParams);
+		}
+
+		if (sOverridingWebViewUrl != null) {
+			il.setOverridingUrl(sOverridingWebViewUrl);
+		}
+		
+		il.startLoading();
+	}
+
+	//================================================================================
+	// VCS
+	//================================================================================
+	
+	/**
+	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
+	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
+	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. The current 
+	 * session will be used to get the application id and user id.
+	 * 
+	 * @param context
+	 *            Android application context.
+	 * @param listener
+	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
+	 *            request.
+	 * @param transactionId
+	 *            Optionally, provide the ID of the latest known transaction. The delta of coins
+	 *            will be calculated from this transaction (not included) up to the present. Leave
+	 *            it to null to let the SDK use the latest transaction ID it kept track of.
+	 * @param securityToken
+	 *            Security Token associated with the provided Application ID. It's used to sign the
+	 *            requests and verify the server responses.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
+		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
+		requestNewCoins(sessionToken, context, listener, null, null);
+	}
+	
+	/**
+	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
+	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
+	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. It will use the 
+	 * session identified by the provided token id.
+	 * 
+	 * @param sessionToken
+	 *            The token id of the session to be used.
+	 * @param context
+	 *            Android application context.
+	 * @param listener
+	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
+	 *            request.
+	 * @param transactionId
+	 *            Optionally, provide the ID of the latest known transaction. The delta of coins
+	 *            will be calculated from this transaction (not included) up to the present. Leave
+	 *            it to null to let the SDK use the latest transaction ID it kept track of.
+	 * @param securityToken
+	 *            Security Token associated with the provided Application ID. It's used to sign the
+	 *            requests and verify the server responses.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void requestNewCoins(String sessionToken, Context context, 
+			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams) {
+		
+		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, sessionToken, listener);
+		vcc.setCustomParameters(getCustomParameters(customParams));
+		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
+	}
+	
+	//================================================================================
+	// Unlock Items
+	//================================================================================
+	
+	public static void requestUnlockItemsStatus(Context context, SPUnlockResponseListener listener) {
+		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
+		requestUnlockItemsStatus(sessionToken, context, listener, null);
+	}
+	
+	public static void requestUnlockItemsStatus(String sessionToken, Context context,
+			SPUnlockResponseListener listener, Map<String, String> customParams) {
+		
+		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, sessionToken, listener);
+		
+		uc.setCustomParameters(getCustomParameters(customParams));
+		
+		uc.fetchItemsStatus();
+	}
+
+	//================================================================================
+	// Offer Banner
+	//================================================================================
+	
+	public static OfferBannerRequest requestOfferBanner(Context context, SPOfferBannerListener listener) {
+		return requestOfferBanner(context, listener, null, null, (Map<String, String>)null);
+	}
+	
+	/**
+	 * Requests an Offer Banner to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param context
+	 *            Android application context.
+	 * @param listener
+	 *            {@link SPOfferBannerListener} which will be notified of the results of the
+	 *            request.
+	 * @param offerBannerAdShape
+	 *            Provide null for this parameter to request a banner of the default dimensions (320
+	 *            x 50).
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * 
+	 * @return An {@link OfferBannerRequest} instance which manages the request to the server on the
+	 *         background.
+	 */
+	public static OfferBannerRequest requestOfferBanner(Context context,
+			SPOfferBannerListener listener,	OfferBanner.AdShape offerBannerAdShape, 
+			String currencyName, Map<String, String> customParams) {
+		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
+		return requestOfferBanner(sessionToken, context, listener, null, null, (Map<String, String>)null);
+	}
+	
+	/**
+	 * Requests an Offer Banner to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param sessionToken
+	 *            The token id of the session to be used.
+	 * @param context
+	 *            Android application context.
+	 * @param listener
+	 *            {@link SPOfferBannerListener} which will be notified of the results of the
+	 *            request.
+	 * @param offerBannerAdShape
+	 *            Provide null for this parameter to request a banner of the default dimensions (320
+	 *            x 50).
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * 
+	 * @return An {@link OfferBannerRequest} instance which manages the request to the server on the
+	 *         background.
+	 */
+	public static OfferBannerRequest requestOfferBanner(String sessionToken, Context context, 
+			SPOfferBannerListener listener,	OfferBanner.AdShape offerBannerAdShape, 
+			String currencyName, Map<String, String> customParams) {
+		
+		if (offerBannerAdShape == null) {
+			offerBannerAdShape = sDefaultOfferBannerAdShape;
+		}
+		
+		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, sessionToken,
+				listener, offerBannerAdShape, currencyName, getCustomParameters(customParams));
+		
+		if (sOverridingWebViewUrl != null) {
+			bannerRequest.setOverridingUrl(sOverridingWebViewUrl);
+		}
+		
+		bannerRequest.requestOfferBanner();
+		
+		return bannerRequest;
+	}
+
+	
+	//================================================================================
+    // Deprecated Methods
+	//================================================================================
+	
+	//================================================================================
+	// OfferWall
+	//================================================================================
+	
 	/**
 	 * <p>
 	 * Returns an {@link Intent} that can be used to launch the {@link OfferWallActivity}.
@@ -450,57 +940,14 @@ public class SponsorPayPublisher {
 	public static Intent getIntentForOfferWallActivity(Context context,
 			String userId, Boolean shouldStayOpen, String currencyName,
 			String overridingAppId, HashMap<String, String> customParams) {
-		String sessionToken = SPSessionManager.INSTANCE.getSession(overridingAppId, userId, null, context);
-		return getIntentForOfferWallActivity(context, shouldStayOpen, sessionToken, currencyName, customParams);
+		String sessionToken = SPSessionManager.getSession(overridingAppId, userId, null, context);
+		return getIntentForOfferWallActivity(sessionToken, context, shouldStayOpen, currencyName, customParams);
 	}
 	
-	public static Intent getIntentForOfferWallActivity(Context context,
-			Boolean shouldStayOpen) {
-		String sessionToken =  SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
-		return getIntentForOfferWallActivity(context, shouldStayOpen, sessionToken, null, null);
-	}
-
-	public static Intent getIntentForOfferWallActivity(Context context,
-			Boolean shouldStayOpen, String currencyName,
-			HashMap<String, String> customParams) {
-		String sessionToken =  SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
-		return getIntentForOfferWallActivity(context, shouldStayOpen, sessionToken, currencyName, customParams);
-	}
+	//================================================================================
+	// Unlock OfferWall
+	//================================================================================
 	
-	public static Intent getIntentForOfferWallActivity(Context context,
-			Boolean shouldStayOpen, String sessionToken, String currencyName,
-			HashMap<String, String> customParams) {
-
-		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
-
-
-		Intent intent = new Intent(context, OfferWallActivity.class);
-		intent.putExtra(OfferWallActivity.EXTRA_SESSION_TOKEN_KEY, session.getSessionToken());
-//		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, session.getUserId());
-
-		if (shouldStayOpen != null) {
-			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
-		}
-
-//		String overridingAppId = session.getAppId();
-//		if (StringUtils.notNullNorEmpty(overridingAppId )) {
-//			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overridingAppId);
-//		}
-		
-		if (StringUtils.notNullNorEmpty(currencyName)) {
-			intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
-		}
-
-		if (sOverridingWebViewUrl != null) {
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
-		}
-
-		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY,
-				getCustomParameters(customParams));
-
-		return intent;
-	}
-
 	/**
 	 * 
 	 * @param context
@@ -530,54 +977,15 @@ public class SponsorPayPublisher {
 	public static Intent getIntentForUnlockOfferWallActivity(Context context, String userId,
 			String unlockItemId, String unlockItemName, String overrideAppId,
 			HashMap<String, String> customParams) {
-		String sessionToken = SPSessionManager.INSTANCE.getSession(overrideAppId, userId, null, context);
-		return getIntentForUnlockOfferWallActivity(context,
-				sessionToken, unlockItemId, unlockItemName, customParams);
+		String sessionToken = SPSessionManager.getSession(overrideAppId, userId, null, context);
+		return getIntentForUnlockOfferWallActivity(sessionToken, context,
+				unlockItemId, unlockItemName, customParams);
 	}
 	
+	//================================================================================
+	// Interstitial
+	//================================================================================
 	
-	public static Intent getIntentForUnlockOfferWallActivity(Context context,
-			String unlockItemId, String unlockItemName) {
-		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
-		return getIntentForUnlockOfferWallActivity(context,
-				sessionToken, unlockItemId, unlockItemName, null);
-	}
-	
-	public static Intent getIntentForUnlockOfferWallActivity(Context context, String sessionToken, 
-			String unlockItemId, String unlockItemName,	HashMap<String, String> customParams) {
-		
-		ItemIdValidator itemIdValidator = new ItemIdValidator(unlockItemId);
-		if (!itemIdValidator.validate()) {
-			throw new RuntimeException("The provided Unlock Item ID is not valid. "
-					+ itemIdValidator.getValidationDescription());
-		}
-		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
-
-		Intent intent = new Intent(context, OfferWallActivity.class);
-		intent.putExtra(OfferWallActivity.EXTRA_SESSION_TOKEN_KEY, session.getSessionToken());
-//		intent.putExtra(OfferWallActivity.EXTRA_USERID_KEY, session.getUserId());
-
-		intent.putExtra(OfferWallActivity.EXTRA_OFFERWALL_TYPE,
-				OfferWallActivity.OFFERWALL_TYPE_UNLOCK);
-		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_ID_KEY,
-				unlockItemId);
-		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
-				unlockItemName);
-		
-//		String overrideAppId = session.getAppId();
-//		if (StringUtils.notNullNorEmpty(overrideAppId )) {
-//			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_APP_ID_KEY, overrideAppId);
-//		}
-
-		if (sOverridingWebViewUrl != null) {
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
-		}
-		
-		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
-
-		return intent;
-	}
-
 	/**
 	 * Starts the mobile interstitial request / loading / showing process.
 	 * 
@@ -755,66 +1163,13 @@ public class SponsorPayPublisher {
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName, 
 			String overriddenAppId, Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.INSTANCE.getSession(
+		String sessionToken = SPSessionManager.getSession(
 				overriddenAppId, userId, null, callingActivity.getApplication());
 		loadShowInterstitial(sessionToken, callingActivity,
 				loadingStatusListener, shouldStayOpen, backgroundUrl, skinName,
 				loadingTimeoutSecs, currencyName, customParams);
 	}
 	
-	
-	public static void loadShowInterstitial(Activity callingActivity,  
-			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
-		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
-		loadShowInterstitial(sessionToken , callingActivity, loadingStatusListener, shouldStayOpen,
-				null, null,0, null, null);
-	}
-	
-	public static void loadShowInterstitial(String sessionToken, Activity callingActivity,  
-			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
-			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName,
-			Map<String, String> customParams) {
-		
-
-//		HostInfo hostInfo = new HostInfo(callingActivity);
-
-//		String overriddenAppId = session.getAppId();
-//		if (StringUtils.notNullNorEmpty(overriddenAppId)) {
-//			hostInfo.setOverriddenAppId(overriddenAppId);
-//		}
-
-		InterstitialLoader il = new InterstitialLoader(callingActivity, sessionToken,
-				loadingStatusListener);
-
-		if (shouldStayOpen != null) {
-			il.setShouldStayOpen(shouldStayOpen);
-		}
-		if (StringUtils.notNullNorEmpty(backgroundUrl)) {
-			il.setBackgroundUrl(backgroundUrl);
-		}
-		if (StringUtils.notNullNorEmpty(skinName)) {
-			il.setSkinName(skinName);
-		}
-		if (loadingTimeoutSecs > 0) {
-			il.setLoadingTimeoutSecs(loadingTimeoutSecs);
-		}
-		if (StringUtils.notNullNorEmpty(currencyName)) {
-			il.setCurrencyName(currencyName);
-		}
-		Map<String, String> extraParams = getCustomParameters(customParams);
-
-		if (extraParams != null) {
-			il.setCustomParameters(extraParams);
-		}
-
-		if (sOverridingWebViewUrl != null) {
-			il.setOverridingUrl(sOverridingWebViewUrl);
-		}
-		
-		il.startLoading();
-	}
-	
-
 	/**
 	 * Starts the mobile interstitial request / loading / showing process retrieving the application
 	 * id from the Android Manifest.
@@ -1045,6 +1400,10 @@ public class SponsorPayPublisher {
 				currencyName, null, null);
 	}
 
+	//================================================================================
+	//VCS
+	//================================================================================
+	
 	/**
 	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
 	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
@@ -1107,34 +1466,14 @@ public class SponsorPayPublisher {
 			SPCurrencyServerListener listener, String transactionId, String securityToken,
 			String applicationId, Map<String, String> customParams) {
 		
-		String sessionToken = SPSessionManager.INSTANCE.getSession(applicationId, userId, securityToken, context);
-		requestNewCoins(context, sessionToken, listener, transactionId, customParams);
+		String sessionToken = SPSessionManager.getSession(applicationId, userId, securityToken, context);
+		requestNewCoins(sessionToken, context, listener, transactionId, customParams);
 	}
+
+	//================================================================================
+	// Unlock Items
+	//================================================================================
 	
-	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
-		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
-		requestNewCoins(context, sessionToken, listener, null, null);
-	}
-	
-	public static void requestNewCoins(Context context, String sessionToken,
-			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams) {
-		
-//		HostInfo hostInfo = new HostInfo(context);
-		
-//		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
-		
-		
-//		String applicationId = session.getAppId();
-//		if (StringUtils.notNullNorEmpty(applicationId )) {
-//			hostInfo.setOverriddenAppId(applicationId);
-//		}
-		
-		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, sessionToken, listener);
-		
-		vcc.setCustomParameters(getCustomParameters(customParams));
-		
-		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
-	}
 	/**
 	 * 
 	 * @param context
@@ -1163,34 +1502,14 @@ public class SponsorPayPublisher {
 	public static void requestUnlockItemsStatus(Context context, String userId,
 			SPUnlockResponseListener listener, String securityToken, String applicationId,
 			Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.INSTANCE.getSession(applicationId, userId, securityToken, context);
-		requestUnlockItemsStatus(context, sessionToken, listener, customParams);
+		String sessionToken = SPSessionManager.getSession(applicationId, userId, securityToken, context);
+		requestUnlockItemsStatus(sessionToken, context, listener, customParams);
 	}
 	
-	public static void requestUnlockItemsStatus(Context context, SPUnlockResponseListener listener) {
-		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
-		requestUnlockItemsStatus(context, sessionToken, listener, (Map<String, String>)null);
-	}
+	//================================================================================
+	// Offer banner
+	//================================================================================
 	
-	public static void requestUnlockItemsStatus(Context context, String sessionToken,
-			SPUnlockResponseListener listener, Map<String, String> customParams) {
-		
-//		HostInfo hostInfo = new HostInfo(context);
-		
-//		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
-		
-//		String applicationId = session.getAppId();
-//		if (StringUtils.notNullNorEmpty(applicationId )) {
-//			hostInfo.setOverriddenAppId(applicationId);
-//		}
-		
-		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, sessionToken, listener);
-		
-		uc.setCustomParameters(getCustomParameters(customParams));
-		
-		uc.fetchItemsStatus();
-	}
-
 	/**
 	 * Requests an Offer Banner to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
@@ -1251,96 +1570,8 @@ public class SponsorPayPublisher {
 	public static OfferBannerRequest requestOfferBanner(Context context, String userId,
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
 			String currencyName, String applicationId, Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.INSTANCE.getSession(applicationId, userId, null, context);
-		return requestOfferBanner(context, sessionToken, listener, offerBannerAdShape, currencyName, customParams);
+		String sessionToken = SPSessionManager.getSession(applicationId, userId, null, context);
+		return requestOfferBanner(sessionToken, context, listener, offerBannerAdShape, currencyName, customParams);
 	}
 	
-	
-	public static OfferBannerRequest requestOfferBanner(Context context, SPOfferBannerListener listener) {
-		return requestOfferBanner(context, listener, null, null, (Map<String, String>)null);
-	}
-	
-	
-	public static OfferBannerRequest requestOfferBanner(Context context,
-			SPOfferBannerListener listener,	OfferBanner.AdShape offerBannerAdShape, 
-			String currencyName, Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.INSTANCE.getCurrentSession().getSessionToken();
-		return requestOfferBanner(context, sessionToken, listener, null, null, (Map<String, String>)null);
-	}
-	
-	public static OfferBannerRequest requestOfferBanner(Context context, String sessionToken,
-			SPOfferBannerListener listener,	OfferBanner.AdShape offerBannerAdShape, 
-			String currencyName, Map<String, String> customParams) {
-		
-//		SPSession session = SPSessionManager.INSTANCE.getSession(sessionToken);
-		
-//		HostInfo hostInfo = new HostInfo(context);
-//		
-//		String applicationId = session.getAppId();
-//		if (StringUtils.notNullNorEmpty(applicationId)) {
-//			hostInfo.setOverriddenAppId(applicationId);
-//		}
-		
-		if (offerBannerAdShape == null) {
-			offerBannerAdShape = sDefaultOfferBannerAdShape;
-		}
-		
-		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, sessionToken,
-				listener, offerBannerAdShape, currencyName, getCustomParameters(customParams));
-		
-		if (sOverridingWebViewUrl != null) {
-			bannerRequest.setOverridingUrl(sOverridingWebViewUrl);
-		}
-		
-		bannerRequest.requestOfferBanner();
-		
-		return bannerRequest;
-	}
-
-	/**
-	 * Sets the provided cookie strings into the application's cookie manager for the given base
-	 * URL.
-	 * 
-	 * @param cookies
-	 *            An array of cookie strings.
-	 * @param baseUrl
-	 *            The base URL to set the cookies for.
-	 * @param context
-	 *            Android application context.
-	 */
-	static void setCookiesIntoCookieManagerInstance(String[] cookies, String baseUrl,
-			Context context) {
-		if (cookies == null || cookies.length == 0) {
-			return;
-		}
-
-		CookieManager instance;
-
-		// CookieSyncManager.createInstance() has to be called before we get CookieManager's
-		// instance.
-		try {
-			CookieSyncManager.getInstance();
-		} catch (IllegalStateException e) {
-			CookieSyncManager.createInstance(context);
-		}
-
-		instance = CookieManager.getInstance();
-
-		SponsorPayLogger.v(AsyncRequest.LOG_TAG, "Setting the following cookies into CookieManager instance "
-				+ instance + " for base URL " + baseUrl + ": ");
-
-		for (String cookieString : cookies) {
-			instance.setCookie(baseUrl, cookieString);
-			SponsorPayLogger.v(AsyncRequest.LOG_TAG, cookieString);
-		}
-	}
-
-	/**
-	 * Converts device pixels into screen pixels.
-	 */
-	static int convertDevicePixelsIntoPixelsMeasurement(float dps, Context context) {
-		final float scale = context.getResources().getDisplayMetrics().density;
-		int pixels = (int) (dps * scale + 0.5f);
-		return pixels;
-	}
 }

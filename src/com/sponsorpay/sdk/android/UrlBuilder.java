@@ -143,15 +143,15 @@ public class UrlBuilder {
 
 	private String mResourceUrl;
 	/**
-	 * 	@deprecated 
+	 * 	@deprecated this field will be removed from a future release of the SDK.
 	 */
 	private HostInfo mHostInfo;
 	/**
-	 * 	@deprecated 
+	 * 	@deprecated this field will be removed from a future release of the SDK.
 	 */
 	private String mUserId;
 	/**
-	 * 	@deprecated 
+	 * 	@deprecated this field will be removed from a future release of the SDK.
 	 */
 	private String mSecretKey;
 
@@ -164,11 +164,7 @@ public class UrlBuilder {
 	private boolean mShouldAddUserId = true;
 
 	/**
-	 * 
-	 * @param resourceUrl
-	 * @param hostInfo
-	 * 
-	 * @deprecated bla bal blak
+	 * @deprecated This method will be removed from a future SDK release. .
 	 */
 	protected UrlBuilder(String resourceUrl, HostInfo hostInfo) {
 		mResourceUrl = resourceUrl;
@@ -181,11 +177,15 @@ public class UrlBuilder {
 	}
 
 	/**
+	 * Sets to user id to be used in the URL generation process.
 	 * 
 	 * @param userId
-	 * @return
+	 * 		  the user id
 	 * 
-	 * @deprecated
+	 * @return the instance of {@link UrlBuilder} to allow further chained methods.
+	 * 
+	 * @deprecated This method will be removed from a future SDK release. The user id
+	 * 			   will be fetched from the {@link SPSession}.
 	 */
 	public UrlBuilder setUserId(String userId) {
 		mUserId = userId;
@@ -207,7 +207,8 @@ public class UrlBuilder {
 	 * 
 	 * @param secretKey
 	 * @return
-	 * @deprecated blaksdkas 
+	 * @deprecated This method will be removed from a future SDK release. The secret key
+	 * 			   will be fetched from the {@link SPSession}.
 	 */
 	public UrlBuilder setSecretKey(String secretKey) {
 		mSecretKey = secretKey;
@@ -291,13 +292,25 @@ public class UrlBuilder {
 	 * 
 	 * @param resourceUrl
 	 * @param hostInfo
-	 * @return
+	 * @return a new {@link UrlBuilder}
 	 * 
-	 * @deprecated bla bal bal
+	 * @deprecated This method will be removed from a future SDK release. Get a UrlBuilder instance
+	 *             with {@link #newBuilder(String, SPSession)} instead.
 	 */
 	public static UrlBuilder newBuilder(String resourceUrl, HostInfo hostInfo) {
 		return new UrlBuilder(resourceUrl, hostInfo);
 	}
+	
+	/**
+	 * 
+	 * @param resourceUrl
+	 * 		  The base URL for this builder.
+	 * @param session
+	 * 		  The {@link SPSession} holding the values (userId, appId and secret key) 
+	 * 		  to be used within this builder.
+	 * 		  
+	 * @return a new {@link UrlBuilder}
+	 */
 	
 	public static UrlBuilder newBuilder(String resourceUrl, SPSession session) {
 		return new UrlBuilder(resourceUrl, session);

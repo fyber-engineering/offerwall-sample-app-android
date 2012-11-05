@@ -42,19 +42,9 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	private SPOfferBannerListener mListener;
 
 	/**
-	 * User ID to include in the request.
-	 */
-//	private UserId mUserId;
-
-	/**
 	 * {@link AdShape} whose description will be sent to the server in the request.
 	 */
 	private OfferBanner.AdShape mOfferBannerAdShape;
-
-	/**
-	 * {@link HostInfo} instance containing the Application ID and data about the device.
-	 */
-//	private HostInfo mHostInfo;
 
 	/**
 	 * Currency Name to be sent in the request.
@@ -77,17 +67,13 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	private SPSession mSession;
 
 	
-	
-	
 	/**
 	 * Initializes a new instance and sends the request immediately.
 	 * 
 	 * @param context
 	 *            Android application context.
-	 * @param userId
-	 *            ID of the user on whose behalf the banner will be requested.
-	 * @param hostInfo
-	 *            {@link HostInfo} instance containing the Application ID and data about the device.
+	 * @param sessionToken
+	 *            the token ID identifying the session used to retrieve values.
 	 * @param listener
 	 *            {@link SPOfferBannerListener} which will be notified of the result of the request.
 	 * @param offerBannerAdShape
@@ -100,14 +86,11 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	public OfferBannerRequest(Context context, String sessionToken, 
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
 			String currencyName, Map<String, String> customParams) {
-		//TODO documentation
 		
-		mSession = SPSessionManager.INSTANCE.getSession(sessionToken);
+		mSession = SPSessionManager.getSession(sessionToken);
 		mContext = context;
 		mListener = listener;
-//		mUserId = UserId.make(context, userId);
 		mOfferBannerAdShape = offerBannerAdShape;
-//		mHostInfo = hostInfo;
 		mCurrencyName = currencyName;
 		mCustomParams = customParams;
 	}

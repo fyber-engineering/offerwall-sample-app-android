@@ -27,22 +27,6 @@ public abstract class AbstractConnector implements AsyncRequestResultListener {
 	 * Android application context.
 	 */
 	protected Context mContext;
-	
-//	/**
-//	 * ID of the user for whom the requests will be made.
-//	 */
-//	protected String mUserId;
-//	
-//	/**
-//	 * {@link HostInfo} containing data about the host device and application, including its
-//	 * application ID.
-//	 */
-//	protected HostInfo mHostInfo;
-//	
-//	/**
-//	 * Security token used to sign requests to the server and verify its responses.
-//	 */
-//	protected String mSecurityToken;
 
 	/**
 	 * Map of custom key/values to add to the parameters on the requests.
@@ -53,13 +37,10 @@ public abstract class AbstractConnector implements AsyncRequestResultListener {
 	
 	protected AbstractConnector(Context context, String sessionToken) {
 		mContext = context;
-		mSession = SPSessionManager.INSTANCE.getSession(sessionToken);
+		mSession = SPSessionManager.getSession(sessionToken);
 		if (StringUtils.nullOrEmpty(mSession.getSecurityToken())) {
 			throw new IllegalArgumentException("Security token has not been set on the session");
 		}
-//		mUserId = session.getUserId();
-//		mHostInfo = ;
-//		mSecurityToken = securityToken;
 	}
 	
 	/**

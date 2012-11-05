@@ -1,7 +1,7 @@
 /**
- * SponsorPay Android Publisher SDK
+ * SponsorPay Android SDK
  *
- * Copyright 2011 SponsorPay. All rights reserved.
+ * Copyright 2012 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android;
@@ -106,7 +106,7 @@ public class HostInfo {
 	/**
 	 * The SponsorPay's App ID Key that is used in the AndroidManifest.xml file.
 	 * 
-	 * @deprecated bla bal bal
+	 * @deprecated this will no longer be supported in a future release of the SDK
 	 */
 	private static final String SPONSORPAY_APP_ID_KEY = "SPONSORPAY_APP_ID";
 
@@ -334,9 +334,13 @@ public class HostInfo {
 		return mAppId;
 	}
 	/**
+	 * <p>
+	 * Get the Application ID set in meta-data on the AndroidManifest.xml file.
+	 * </p>
 	 * 
-	 * @return
-	 * @deprecated bla bal bal
+	 * @return the Application id set in the AndroidManifest.xml file
+	 * 
+	 * @deprecated this will no longer be supported in a future release of the SDK
 	 */
 	private String getAppIdFromManifest() {
 		return StringUtils.trim(

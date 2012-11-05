@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2012 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.publisher.unlock;
 
 import java.util.Map;

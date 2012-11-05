@@ -1,7 +1,7 @@
 /**
- * SponsorPay Android Advertiser SDK
+ * SponsorPay Android SDK
  *
- * Copyright 2011 SponsorPay. All rights reserved.
+ * Copyright 2012 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.advertiser;

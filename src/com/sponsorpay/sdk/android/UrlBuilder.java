@@ -1,7 +1,7 @@
 /**
- * SponsorPay Android Publisher SDK
+ * SponsorPay Android SDK
  *
- * Copyright 2011 SponsorPay. All rights reserved.
+ * Copyright 2012 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android;
@@ -204,9 +204,13 @@ public class UrlBuilder {
 	}
 
 	/**
+	 * Sets to secret key to be used in the URL generation process.
 	 * 
 	 * @param secretKey
-	 * @return
+	 * 		  the secret key
+	 * 
+	 * @return the instance of {@link UrlBuilder} to allow further chained methods.
+	 * 
 	 * @deprecated This method will be removed from a future SDK release. The secret key
 	 * 			   will be fetched from the {@link SPSession}.
 	 */
@@ -225,6 +229,13 @@ public class UrlBuilder {
 		return this;
 	}
 
+	/**
+	 * <p>
+	 * This will build the final URL with all the provided parameters
+	 * </p>
+	 * 
+	 * @return the generated URL
+	 */
 	public String buildUrl() {
 		HashMap<String, String> keyValueParams = new HashMap<String, String>();
 
@@ -289,9 +300,14 @@ public class UrlBuilder {
 	}
 
 	/**
+	 * <p>
+	 * Used to retrieved a new {@link UrlBuilder}.
+	 * </p> 
 	 * 
 	 * @param resourceUrl
+	 * 		  The base URL for this builder.
 	 * @param hostInfo
+	 * 		 The {@link HostInfo} holding device information
 	 * @return a new {@link UrlBuilder}
 	 * 
 	 * @deprecated This method will be removed from a future SDK release. Get a UrlBuilder instance
@@ -302,6 +318,9 @@ public class UrlBuilder {
 	}
 	
 	/**
+	 * <p>
+	 * Used to retrieved a new {@link UrlBuilder}.
+	 * </p> 
 	 * 
 	 * @param resourceUrl
 	 * 		  The base URL for this builder.
@@ -311,7 +330,6 @@ public class UrlBuilder {
 	 * 		  
 	 * @return a new {@link UrlBuilder}
 	 */
-	
 	public static UrlBuilder newBuilder(String resourceUrl, SPSession session) {
 		return new UrlBuilder(resourceUrl, session);
 	}

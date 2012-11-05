@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2012 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.session;
 
 import java.util.HashMap;
@@ -6,7 +12,6 @@ import java.util.Set;
 import android.content.Context;
 
 import com.sponsorpay.sdk.android.HostInfo;
-import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -50,7 +55,6 @@ public class SPSessionManager {
 			session = new SPSession(appId, userId, securityToken, context);
 			currentSession = session.getSessionToken();
 			tokenSessionMap.put(currentSession, session);
-			SponsorPayAdvertiser.register(currentSession, context, null);
 		} else if (StringUtils.nullOrEmpty(session.getSecurityToken())) {
 			session.setSecurityToken(securityToken);
 		}

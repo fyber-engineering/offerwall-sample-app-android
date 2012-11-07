@@ -264,7 +264,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 			startActivityForResult(
 			/* Pass in a User ID */
 			SponsorPayPublisher.getIntentForOfferWallActivity(
-					getApplicationContext(), mShouldStayOpen),
+					getApplicationContext(), mShouldStayOpen, mCurrencyName, null),
 					SponsorPayPublisher.DEFAULT_OFFERWALL_REQUEST_CODE);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());

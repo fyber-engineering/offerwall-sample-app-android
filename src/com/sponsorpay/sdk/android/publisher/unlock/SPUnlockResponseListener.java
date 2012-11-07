@@ -32,7 +32,7 @@ public interface SPUnlockResponseListener {
 	 * 
 	 * @param response
 	 *            A response instance that implements the {@link UnlockedItemsResponse#getItems()}
-	 *            method, returning a {@link Map} where the key is the ItemID and the value is 
+	 *            method, returning a {@link java.util.Map} where the key is the ItemID and the value is 
 	 *            {@link UnlockedItemsResponse.Item}.
 	 */
 	void onSPUnlockItemsStatusResponseReceived(UnlockedItemsResponse response);

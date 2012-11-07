@@ -108,8 +108,8 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 * </p>
 	 * See {@link AdvertiserHostInfo} and {@link APIResultListener}.
 	 * 
-	 * @param hostInfo
-	 *            the host information for the given device
+	 * @param session
+	 *            the session used for this callback
 	 * @param listener
 	 *            the callback listener
 	 */
@@ -147,7 +147,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	/**
 	 * Triggers the callback request that contacts the Sponsorpay Advertiser API. If and when a
 	 * successful response is received from the server, the {@link APIResultListener} registered
-	 * through the constructor {@link #AsyncAPICaller(AdvertiserHostInfo, APIResultListener)} will
+	 * through the constructor {@link #AdvertiserCallbackSender(SPSession, APIResultListener)} will
 	 * be notified.
 	 */
 	public void trigger() {

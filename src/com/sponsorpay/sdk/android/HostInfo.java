@@ -319,7 +319,7 @@ public class HostInfo {
 	 * mentioned method, this method will throw a RuntimeException.
 	 * </p>
 	 * 
-	 * @return The offer id previously set or defined in the manifest, or throws a {@RuntimeException}.
+	 * @return The offer id previously set or defined in the manifest, or throws a {@link RuntimeException}.
 	 */
 	public String getAppId() {
 		if (StringUtils.nullOrEmpty(mAppId)) {
@@ -350,7 +350,8 @@ public class HostInfo {
 	/**
 	 * Set the application ID, overriding the one which would be read from the manifest.
 	 * 
-	 * @param appId, the application ID
+	 * @param appId 
+	 * 			the application ID
 	 */
 	public void setOverriddenAppId(String appId) {
 		mAppId = appId;

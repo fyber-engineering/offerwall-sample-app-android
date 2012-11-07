@@ -3,3 +3,5 @@ com.sponsorpay.sdk.android.advertiser
 com.sponsorpay.sdk.android.publisher
 com.sponsorpay.sdk.android.publisher.currency
 com.sponsorpay.sdk.android.publisher.unlock
+com.sponsorpay.sdk.android.session
+com.sponsorpay.sdk.android.utils

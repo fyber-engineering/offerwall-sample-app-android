@@ -162,7 +162,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * received. Performs the first stage of error handling and initializes the right kind of
 	 * {@link CurrencyServerAbstractResponse}.
 	 * 
-	 * @param requestTask
+	 * @param request
 	 *            The calling {@link CurrencyServerRequestAsyncTask} with the response data.
 	 */
 	@Override

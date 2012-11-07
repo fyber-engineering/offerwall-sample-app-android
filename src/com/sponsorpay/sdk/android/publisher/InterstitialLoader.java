@@ -62,7 +62,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		void onWillShowInterstitial();
 
 		/**
-		 * Invoked when a response has been received from SponsorPay�s backend indicating that no
+		 * Invoked when a response has been received from SponsorPay's backend indicating that no
 		 * interstitial ad is available for this particular request.
 		 */
 		void onNoInterstitialAvailable();
@@ -227,7 +227,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * <p>
 	 * The process will be performed in a background thread. The invocation of the
 	 * {@link InterstitialLoadingStatusListener} registered in
-	 * {@link #InterstitialLoader(Activity, String, HostInfo, InterstitialLoadingStatusListener)}
+	 * {@link #InterstitialLoader(Activity, String, InterstitialLoadingStatusListener)}
 	 * will be done in the calling thread.
 	 * </p>
 	 */
@@ -363,8 +363,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * by the host publisher application of the events "Will Show Interstitial",
 	 * "Interstitial Request Error" and "No Interstitial Available"
 	 * 
-	 * @param result
-	 *            a {@link InterstitialLoadingResults} containing the status code and the contents
+	 * @param request
+	 *            a {@link AsyncRequest} containing the status code and the contents
 	 *            of the response.
 	 */
 	@Override

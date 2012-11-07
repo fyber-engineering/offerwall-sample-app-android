@@ -485,22 +485,6 @@ public class SponsorPayPublisher {
 	 *            that called the interstitial when they come back to the app. If you want the
 	 *            interstitial not to close until the user does it explicitly, set this parameter to
 	 *            true.
-	 * @param backgroundUrl
-	 *            Can be set to the absolute URL of an image to use as background graphic for the
-	 *            interstitial. Must include the protocol scheme (http:// or https://) at the
-	 *            beginning of the URL. Leave it null for no custom background.
-	 * @param skinName
-	 *            Used to specify the name of a custom skin or template for the requested
-	 *            interstitial. Leaving it null will make the interstitial fall back to the DEFAULT
-	 *            template.
-	 * @param loadingTimeoutSecs
-	 *            Sets the maximum amount of time the interstitial should take to load. If you set
-	 *            it to 0 or a negative number, it will fall back to the default value of 5 seconds.
-	 * @param currencyName
-	 *            The name of the currency employed by your application. Provide null if you don't
-	 *            use a custom currency name.
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the request URL.
 	 */
 	public static void loadShowInterstitial(Activity callingActivity,  
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
@@ -641,15 +625,6 @@ public class SponsorPayPublisher {
 	 * @param listener
 	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
 	 *            request.
-	 * @param transactionId
-	 *            Optionally, provide the ID of the latest known transaction. The delta of coins
-	 *            will be calculated from this transaction (not included) up to the present. Leave
-	 *            it to null to let the SDK use the latest transaction ID it kept track of.
-	 * @param securityToken
-	 *            Security Token associated with the provided Application ID. It's used to sign the
-	 *            requests and verify the server responses.
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the request URL.
 	 */
 	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
 		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
@@ -673,9 +648,6 @@ public class SponsorPayPublisher {
 	 *            Optionally, provide the ID of the latest known transaction. The delta of coins
 	 *            will be calculated from this transaction (not included) up to the present. Leave
 	 *            it to null to let the SDK use the latest transaction ID it kept track of.
-	 * @param securityToken
-	 *            Security Token associated with the provided Application ID. It's used to sign the
-	 *            requests and verify the server responses.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */

@@ -161,8 +161,6 @@ public class SPSessionManager {
 		if (!sessions.contains(sessionToken)) {
 			SponsorPayAdvertiser.register(context);
 		}
-//		StackTraceElement[] element = new Exception().getStackTrace();
-//		element[0].
 		return sessionToken;
 	}
 	

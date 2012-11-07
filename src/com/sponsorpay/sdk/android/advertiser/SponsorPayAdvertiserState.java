@@ -18,7 +18,7 @@ import android.content.SharedPreferences.Editor;
 public class SponsorPayAdvertiserState {
 	/**
 	 * Shared preferences file name. We store a flag into the shared preferences which is checked on
-	 * each consecutive invocation of {@link #register()}, to keep track of whether we have already
+	 * each consecutive invocation of {@link SponsorPayAdvertiser#register(Context)}, to keep track of whether we have already
 	 * successfully contacted the Advertiser API.
 	 */
 	public static final String PREFERENCES_FILE_NAME = "SponsorPayAdvertiserState";

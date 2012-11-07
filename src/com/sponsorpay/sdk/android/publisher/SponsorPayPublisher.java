@@ -768,7 +768,8 @@ public class SponsorPayPublisher {
 			SPOfferBannerListener listener,	OfferBanner.AdShape offerBannerAdShape, 
 			String currencyName, Map<String, String> customParams) {
 		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
-		return requestOfferBanner(sessionToken, context, listener, null, null, (Map<String, String>)null);
+		return requestOfferBanner(sessionToken, context, listener, offerBannerAdShape,
+				currencyName, (Map<String, String>)null);
 	}
 	
 	/**

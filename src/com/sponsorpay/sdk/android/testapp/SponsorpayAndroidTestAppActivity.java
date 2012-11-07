@@ -12,12 +12,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.sponsorpay.sdk.android.SponsorPay;
@@ -28,7 +25,8 @@ import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerAbstractRespo
 import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerDeltaOfCoinsResponse;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
-import com.sponsorpay.sdk.android.testapp.fragments.AdvertiserSettingsFragment;
+import com.sponsorpay.sdk.android.session.SPSession;
+import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.testapp.fragments.BannersSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.InterstitialSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.ItemsSettingsFragment;
@@ -41,6 +39,8 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
  */
 public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	
+	private static final String TAG = SponsorpayAndroidTestAppActivity.class.getSimpleName();
+
 	/**
 	 * Shared preferences file name. Stores the values entered into the UI fields.
 	 */
@@ -51,26 +51,19 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	private static final String SECURITY_TOKEN_PREFS_KEY = "SECURITY_TOKEN";
 	private static final String CURRENCY_NAME_PREFS_KEY = "CURRENCY_NAME";
 	private static final String USE_STAGING_URLS_PREFS_KEY = "USE_STAGING_URLS";
-	private static final String DEFAULT_SECURITY_TOKEN_VALUE = "test";
 	
 	private static final int MAIN_SETTINGS_ACTIVITY_CODE = 3962;
 
-	private String mOverridingAppId;
-	private String mUserId;
-	private String mSecurityToken;
 	private String mCurrencyName;
 	
 	private EditText mAppIdField;
 	private EditText mUserIdField;
 	private EditText mSecurityTokenField;
 	private EditText mCurrencyNameField;
+	private TextView mSessionInfo;
 
 	private CheckBox mUseStagingUrlsCheckBox;
 	
-	private ImageButton mSettingsButton;
-	
-	private boolean mShouldSendAdvertiserCallbackOnResume;
-
 	private boolean mShouldStayOpen;
 	
 	/**
@@ -86,10 +79,9 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		
 		createLauncherFragment();
 
-		((TextView) findViewById(R.id.sdk_version_string)).setText("SponsorPay Android SDK v. "
+		((TextView) findViewById(R.id.sdk_version_string)).setText("SP Android SDK v. "
 				+ SponsorPay.RELEASE_VERSION_STRING);
 
-		mShouldSendAdvertiserCallbackOnResume = true;
 		SponsorPayLogger.enableLogging(true);
 	}
 
@@ -111,26 +103,21 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		
 		mUseStagingUrlsCheckBox = (CheckBox) findViewById(R.id.use_staging_urls_checkbox);
 		
-		mSettingsButton = (ImageButton) findViewById(R.id.settings_button);
-
-		mSettingsButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				fetchValuesFromFields();
-				Intent intent = new Intent(getApplicationContext(),
-						MainSettingsActivity.class);
-				intent.putExtra(MainSettingsActivity.PREFERENCES_EXTRA, PREFERENCES_FILE_NAME);
-				intent.putExtra(MainSettingsActivity.OVERRIDING_APP_ID_EXTRA, mOverridingAppId);
-				intent.putExtra(MainSettingsActivity.USER_ID_EXTRA, mUserId);
-				intent.putExtra(MainSettingsActivity.SECURITY_TOKEN_EXTRA, mSecurityToken);
-				startActivityForResult(intent,
-						MAIN_SETTINGS_ACTIVITY_CODE);
-			}
-		});
+		mSessionInfo = (TextView) findViewById(R.id.session_info);
 
 	}
 
 
+	public void onSettingsButtonClick (View v) {
+		fetchValuesFromFields();
+		Intent intent = new Intent(getApplicationContext(),
+				MainSettingsActivity.class);
+		intent.putExtra(MainSettingsActivity.PREFERENCES_EXTRA, PREFERENCES_FILE_NAME);
+		startActivityForResult(intent,
+				MAIN_SETTINGS_ACTIVITY_CODE);
+	}
+	
+	
 	@Override
 	protected void onPause() {
 		// Save the state of the UI fields into the app preferences.
@@ -139,9 +126,15 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		SharedPreferences prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE);
 		Editor prefsEditor = prefs.edit();
 
-		prefsEditor.putString(APP_ID_PREFS_KEY, mOverridingAppId);
-		prefsEditor.putString(USER_ID_PREFS_KEY, mUserId);
-		prefsEditor.putString(SECURITY_TOKEN_PREFS_KEY, mSecurityToken);
+		try {
+			SPSession session = SPSessionManager.getCurrentSession();
+			prefsEditor.putString(APP_ID_PREFS_KEY, session.getAppId());
+			prefsEditor.putString(USER_ID_PREFS_KEY, session.getUserId());
+			prefsEditor.putString(SECURITY_TOKEN_PREFS_KEY, session.getSecurityToken());
+		} catch (RuntimeException e) {
+			SponsorPayLogger.d(TAG, "There's no current session.");
+		}
+		
 		prefsEditor.putString(CURRENCY_NAME_PREFS_KEY, mCurrencyName);
 		prefsEditor.putBoolean(USE_STAGING_URLS_PREFS_KEY, mUseStagingUrlsCheckBox.isChecked());
 
@@ -157,10 +150,17 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		// Recover the state of the UI fields from the app preferences.
 		SharedPreferences prefs = getSharedPreferences(PREFERENCES_FILE_NAME, Context.MODE_PRIVATE);
 
-		mOverridingAppId = prefs.getString(APP_ID_PREFS_KEY, StringUtils.EMPTY_STRING);
-		mUserId = prefs.getString(USER_ID_PREFS_KEY, StringUtils.EMPTY_STRING);
-		mSecurityToken = prefs.getString(SECURITY_TOKEN_PREFS_KEY, DEFAULT_SECURITY_TOKEN_VALUE);
+		String overridingAppId = prefs.getString(APP_ID_PREFS_KEY, StringUtils.EMPTY_STRING);
+		String userId = prefs.getString(USER_ID_PREFS_KEY, StringUtils.EMPTY_STRING);
+		String securityToken = prefs.getString(SECURITY_TOKEN_PREFS_KEY, StringUtils.EMPTY_STRING);
 		mCurrencyName = prefs.getString(CURRENCY_NAME_PREFS_KEY, StringUtils.EMPTY_STRING);
+		
+		try {
+			SPSessionManager.initialize(overridingAppId, userId, securityToken, getApplicationContext());
+		} catch (RuntimeException e){
+			SponsorPayLogger.d(TAG,
+						e.getLocalizedMessage());
+		}
 		
 		mShouldStayOpen = prefs.getBoolean(MainSettingsActivity.KEEP_OFFERWALL_OPEN_PREFS_KEY, true);
 
@@ -168,15 +168,6 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 
 		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
 
-		if (mShouldSendAdvertiserCallbackOnResume) {
-			if (mOverridingAppId != null && !mOverridingAppId.equals(StringUtils.EMPTY_STRING)) {
-				sendAdvertiserCallback(true);
-			} else {
-				Log.w(SponsorpayAndroidTestAppActivity.class.getSimpleName(),
-						"No advertiser callback is being sent on application launch because App ID is empty.");
-			}
-			mShouldSendAdvertiserCallbackOnResume = false;
-		}
 	}
 
 	
@@ -209,9 +200,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	 * Fetches user provided values from the state of the UI text fields and text boxes.
 	 */
 	private void fetchValuesFromFields() {
-		mOverridingAppId = mAppIdField.getText().toString();
-		mUserId = mUserIdField.getText().toString();
-		mSecurityToken = mSecurityTokenField.getText().toString();
+
 		mCurrencyName = mCurrencyNameField.getText().toString();
 
 		SponsorPayAdvertiser.setShouldUseStagingUrls(mUseStagingUrlsCheckBox
@@ -224,10 +213,44 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	 * Sets values in the state of the UI text fields and text boxes.
 	 */
 	private void setValuesInFields() {
-		mAppIdField.setText(mOverridingAppId);
-		mUserIdField.setText(mUserId);
-		mSecurityTokenField.setText(mSecurityToken);
+		try {
+			SPSession session = SPSessionManager.getCurrentSession();
+			mAppIdField.setText(session.getAppId());
+			mUserIdField.setText(session.getUserId());
+			mSecurityTokenField.setText(session.getSecurityToken());
+		} catch (RuntimeException e) {
+			SponsorPayLogger.d(TAG, "There's no current session.");
+		}
 		mCurrencyNameField.setText(mCurrencyName);
+		setSessionInfo();
+	}
+	
+	private void setSessionInfo() {
+		try {
+			mSessionInfo.setText(SPSessionManager.getCurrentSession().toString());
+		} catch (RuntimeException e) {
+			SponsorPayLogger.d(TAG,
+					"There's no session yet, unable to send the callback.");
+		}
+	}
+	
+	/**
+	 * Triggered when the user clicks on the create new session button.
+	 * 
+	 * @param v
+	 */
+	public void onCreateNewSessionClick(View v) {
+		try {
+			String overridingAppId = mAppIdField.getText().toString();
+			String userId = mUserIdField.getText().toString();
+			String securityToken = mSecurityTokenField.getText().toString();
+			SPSessionManager.initialize(overridingAppId, userId, securityToken, getApplicationContext());
+		} catch (RuntimeException e){
+			showCancellableAlertBox("Exception from SDK", e.getMessage());
+			SponsorPayLogger.e(TAG,
+					"SponsorPay SDK Exception: ", e);
+		}
+		setSessionInfo();
 	}
 
 	/**
@@ -241,12 +264,11 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 			startActivityForResult(
 			/* Pass in a User ID */
 			SponsorPayPublisher.getIntentForOfferWallActivity(
-					getApplicationContext(), mUserId, mShouldStayOpen,
-					mCurrencyName, mOverridingAppId),
+					getApplicationContext(), mShouldStayOpen),
 					SponsorPayPublisher.DEFAULT_OFFERWALL_REQUEST_CODE);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
-			Log.e(SponsorpayAndroidTestAppActivity.class.toString(),
+			SponsorPayLogger.e(TAG,
 					"SponsorPay SDK Exception: ", ex);
 		}
 	}
@@ -263,55 +285,10 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 				R.id.fragment_placeholder);
 
 		if (fragment instanceof ItemsSettingsFragment) {
-			((ItemsSettingsFragment) fragment).launchUnlockOfferWall(mUserId,
-					mOverridingAppId);
+			((ItemsSettingsFragment) fragment).launchUnlockOfferWall();
 		}
 	}
 
-	/**
-	 * Sends the advertiser callback after fetching the values entered in the UI fields.
-	 */
-	private void sendAdvertiserCallback(boolean isFromResume) {
-		fetchValuesFromFields();
-
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-
-		if (fragment instanceof AdvertiserSettingsFragment) {
-			((AdvertiserSettingsFragment) fragment).sendCallback(mOverridingAppId);
-		} else if (isFromResume) {
-			fragment = new AdvertiserSettingsFragment();
-			replaceFragment(fragment);
-			((AdvertiserSettingsFragment) fragment)
-					.sendCallbackOnStart(mOverridingAppId);
-		}
-	}
-
-	/**
-	 * Invoked when the user clicks on the "Send advertiser callback now" button.
-	 * 
-	 * @param v
-	 */
-	public void onSendCallbackNowButtonClick(View v) {
-		sendAdvertiserCallback(false);
-	}
-
-	/**
-	 * Invoked when the user clicks on the "Send advertiser callback with delay" button.
-	 * 
-	 * @param v
-	 */
-	public void onSendCallbackWithDelayButtonClick(View v) {
-		fetchValuesFromFields();
-		
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-
-		if (fragment instanceof AdvertiserSettingsFragment) {
-			((AdvertiserSettingsFragment) fragment).sendCallbackWithDelay(mOverridingAppId);
-
-		}
-	}
 
 	/**
 	 * Triggered when the user clicks on the launch interstitial button.
@@ -325,8 +302,8 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 				R.id.fragment_placeholder);
 
 		if (fragment instanceof InterstitialSettingsFragment) {
-			((InterstitialSettingsFragment) fragment).launchInsterstitial(mUserId,
-					mShouldStayOpen, mCurrencyName, mOverridingAppId);
+			((InterstitialSettingsFragment) fragment).launchInsterstitial(
+					mShouldStayOpen, mCurrencyName);
 		}
 	}
 
@@ -340,34 +317,34 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	public void onRequestNewCoinsClick(View v) {
 		fetchValuesFromFields();
 
-		final String usedTransactionId = VirtualCurrencyConnector.fetchLatestTransactionId(
-				getApplicationContext(), mOverridingAppId, mUserId);
-
-		SPCurrencyServerListener requestListener = new SPCurrencyServerListener() {
-
-			@Override
-			public void onSPCurrencyServerError(CurrencyServerAbstractResponse response) {
-				showCancellableAlertBox("Response or Request Error", String.format("%s\n%s\n%s\n",
-						response.getErrorType(), response.getErrorCode(), response
-								.getErrorMessage()));
-			}
-
-			@Override
-			public void onSPCurrencyDeltaReceived(CurrencyServerDeltaOfCoinsResponse response) {
-				showCancellableAlertBox("Response From Currency Server", String.format(
-						"Delta of Coins: %s\n\n" + "Used Latest Transaction ID: %s\n\n"
-								+ "Returned Latest Transaction ID: %s\n\n", response
-								.getDeltaOfCoins(), usedTransactionId, response
-								.getLatestTransactionId()));
-			}
-		};
-
 		try {
-			SponsorPayPublisher.requestNewCoins(getApplicationContext(), mUserId, requestListener,
-					null, mSecurityToken, mOverridingAppId);
+			SPSession session = SPSessionManager.getCurrentSession();
+			
+			final String usedTransactionId = VirtualCurrencyConnector.fetchLatestTransactionId(
+					getApplicationContext(), session.getAppId(), session.getUserId());
+			
+			SPCurrencyServerListener requestListener = new SPCurrencyServerListener() {
+				
+				@Override
+				public void onSPCurrencyServerError(CurrencyServerAbstractResponse response) {
+					showCancellableAlertBox("Response or Request Error", String.format("%s\n%s\n%s\n",
+							response.getErrorType(), response.getErrorCode(), response
+							.getErrorMessage()));
+				}
+				
+				@Override
+				public void onSPCurrencyDeltaReceived(CurrencyServerDeltaOfCoinsResponse response) {
+					showCancellableAlertBox("Response From Currency Server", String.format(
+							"Delta of Coins: %s\n\n" + "Used Latest Transaction ID: %s\n\n"
+									+ "Returned Latest Transaction ID: %s\n\n", response
+									.getDeltaOfCoins(), usedTransactionId, response
+									.getLatestTransactionId()));
+				}
+			};
+			SponsorPayPublisher.requestNewCoins(getApplicationContext(), requestListener);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
-			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",
+			SponsorPayLogger.e(TAG, "SponsorPay SDK Exception: ",
 					ex);
 		}
 	}
@@ -386,19 +363,17 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 				R.id.fragment_placeholder);
 
 		if (fragment instanceof ItemsSettingsFragment) {
-			((ItemsSettingsFragment) fragment).launchUnlockItems(mUserId,
-					mSecurityToken, mOverridingAppId);
+			((ItemsSettingsFragment) fragment).launchUnlockItems();
 		}
 	}
 
 	public void onRequestBannerClick(View v) {
 		fetchValuesFromFields();
-		Log.i(getClass().getSimpleName(), "Requesting banner");
+		SponsorPayLogger.i(TAG, "Requesting banner");
 		Fragment fragment = getSupportFragmentManager().findFragmentById(
 				R.id.fragment_placeholder);
 		if (fragment instanceof BannersSettingsFragment) {
-			((BannersSettingsFragment) fragment).requestBanner(mUserId, mCurrencyName,
-					mOverridingAppId);
+			((BannersSettingsFragment) fragment).requestBanner(mCurrencyName);
 		}
 	}
 
@@ -445,10 +420,6 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		replaceFragment( new InterstitialSettingsFragment());
 	}
 	
-	public void onAdvertiserClick(View view){
-		replaceFragment( new AdvertiserSettingsFragment());
-	}
-
 	public void onBannersClick(View view){
 		replaceFragment( new BannersSettingsFragment());
 	}

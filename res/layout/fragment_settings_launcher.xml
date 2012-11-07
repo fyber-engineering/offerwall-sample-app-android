@@ -4,12 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     android:padding="15dp" >
-
-	<Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:onClick="onAdvertiserClick"
-        android:text="@string/advertiser" />
         
     <Button
         android:layout_width="fill_parent"

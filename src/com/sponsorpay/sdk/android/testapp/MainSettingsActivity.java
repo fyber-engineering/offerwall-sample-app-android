@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.method.KeyListener;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,6 +31,7 @@ import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiserState;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
+import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class MainSettingsActivity extends Activity {
@@ -37,9 +40,6 @@ public class MainSettingsActivity extends Activity {
 	 * Shared preferences file name. Stores the values entered into the UI fields.
 	 */
 	public static final String PREFERENCES_EXTRA = "prefs.extra";
-	public static final String USER_ID_EXTRA = "user.id.extra";
-	public static final String OVERRIDING_APP_ID_EXTRA = "overriding.app.id.extra";
-	public static final String SECURITY_TOKEN_EXTRA = "security.token.extra";
 	public static final String KEEP_OFFERWALL_OPEN_EXTRA = "keep.offerwall.extra.extra";
 	
 	private static final String OVERRIDING_URL_PREFS_KEY = "OVERRIDING_URL";
@@ -63,9 +63,6 @@ public class MainSettingsActivity extends Activity {
 	
 	private String mOverridingUrl;
 
-	private String mUserId;
-	private String mOverridingAppId;
-	private String mSecurityToken;
 	private String mPreferencesFileName;
 
 	private Map<String, String> mCustomKeyValuesForRequest;
@@ -76,9 +73,6 @@ public class MainSettingsActivity extends Activity {
 		setContentView(R.layout.main_settings);
 		
 		mPreferencesFileName = getIntent().getStringExtra(PREFERENCES_EXTRA);
-		mOverridingAppId = getIntent().getStringExtra(OVERRIDING_APP_ID_EXTRA);
-		mUserId = getIntent().getStringExtra(USER_ID_EXTRA);
-		mSecurityToken = getIntent().getStringExtra(SECURITY_TOKEN_EXTRA);
 		
 		bindViews();
 	}
@@ -334,13 +328,23 @@ public class MainSettingsActivity extends Activity {
 
 	public void appendDefaultParamsToUrlField(View v) {
 		fetchValuesFromFields();
-		HostInfo hostInfo = new HostInfo(getApplicationContext());
-		hostInfo.setOverriddenAppId(mOverridingAppId);
-		mOverridingUrl = UrlBuilder.newBuilder(mOverridingUrl, hostInfo)
-				.setUserId(mUserId)
-				.addExtraKeysValues(mCustomKeyValuesForRequest)
-				.setSecretKey(mSecurityToken).buildUrl();
+		try {
+			mOverridingUrl = UrlBuilder.newBuilder(mOverridingUrl, SPSessionManager.getCurrentSession())
+					.addExtraKeysValues(mCustomKeyValuesForRequest)
+					.buildUrl();
+		} catch (RuntimeException e) {
+			showCancellableAlertBox("Exception from SDK", e.getMessage());
+			Log.e(SponsorpayAndroidTestAppActivity.class.toString(),
+					"SponsorPay SDK Exception: ", e);
+		}
 		setValuesInFields();
+	}
+	
+	//refactor this, copied from SponsorpayAndroidTestAppActivity
+	public void showCancellableAlertBox(String title, String text) {
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+		dialogBuilder.setTitle(title).setMessage(text).setCancelable(true);
+		dialogBuilder.show();
 	}
 	
 	private static class ExtendedHostInfo extends HostInfo {

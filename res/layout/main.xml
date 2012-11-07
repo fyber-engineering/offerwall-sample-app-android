@@ -17,25 +17,27 @@
 
             <RelativeLayout android:layout_width="fill_parent"
             	android:layout_height="wrap_content" >
-            <ImageButton
-                android:id="@+id/settings_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/settings"
-                android:layout_alignParentRight="true" />
-
-            <TextView
-                android:id="@+id/sdk_version_string"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:layout_marginTop="8dp"
-                android:gravity="center_horizontal"
-                android:textSize="16dp"
-                android:textStyle="bold"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@id/settings_button" />
+            
+	            <ImageButton
+	                android:id="@+id/settings_button"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:background="@drawable/settings"
+	                android:layout_alignParentRight="true"
+	                android:onClick="onSettingsButtonClick" />
+	
+	            <TextView
+	                android:id="@+id/sdk_version_string"
+	                android:layout_width="fill_parent"
+	                android:layout_height="wrap_content"
+	                android:layout_marginBottom="15dp"
+	                android:layout_marginTop="8dp"
+	                android:gravity="center_horizontal"
+	                android:textSize="16dp"
+	                android:textStyle="bold"
+	                android:layout_alignParentLeft="true"
+	                android:layout_centerVertical="true"
+	                android:layout_toLeftOf="@id/settings_button" />
                 
             </RelativeLayout>
 
@@ -92,6 +94,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Use staging URLs" />
+            
+            <!-- 
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Session" />
+             -->
+            
+            <Button 
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Create new session"
+                android:onClick="onCreateNewSessionClick" />
+            
+            <TextView 
+                android:id="@+id/session_info"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                />
+            <!-- 
+                android:typeface="monospace" 
+             -->
+            
         </LinearLayout>
 
         <LinearLayout

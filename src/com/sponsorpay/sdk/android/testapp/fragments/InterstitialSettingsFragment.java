@@ -78,14 +78,12 @@ public class InterstitialSettingsFragment extends AbstractSettingsFragment {
 		prefsEditor.putString(SKIN_NAME_PREFS_KEY, mSkinName);
 	}
 
-	public void launchInsterstitial(String userId, Boolean shouldStayOpen,
-			String currencyName, String overridingAppId) {
+	public void launchInsterstitial(Boolean shouldStayOpen, String currencyName) {
 		fetchValuesFromFields();
 		try {
 
 			SponsorPayPublisher.loadShowInterstitial(
 					getActivity(),
-					userId,
 					new InterstitialLoadingStatusListener() {
 
 						@Override
@@ -113,7 +111,7 @@ public class InterstitialSettingsFragment extends AbstractSettingsFragment {
 						}
 
 					}, shouldStayOpen, mBackgroundUrl, mSkinName, 0,
-					currencyName, overridingAppId);
+					currencyName, null);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(),

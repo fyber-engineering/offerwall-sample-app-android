@@ -83,11 +83,11 @@ public class ItemsSettingsFragment extends AbstractSettingsFragment {
 	}
 	
 	
-	public void launchUnlockOfferWall(String userId, String overridingAppId){
+	public void launchUnlockOfferWall(){
 		fetchValuesFromFields();
 		try {
 			startActivityForResult(SponsorPayPublisher.getIntentForUnlockOfferWallActivity(
-					getApplicationContext(), userId, mUnlockItemId, mUnlockItemName, overridingAppId, null),
+					getApplicationContext(), mUnlockItemId, mUnlockItemName),
 					SponsorPayPublisher.DEFAULT_UNLOCK_OFFERWALL_REQUEST_CODE);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
@@ -96,7 +96,7 @@ public class ItemsSettingsFragment extends AbstractSettingsFragment {
 		}
 	}
 	
-	public void launchUnlockItems(String userId, String securityToken, String overridingAppId){
+	public void launchUnlockItems(){
 		fetchValuesFromFields();
 		
 		SPUnlockResponseListener listener = new SPUnlockResponseListener() {
@@ -184,8 +184,7 @@ public class ItemsSettingsFragment extends AbstractSettingsFragment {
 		};
 
 		try {
-			SponsorPayPublisher.requestUnlockItemsStatus(getApplicationContext(), userId,
-					listener, securityToken, overridingAppId, null);
+			SponsorPayPublisher.requestUnlockItemsStatus(getApplicationContext(), listener);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",

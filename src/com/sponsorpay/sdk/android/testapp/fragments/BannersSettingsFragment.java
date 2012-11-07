@@ -102,13 +102,12 @@ public class BannersSettingsFragment extends AbstractSettingsFragment implements
 		mBannerContainer.addView(mMessageView);
 	}
 
-	public void requestBanner(String userId, String currencyName,
-			String overridingAppId) {
+	public void requestBanner(String currencyName) {
 		fetchValuesFromFields();
 		try {
 
-			SponsorPayPublisher.requestOfferBanner(getApplicationContext(), userId, this, null, currencyName,
-					overridingAppId);
+			SponsorPayPublisher.requestOfferBanner(getApplicationContext(), this, null, currencyName,
+					null);
 			scrollToBottom();
 			// scrollToBottom();
 		} catch (RuntimeException ex) {

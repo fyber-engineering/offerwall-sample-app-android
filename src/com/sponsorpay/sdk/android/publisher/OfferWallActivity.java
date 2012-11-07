@@ -91,7 +91,11 @@ public class OfferWallActivity extends Activity {
 
 	private String mCurrencyName;
 	
+	/**
+	 * The {@link SPSession} used for showing the Offer Wall
+	 */
 	private SPSession mSession;
+	
 	private ActivityOfferWebClient mActivityOfferWebClient;
 
 	/**

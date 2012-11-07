@@ -39,6 +39,9 @@ public abstract class AbstractConnector implements AsyncRequestResultListener {
 	 */
 	protected Map<String, String> mCustomParameters;
 
+	/**
+	 * Session holding AppID, UserId and Security Token 
+	 */
 	protected SPSession mSession;
 	
 	protected AbstractConnector(Context context, String sessionToken) {

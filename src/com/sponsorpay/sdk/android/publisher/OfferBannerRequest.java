@@ -227,27 +227,6 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * Returns the local error thrown when trying to send the request. An exception typically means
 	 * that there was a problem connecting to the network, but checking the type of the returned
 	 * error can give a more accurate cause for the error.
-	 * 
-	 * @deprecated Use getRequestThrownError() instead, which returns a Throwable instance or null.
-	 *             This method will be removed in a future release.
-	 */
-	public Exception getRequestException() {
-		Exception retval = null;
-
-		if (mAsyncRequest != null) {
-			Throwable requestError = mAsyncRequest.getRequestThrownError();
-			if (requestError != null && Exception.class.isAssignableFrom(requestError.getClass())) {
-				retval = (Exception) requestError;
-			}
-		}
-
-		return retval;
-	}
-
-	/**
-	 * Returns the local error thrown when trying to send the request. An exception typically means
-	 * that there was a problem connecting to the network, but checking the type of the returned
-	 * error can give a more accurate cause for the error.
 	 */
 	public Throwable getRequestThrownError() {
 		if (mAsyncRequest != null) {

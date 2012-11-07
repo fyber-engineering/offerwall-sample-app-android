@@ -134,20 +134,15 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * 
 	 * @param callingActivity
 	 *            The activity from which the loading of the interstitial is requested.
-	 * @param userId
-	 *            The current user of the host application.
-	 * @param hostInfo
-	 *            {@link HostInfo} with information from the host device and publisher application.
+	 * @param sessionToken
+	 *            The token ID identifying the session to be used.
 	 * @param loadingStatusListener
 	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
 	 *            the interstitial lifecycle.
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the result URL.
 	 */
 	public InterstitialLoader(Activity callingActivity, String sessionToken,
 			InterstitialLoadingStatusListener loadingStatusListener) {
 
-		//FIXME documentation!!
 		mCallingActivity = callingActivity;
 		
 		mSession = SPSessionManager.getSession(sessionToken);

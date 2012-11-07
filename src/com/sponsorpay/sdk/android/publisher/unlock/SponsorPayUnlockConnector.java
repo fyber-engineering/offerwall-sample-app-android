@@ -16,6 +16,7 @@ import com.sponsorpay.sdk.android.publisher.AbstractResponse;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse.RequestErrorType;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
+import com.sponsorpay.sdk.android.session.SPSession;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
@@ -43,19 +44,14 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 	 * 
 	 * @param context
 	 *            Android application context.
-	 * @param userId
-	 *            User ID.
+	 * @param sessionToken
+	 *            The token identifying the {@link SPSession} to be used.
 	 * @param userListener
 	 *            Listener which will be notified of asynchronous responses to the requests sent by
 	 *            this app.
-	 * @param hostInfo
-	 *            {@link HostInfo} containing information about the host app and device.
-	 * @param securityToken
-	 *            Security token used to sign the requests and verify the server responses.
 	 */
 	public SponsorPayUnlockConnector(Context context, String sessionToken, 
 			SPUnlockResponseListener userListener) {
-		//TODO documentation
 		super(context, sessionToken);
 
 		mUserListener = userListener;

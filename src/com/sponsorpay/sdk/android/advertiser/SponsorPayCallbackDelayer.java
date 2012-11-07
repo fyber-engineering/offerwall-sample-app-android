@@ -27,7 +27,8 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
  * Enables triggering the advertiser's callback with a delay. Uses the Android alarm mechanism
  * provided by {@link AlarmManager}.
  * 
- * @deprecated bla bal bal
+ * @deprecated This class will it's not supported anymore and will be removed from a future
+ * 			   release of the SDK
  */
 public class SponsorPayCallbackDelayer extends BroadcastReceiver {
 	public static final String ACTION_TRIGGER_SPONSORPAY_CALLBACK = "ACTION_TRIGGER_SPONSORPAY_CALLBACK";

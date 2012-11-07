@@ -143,15 +143,15 @@ public class UrlBuilder {
 
 	private String mResourceUrl;
 	/**
-	 * 	@deprecated this field will be removed from a future release of the SDK.
+	 * @deprecated this field will be removed from a future release of the SDK.
 	 */
 	private HostInfo mHostInfo;
 	/**
-	 * 	@deprecated this field will be removed from a future release of the SDK.
+	 * @deprecated this field will be removed from a future release of the SDK.
 	 */
 	private String mUserId;
 	/**
-	 * 	@deprecated this field will be removed from a future release of the SDK.
+	 * @deprecated this field will be removed from a future release of the SDK.
 	 */
 	private String mSecretKey;
 
@@ -164,7 +164,7 @@ public class UrlBuilder {
 	private boolean mShouldAddUserId = true;
 
 	/**
-	 * @deprecated This method will be removed from a future SDK release. .
+	 * @deprecated This method will be removed from a future SDK release.
 	 */
 	protected UrlBuilder(String resourceUrl, HostInfo hostInfo) {
 		mResourceUrl = resourceUrl;

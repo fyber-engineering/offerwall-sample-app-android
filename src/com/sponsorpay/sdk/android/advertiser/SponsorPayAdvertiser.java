@@ -231,7 +231,9 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            Host application context.
 	 * @param overrideAppId
 	 *            The App ID to use.
-	 * @deprecated bla bal bal
+	 *            
+	 * @deprecated This method will be removed from a future version of the SDK. 
+	 * 				Use {@link SponsorPayAdvertiser#register(Context)} instead.
 	 */
 	public static void register(Context context, String overrideAppId) {
 		register(context, overrideAppId, null);
@@ -248,7 +250,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            The App ID to use.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
-	 * @deprecated bla bal bal
+	 * @deprecated This method will be removed from a future version of the SDK. 
+	 * 				Use {@link SponsorPayAdvertiser#register(Context, Map)} instead.
 	 */
 	public static void register(Context context, String overrideAppId,
 			Map<String, String> customParams) {
@@ -273,7 +276,9 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            Host application context.
 	 * @param delayMin
 	 *            The delay in minutes for triggering the Advertiser callback.
-	 * @deprecated bla bal bal
+	 *            
+	 * @deprecated We no longer support delayed callbacks. This method will be 
+	 * 			   removed from a future version of the SDK
 	 */
 	public static void registerWithDelay(Context context, int delayMin) {
 		registerWithDelay(context, delayMin, null, null);
@@ -289,7 +294,9 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            The delay in minutes for triggering the Advertiser callback.
 	 * @param overrideAppId
 	 *            The App ID to use.
-	 * @deprecated bla bal bal
+	 *            
+	 * @deprecated We no longer support delayed callbacks. This method will be 
+	 * 			   removed from a future version of the SDK
 	 */
 	public static void registerWithDelay(Context context, int delayMin, String overrideAppId) {
 		registerWithDelay(context, delayMin, overrideAppId, null);
@@ -307,7 +314,9 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	 *            The App ID to use.
 	 * @param customParams
 	 *            Map of custom key/values to add to the parameters on the requests to the REST API.
-	 * @deprecated bla bal bal
+	 *            
+	 * @deprecated We no longer support delayed callbacks. This method will be 
+	 * 			   removed from a future version of the SDK
 	 */
 	public static void registerWithDelay(Context context, int delayMin, String overrideAppId,
 			Map<String, String> customParams) {

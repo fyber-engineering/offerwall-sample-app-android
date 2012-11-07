@@ -6,6 +6,8 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
+import com.sponsorpay.sdk.android.utils.StringUtils;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -25,7 +27,7 @@ public class SponsorPayAdvertiserState {
 	 * The key to store in the preferences file the flag which determines if we have already
 	 * successfully contacted the Advertiser API.
 	 */
-	private static final String STATE_GOT_SUCCESSFUL_RESPONSE_KEY = "SponsorPayAdvertiserState"; // TODO
+	private static final String STATE_GOT_SUCCESSFUL_RESPONSE_KEY = "SponsorPayAdvertiserState";
 
 	/**
 	 * The key to store the install subID in the preferences file
@@ -83,7 +85,7 @@ public class SponsorPayAdvertiserState {
 	 * Retrieves the value of the install subID.
 	 */
 	public String getInstallSubId() {
-		return mPrefs.getString(STATE_INSTALL_SUBID_KEY, "");
+		return mPrefs.getString(STATE_INSTALL_SUBID_KEY, StringUtils.EMPTY_STRING);
 	}
 
 	/**
@@ -101,6 +103,6 @@ public class SponsorPayAdvertiserState {
 	 * @return
 	 */
 	public String getInstallReferrer() {
-		return mPrefs.getString(STATE_INSTALL_REFERRER_KEY, "");
+		return mPrefs.getString(STATE_INSTALL_REFERRER_KEY, StringUtils.EMPTY_STRING);
 	}
 }

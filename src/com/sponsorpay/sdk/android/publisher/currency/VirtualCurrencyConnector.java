@@ -16,6 +16,7 @@ import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
+import com.sponsorpay.sdk.android.session.SPSession;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -95,20 +96,14 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * 
 	 * @param context
 	 *            Android application context.
-	 * @param userId
-	 *            ID of the user for whom the requests will be made.
+	 * @param sessionToken
+	 *            The token identifying the {@link SPSession} to be used.
 	 * @param userListener
 	 *            {@link SPCurrencyServerListener} registered by the developer code to be notified
 	 *            of the result of requests to the Virtual Currency Server.
-	 * @param hostInfo
-	 *            {@link HostInfo} containing data about the host device and application, including
-	 *            its application ID.
-	 * @param securityToken
-	 *            Security token used to sign requests to the server and verify its responses.
 	 */
 	public VirtualCurrencyConnector(Context context, String sessionToken,
 			SPCurrencyServerListener userListener) {
-		//TODO documentation
 		super(context, sessionToken);
 		mUserListener = userListener;
 	}

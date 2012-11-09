@@ -12,9 +12,9 @@ import java.util.Map;
 import android.content.Context;
 
 import com.sponsorpay.sdk.android.UrlBuilder;
-import com.sponsorpay.sdk.android.advertiser.AdvertiserCallbackSender.APIResultListener;
 import com.sponsorpay.sdk.android.session.SPSession;
 import com.sponsorpay.sdk.android.session.SPSessionManager;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -27,7 +27,7 @@ import com.sponsorpay.sdk.android.session.SPSessionManager;
  * It's implemented as a singleton, and its public methods are static.
  * </p>
  */
-public class SponsorPayAdvertiser implements APIResultListener {
+public class SponsorPayAdvertiser {
 
 	/**
 	 * Map of custom key/values to add to the parameters on the requests to the REST API.
@@ -69,11 +69,6 @@ public class SponsorPayAdvertiser implements APIResultListener {
 	public static void clearCustomParameters() {
 		sCustomParameters = null;
 	}
-
-	/**
-	 * {@link AdvertiserCallbackSender} used to call the Advertiser API asynchronously.
-	 */
-	private AdvertiserCallbackSender mAPICaller;
 
 	/**
 	 * Keep track of the persisted state of the Advertiser part of the SDK
@@ -119,6 +114,88 @@ public class SponsorPayAdvertiser implements APIResultListener {
 		mPersistedState = new SponsorPayAdvertiserState(context);
 	}
 	
+	private static SponsorPayAdvertiser getInstance(Context context) {
+		if (mInstance == null) {
+			mInstance = new SponsorPayAdvertiser(context);
+		}
+		return mInstance;
+	}
+	
+	
+	/**
+	 * This method does the actual registration at the SponsorPay backend, performing the advertiser
+	 * callback, and including in it a parameter to signal if a successful response has been
+	 * received yet.
+	 * 
+	 * @param sessionToken
+	 *            The token id of the session to be used.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	private void register(String sessionToken, Map<String, String> customParams) {
+		register(sessionToken, customParams, null);
+	}
+	
+	private void register(String sessionToken, Map<String, String> customParams, String actionId) {
+		
+		SPSession session = SPSessionManager.getSession(sessionToken);
+		
+		/* Send asynchronous call to SponsorPay's API */
+		AdvertiserCallbackSender callback = new AdvertiserCallbackSender(actionId, session, mPersistedState);
+		
+		callback.setCustomParams(customParams);
+		
+		callback.trigger();
+	}
+	
+	//================================================================================
+	// Custom Actions
+	//================================================================================
+	
+	
+	/**
+	 * Triggers the Advertiser's Action callback. It will use the values hold on the current session.
+	 * 
+	 * @param context
+	 *            Host application context.
+	 */
+	public static void registerAction(String actionId, Context context) {
+		registerAction(actionId, context, (Map<String, String>)null);
+	}
+	
+	/**
+	 * Triggers the Advertiser's Action callback. It will use the values hold on the current session..
+	 * 
+	 * @param context
+	 *            Host application context.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void registerAction(String actionId, Context context, Map<String, String> customParams) {
+		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
+		registerAction(sessionToken, actionId, context, customParams);
+	}
+	
+	/**
+	 * Triggers the Advertiser callback.
+	 * 
+	 * @param sessionToken
+	 * 			  the token id of session
+	 * @param context
+	 *            Host application context.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void registerAction(String sessionToken,String actionId, Context context, Map<String, String> customParams) {
+		getInstance(context);
+		
+		if (StringUtils.nullOrEmpty(actionId)) {
+			// FIXME
+			throw new RuntimeException("Action Id must have a valid value. Please refer to ...");
+		}
+		// The actual work is performed by the register() instance method.
+		mInstance.register(sessionToken, getCustomParameters(customParams), actionId);
+	}
 	
 	//================================================================================
 	// Callbacks
@@ -164,55 +241,7 @@ public class SponsorPayAdvertiser implements APIResultListener {
 		mInstance.register(sessionToken, getCustomParameters(customParams));
 	}
 	
-	private static SponsorPayAdvertiser getInstance(Context context) {
-		if (mInstance == null) {
-			mInstance = new SponsorPayAdvertiser(context);
-		}
-		return mInstance;
-	}
-	
-	
-	/**
-	 * This method does the actual registration at the SponsorPay backend, performing the advertiser
-	 * callback, and including in it a parameter to signal if a successful response has been
-	 * received yet.
-	 * 
-	 * @param sessionToken
-	 *            The token id of the session to be used.
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the request URL.
-	 */
-	private void register(String sessionToken, Map<String, String> customParams) {
-		
-		SPSession session = SPSessionManager.getSession(sessionToken);
-		/*
-		 * Check if we have called SponsorPay's API before and gotten a successful response.
-		 */
-		boolean gotSuccessfulResponseYet = mPersistedState
-				.getHasAdvertiserCallbackReceivedSuccessfulResponse();
 
-		/* Send asynchronous call to SponsorPay's API */
-		mAPICaller = new AdvertiserCallbackSender(session, this);
-
-		mAPICaller.setWasAlreadySuccessful(gotSuccessfulResponseYet);
-		mAPICaller.setInstallSubId(mPersistedState.getInstallSubId());
-		mAPICaller.setCustomParams(customParams);
-		
-		mAPICaller.trigger();
-	}
-
-	/**
-	 * This method is invoked when a response for the advertiser callback is received.
-	 * 
-	 * @param wasSuccessful
-	 *            Status flag to indicate if Advertiser API has been contacted successfully.
-	 */
-	public void onAPIResponse(boolean wasSuccessful) {
-		if (wasSuccessful) {
-			mPersistedState.setHasAdvertiserCallbackReceivedSuccessfulResponse(true);
-		}
-	}
-	
 	//================================================================================
     // Deprecated Methods
 	//================================================================================
@@ -263,6 +292,8 @@ public class SponsorPayAdvertiser implements APIResultListener {
 		// The actual work is performed by the register() instance method.
 		mInstance.register(sessionToken, getCustomParameters(customParams));
 	}
+	
+
 	
 	//================================================================================
 	// Delayed callback

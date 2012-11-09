@@ -110,7 +110,7 @@ public class SPSession{
 	
 	/**
 	 * Convenience method to get a session token id for the appId-userId
-	 * pair. Throws an {@link IllegalArgumentException} if AppId is null.
+	 * pair. Throws an {@link RuntimeException} if AppId is null.
 	 * 
 	 * @param appId
 	 * 			the application id
@@ -121,7 +121,7 @@ public class SPSession{
 	 */
 	public static String getSessionToken(String appId, String userId) {
 		if (StringUtils.nullOrEmpty(appId)) {
-			throw new IllegalArgumentException("AppID cannot be null!");
+			throw new RuntimeException("AppID cannot be null!");
 		}
 		if (StringUtils.nullOrEmpty(userId)) {
 			userId = StringUtils.EMPTY_STRING;

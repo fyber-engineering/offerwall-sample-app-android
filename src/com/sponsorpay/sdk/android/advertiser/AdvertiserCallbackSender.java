@@ -11,7 +11,6 @@ import java.util.Map;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
 
 import android.os.AsyncTask;
 
@@ -30,50 +29,30 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 * HTTP status code that the response should have in order to determine that the API has been
 	 * contacted successfully.
 	 */
-	private static final int SUCCESFUL_HTTP_STATUS_CODE = 200;
-
-	/**
-	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
-	 */
-	private static final String API_PRODUCTION_RESOURCE_URL = "https://service.sponsorpay.com/installs/v2";
-	private static final String API_STAGING_RESOURCE_URL = "https://staging.sws.sponsorpay.com/installs/v2";
-
-	/**
-	 * The key for encoding the parameter corresponding to whether a previous invocation of the
-	 * advertiser callback had received a successful response.
-	 */
-	private static final String SUCCESSFUL_ANSWER_RECEIVED_KEY = "answer_received";
+	protected static final int SUCCESFUL_HTTP_STATUS_CODE = 200;
 
 	/**
 	 * SubID URL parameter key
 	 */
 	private static final String INSTALL_SUBID_KEY = "subid";
-
+	
 	/**
-	 * The HTTP request that will be executed to contact the API with the callback request
+	 * The key for encoding the parameter corresponding to whether a previous invocation of the
+	 * advertiser callback had received a successful response.
 	 */
-	private HttpUriRequest mHttpRequest;
-
+	private static final String SUCCESSFUL_ANSWER_RECEIVED_KEY = "answer_received";
+	
 	/**
-	 * The response returned by the SponsorPay API
+	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
 	 */
-	private HttpResponse mHttpResponse;
-
+	private static final String API_PRODUCTION_RESOURCE_URL = "https://service.sponsorpay.com/installs/v2";
+	private static final String API_STAGING_RESOURCE_URL = "https://staging.sws.sponsorpay.com/installs/v2";
+	
 	/**
-	 * The HTTP client employed to call the Sponsorpay API
+	 * The key for encoding the action id parameter.
 	 */
-	private HttpClient mHttpClient;
+	private static final String ACTION_ID_KEY = "action_id";
 
-	/**
-	 * True if the advertiser callback was sent and received a successful response in a previous
-	 * invocation.
-	 */
-	private boolean mWasAlreadySuccessful = false;
-
-	/**
-	 * Install subID to report on the advertiser callback
-	 */
-	private String mInstallSubId;
 
 	/**
 	 * Map of custom parameters to be sent in the callback request.
@@ -102,6 +81,10 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 
 	private SPSession mSession;
 
+	protected SponsorPayAdvertiserState mState;
+	
+	protected String mActionId;
+
 	/**
 	 * <p>
 	 * Constructor. Sets the request callback listener and stores the host information.
@@ -113,9 +96,15 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 * @param listener
 	 *            the callback listener
 	 */
-	public AdvertiserCallbackSender(SPSession session, APIResultListener listener) {
-		mListener = listener;
+	public AdvertiserCallbackSender(SPSession session, SponsorPayAdvertiserState state) {
+		mState = state;
 		mSession = session;
+	}
+
+	public AdvertiserCallbackSender(String actionId, SPSession session, SponsorPayAdvertiserState state) {
+		mState = state;
+		mSession = session;
+		mActionId = actionId;
 	}
 
 	/**
@@ -125,23 +114,9 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 		mCustomParams = customParams;
 	}
 
-	/**
-	 * Sets the install subID to report on the advertiser callback.
-	 * 
-	 * @param subIdValue
-	 *            The install subID received on the app instalation.
-	 */
-	public void setInstallSubId(String subIdValue) {
-		SponsorPayLogger.d(AdvertiserCallbackSender.class.getSimpleName(), "SubID value set to " + subIdValue);
-		mInstallSubId = subIdValue;
-	}
-
-	/**
-	 * Sets whether a previous invocation of the advertiser callback had received a successful
-	 * response.
-	 */
-	public void setWasAlreadySuccessful(boolean value) {
-		mWasAlreadySuccessful = value;
+	
+	public void setListener(APIResultListener mListener) {
+		this.mListener = mListener;
 	}
 
 	/**
@@ -163,27 +138,36 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 		String baseUrl = SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
 				: API_PRODUCTION_RESOURCE_URL;
 
-		Map<String, String> extraParams = UrlBuilder.mapKeysToValues(
+		boolean gotSuccessfulResponseYet = mState
+				.getCallbackReceivedSuccessfulResponse(mActionId);
+
+		Map<String, String> params = UrlBuilder.mapKeysToValues(
 				new String[] { SUCCESSFUL_ANSWER_RECEIVED_KEY },
-				new String[] { mWasAlreadySuccessful ? "1" : "0" });
-
-		if (StringUtils.notNullNorEmpty(mInstallSubId)) {
-			extraParams.put(INSTALL_SUBID_KEY, mInstallSubId);
+				new String[] { gotSuccessfulResponseYet ? "1" : "0" });
+		
+		if (StringUtils.notNullNorEmpty(mActionId)) {
+			params.put(ACTION_ID_KEY, mActionId);
 		}
-
+		
+		String installSubId = mState.getInstallSubId();
+		
+		if (StringUtils.notNullNorEmpty(installSubId)) {
+			params.put(INSTALL_SUBID_KEY, installSubId);
+		}
+		
 		if (mCustomParams != null) {
-			extraParams.putAll(mCustomParams);
+			params.putAll(mCustomParams);
 		}
 
 		String callbackUrl = UrlBuilder.newBuilder(baseUrl, mSession).addExtraKeysValues(
-				extraParams).sendUserId(false).addScreenMetrics().buildUrl();
+				params).sendUserId(false).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(AdvertiserCallbackSender.class.getSimpleName(),
-				"Advertiser callback will be sent to: " + callbackUrl);
+				"Callback will be sent to: " + callbackUrl);
 
 		return callbackUrl;
 	}
-
+	
 	/**
 	 * <p>
 	 * Method overridden from {@link AsyncTask}. Executed on a background thread, runs the API
@@ -206,17 +190,17 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 
 		String callbackUrl = params[0];
 
-		mHttpRequest = new HttpGet(callbackUrl);
-		mHttpClient = SPHttpClient.getHttpClient();
+		HttpGet httpRequest = new HttpGet(callbackUrl);
+		HttpClient httpClient = SPHttpClient.getHttpClient();
 
 		try {
-			mHttpResponse = mHttpClient.execute(mHttpRequest);
+			HttpResponse httpResponse = httpClient.execute(httpRequest);
 
 			// We're not parsing the response, just making sure that a successful status code has
 			// been received.
-			int responseStatusCode = mHttpResponse.getStatusLine().getStatusCode();
+			int responseStatusCode = httpResponse.getStatusLine().getStatusCode();
 			
-			mHttpResponse.getEntity().consumeContent();
+			httpResponse.getEntity().consumeContent();
 			
 			if (responseStatusCode == SUCCESFUL_HTTP_STATUS_CODE) {
 				returnValue = true;
@@ -237,7 +221,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	/**
 	 * This method is called by the Android {@link AsyncTask} implementation in the UI thread (or
 	 * the thread which invoked {@link #trigger()}) when
-	 * {@link #doInBackground(AdvertiserHostInfo...)} returns. It will invoke the registered
+	 * {@link #doInBackground(String...)} returns. It will invoke the registered
 	 * {@link APIResultListener}
 	 * 
 	 * @param requestWasSuccessful
@@ -247,6 +231,9 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	@Override
 	protected void onPostExecute(Boolean requestWasSuccessful) {
 		super.onPostExecute(requestWasSuccessful);
+		if (requestWasSuccessful) {
+			mState.setCallbackReceivedSuccessfulResponse(mActionId, true);
+		}
 
 		if (mListener != null) {
 			mListener.onAPIResponse(requestWasSuccessful);

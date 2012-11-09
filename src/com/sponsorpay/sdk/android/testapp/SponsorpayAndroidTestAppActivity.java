@@ -27,6 +27,7 @@ import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
 import com.sponsorpay.sdk.android.session.SPSession;
 import com.sponsorpay.sdk.android.session.SPSessionManager;
+import com.sponsorpay.sdk.android.testapp.fragments.ActionsSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.BannersSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.InterstitialSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.ItemsSettingsFragment;
@@ -288,7 +289,24 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 			((ItemsSettingsFragment) fragment).launchUnlockOfferWall();
 		}
 	}
-
+	
+	/**
+	 * Triggered when the user clicks on the send action button.
+	 * 
+	 * @param v
+	 */
+	public void onSendActionClick(View v) {
+		fetchValuesFromFields();
+		
+		Fragment fragment = getSupportFragmentManager().findFragmentById(
+				R.id.fragment_placeholder);
+		
+		if (fragment instanceof ActionsSettingsFragment) {
+			((ActionsSettingsFragment) fragment).sendActionCompleted();
+		}
+		
+	}
+	
 
 	/**
 	 * Triggered when the user clicks on the launch interstitial button.
@@ -427,5 +445,10 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	public void onItemsClick(View view){
 		replaceFragment( new ItemsSettingsFragment());
 	}
+	
+	public void onActionsClick(View view) {
+		replaceFragment(new ActionsSettingsFragment());
+	}
+	
 	
 }

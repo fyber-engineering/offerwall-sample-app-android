@@ -105,11 +105,11 @@
             <Button 
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Create new session"
-                android:onClick="onCreateNewSessionClick" />
+                android:text="Create new credentials"
+                android:onClick="onCreateNewCredentialsClick" />
             
             <TextView 
-                android:id="@+id/session_info"
+                android:id="@+id/credentials_info"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 />

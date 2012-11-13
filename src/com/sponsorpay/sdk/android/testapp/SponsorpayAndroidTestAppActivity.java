@@ -19,14 +19,13 @@ import android.widget.TextView;
 
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerAbstractResponse;
 import com.sponsorpay.sdk.android.publisher.currency.CurrencyServerDeltaOfCoinsResponse;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
-import com.sponsorpay.sdk.android.session.SPSession;
-import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.testapp.fragments.BannersSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.InterstitialSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.ItemsSettingsFragment;
@@ -60,7 +59,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	private EditText mUserIdField;
 	private EditText mSecurityTokenField;
 	private EditText mCurrencyNameField;
-	private TextView mSessionInfo;
+	private TextView mCredentialsInfo;
 
 	private CheckBox mUseStagingUrlsCheckBox;
 	
@@ -103,7 +102,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		
 		mUseStagingUrlsCheckBox = (CheckBox) findViewById(R.id.use_staging_urls_checkbox);
 		
-		mSessionInfo = (TextView) findViewById(R.id.session_info);
+		mCredentialsInfo = (TextView) findViewById(R.id.credentials_info);
 
 	}
 
@@ -127,12 +126,12 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		Editor prefsEditor = prefs.edit();
 
 		try {
-			SPSession session = SPSessionManager.getCurrentSession();
-			prefsEditor.putString(APP_ID_PREFS_KEY, session.getAppId());
-			prefsEditor.putString(USER_ID_PREFS_KEY, session.getUserId());
-			prefsEditor.putString(SECURITY_TOKEN_PREFS_KEY, session.getSecurityToken());
+			SPCredentials credentials = SponsorPay.getCurrentCredentials();
+			prefsEditor.putString(APP_ID_PREFS_KEY, credentials.getAppId());
+			prefsEditor.putString(USER_ID_PREFS_KEY, credentials.getUserId());
+			prefsEditor.putString(SECURITY_TOKEN_PREFS_KEY, credentials.getSecurityToken());
 		} catch (RuntimeException e) {
-			SponsorPayLogger.d(TAG, "There's no current session.");
+			SponsorPayLogger.d(TAG, "There's no current credentials.");
 		}
 		
 		prefsEditor.putString(CURRENCY_NAME_PREFS_KEY, mCurrencyName);
@@ -156,7 +155,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		mCurrencyName = prefs.getString(CURRENCY_NAME_PREFS_KEY, StringUtils.EMPTY_STRING);
 		
 		try {
-			SPSessionManager.initialize(overridingAppId, userId, securityToken, getApplicationContext());
+			SponsorPay.start(overridingAppId, userId, securityToken, getApplicationContext());
 		} catch (RuntimeException e){
 			SponsorPayLogger.d(TAG,
 						e.getLocalizedMessage());
@@ -214,43 +213,43 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	 */
 	private void setValuesInFields() {
 		try {
-			SPSession session = SPSessionManager.getCurrentSession();
-			mAppIdField.setText(session.getAppId());
-			mUserIdField.setText(session.getUserId());
-			mSecurityTokenField.setText(session.getSecurityToken());
+			SPCredentials credentials = SponsorPay.getCurrentCredentials();
+			mAppIdField.setText(credentials.getAppId());
+			mUserIdField.setText(credentials.getUserId());
+			mSecurityTokenField.setText(credentials.getSecurityToken());
 		} catch (RuntimeException e) {
-			SponsorPayLogger.d(TAG, "There's no current session.");
+			SponsorPayLogger.d(TAG, "There's no current credentials.");
 		}
 		mCurrencyNameField.setText(mCurrencyName);
-		setSessionInfo();
+		setCredentialsInfo();
 	}
 	
-	private void setSessionInfo() {
+	private void setCredentialsInfo() {
 		try {
-			mSessionInfo.setText(SPSessionManager.getCurrentSession().toString());
+			mCredentialsInfo.setText(SponsorPay.getCurrentCredentials().toString());
 		} catch (RuntimeException e) {
 			SponsorPayLogger.d(TAG,
-					"There's no session yet, unable to send the callback.");
+					"There are no credentials yet, unable to send the callback.");
 		}
 	}
 	
 	/**
-	 * Triggered when the user clicks on the create new session button.
+	 * Triggered when the user clicks on the create new credentials button.
 	 * 
 	 * @param v
 	 */
-	public void onCreateNewSessionClick(View v) {
+	public void onCreateNewCredentialsClick(View v) {
 		try {
 			String overridingAppId = mAppIdField.getText().toString();
 			String userId = mUserIdField.getText().toString();
 			String securityToken = mSecurityTokenField.getText().toString();
-			SPSessionManager.initialize(overridingAppId, userId, securityToken, getApplicationContext());
+			SponsorPay.start(overridingAppId, userId, securityToken, getApplicationContext());
 		} catch (RuntimeException e){
 			showCancellableAlertBox("Exception from SDK", e.getMessage());
 			SponsorPayLogger.e(TAG,
 					"SponsorPay SDK Exception: ", e);
 		}
-		setSessionInfo();
+		setCredentialsInfo();
 	}
 
 	/**
@@ -318,10 +317,10 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		fetchValuesFromFields();
 
 		try {
-			SPSession session = SPSessionManager.getCurrentSession();
+			SPCredentials credentials = SponsorPay.getCurrentCredentials();
 			
 			final String usedTransactionId = VirtualCurrencyConnector.fetchLatestTransactionId(
-					getApplicationContext(), session.getAppId(), session.getUserId());
+					getApplicationContext(), credentials.getCredentialsToken());
 			
 			SPCurrencyServerListener requestListener = new SPCurrencyServerListener() {
 				

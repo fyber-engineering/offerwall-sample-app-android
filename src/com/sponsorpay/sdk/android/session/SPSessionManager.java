@@ -151,7 +151,8 @@ public class SPSessionManager {
 	 * @param context
 	 *            Android application context.
 	 *            
-	 * @return
+	 * @return the session token that identify the session for the provided
+	 * 			parameters.
 	 */
 	public static String initialize(String appId, String userId,
 			String securityToken, Context context) {

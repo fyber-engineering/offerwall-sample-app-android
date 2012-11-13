@@ -10,9 +10,9 @@ import java.util.Map;
 
 import android.content.Context;
 
+import com.sponsorpay.sdk.android.SponsorPay;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest.AsyncRequestResultListener;
-import com.sponsorpay.sdk.android.session.SPSession;
-import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
@@ -40,15 +40,15 @@ public abstract class AbstractConnector implements AsyncRequestResultListener {
 	protected Map<String, String> mCustomParameters;
 
 	/**
-	 * Session holding AppID, UserId and Security Token 
+	 * Credentials holding AppID, UserId and Security Token 
 	 */
-	protected SPSession mSession;
+	protected SPCredentials mCredentials;
 	
-	protected AbstractConnector(Context context, String sessionToken) {
+	protected AbstractConnector(Context context, String credentialsToken) {
 		mContext = context;
-		mSession = SPSessionManager.getSession(sessionToken);
-		if (StringUtils.nullOrEmpty(mSession.getSecurityToken())) {
-			throw new IllegalArgumentException("Security token has not been set on the session");
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
+		if (StringUtils.nullOrEmpty(mCredentials.getSecurityToken())) {
+			throw new IllegalArgumentException("Security token has not been set on the credentials");
 		}
 	}
 	

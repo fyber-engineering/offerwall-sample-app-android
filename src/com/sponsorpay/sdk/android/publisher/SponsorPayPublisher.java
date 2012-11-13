@@ -16,7 +16,9 @@ import android.content.Intent;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
@@ -24,8 +26,6 @@ import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
 import com.sponsorpay.sdk.android.publisher.unlock.ItemIdValidator;
 import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
 import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
-import com.sponsorpay.sdk.android.session.SPSession;
-import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -278,7 +278,7 @@ public class SponsorPayPublisher {
 	 * </p>
 	 * 
 	 * <p>
-	 * Will use the publisher application id and user id stored in the current session.
+	 * Will use the publisher application id and user id stored in the current credentials.
 	 * </p>
 	 * 
 	 * @param context
@@ -291,8 +291,8 @@ public class SponsorPayPublisher {
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context,	Boolean shouldStayOpen) {
-		String sessionToken =  SPSessionManager.getCurrentSession().getSessionToken();
-		return getIntentForOfferWallActivity(sessionToken, context, shouldStayOpen, null, null);
+		String credentialsToken =  SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, null, null);
 	}
 
 	/**
@@ -303,7 +303,7 @@ public class SponsorPayPublisher {
 	 * </p>
 	 * 
 	 * <p>
-	 * Will use the publisher application id and user id stored in the current session.
+	 * Will use the publisher application id and user id stored in the current credentials.
 	 * </p>
 	 * 
 	 * @param context
@@ -322,8 +322,8 @@ public class SponsorPayPublisher {
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, Boolean shouldStayOpen,
 			String currencyName, HashMap<String, String> customParams) {
-		String sessionToken =  SPSessionManager.getCurrentSession().getSessionToken();
-		return getIntentForOfferWallActivity(sessionToken, context, shouldStayOpen, currencyName, customParams);
+		String credentialsToken =  SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, currencyName, customParams);
 	}
 	
 	/**
@@ -334,12 +334,12 @@ public class SponsorPayPublisher {
 	 * </p>
 	 * 
 	 * <p>
-	 * Will use the provided publisher application id and user id stored in the session identified 
+	 * Will use the provided publisher application id and user id stored in the credentials identified 
 	 * by the token id.
 	 * </p>
 	 * 
-	 * @param sessionToken
-	 *            The token id of the session to be used.
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
 	 * @param context
 	 *            The publisher application context.
 	 * @param shouldStayOpen
@@ -354,14 +354,14 @@ public class SponsorPayPublisher {
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
 	 */
-	public static Intent getIntentForOfferWallActivity(String sessionToken, Context context,
+	public static Intent getIntentForOfferWallActivity(String credentialsToken, Context context,
 			Boolean shouldStayOpen, String currencyName, HashMap<String, String> customParams) {
 
-		SPSession session = SPSessionManager.getSession(sessionToken);
+		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 
 
 		Intent intent = new Intent(context, OfferWallActivity.class);
-		intent.putExtra(OfferWallActivity.EXTRA_SESSION_TOKEN_KEY, session.getSessionToken());
+		intent.putExtra(OfferWallActivity.EXTRA_CREDENTIALS_TOKEN_KEY, credentials.getCredentialsToken());
 
 		if (shouldStayOpen != null) {
 			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
@@ -393,7 +393,7 @@ public class SponsorPayPublisher {
 	 * </p>
 	 * 
 	 * <p>
-	 * Will use the current session or throw an exception if none exists yet.
+	 * Will use the current credentials or throw an exception if none exists yet.
 	 * </p>
 	 * 
 	 * @param context
@@ -408,8 +408,8 @@ public class SponsorPayPublisher {
 	 */
 	public static Intent getIntentForUnlockOfferWallActivity(Context context,
 			String unlockItemId, String unlockItemName) {
-		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
-		return getIntentForUnlockOfferWallActivity(sessionToken, context,
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForUnlockOfferWallActivity(credentialsToken, context,
 				unlockItemId, unlockItemName, null);
 	}
 	
@@ -420,8 +420,8 @@ public class SponsorPayPublisher {
 	 * application by clicking on an offer.
 	 * </p>
 	 * 
-	 * @param sessionToken
-	 * 			  the id of the session hat will be used
+	 * @param credentialsToken
+	 * 			  the id of the credentials hat will be used
 	 * @param context
 	 *            The publisher application context.
 	 * @param unlockItemId
@@ -434,7 +434,7 @@ public class SponsorPayPublisher {
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
 	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
 	 */
-	public static Intent getIntentForUnlockOfferWallActivity(String sessionToken, Context context,
+	public static Intent getIntentForUnlockOfferWallActivity(String credentialsToken, Context context,
 			String unlockItemId, String unlockItemName,	HashMap<String, String> customParams) {
 		
 		ItemIdValidator itemIdValidator = new ItemIdValidator(unlockItemId);
@@ -442,10 +442,10 @@ public class SponsorPayPublisher {
 			throw new RuntimeException("The provided Unlock Item ID is not valid. "
 					+ itemIdValidator.getValidationDescription());
 		}
-		SPSession session = SPSessionManager.getSession(sessionToken);
+		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 
 		Intent intent = new Intent(context, OfferWallActivity.class);
-		intent.putExtra(OfferWallActivity.EXTRA_SESSION_TOKEN_KEY, session.getSessionToken());
+		intent.putExtra(OfferWallActivity.EXTRA_CREDENTIALS_TOKEN_KEY, credentials.getCredentialsToken());
 
 		intent.putExtra(OfferWallActivity.EXTRA_OFFERWALL_TYPE,
 				OfferWallActivity.OFFERWALL_TYPE_UNLOCK);
@@ -469,7 +469,7 @@ public class SponsorPayPublisher {
 	
 	/**
 	 * Starts the mobile interstitial request / loading / showing process using the current
-	 * session.
+	 * credentials.
 	 * 
 	 * @param callingActivity
 	 *            The activity which requests the interstitial. A progress dialog will be shown on
@@ -488,14 +488,14 @@ public class SponsorPayPublisher {
 	 */
 	public static void loadShowInterstitial(Activity callingActivity,  
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen) {
-		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
-		loadShowInterstitial(sessionToken , callingActivity, loadingStatusListener, shouldStayOpen,
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		loadShowInterstitial(credentialsToken , callingActivity, loadingStatusListener, shouldStayOpen,
 				null, null,0, null, null);
 	}
 	
 	/**
 	 * Starts the mobile interstitial request / loading / showing process using the current
-	 * session.
+	 * credentials.
 	 * 
 	 * @param callingActivity
 	 *            The activity which requests the interstitial. A progress dialog will be shown on
@@ -532,8 +532,8 @@ public class SponsorPayPublisher {
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName,
 			Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
-		loadShowInterstitial(sessionToken, callingActivity,
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		loadShowInterstitial(credentialsToken, callingActivity,
 				loadingStatusListener, shouldStayOpen, backgroundUrl, skinName,
 				loadingTimeoutSecs, currencyName, customParams);
 	}
@@ -541,8 +541,8 @@ public class SponsorPayPublisher {
 	/**
 	 * Starts the mobile interstitial request / loading / showing process.
 	 * 
-	 * @param sessionToken
-	 *            The token id of the session to be used.
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
 	 * @param callingActivity
 	 *            The activity which requests the interstitial. A progress dialog will be shown on
 	 *            top of it and if an ad is returned, the calling activity will be used to launch
@@ -574,12 +574,12 @@ public class SponsorPayPublisher {
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	public static void loadShowInterstitial(String sessionToken, Activity callingActivity,  
+	public static void loadShowInterstitial(String credentialsToken, Activity callingActivity,  
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName,
 			Map<String, String> customParams) {
 
-		InterstitialLoader il = new InterstitialLoader(callingActivity, sessionToken,
+		InterstitialLoader il = new InterstitialLoader(callingActivity, credentialsToken,
 				loadingStatusListener);
 
 		if (shouldStayOpen != null) {
@@ -618,7 +618,7 @@ public class SponsorPayPublisher {
 	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
 	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
 	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. The current 
-	 * session will be used to get the application id and user id.
+	 * credentials will be used to get the application id and user id.
 	 * 
 	 * @param context
 	 *            Android application context.
@@ -627,18 +627,18 @@ public class SponsorPayPublisher {
 	 *            request.
 	 */
 	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
-		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
-		requestNewCoins(sessionToken, context, listener, null, null);
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		requestNewCoins(credentialsToken, context, listener, null, null);
 	}
 	
 	/**
 	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
 	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
 	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. It will use the 
-	 * session identified by the provided token id.
+	 * credentials identified by the provided token id.
 	 * 
-	 * @param sessionToken
-	 *            The token id of the session to be used.
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
 	 * @param context
 	 *            Android application context.
 	 * @param listener
@@ -651,10 +651,10 @@ public class SponsorPayPublisher {
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	public static void requestNewCoins(String sessionToken, Context context, 
+	public static void requestNewCoins(String credentialsToken, Context context, 
 			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams) {
 		
-		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, sessionToken, listener);
+		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, credentialsToken, listener);
 		vcc.setCustomParameters(getCustomParameters(customParams));
 		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
 	}
@@ -670,7 +670,7 @@ public class SponsorPayPublisher {
 	 * </p>
 	 * 
 	 * <p>
-	 * This method will use the current session or throw a {@link RuntimeException} if there's none.
+	 * This method will use the current credentials or throw a {@link RuntimeException} if there's none.
 	 * </p>
 	 * 
 	 * @param context
@@ -680,8 +680,8 @@ public class SponsorPayPublisher {
 	 *            request.
 	 */
 	public static void requestUnlockItemsStatus(Context context, SPUnlockResponseListener listener) {
-		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
-		requestUnlockItemsStatus(sessionToken, context, listener, null);
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		requestUnlockItemsStatus(credentialsToken, context, listener, null);
 	}
 	
 	/**
@@ -690,8 +690,8 @@ public class SponsorPayPublisher {
 	 * notified when a response is received.
 	 * </p>
 	 * 
-	 * @param sessionToken
-	 *            The token id of the session to be used.
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
 	 * @param context
 	 *            Android application context.
 	 * @param listener
@@ -700,10 +700,10 @@ public class SponsorPayPublisher {
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	public static void requestUnlockItemsStatus(String sessionToken, Context context,
+	public static void requestUnlockItemsStatus(String credentialsToken, Context context,
 			SPUnlockResponseListener listener, Map<String, String> customParams) {
 		
-		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, sessionToken, listener);
+		SponsorPayUnlockConnector uc = new SponsorPayUnlockConnector(context, credentialsToken, listener);
 		
 		uc.setCustomParameters(getCustomParameters(customParams));
 		
@@ -721,7 +721,7 @@ public class SponsorPayPublisher {
 	 * </p>
 	 * 
 	 * <p>
-	 * This method will use the current session or throw a {@link RuntimeException} if there's none.
+	 * This method will use the current credentials or throw a {@link RuntimeException} if there's none.
 	 * </p>
 	 * 
 	 * @param context
@@ -744,7 +744,7 @@ public class SponsorPayPublisher {
 	 * </p>
 	 * 
 	 * <p>
-	 * This method will use the current session or throw a {@link RuntimeException} if there's none.
+	 * This method will use the current credentials or throw a {@link RuntimeException} if there's none.
 	 * </p>
 	 * 
 	 * @param context
@@ -767,8 +767,8 @@ public class SponsorPayPublisher {
 	public static OfferBannerRequest requestOfferBanner(Context context,
 			SPOfferBannerListener listener,	OfferBanner.AdShape offerBannerAdShape, 
 			String currencyName, Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
-		return requestOfferBanner(sessionToken, context, listener, offerBannerAdShape,
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return requestOfferBanner(credentialsToken, context, listener, offerBannerAdShape,
 				currencyName, (Map<String, String>)null);
 	}
 	
@@ -776,8 +776,8 @@ public class SponsorPayPublisher {
 	 * Requests an Offer Banner to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
 	 * 
-	 * @param sessionToken
-	 *            The token id of the session to be used.
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
 	 * @param context
 	 *            Android application context.
 	 * @param listener
@@ -795,7 +795,7 @@ public class SponsorPayPublisher {
 	 * @return An {@link OfferBannerRequest} instance which manages the request to the server on the
 	 *         background.
 	 */
-	public static OfferBannerRequest requestOfferBanner(String sessionToken, Context context, 
+	public static OfferBannerRequest requestOfferBanner(String credentialsToken, Context context, 
 			SPOfferBannerListener listener,	OfferBanner.AdShape offerBannerAdShape, 
 			String currencyName, Map<String, String> customParams) {
 		
@@ -803,7 +803,7 @@ public class SponsorPayPublisher {
 			offerBannerAdShape = sDefaultOfferBannerAdShape;
 		}
 		
-		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, sessionToken,
+		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, credentialsToken,
 				listener, offerBannerAdShape, currencyName, getCustomParameters(customParams));
 		
 		if (sOverridingWebViewUrl != null) {
@@ -1072,8 +1072,8 @@ public class SponsorPayPublisher {
 	public static Intent getIntentForOfferWallActivity(Context context,
 			String userId, Boolean shouldStayOpen, String currencyName,
 			String overridingAppId, HashMap<String, String> customParams) {
-		String sessionToken = SPSessionManager.getSession(overridingAppId, userId, null, context);
-		return getIntentForOfferWallActivity(sessionToken, context, shouldStayOpen, currencyName, customParams);
+		String credentialsToken = SponsorPay.getCredentials(overridingAppId, userId, null, context);
+		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, currencyName, customParams);
 	}
 	
 	//================================================================================
@@ -1146,8 +1146,8 @@ public class SponsorPayPublisher {
 	public static Intent getIntentForUnlockOfferWallActivity(Context context, String userId,
 			String unlockItemId, String unlockItemName, String overrideAppId,
 			HashMap<String, String> customParams) {
-		String sessionToken = SPSessionManager.getSession(overrideAppId, userId, null, context);
-		return getIntentForUnlockOfferWallActivity(sessionToken, context,
+		String credentialsToken = SponsorPay.getCredentials(overrideAppId, userId, null, context);
+		return getIntentForUnlockOfferWallActivity(credentialsToken, context,
 				unlockItemId, unlockItemName, customParams);
 	}
 	
@@ -1336,9 +1336,9 @@ public class SponsorPayPublisher {
 			InterstitialLoadingStatusListener loadingStatusListener, Boolean shouldStayOpen,
 			String backgroundUrl, String skinName, int loadingTimeoutSecs, String currencyName, 
 			String overriddenAppId, Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.getSession(
+		String credentialsToken = SponsorPay.getCredentials(
 				overriddenAppId, userId, null, callingActivity.getApplication());
-		loadShowInterstitial(sessionToken, callingActivity,
+		loadShowInterstitial(credentialsToken, callingActivity,
 				loadingStatusListener, shouldStayOpen, backgroundUrl, skinName,
 				loadingTimeoutSecs, currencyName, customParams);
 	}
@@ -1648,8 +1648,8 @@ public class SponsorPayPublisher {
 			SPCurrencyServerListener listener, String transactionId, String securityToken,
 			String applicationId, Map<String, String> customParams) {
 		
-		String sessionToken = SPSessionManager.getSession(applicationId, userId, securityToken, context);
-		requestNewCoins(sessionToken, context, listener, transactionId, customParams);
+		String credentialsToken = SponsorPay.getCredentials(applicationId, userId, securityToken, context);
+		requestNewCoins(credentialsToken, context, listener, transactionId, customParams);
 	}
 
 	//================================================================================
@@ -1718,8 +1718,8 @@ public class SponsorPayPublisher {
 	public static void requestUnlockItemsStatus(Context context, String userId,
 			SPUnlockResponseListener listener, String securityToken, String applicationId,
 			Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.getSession(applicationId, userId, securityToken, context);
-		requestUnlockItemsStatus(sessionToken, context, listener, customParams);
+		String credentialsToken = SponsorPay.getCredentials(applicationId, userId, securityToken, context);
+		requestUnlockItemsStatus(credentialsToken, context, listener, customParams);
 	}
 	
 	//================================================================================
@@ -1788,8 +1788,8 @@ public class SponsorPayPublisher {
 	public static OfferBannerRequest requestOfferBanner(Context context, String userId,
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
 			String currencyName, String applicationId, Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.getSession(applicationId, userId, null, context);
-		return requestOfferBanner(sessionToken, context, listener, offerBannerAdShape, currencyName, customParams);
+		String credentialsToken = SponsorPay.getCredentials(applicationId, userId, null, context);
+		return requestOfferBanner(credentialsToken, context, listener, offerBannerAdShape, currencyName, customParams);
 	}
 	
 }

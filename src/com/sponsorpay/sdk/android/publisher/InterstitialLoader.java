@@ -13,10 +13,10 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Handler;
 
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
-import com.sponsorpay.sdk.android.session.SPSession;
-import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -126,7 +126,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 */
 	private ProgressDialog mProgressDialog;
 
-	private SPSession mSession;
+	private SPCredentials mCredentials;
 
 
 	/**
@@ -134,18 +134,18 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * 
 	 * @param callingActivity
 	 *            The activity from which the loading of the interstitial is requested.
-	 * @param sessionToken
-	 *            The token ID identifying the session to be used.
+	 * @param credentialsToken
+	 *            The token ID identifying the credentials to be used.
 	 * @param loadingStatusListener
 	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
 	 *            the interstitial lifecycle.
 	 */
-	public InterstitialLoader(Activity callingActivity, String sessionToken,
+	public InterstitialLoader(Activity callingActivity, String credentialsToken,
 			InterstitialLoadingStatusListener loadingStatusListener) {
 
 		mCallingActivity = callingActivity;
 		
-		mSession = SPSessionManager.getSession(sessionToken);
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
 		
 		mLoadingStatusListener = loadingStatusListener;
 
@@ -302,7 +302,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
 				: INTERSTITIAL_PRODUCTION_BASE_URL;
 
-		return UrlBuilder.newBuilder(interstitialBaseUrl, mSession)
+		return UrlBuilder.newBuilder(interstitialBaseUrl, mCredentials)
 				.addExtraKeysValues(keysValues).addScreenMetrics().buildUrl();
 	}
 

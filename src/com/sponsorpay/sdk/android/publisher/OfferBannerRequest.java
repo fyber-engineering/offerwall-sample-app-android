@@ -11,10 +11,10 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
-import com.sponsorpay.sdk.android.session.SPSession;
-import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -64,7 +64,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	private AsyncRequest mAsyncRequest;
 	
 	
-	private SPSession mSession;
+	private SPCredentials mCredentials;
 
 	
 	/**
@@ -72,8 +72,8 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * 
 	 * @param context
 	 *            Android application context.
-	 * @param sessionToken
-	 *            the token ID identifying the session used to retrieve values.
+	 * @param credentialsToken
+	 *            the token ID identifying the credentials used to retrieve values.
 	 * @param listener
 	 *            {@link SPOfferBannerListener} which will be notified of the result of the request.
 	 * @param offerBannerAdShape
@@ -83,11 +83,11 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	public OfferBannerRequest(Context context, String sessionToken, 
+	public OfferBannerRequest(Context context, String credentialsToken, 
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
 			String currencyName, Map<String, String> customParams) {
 		
-		mSession = SPSessionManager.getSession(sessionToken);
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
 		mContext = context;
 		mListener = listener;
 		mOfferBannerAdShape = offerBannerAdShape;
@@ -137,7 +137,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 			baseUrl = OFFERBANNER_PRODUCTION_BASE_URL;
 		}
 
-		return UrlBuilder.newBuilder(baseUrl, mSession)
+		return UrlBuilder.newBuilder(baseUrl, mCredentials)
 				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 	}
 

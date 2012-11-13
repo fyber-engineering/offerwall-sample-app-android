@@ -27,11 +27,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiserState;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
-import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class MainSettingsActivity extends Activity {
@@ -329,7 +329,7 @@ public class MainSettingsActivity extends Activity {
 	public void appendDefaultParamsToUrlField(View v) {
 		fetchValuesFromFields();
 		try {
-			mOverridingUrl = UrlBuilder.newBuilder(mOverridingUrl, SPSessionManager.getCurrentSession())
+			mOverridingUrl = UrlBuilder.newBuilder(mOverridingUrl, SponsorPay.getCurrentCredentials())
 					.addExtraKeysValues(mCustomKeyValuesForRequest)
 					.buildUrl();
 		} catch (RuntimeException e) {

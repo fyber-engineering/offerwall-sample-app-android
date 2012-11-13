@@ -11,12 +11,12 @@ import java.util.Map;
 import android.content.Context;
 
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse.RequestErrorType;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
-import com.sponsorpay.sdk.android.session.SPSession;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
@@ -44,15 +44,15 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 	 * 
 	 * @param context
 	 *            Android application context.
-	 * @param sessionToken
-	 *            The token identifying the {@link SPSession} to be used.
+	 * @param credentialsToken
+	 *            The token identifying the {@link SPCredentials} to be used.
 	 * @param userListener
 	 *            Listener which will be notified of asynchronous responses to the requests sent by
 	 *            this app.
 	 */
-	public SponsorPayUnlockConnector(Context context, String sessionToken, 
+	public SponsorPayUnlockConnector(Context context, String credentialsToken, 
 			SPUnlockResponseListener userListener) {
-		super(context, sessionToken);
+		super(context, credentialsToken);
 
 		mUserListener = userListener;
 	}
@@ -75,7 +75,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? SP_UNLOCK_SERVER_STAGING_BASE_URL
 				: SP_UNLOCK_SERVER_PRODUCTION_BASE_URL;
 
-		String requestUrl = UrlBuilder.newBuilder(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mSession)
+		String requestUrl = UrlBuilder.newBuilder(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mCredentials)
 				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(getClass().getSimpleName(),
@@ -101,7 +101,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 		}
 
 		response.setResponseListener(this);
-		response.parseAndCallListener(mSession.getSecurityToken());
+		response.parseAndCallListener(mCredentials.getSecurityToken());
 	}
 
 	/**

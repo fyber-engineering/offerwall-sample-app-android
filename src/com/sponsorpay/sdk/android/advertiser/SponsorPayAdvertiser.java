@@ -11,9 +11,9 @@ import java.util.Map;
 
 import android.content.Context;
 
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
-import com.sponsorpay.sdk.android.session.SPSession;
-import com.sponsorpay.sdk.android.session.SPSessionManager;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
@@ -127,21 +127,21 @@ public class SponsorPayAdvertiser {
 	 * callback, and including in it a parameter to signal if a successful response has been
 	 * received yet.
 	 * 
-	 * @param sessionToken
-	 *            The token id of the session to be used.
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	private void register(String sessionToken, Map<String, String> customParams) {
-		register(sessionToken, customParams, null);
+	private void register(String credentialsToken, Map<String, String> customParams) {
+		register(credentialsToken, customParams, null);
 	}
 	
-	private void register(String sessionToken, Map<String, String> customParams, String actionId) {
+	private void register(String credentialsToken, Map<String, String> customParams, String actionId) {
 		
-		SPSession session = SPSessionManager.getSession(sessionToken);
+		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		
 		/* Send asynchronous call to SponsorPay's API */
-		AdvertiserCallbackSender callback = new AdvertiserCallbackSender(actionId, session, mPersistedState);
+		AdvertiserCallbackSender callback = new AdvertiserCallbackSender(actionId, credentials, mPersistedState);
 		
 		callback.setCustomParams(customParams);
 		
@@ -154,7 +154,7 @@ public class SponsorPayAdvertiser {
 	
 	
 	/**
-	 * Triggers the Advertiser's Action callback. It will use the values hold on the current session.
+	 * Triggers the Advertiser's Action callback. It will use the values hold on the current credentials.
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -164,7 +164,7 @@ public class SponsorPayAdvertiser {
 	}
 	
 	/**
-	 * Triggers the Advertiser's Action callback. It will use the values hold on the current session..
+	 * Triggers the Advertiser's Action callback. It will use the values hold on the current credentials.
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -172,21 +172,21 @@ public class SponsorPayAdvertiser {
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
 	public static void registerAction(String actionId, Context context, Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
-		registerAction(sessionToken, actionId, context, customParams);
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		registerAction(credentialsToken, actionId, context, customParams);
 	}
 	
 	/**
 	 * Triggers the Advertiser callback.
 	 * 
-	 * @param sessionToken
-	 * 			  the token id of session
+	 * @param credentialsToken
+	 * 			  the token id of credentials
 	 * @param context
 	 *            Host application context.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	public static void registerAction(String sessionToken,String actionId, Context context, Map<String, String> customParams) {
+	public static void registerAction(String credentialsToken,String actionId, Context context, Map<String, String> customParams) {
 		getInstance(context);
 		
 		if (StringUtils.nullOrEmpty(actionId)) {
@@ -194,7 +194,7 @@ public class SponsorPayAdvertiser {
 			throw new RuntimeException("Action Id must have a valid value. Please refer to ...");
 		}
 		// The actual work is performed by the register() instance method.
-		mInstance.register(sessionToken, getCustomParameters(customParams), actionId);
+		mInstance.register(credentialsToken, getCustomParameters(customParams), actionId);
 	}
 	
 	//================================================================================
@@ -202,7 +202,7 @@ public class SponsorPayAdvertiser {
 	//================================================================================
 
 	/**
-	 * Triggers the Advertiser callback. It will use the values hold on the current session.
+	 * Triggers the Advertiser callback. It will use the values hold on the current credentials.
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -212,7 +212,7 @@ public class SponsorPayAdvertiser {
 	}
 	
 	/**
-	 * Triggers the Advertiser callback. It will use the values hold on the current session..
+	 * Triggers the Advertiser callback. It will use the values hold on the current credentials..
 	 * 
 	 * @param context
 	 *            Host application context.
@@ -220,25 +220,25 @@ public class SponsorPayAdvertiser {
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
 	public static void register(Context context, Map<String, String> customParams) {
-		String sessionToken = SPSessionManager.getCurrentSession().getSessionToken();
-		register(sessionToken, context, customParams);
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		register(credentialsToken, context, customParams);
 	}
 
 	/**
 	 * Triggers the Advertiser callback.
 	 * 
-	 * @param sessionToken
-	 * 			  the token id of session
+	 * @param credentialsToken
+	 * 			  the token id of credentials
 	 * @param context
 	 *            Host application context.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	public static void register(String sessionToken, Context context, Map<String, String> customParams) {
+	public static void register(String credentialsToken, Context context, Map<String, String> customParams) {
 		getInstance(context);
 		
 		// The actual work is performed by the register() instance method.
-		mInstance.register(sessionToken, getCustomParameters(customParams));
+		mInstance.register(credentialsToken, getCustomParameters(customParams));
 	}
 	
 
@@ -287,10 +287,10 @@ public class SponsorPayAdvertiser {
 
 		getInstance(context);
 
-		String sessionToken = SPSessionManager.getSession(overrideAppId, null, null, context);
+		String credentialsToken = SponsorPay.getCredentials(overrideAppId, null, null, context);
 		
 		// The actual work is performed by the register() instance method.
-		mInstance.register(sessionToken, getCustomParameters(customParams));
+		mInstance.register(credentialsToken, getCustomParameters(customParams));
 	}
 	
 

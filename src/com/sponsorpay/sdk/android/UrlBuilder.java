@@ -12,7 +12,7 @@ import java.util.Map.Entry;
 
 import android.net.Uri;
 
-import com.sponsorpay.sdk.android.session.SPSession;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
@@ -159,7 +159,7 @@ public class UrlBuilder {
 
 	private boolean mShouldAddScreenMetrics;
 
-	private SPSession mSession;
+	private SPCredentials mCredentials;
 
 	private boolean mShouldAddUserId = true;
 
@@ -171,9 +171,9 @@ public class UrlBuilder {
 		mHostInfo = hostInfo;
 	}
 	
-	protected UrlBuilder(String resourceUrl, SPSession session) {
+	protected UrlBuilder(String resourceUrl, SPCredentials credentials) {
 		mResourceUrl = resourceUrl;
-		mSession = session;
+		mCredentials = credentials;
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class UrlBuilder {
 	 * @return the instance of {@link UrlBuilder} to allow further chained methods.
 	 * 
 	 * @deprecated This method will be removed from a future SDK release. The user id
-	 * 			   will be fetched from the {@link SPSession}.
+	 * 			   will be fetched from the {@link SPCredentials}.
 	 */
 	public UrlBuilder setUserId(String userId) {
 		mUserId = userId;
@@ -212,7 +212,7 @@ public class UrlBuilder {
 	 * @return the instance of {@link UrlBuilder} to allow further chained methods.
 	 * 
 	 * @deprecated This method will be removed from a future SDK release. The secret key
-	 * 			   will be fetched from the {@link SPSession}.
+	 * 			   will be fetched from the {@link SPCredentials}.
 	 */
 	public UrlBuilder setSecretKey(String secretKey) {
 		mSecretKey = secretKey;
@@ -240,16 +240,16 @@ public class UrlBuilder {
 		HashMap<String, String> keyValueParams = new HashMap<String, String>();
 
 		if (mShouldAddUserId) {
-			if (mSession != null) {
-				keyValueParams.put(USERID_KEY, mSession.getUserId());
+			if (mCredentials != null) {
+				keyValueParams.put(USERID_KEY, mCredentials.getUserId());
 			} else if (mUserId != null) {
 				keyValueParams.put(USERID_KEY, mUserId);
 			}
 		}
 
 		HostInfo hostInfo;
-		if (mSession != null) {
-			hostInfo = mSession.getHostInfo();
+		if (mCredentials != null) {
+			hostInfo = mCredentials.getHostInfo();
 		} else {
 			hostInfo = mHostInfo;
 		}
@@ -284,8 +284,8 @@ public class UrlBuilder {
 		}
 
 		String secretKey;
-		if(mSession != null) {
-			secretKey = mSession.getSecurityToken();
+		if(mCredentials != null) {
+			secretKey = mCredentials.getSecurityToken();
 		} else {
 			secretKey = mSecretKey;
 		}
@@ -311,7 +311,7 @@ public class UrlBuilder {
 	 * @return a new {@link UrlBuilder}
 	 * 
 	 * @deprecated This method will be removed from a future SDK release. Get a UrlBuilder instance
-	 *             with {@link #newBuilder(String, SPSession)} instead.
+	 *             with {@link #newBuilder(String, SPCredentials)} instead.
 	 */
 	public static UrlBuilder newBuilder(String resourceUrl, HostInfo hostInfo) {
 		return new UrlBuilder(resourceUrl, hostInfo);
@@ -324,13 +324,13 @@ public class UrlBuilder {
 	 * 
 	 * @param resourceUrl
 	 * 		  The base URL for this builder.
-	 * @param session
-	 * 		  The {@link SPSession} holding the values (userId, appId and secret key) 
+	 * @param credentials
+	 * 		  The {@link SPCredentials} holding the values (userId, appId and secret key) 
 	 * 		  to be used within this builder.
 	 * 		  
 	 * @return a new {@link UrlBuilder}
 	 */
-	public static UrlBuilder newBuilder(String resourceUrl, SPSession session) {
-		return new UrlBuilder(resourceUrl, session);
+	public static UrlBuilder newBuilder(String resourceUrl, SPCredentials credentials) {
+		return new UrlBuilder(resourceUrl, credentials);
 	}
 }

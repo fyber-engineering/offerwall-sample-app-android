@@ -15,7 +15,7 @@ import org.apache.http.client.methods.HttpGet;
 import android.os.AsyncTask;
 
 import com.sponsorpay.sdk.android.UrlBuilder;
-import com.sponsorpay.sdk.android.session.SPSession;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
@@ -79,7 +79,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 */
 	private APIResultListener mListener;
 
-	private SPSession mSession;
+	private SPCredentials mCredentials;
 
 	protected SponsorPayAdvertiserState mState;
 	
@@ -91,19 +91,19 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	 * </p>
 	 * See {@link AdvertiserHostInfo} and {@link APIResultListener}.
 	 * 
-	 * @param session
-	 *            the session used for this callback
+	 * @param credentials
+	 *            the credentials used for this callback
 	 * @param listener
 	 *            the callback listener
 	 */
-	public AdvertiserCallbackSender(SPSession session, SponsorPayAdvertiserState state) {
+	public AdvertiserCallbackSender(SPCredentials credentials, SponsorPayAdvertiserState state) {
 		mState = state;
-		mSession = session;
+		mCredentials = credentials;
 	}
 
-	public AdvertiserCallbackSender(String actionId, SPSession session, SponsorPayAdvertiserState state) {
+	public AdvertiserCallbackSender(String actionId, SPCredentials credentials, SponsorPayAdvertiserState state) {
 		mState = state;
-		mSession = session;
+		mCredentials = credentials;
 		mActionId = actionId;
 	}
 
@@ -122,7 +122,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 	/**
 	 * Triggers the callback request that contacts the Sponsorpay Advertiser API. If and when a
 	 * successful response is received from the server, the {@link APIResultListener} registered
-	 * through the constructor {@link #AdvertiserCallbackSender(SPSession, APIResultListener)} will
+	 * through the constructor {@link #AdvertiserCallbackSender(SPCredentials, APIResultListener)} will
 	 * be notified.
 	 */
 	public void trigger() {
@@ -159,7 +159,7 @@ public class AdvertiserCallbackSender extends AsyncTask<String, Void, Boolean> {
 			params.putAll(mCustomParams);
 		}
 
-		String callbackUrl = UrlBuilder.newBuilder(baseUrl, mSession).addExtraKeysValues(
+		String callbackUrl = UrlBuilder.newBuilder(baseUrl, mCredentials).addExtraKeysValues(
 				params).sendUserId(false).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(AdvertiserCallbackSender.class.getSimpleName(),

@@ -18,10 +18,10 @@ import android.view.Window;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
-import com.sponsorpay.sdk.android.session.SPSession;
-import com.sponsorpay.sdk.android.session.SPSessionManager;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -36,7 +36,7 @@ public class OfferWallActivity extends Activity {
 	public static final String OFFERWALL_TYPE_UNLOCK = "OFFERWALL_TYPE_UNLOCK";
 
 	
-	public static final String EXTRA_SESSION_TOKEN_KEY = "EXTRA_SESSION_TOKEN_KEY";
+	public static final String EXTRA_CREDENTIALS_TOKEN_KEY = "EXTRA_CREDENTIALS_TOKEN_KEY";
 	
 	/**
 	 * Key for extracting the value of {@link #mShouldStayOpen} from the extras bundle.
@@ -92,9 +92,9 @@ public class OfferWallActivity extends Activity {
 	private String mCurrencyName;
 	
 	/**
-	 * The {@link SPSession} used for showing the Offer Wall
+	 * The {@link SPCredentials} used for showing the Offer Wall
 	 */
-	private SPSession mSession;
+	private SPCredentials mCredentials;
 	
 	private ActivityOfferWebClient mActivityOfferWebClient;
 
@@ -182,9 +182,9 @@ public class OfferWallActivity extends Activity {
 	@SuppressWarnings("unchecked")
 	protected void fetchPassedExtras() {
 		// Get data from extras
-		String sessionToken = getIntent().getStringExtra(EXTRA_SESSION_TOKEN_KEY);
+		String credentialsToken = getIntent().getStringExtra(EXTRA_CREDENTIALS_TOKEN_KEY);
 		
-		mSession = SPSessionManager.getSession(sessionToken);
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
 		
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY,
 				mTemplate.shouldStayOpenByDefault());
@@ -253,7 +253,7 @@ public class OfferWallActivity extends Activity {
 			mCustomKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
 		}
 		String baseUrl = mTemplate.getBaseUrl();
-		return UrlBuilder.newBuilder(baseUrl, mSession)
+		return UrlBuilder.newBuilder(baseUrl, mCredentials)
 				.addExtraKeysValues(mCustomKeysValues).addScreenMetrics().buildUrl();
 	}
 

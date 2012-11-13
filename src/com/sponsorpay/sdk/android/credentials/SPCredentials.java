@@ -4,7 +4,7 @@
  * Copyright 2012 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android.session;
+package com.sponsorpay.sdk.android.credentials;
 
 import java.util.UUID;
 
@@ -20,21 +20,22 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
  * </p>
  * 
  * <p>
- * The application and user id are immutable. You'll need to create a new session 
+ * The application and user id are immutable. You'll need to create a new credentials object 
  * to change any of those.
  * </p>
  *
  */
-public class SPSession{
+public class SPCredentials{
 
-	private final String mSessionToken;
+	private final String mCredentialsToken;
 	
 	private final String mAppId;
 	private final String mUserId;
 	private String mSecurityToken;
+	
 	private final HostInfo mHostInfo;
 
-	public SPSession(String appId, String userId, String securityToken, Context context) {
+	public SPCredentials(String appId, String userId, String securityToken, Context context) {
 		mSecurityToken = StringUtils.trim(securityToken);
 		mHostInfo = new HostInfo(context);
 		// to be removed when we no longer support appid in manifest
@@ -44,7 +45,7 @@ public class SPSession{
 	 	} else {
 	 		mAppId = mHostInfo.getAppId();
 	 	}
-		mSessionToken = getSessionToken(mAppId, userId);
+		mCredentialsToken = getCredentialsToken(mAppId, userId);
 		if (StringUtils.nullOrEmpty(userId)) {
 			mUserId = UserId.make(context, userId).toString();
 		} else {
@@ -53,12 +54,12 @@ public class SPSession{
 	}
 	
 	/**
-	 * Returns the session token ID.
+	 * Returns the credentials token ID.
 	 * 
 	 * @return
 	 */
-	public String getSessionToken() {
-		return mSessionToken;
+	public String getCredentialsToken() {
+		return mCredentialsToken;
 	}
 
 	/**
@@ -90,10 +91,10 @@ public class SPSession{
 	}
 	
 	/**
-	 * Sets a new security token for this session
+	 * Sets a new security token for this credentials object
 	 * 
 	 * @param securityToken
-	 * 			the new security token to be used in this session
+	 * 			the new security token to be used in this credentials
 	 */
 	public void setSecurityToken(String securityToken) {
 		mSecurityToken = securityToken;
@@ -109,19 +110,19 @@ public class SPSession{
 	}
 	
 	/**
-	 * Convenience method to get a session token id for the appId-userId
-	 * pair. Throws an {@link RuntimeException} if AppId is null.
+	 * Convenience method to get a credentials token id for the appId-userId
+	 * pair. Throws an {@link IllegalArgumentException} if AppId is null.
 	 * 
 	 * @param appId
 	 * 			the application id
 	 * @param userId
 	 * 			the user id
 	 * 
-	 * @return the session token
+	 * @return the credentials token
 	 */
-	public static String getSessionToken(String appId, String userId) {
+	public static String getCredentialsToken(String appId, String userId) {
 		if (StringUtils.nullOrEmpty(appId)) {
-			throw new RuntimeException("AppID cannot be null!");
+			throw new IllegalArgumentException("AppID cannot be null!");
 		}
 		if (StringUtils.nullOrEmpty(userId)) {
 			userId = StringUtils.EMPTY_STRING;
@@ -133,8 +134,8 @@ public class SPSession{
 	@Override
 	public String toString() {
 		return String
-				.format("Session token - %s\nAppId - %s\nUserId - %s\nSecurityToken - %s",
-						mSessionToken,
+				.format("Credentials token - %s\nAppId - %s\nUserId - %s\nSecurityToken - %s",
+						mCredentialsToken,
 						mAppId,
 						StringUtils.notNullNorEmpty(mUserId) ? mUserId : "N/A",
 						StringUtils.notNullNorEmpty(mSecurityToken) ? mSecurityToken : "N/A");

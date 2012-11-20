@@ -1,6 +1,6 @@
 Then /^I see the main activity$/ do
   sleep 2
-  main_activity? == true
+  raise_and_screenshot "Not on main activity" unless main_activity?
 end
 
 Given /^that I am on production$/ do

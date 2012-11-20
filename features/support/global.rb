@@ -41,16 +41,3 @@ def fragment?
     false
   end
 end
-
-def alert_dialog?
-  begin
-    performAction('has_view', "android:id/alertTitle")["success"]
-  rescue
-    false
-  end
-end
-
-def get_alert_error_message
-  raise "There's no alert dialog" unless alert_dialog?
-  performAction('get_view_property', 'android:id/message', 'text')["message"]
-end

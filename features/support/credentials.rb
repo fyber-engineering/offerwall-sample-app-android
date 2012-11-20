@@ -12,6 +12,10 @@ def create_credentials (userId, appId, securityToken=nil)
   enter_text( "#{appId}", "app_id_field")
   enter_text( "#{userId}", "user_id_field")
   enter_text( "#{securityToken}", "security_token_field")
+  push_credentials_button
+end
+
+def push_credentials_button
   performAction('press_button_with_text', 'Create new credentials')
 end
 

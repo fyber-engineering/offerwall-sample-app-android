@@ -5,7 +5,7 @@ end
 
 And /^I wait for the OfferWall to become visible$/ do
   wait_for_offerwall
-  sleep 2
+  sleep 4
 end
 
 Then /^I should see some offers$/ do
@@ -15,7 +15,7 @@ end
 
 Then /^I click on the support button$/ do
   touch_support_button
-  sleep 2
+  sleep 4
 end
 
 Then /^I click on the privacy button$/ do
@@ -34,12 +34,13 @@ Then /^I click on the back button$/ do
 end
 
 Given /^that offer with LPID (-?\d+) is available$/ do |lpid|
-  (offer_with_lpid? lpid.to_i, true) == true
+  raise_and_screenshot "Offer is not available" unless offer_with_lpid? lpid.to_i, true
   sleep 2
 end
 
 Then /^I press offer with LPID (-?\d+)$/ do |lpid|
   touch_offer_with_lpid lpid.to_i, true
+  sleep 2
 end
 
 

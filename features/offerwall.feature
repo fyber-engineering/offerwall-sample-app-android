@@ -1,4 +1,4 @@
-Feature: Offerwall, valid user on Production
+Feature: Offerwall, valid user/appid on Production
   
   Background:
     Given that I am user "tester" with valid credentials for "1246"
@@ -31,8 +31,6 @@ Feature: Offerwall, valid user on Production
     Then I see the main activity
 
   Scenario: I am able to click the offer with LPID 27067
-    * I take a screenshot 
     Given that offer with LPID 27067 is available
-    * I take a screenshot
     Then I press offer with LPID 27067
 

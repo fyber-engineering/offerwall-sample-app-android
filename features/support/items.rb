@@ -6,16 +6,14 @@ def goto_items
 end
 
 def items_fragment?
-  begin
     loaded_fragment == "Items"
   rescue
     false
-  end
 end
 
 def request_unlock_items
-  check_items true
- press_button "Request SponsorPay Unlock Items"
+  check_items 
+  press_button "Request SponsorPay Unlock Items"
 end
 
 def launch_unlock_offerwall (itemId=nil)
@@ -72,15 +70,16 @@ end
 #helper methods
 
 def touch_button_unlock (button)
-  touch_button(button) { check_items }
+  touch_button(button) { check_unlock_offerwall }
 end
 
 def check_unlock_offerwall
   raise "Unlock Offerwall is not visible at the moment" unless unlock_offerwall_visible?
 end
 
-def check_items (securityToken=false)
+def check_items 
+  #(securityToken=false)
   raise "Items fragment not loaded" unless items_fragment?
-  raise "There's no valid credentials" unless valid_credentials?
-  raise "There's no securityToken" unless !securityToken || security_token_set?
+  #raise "There's no valid credentials" unless valid_credentials?
+  #raise "There's no securityToken" unless !securityToken || security_token_set?
 end

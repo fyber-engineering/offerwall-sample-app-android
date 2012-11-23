@@ -13,17 +13,20 @@ Feature: Offerwall, valid user/appid on Production
   Scenario: I am able to go to the support page and get back to offers
     Given I click on the support button
     And I take a screenshot
-    Then I click on the back button
+    When I click on the back button
+    Then I should see some offers
 
   Scenario: I am able to go to the help page and get back to offers
     Given I click on the help button
     And I take a screenshot
-    Then I click on the back button
+    When I click on the back button
+    Then I should see some offers
 
   Scenario: I am able to go to the privacy page and get back to offers
     Given I click on the privacy button
     And I take a screenshot
-    Then I click on the back button
+    When I click on the back button
+    Then I should see some offers
   
   Scenario: I am able to close the offerwall
     * I take a screenshot
@@ -33,4 +36,3 @@ Feature: Offerwall, valid user/appid on Production
   Scenario: I am able to click the offer with LPID 27067
     Given that offer with LPID 27067 is available
     Then I press offer with LPID 27067
-

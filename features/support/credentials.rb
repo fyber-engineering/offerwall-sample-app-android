@@ -3,7 +3,7 @@ def check_and_create_credentials (userId, appId, securityToken=nil)
   if (! valid_credentials? userId,  appId)
     create_credentials userId, appId, securityToken
     if (! valid_credentials? userId,  appId)
-      screenshot_and_raise "Impossible to get valid credentials"
+      raise "Impossible to get valid credentials"
     end  
   end
 end
@@ -20,6 +20,9 @@ def push_credentials_button
 end
 
 def valid_credentials? (userId=".*", appId=".*", securityToken=".*")
+  if userId.empty?
+    userId = ".*"
+  end
   credentialsInfo = performAction( 'get_view_property', 'credentials_info', 'text')["message"]
   (credentialsInfo =~ /AppId - #{appId}\nUserId - #{userId}\nSecurityToken - #{securityToken}/) != nil 
 end

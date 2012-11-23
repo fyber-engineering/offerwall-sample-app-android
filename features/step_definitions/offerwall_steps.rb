@@ -5,12 +5,12 @@ end
 
 And /^I wait for the OfferWall to become visible$/ do
   wait_for_offerwall
-  sleep 4
+  sleep 1
 end
 
 Then /^I should see some offers$/ do
-  get_offers_in_page > 0
-  sleep 2
+  screenshot_and_raise "No offers available" unless get_offers_in_page > 0
+  sleep 1
 end
 
 Then /^I click on the support button$/ do
@@ -34,7 +34,7 @@ Then /^I click on the back button$/ do
 end
 
 Given /^that offer with LPID (-?\d+) is available$/ do |lpid|
-  raise_and_screenshot "Offer is not available" unless offer_with_lpid? lpid.to_i, true
+  screenshot_and_raise "Offer is not available" unless offer_with_lpid? lpid.to_i, true
   sleep 2
 end
 

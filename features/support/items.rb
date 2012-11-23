@@ -22,6 +22,11 @@ def launch_unlock_offerwall (itemId=nil)
   press_button "Launch Unlock Offer Wall"
 end
 
+def item_name (name)
+  check_items
+  enter_text name, "unlock_item_name_field"
+end
+
 def wait_for_unlock_offerwall
   if performAction('wait_for_screen', 'OfferWallActivity', '15')["success"]
     wait_for(30.to_f) {
@@ -41,9 +46,9 @@ def unlock_offerwall_visible?
   value
 end
 
-
-def invalid_unlock_item_id?
-  (get_alert_error_message =~ /Item ID is not valid/) != nil
+def get_item_name
+  check_unlock_offerwall
+  query("webView css:header h1 strong")[0]["textContent"]
 end
 
 def no_offers?

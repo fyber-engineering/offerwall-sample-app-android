@@ -26,3 +26,11 @@ end
 def error_invalid_appid?
   (get_alert_error_message =~ /ERROR_INVALID_APPID/) != nil
 end
+
+def error_invalid_unlock_item_id?
+  (get_alert_error_message =~ /Item ID is not valid/) != nil
+end
+
+def error_no_credentials?
+  (get_alert_error_message =~ /No credentials object was created yet/) != nil
+end

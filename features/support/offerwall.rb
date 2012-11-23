@@ -6,7 +6,6 @@ end
 
 def wait_for_offerwall
   if performAction('wait_for_screen', 'OfferWallActivity', '15')["success"]
-    sleep (4)
     wait_for(30.to_f) {
       sleep 1
       offerwall_visible?
@@ -52,6 +51,7 @@ def offer_with_lpid? (lpid, expandMoreOffers=false)
   until (offer || !expandMoreOffers || !more_offers?) do
     touch_more_offers
     offer = query("webView css:li[data-lp=\"#{lpid}\"]").size == 1
+    sleep 2
   end
   offer
 end
@@ -97,14 +97,4 @@ def touch_button_offerwall (button)
   touch_button (button) {check_offerwall}
 end
 
-def check_offerwall
-  raise "Offerwall is not visible at the moment" unless offerwall_visible?
-end
 
-
-__END__
-//*[@id="offers"]/ul/li[1]/div[4]/h2
-
-#offers 
-
-h2:contains("Click here")

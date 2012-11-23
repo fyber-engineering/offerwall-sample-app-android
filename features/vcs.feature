@@ -36,3 +36,19 @@ Feature: VCS on production
     And I request coins
     Then I get no coins
     * I take a screenshot
+
+  Scenario: I complete the test offer and I get coins
+    Given that I am an unique user for app "1246"
+    And I use "12345678" as security token
+    When I request coins
+    Then I get no coins
+    And I have no transactions yet
+    Then I dismiss the dialog
+    Given that I launch the OfferWall
+    And I wait for the OfferWall to become visible
+    Given that offer with LPID 27067 is available
+    Then I press offer with LPID 27067
+    * I wait for 5 seconds
+    Given I restart the application
+    When I request coins
+    Then I get some coins

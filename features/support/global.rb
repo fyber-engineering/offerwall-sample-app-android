@@ -41,3 +41,15 @@ def fragment?
     false
   end
 end
+
+def generate_unique_user
+  "testuser-" + Time.now.to_i.to_s
+end
+
+def currency (currency=nil)
+  enter_text currency, "currency_name_field"
+end
+
+def check_offerwall
+  raise "Offerwall is not visible at the moment" unless offerwall_visible? || interstitial_visible?
+end

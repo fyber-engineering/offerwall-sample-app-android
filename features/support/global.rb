@@ -43,7 +43,7 @@ def fragment?
 end
 
 def generate_unique_user
-  "testuser-" + Time.now.to_i.to_s
+  "testuser-#{Time.now.to_i}"
 end
 
 def currency (currency=nil)

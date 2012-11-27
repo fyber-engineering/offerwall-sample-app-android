@@ -2,8 +2,8 @@ Feature: Interstitial
 
   Background:
     Given that I am on the interstitial page
-    #And that I am on production
-    And that I am on staging
+    And that I am on production
+    #And that I am on staging
 
   Scenario: I request several interstitial one after the other
     Given that I am user "tester" with valid credentials for "1246"
@@ -47,12 +47,16 @@ Feature: Interstitial
     Given that I am user "tester" with valid credentials for "1246"
     And that I launch the Interstitial
     Then I wait for the Interstitial to become visible
-    When I click on more apps
     * I take a screenshot
+    Then I click on more apps
+    * I wait for 4 seconds
     When I click on the support button
+    * I wait for 4 seconds
     * I take a screenshot
     Then I click on the back button
+    * I wait for 4 seconds
     When I click on the privacy button
+    * I wait for 4 seconds
     * I take a screenshot
     Then I click on the back button
     

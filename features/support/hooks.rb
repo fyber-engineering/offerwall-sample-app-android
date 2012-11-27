@@ -20,7 +20,7 @@ module Calabash
       class Device
 
         def kill_application(package_name)
-          cmd = "adb shell ps | grep #{package_name} | awk '{print $2}' | xargs adb shell kill"
+          cmd = "#{default_device.adb_command} shell ps | grep #{package_name} | awk '{print $2}' | xargs #{default_device.adb_command} shell kill"
           log "Killing application : #{package_name}"
           `#{cmd}`
         end
@@ -31,7 +31,7 @@ module Calabash
           
           if !`#{list}`.empty?
             cmd ="#{default_device.adb_command} shell rm -R #{path}/*"
-            log "Clearing application data: #{package_name}"
+            log "Clearing application data: #{package_name} -> #{cmd}"
             result = `#{cmd}`
             if result.empty?
               log "Success"

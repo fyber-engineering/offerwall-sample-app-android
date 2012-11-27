@@ -20,9 +20,7 @@ def push_credentials_button
 end
 
 def valid_credentials? (userId=".*", appId=".*", securityToken=".*")
-  if userId.empty?
-    userId = ".*"
-  end
+  userId = ".*" if userId.empty?
   credentialsInfo = performAction( 'get_view_property', 'credentials_info', 'text')["message"]
   (credentialsInfo =~ /AppId - #{appId}\nUserId - #{userId}\nSecurityToken - #{securityToken}/) != nil 
 end

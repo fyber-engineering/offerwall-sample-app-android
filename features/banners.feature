@@ -46,4 +46,5 @@ Feature: Banners, production
     * I take a screenshot
     Then I touch the banner
     # not sure if this works
+    * I wait for 5 seconds
     * I take a screenshot

@@ -6,6 +6,7 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
@@ -13,8 +14,8 @@ import com.sponsorpay.sdk.android.credentials.SPCredentials;
 /**
  * Runs in the background the Advertiser Callback HTTP request.
  */
-public class AdvertiserCallbackSender extends AbstractCallbackSender{
-	
+public class RewardedActionCallbackSender extends AbstractCallbackSender {
+
 	/**
 	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
 	 */
@@ -22,9 +23,11 @@ public class AdvertiserCallbackSender extends AbstractCallbackSender{
 	private static final String API_STAGING_RESOURCE_URL = "https://staging.sws.sponsorpay.com/installs/v2";
 	
 	/**
-	 * Map of custom parameters to be sent in the callback request.
+	 * The key for encoding the action id parameter.
 	 */
-	private Map<String, String> mCustomParams;
+	private static final String ACTION_ID_KEY = "action_id";
+
+	protected String mActionId;
 
 	/**
 	 * <p>
@@ -37,36 +40,33 @@ public class AdvertiserCallbackSender extends AbstractCallbackSender{
 	 * @param state
 	 *            the advertiser state for getting information about previous callbacks
 	 */
-	public AdvertiserCallbackSender(SPCredentials credentials, SponsorPayAdvertiserState state) {
+
+	public RewardedActionCallbackSender(String actionId, SPCredentials credentials, SponsorPayAdvertiserState state) {
 		super(credentials, state);
+		mActionId = actionId;
 	}
 
-	/**
-	 * Sets the map of custom parameters to be sent in the callback request.
-	 */
-	public void setCustomParams(Map<String, String> customParams) {
-		mCustomParams = customParams;
+	@Override
+	protected String getAnswerReceived() {
+		return mState.getCallbackReceivedSuccessfulResponse(mActionId);
 	}
-
+	
 	@Override
 	protected String getBaseUrl() {
 		return SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
 				: API_PRODUCTION_RESOURCE_URL;
 	}
-	
-	@Override
-	protected String getAnswerReceived() {
-		return mState.getCallbackReceivedSuccessfulResponse(null);
-	}
-	
+
 	@Override
 	protected Map<String, String> getParams() {
-		return mCustomParams;
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(ACTION_ID_KEY, mActionId);
+		return map;
 	}
 	
 	@Override
 	protected void processRequest(Boolean callbackWasSuccessful) {
-		mState.setCallbackReceivedSuccessfulResponse(null, true);
+		mState.setCallbackReceivedSuccessfulResponse(mActionId, true);
 	}
 
 }

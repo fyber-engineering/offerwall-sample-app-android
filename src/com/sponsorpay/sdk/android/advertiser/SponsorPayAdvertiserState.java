@@ -60,7 +60,7 @@ public class SponsorPayAdvertiserState {
 	 */
 	public void setCallbackReceivedSuccessfulResponse(String actionId, boolean value) {
 		Editor prefsEditor = mPrefs.edit();
-		prefsEditor.putBoolean(STATE_GOT_SUCCESSFUL_RESPONSE_KEY + actionId, value);
+		prefsEditor.putString(STATE_GOT_SUCCESSFUL_RESPONSE_KEY + actionId, value ? "1" : "0");
 		prefsEditor.commit();
 	}
 
@@ -68,8 +68,8 @@ public class SponsorPayAdvertiserState {
 	 * Retrieves the flag which determines if we have already successfully contacted the Advertiser
 	 * API.
 	 */
-	public boolean getCallbackReceivedSuccessfulResponse(String actionId) {
-		return mPrefs.getBoolean(STATE_GOT_SUCCESSFUL_RESPONSE_KEY + actionId, false);
+	public String getCallbackReceivedSuccessfulResponse(String actionId) {
+		return mPrefs.getString(STATE_GOT_SUCCESSFUL_RESPONSE_KEY + actionId, "0");
 	}
 
 	/**

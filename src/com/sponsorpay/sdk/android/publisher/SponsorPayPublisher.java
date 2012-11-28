@@ -23,9 +23,10 @@ import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadi
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
-import com.sponsorpay.sdk.android.publisher.unlock.ItemIdValidator;
 import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
 import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
+import com.sponsorpay.sdk.android.utils.SPIdException;
+import com.sponsorpay.sdk.android.utils.SPIdValidator;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -437,10 +438,11 @@ public class SponsorPayPublisher {
 	public static Intent getIntentForUnlockOfferWallActivity(String credentialsToken, Context context,
 			String unlockItemId, String unlockItemName,	HashMap<String, String> customParams) {
 		
-		ItemIdValidator itemIdValidator = new ItemIdValidator(unlockItemId);
-		if (!itemIdValidator.validate()) {
+		try {
+			SPIdValidator.validate(unlockItemId);
+		} catch (SPIdException e) {
 			throw new RuntimeException("The provided Unlock Item ID is not valid. "
-					+ itemIdValidator.getValidationDescription());
+					+ e.getLocalizedMessage());
 		}
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 

@@ -14,7 +14,8 @@ import android.content.Context;
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
-import com.sponsorpay.sdk.android.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.SPIdException;
+import com.sponsorpay.sdk.android.utils.SPIdValidator;
 
 /**
  * <p>
@@ -111,6 +112,9 @@ public class SponsorPayAdvertiser {
 	 *            The host application context.
 	 */
 	private SponsorPayAdvertiser(Context context) {
+		if (context == null) {
+			throw new RuntimeException("The SDK was not initialized. You should call SponsorPay.start method");
+		}
 		mPersistedState = new SponsorPayAdvertiserState(context);
 	}
 	
@@ -133,23 +137,26 @@ public class SponsorPayAdvertiser {
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
 	private void register(String credentialsToken, Map<String, String> customParams) {
-		register(credentialsToken, customParams, null);
+		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
+		
+		/* Send asynchronous call to SponsorPay's API */
+		AdvertiserCallbackSender callback = new AdvertiserCallbackSender(credentials, mPersistedState);
+		callback.setCustomParams(customParams);
+		callback.trigger();
 	}
 	
-	private void register(String credentialsToken, Map<String, String> customParams, String actionId) {
+	private void notitfyActionCompletion(String credentialsToken, String actionId) {
 		
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		
 		/* Send asynchronous call to SponsorPay's API */
-		AdvertiserCallbackSender callback = new AdvertiserCallbackSender(actionId, credentials, mPersistedState);
-		
-		callback.setCustomParams(customParams);
-		
+		RewardedActionCallbackSender callback = new RewardedActionCallbackSender(
+				actionId, credentials, mPersistedState);
 		callback.trigger();
 	}
 	
 	//================================================================================
-	// Custom Actions
+	// Rewarded Actions
 	//================================================================================
 	
 	
@@ -159,42 +166,29 @@ public class SponsorPayAdvertiser {
 	 * @param context
 	 *            Host application context.
 	 */
-	public static void registerAction(String actionId, Context context) {
-		registerAction(actionId, context, (Map<String, String>)null);
-	}
-	
-	/**
-	 * Triggers the Advertiser's Action callback. It will use the values hold on the current credentials.
-	 * 
-	 * @param context
-	 *            Host application context.
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the request URL.
-	 */
-	public static void registerAction(String actionId, Context context, Map<String, String> customParams) {
+	public static void reportActionCompletion(String actionId) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		registerAction(credentialsToken, actionId, context, customParams);
+		reportActionCompletion(credentialsToken, actionId);
 	}
 	
+
 	/**
-	 * Triggers the Advertiser callback.
+	 * Report completion of an action callback.
 	 * 
 	 * @param credentialsToken
 	 * 			  the token id of credentials
-	 * @param context
-	 *            Host application context.
 	 * @param customParams
-	 *            A map of extra key/value pairs to add to the request URL.
+	 *            the id of the action
 	 */
-	public static void registerAction(String credentialsToken,String actionId, Context context, Map<String, String> customParams) {
-		getInstance(context);
-		
-		if (StringUtils.nullOrEmpty(actionId)) {
-			// FIXME
-			throw new RuntimeException("Action Id must have a valid value. Please refer to ...");
+	public static void reportActionCompletion(String credentialsToken, String actionId) {
+		try {
+			SPIdValidator.validate(actionId);
+		} catch (SPIdException e) {
+			throw new RuntimeException("The provided Action ID is not valid. "
+					+ e.getLocalizedMessage());
 		}
 		// The actual work is performed by the register() instance method.
-		mInstance.register(credentialsToken, getCustomParameters(customParams), actionId);
+		mInstance.notitfyActionCompletion(credentialsToken, actionId);
 	}
 	
 	//================================================================================

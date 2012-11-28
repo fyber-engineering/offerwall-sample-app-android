@@ -67,7 +67,7 @@ public class ActionsSettingsFragment extends AbstractSettingsFragment {
 	public void sendActionCompleted(){
 		fetchValuesFromFields();
 		try {
-			SponsorPayAdvertiser.registerAction(mActionId, getApplicationContext());
+			SponsorPayAdvertiser.reportActionCompletion(mActionId);
 		} catch (RuntimeException ex) {
 			showCancellableAlertBox("Exception from SDK", ex.getMessage());
 			Log.e(SponsorpayAndroidTestAppActivity.class.toString(), "SponsorPay SDK Exception: ",

@@ -17,10 +17,10 @@
     <string name="interstitial">Interstitial</string>
     <string name="banners">Banners</string>
     <string name="items">Items</string>
-    <string name="actions">Customized Actions</string>
+    <string name="actions">Rewarded Actions</string>
     <string name="settings">Settings</string>
     <string name="back">Back</string>
     <string name="action_id">Action ID</string>
-    <string name="send_action">Send Action</string>
+    <string name="send_action">Report Action</string>
 
 </resources>

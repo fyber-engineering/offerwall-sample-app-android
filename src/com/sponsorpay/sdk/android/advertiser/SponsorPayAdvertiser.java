@@ -113,7 +113,7 @@ public class SponsorPayAdvertiser {
 	 */
 	private SponsorPayAdvertiser(Context context) {
 		if (context == null) {
-			throw new RuntimeException("The SDK was not initialized. You should call SponsorPay.start method");
+			throw new RuntimeException("The SDK was not initialized yet. You should call SponsorPay.start method");
 		}
 		mPersistedState = new SponsorPayAdvertiserState(context);
 	}
@@ -140,7 +140,7 @@ public class SponsorPayAdvertiser {
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		
 		/* Send asynchronous call to SponsorPay's API */
-		AdvertiserCallbackSender callback = new AdvertiserCallbackSender(credentials, mPersistedState);
+		InstallCallbackSender callback = new InstallCallbackSender(credentials, mPersistedState);
 		callback.setCustomParams(customParams);
 		callback.trigger();
 	}
@@ -150,21 +150,21 @@ public class SponsorPayAdvertiser {
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		
 		/* Send asynchronous call to SponsorPay's API */
-		RewardedActionCallbackSender callback = new RewardedActionCallbackSender(
+		ActionCallbackSender callback = new ActionCallbackSender(
 				actionId, credentials, mPersistedState);
 		callback.trigger();
 	}
 	
 	//================================================================================
-	// Rewarded Actions
+	// Actions
 	//================================================================================
 	
 	
 	/**
-	 * Triggers the Advertiser's Action callback. It will use the values hold on the current credentials.
+	 * Report an Action completion. It will use the values hold on the current credentials.
 	 * 
-	 * @param context
-	 *            Host application context.
+	 * @param actionId
+	 *            the id of the action
 	 */
 	public static void reportActionCompletion(String actionId) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
@@ -173,11 +173,11 @@ public class SponsorPayAdvertiser {
 	
 
 	/**
-	 * Report completion of an action callback.
+	 * Report an Action completion.
 	 * 
 	 * @param credentialsToken
 	 * 			  the token id of credentials
-	 * @param customParams
+	 * @param actionId
 	 *            the id of the action
 	 */
 	public static void reportActionCompletion(String credentialsToken, String actionId) {

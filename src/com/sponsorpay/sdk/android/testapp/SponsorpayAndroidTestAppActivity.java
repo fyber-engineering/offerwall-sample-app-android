@@ -31,6 +31,7 @@ import com.sponsorpay.sdk.android.testapp.fragments.BannersSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.InterstitialSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.ItemsSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.LauncherFragment;
+import com.sponsorpay.sdk.android.testapp.fragments.MBESettingsFragment;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -83,6 +84,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 				+ SponsorPay.RELEASE_VERSION_STRING);
 
 		SponsorPayLogger.enableLogging(true);
+		SponsorPayLogger.setTextView((TextView)findViewById(R.id.log_text_view));
 	}
 
 	private void createLauncherFragment() {
@@ -155,18 +157,24 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		String securityToken = prefs.getString(SECURITY_TOKEN_PREFS_KEY, StringUtils.EMPTY_STRING);
 		mCurrencyName = prefs.getString(CURRENCY_NAME_PREFS_KEY, StringUtils.EMPTY_STRING);
 		
+		mShouldStayOpen = prefs.getBoolean(MainSettingsActivity.KEEP_OFFERWALL_OPEN_PREFS_KEY, true);
+
+
+		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
+		
+		SponsorPayAdvertiser.setShouldUseStagingUrls(mUseStagingUrlsCheckBox
+				.isChecked());
+		SponsorPayPublisher.setShouldUseStagingUrls(mUseStagingUrlsCheckBox
+				.isChecked());
+		
 		try {
 			SponsorPay.start(overridingAppId, userId, securityToken, getApplicationContext());
 		} catch (RuntimeException e){
 			SponsorPayLogger.d(TAG,
-						e.getLocalizedMessage());
+					e.getLocalizedMessage());
 		}
 		
-		mShouldStayOpen = prefs.getBoolean(MainSettingsActivity.KEEP_OFFERWALL_OPEN_PREFS_KEY, true);
-
 		setValuesInFields();
-
-		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
 
 	}
 
@@ -393,6 +401,31 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 			((BannersSettingsFragment) fragment).requestBanner(mCurrencyName);
 		}
 	}
+	
+	// MBE
+	
+	public void onRequestOffersClick(View v) {
+		fetchValuesFromFields();
+		SponsorPayLogger.d(TAG, "Requesting MBE offers...");
+		//TODO extract this and refactor 
+		Fragment fragment = getSupportFragmentManager().findFragmentById(
+				R.id.fragment_placeholder);
+		if (fragment instanceof MBESettingsFragment) {
+			((MBESettingsFragment) fragment).requestOffers();
+		}
+	}
+	
+	public void onStartMBEClick(View v) {
+		fetchValuesFromFields();
+		SponsorPayLogger.d(TAG, "Starting MBE engagement...");
+		//TODO extract this and refactor 
+		Fragment fragment = getSupportFragmentManager().findFragmentById(
+				R.id.fragment_placeholder);
+		if (fragment instanceof MBESettingsFragment) {
+			((MBESettingsFragment) fragment).startEngament();
+		}
+	}
+	
 
 	/**
 	 * Shows an alert box with the provided title and message and a unique button to cancel it.
@@ -449,5 +482,8 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		replaceFragment(new ActionsSettingsFragment());
 	}
 	
+	public void onMBEClick(View view) {
+		replaceFragment(new MBESettingsFragment());
+	}
 	
 }

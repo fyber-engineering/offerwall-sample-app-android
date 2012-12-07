@@ -42,9 +42,12 @@ public class SponsorPayPublisher {
 	public enum UIStringIdentifier {
 		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, 
 		ERROR_LOADING_OFFERWALL, ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, 
-		LOADING_INTERSTITIAL, LOADING_OFFERWALL, ERROR_PLAY_STORE_UNAVAILABLE
+		LOADING_INTERSTITIAL, LOADING_OFFERWALL, ERROR_PLAY_STORE_UNAVAILABLE,
+		MBE_REWARD_NOTIFICATION, MBE_COINS_NOTIFICATION, MBE_DEFAULT_CURRENCY
 	};
 
+
+	
 	/**
 	 * Messages which can be displayed in the user interface.
 	 */
@@ -76,6 +79,9 @@ public class SponsorPayPublisher {
 		sUIStrings.put(UIStringIdentifier.LOADING_INTERSTITIAL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.LOADING_OFFERWALL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE, "You don't have the Google Play Store application on your device to complete App Install offers.");
+		sUIStrings.put(UIStringIdentifier.MBE_REWARD_NOTIFICATION, "Thanks! Your reward will be payed out shortly");
+		sUIStrings.put(UIStringIdentifier.MBE_COINS_NOTIFICATION,"Congratulations! You've earned %f %s!");
+		sUIStrings.put(UIStringIdentifier.MBE_DEFAULT_CURRENCY, "coins");
 	}
 
 	/**

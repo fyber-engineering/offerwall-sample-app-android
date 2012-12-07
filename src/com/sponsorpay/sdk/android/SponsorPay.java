@@ -14,7 +14,6 @@ import android.content.Context;
 
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
-import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 
@@ -30,13 +29,13 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
  *
  */
 public class SponsorPay {
-	public static final int MAJOR_RELEASE_NUMBER = 2;
+	public static final int MAJOR_RELEASE_NUMBER = 3;
 	public static final int MINOR_RELEASE_NUMBER = 0;
 	public static final int BUGFIX_RELEASE_NUMBER = 0;
 	public static final String RELEASE_VERSION_STRING = String.format("%d.%d.%d",
 			MAJOR_RELEASE_NUMBER, MINOR_RELEASE_NUMBER, BUGFIX_RELEASE_NUMBER);
 	
-	private static final String TAG = "SponsorPay";
+//	private static final String TAG = "SponsorPay";
 	
 	protected static SponsorPay INSTANCE = new SponsorPay();
 	
@@ -48,7 +47,7 @@ public class SponsorPay {
 	}
 
 	private SPCredentials getCredentialsFromToken(String token) {
-		SponsorPayLogger.d(TAG, "Credentials token: " + token);
+//		SponsorPayLogger.d(TAG, "Credentials token: " + token);
 		SPCredentials credendials = tokensMap.get(token);
 		if (credendials == null) {
 			throw new RuntimeException("There are no credentials identified by " + token +

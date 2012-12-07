@@ -75,6 +75,18 @@ public class UrlBuilder {
 	private static final String SCREEN_DENSITY_Y_KEY = "screen_density_y";
 
 	private static final String SCREEN_DENSITY_CATEGORY_KEY = "screen_density_category";
+	
+	private static final String CARRIER_COUNTRY_KEY = "carrier_country";
+	
+	private static final String CARRIER_NAME_KEY = "carrier_name";
+	
+	private static final String NETWORK_CONNECTION_TYPE_KEY = "network_connection_type";
+
+	private static final String MANUFACTURER_KEY = "manufacturer";
+	
+	private static final String APP_BUNDLE_NAME_KEY = "app_bundle_name";
+
+	private static final String APP_VERSION_KEY = "app_version";
 
 	/**
 	 * Request signature parameter key.
@@ -85,6 +97,7 @@ public class UrlBuilder {
 	public static final String URL_PARAM_VALUE_ON = "on";
 	public static final String URL_PARAM_OFFSET_KEY = "offset";
 	public static final String URL_PARAM_CURRENCY_NAME_KEY = "currency";
+
 
 
 	/**
@@ -254,14 +267,24 @@ public class UrlBuilder {
 			hostInfo = mHostInfo;
 		}
 		
-		keyValueParams.put(UDID_KEY, hostInfo.getUDID());
+		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(APPID_KEY, String.valueOf(hostInfo.getAppId()));
+		keyValueParams.put(UDID_KEY, hostInfo.getUDID());
+
 		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());
 		keyValueParams.put(PHONE_VERSION_KEY, hostInfo.getPhoneVersion());
 		keyValueParams.put(LANGUAGE_KEY, hostInfo.getLanguageSetting());
-		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(ANDROID_ID_KEY, hostInfo.getAndroidId());
 		keyValueParams.put(WIFI_MAC_ADDRESS_KEY, hostInfo.getWifiMacAddress());
+		
+		keyValueParams.put(CARRIER_NAME_KEY, hostInfo.getCarrierName());
+		keyValueParams.put(CARRIER_COUNTRY_KEY, hostInfo.getCarrierCountry());
+		keyValueParams.put(NETWORK_CONNECTION_TYPE_KEY, hostInfo.getConnectionType());
+		keyValueParams.put(MANUFACTURER_KEY, hostInfo.getManufacturer());
+		
+
+		keyValueParams.put(APP_BUNDLE_NAME_KEY, hostInfo.getAppBundleName());
+		keyValueParams.put(APP_VERSION_KEY, hostInfo.getAppVersion());
 
 		if (mShouldAddScreenMetrics) {
 			keyValueParams.put(SCREEN_WIDTH_KEY, hostInfo.getScreenWidth());

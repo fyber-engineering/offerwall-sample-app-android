@@ -187,7 +187,12 @@ public class SponsorPayAdvertiser {
 			throw new RuntimeException("The provided Action ID is not valid. "
 					+ e.getLocalizedMessage());
 		}
-		// The actual work is performed by the register() instance method.
+		// The actual work is performed by the notitfyActionCompletion() instance method.
+		//mInstance has to exist so we can have a credentialsToken, anyway, shielding it
+		if (mInstance == null) {
+			throw new RuntimeException("No valid credentials object was created yet.\n" +
+					"You have to execute SponsorPay.start method first.");
+		}
 		mInstance.notitfyActionCompletion(credentialsToken, actionId);
 	}
 	

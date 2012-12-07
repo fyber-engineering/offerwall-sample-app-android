@@ -13,6 +13,9 @@ import java.util.Map;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.Window;
 import android.webkit.WebChromeClient;
@@ -184,7 +187,14 @@ public class OfferWallActivity extends Activity {
 		// Get data from extras
 		String credentialsToken = getIntent().getStringExtra(EXTRA_CREDENTIALS_TOKEN_KEY);
 		
-		mCredentials = SponsorPay.getCredentials(credentialsToken);
+		try {
+			mCredentials = SponsorPay.getCredentials(credentialsToken);
+		} catch (RuntimeException e) {
+			// occurs in the unlikelyt event when the credentials we're wiped 
+			// out of memory and the owf was left open
+			restoreCredentialsValues();
+			deleteCredentialsValues();
+		}
 		
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY,
 				mTemplate.shouldStayOpenByDefault());
@@ -215,6 +225,7 @@ public class OfferWallActivity extends Activity {
 			mProgressDialog.dismiss();
 			mProgressDialog = null;
 		}
+		storeCrendentialsValues();
 		super.onPause();
 	}
 
@@ -268,6 +279,38 @@ public class OfferWallActivity extends Activity {
 		mActivityOfferWebClient.showDialog(errorMessage);
 	}
 
+	// Credentials helper methods
+	
+	private static final String UID_KEY = "user.id.key";
+	private static final String APPID_KEY = "app.id.key";
+	private static final String SECURITY_TOKEN_KEY = "security.token.key";
+	
+	private void storeCrendentialsValues() {
+		SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+		Editor prefsEditor = preferences.edit();
+		prefsEditor.putString(APPID_KEY, mCredentials.getAppId());
+		prefsEditor.putString(UID_KEY, mCredentials.getUserId());
+		prefsEditor.putString(SECURITY_TOKEN_KEY, mCredentials.getSecurityToken());
+		prefsEditor.commit();
+	}
+	
+	private void deleteCredentialsValues() {
+		SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+		Editor prefsEditor = preferences.edit();
+		prefsEditor.clear();
+		prefsEditor.commit();
+	}
+	
+	private void restoreCredentialsValues() {
+		SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+		String appId = preferences.getString(APPID_KEY, StringUtils.EMPTY_STRING);
+		String userId = preferences.getString(UID_KEY, StringUtils.EMPTY_STRING);
+		String securityToken = preferences.getString(SECURITY_TOKEN_KEY, StringUtils.EMPTY_STRING);
+		SponsorPay.start(appId, userId, securityToken, getApplicationContext());
+		mCredentials = SponsorPay.getCurrentCredentials();
+	}
+	
+	//
 
 	public abstract class OfferWallTemplate {
 		

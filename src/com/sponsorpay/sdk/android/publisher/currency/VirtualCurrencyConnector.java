@@ -11,6 +11,7 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
@@ -18,6 +19,7 @@ import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -47,6 +49,10 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 */
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_";
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR = "_";
+	
+	private static boolean showToastNotification = true;
+	
+//	private static SPCurrencyRoundingMode roundingMode = SPCurrencyRoundingMode.ROUND;
 
 	/**
 	 * {@link SPCurrencyServerListener} registered by the developer's code to be notified of the
@@ -54,6 +60,11 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 */
 	private SPCurrencyServerListener mUserListener;
 
+	private boolean mShouldShowNotification;
+
+	private String mCurrency;
+//	private SPCurrencyRoundingMode mRoundingMode;
+	
 	/**
 	 * Types of requests to be sent to the Virtual Currency Server.
 	 * 
@@ -61,6 +72,12 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	public enum RequestType {
 		DELTA_COINS
 	}
+	
+//	public enum SPCurrencyRoundingMode {
+//		ROUND,
+//		FLOOR,
+//		CEIL
+//	}
 
 	/**
 	 * {@link AsyncTask} used to perform the HTTP requests on a background thread and be notified of
@@ -109,6 +126,11 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		mUserListener = userListener;
 	}
 
+	public VirtualCurrencyConnector setCurrency(String currency) {
+		mCurrency = currency;
+		return this;
+	}
+	
 	/**
 	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
 	 * virtual currency for a given user since the last time this method was called. The response
@@ -155,6 +177,9 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		CurrencyServerRequestAsyncTask requestTask = new CurrencyServerRequestAsyncTask(
 				RequestType.DELTA_COINS, requestUrl, this);
 
+		mShouldShowNotification = showToastNotification;
+//		mRoundingMode = roundingMode;
+		
 		requestTask.execute();
 	}
 
@@ -245,6 +270,15 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		return retval;
 	}
 
+	
+	public static void shouldShowToastNotification(boolean showNotification) {
+		showToastNotification = showNotification;
+	}
+
+//	public static void setRoundingMode(SPCurrencyRoundingMode newRoundingMode) {
+//		roundingMode = newRoundingMode;
+//	}
+	
 	/**
 	 * Implemented from {@link SPCurrencyServerListener}. Forwards the call to the user listener.
 	 */
@@ -260,6 +294,33 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	@Override
 	public void onSPCurrencyDeltaReceived(CurrencyServerDeltaOfCoinsResponse response) {
 		saveLatestTransactionIdForCurrentUser(response.getLatestTransactionId());
+		if (response.getDeltaOfCoins() > 0 && mShouldShowNotification) {
+			String text = String
+					.format(SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_COINS_NOTIFICATION),
+							response.getDeltaOfCoins(),
+							StringUtils.notNullNorEmpty(mCurrency) ? mCurrency : 
+								SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_DEFAULT_CURRENCY));
+			Toast.makeText(mContext, text,
+					Toast.LENGTH_LONG).show();
+		}
 		mUserListener.onSPCurrencyDeltaReceived(response);
 	}
+	
+//	private int roundDeltaOfCoins(double amount) {
+//		int roundedAmount;
+//		switch (mRoundingMode) {
+//		case FLOOR:
+//			roundedAmount = (int) Math.floor(amount);
+//			break;
+//		case CEIL:
+//			roundedAmount = (int) Math.ceil(amount);
+//			break;
+//		default:
+//		case ROUND:
+//			roundedAmount = (int) Math.round(amount);
+//			break;
+//		}
+//		return roundedAmount;
+//	}
+	
 }

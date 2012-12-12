@@ -174,7 +174,7 @@ public class SponsorPayLogger {
 				colorSpan = new ForegroundColorSpan(Color.GREEN);
 				break;
 			case WARNING:
-				colorSpan = new ForegroundColorSpan(0xFFA500);
+				colorSpan = new ForegroundColorSpan(Color.rgb(0xFF,0xA5,0x00));
 				break;
 			case ERROR:
 				colorSpan = new ForegroundColorSpan(Color.RED);

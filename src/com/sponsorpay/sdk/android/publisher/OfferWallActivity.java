@@ -257,14 +257,15 @@ public class OfferWallActivity extends Activity {
 
 	private String generateUrl() {
 		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
-		if (mCurrencyName != null && !mCurrencyName.trim().equals("")) {
-			if (mCustomKeysValues == null) {
-				mCustomKeysValues = new HashMap<String, String>();
-			}
-			mCustomKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
-		}
+		//FIXME check and clean
+//		if (StringUtils.notNullNorEmpty(mCurrencyName)) {
+//			if (mCustomKeysValues == null) {
+//				mCustomKeysValues = new HashMap<String, String>();
+//			}
+//			mCustomKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
+//		}
 		String baseUrl = mTemplate.getBaseUrl();
-		return UrlBuilder.newBuilder(baseUrl, mCredentials)
+		return UrlBuilder.newBuilder(baseUrl, mCredentials).setCurrency(mCurrencyName)
 				.addExtraKeysValues(mCustomKeysValues).addScreenMetrics().buildUrl();
 	}
 

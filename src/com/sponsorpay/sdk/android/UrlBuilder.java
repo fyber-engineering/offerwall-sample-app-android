@@ -87,6 +87,8 @@ public class UrlBuilder {
 	private static final String APP_BUNDLE_NAME_KEY = "app_bundle_name";
 
 	private static final String APP_VERSION_KEY = "app_version";
+	
+	private static final String CURRENCY_KEY = "currency";
 
 	/**
 	 * Request signature parameter key.
@@ -176,6 +178,8 @@ public class UrlBuilder {
 
 	private boolean mShouldAddUserId = true;
 
+	private String mCurrency;
+
 	/**
 	 * @deprecated This method will be removed from a future SDK release.
 	 */
@@ -206,8 +210,8 @@ public class UrlBuilder {
 	}
 
 	public UrlBuilder addExtraKeysValues(Map<String, String> extraKeysValues) {
-		if (null != extraKeysValues) {
-			if (null == mExtraKeysValues) {
+		if (extraKeysValues != null) {
+			if (mExtraKeysValues == null) {
 				mExtraKeysValues = new HashMap<String, String>(extraKeysValues);
 			} else {
 				mExtraKeysValues.putAll(extraKeysValues);
@@ -239,6 +243,11 @@ public class UrlBuilder {
 	
 	public UrlBuilder sendUserId(boolean shouldSend) {
 		mShouldAddUserId = shouldSend;
+		return this;
+	}
+	
+	public UrlBuilder setCurrency(String currency) {
+		mCurrency = currency;
 		return this;
 	}
 
@@ -286,6 +295,10 @@ public class UrlBuilder {
 		keyValueParams.put(APP_BUNDLE_NAME_KEY, hostInfo.getAppBundleName());
 		keyValueParams.put(APP_VERSION_KEY, hostInfo.getAppVersion());
 
+		if (StringUtils.notNullNorEmpty(mCurrency)) {
+			keyValueParams.put(CURRENCY_KEY, mCurrency);
+		}
+		
 		if (mShouldAddScreenMetrics) {
 			keyValueParams.put(SCREEN_WIDTH_KEY, hostInfo.getScreenWidth());
 			keyValueParams.put(SCREEN_HEIGHT_KEY, hostInfo.getScreenHeight());

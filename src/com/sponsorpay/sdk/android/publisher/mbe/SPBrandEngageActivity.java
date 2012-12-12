@@ -16,22 +16,14 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		
+//		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		
 		mFrameLayout = new FrameLayout(this);
 		SPBrandEngageClient.INSTANCE.startEngament(mFrameLayout);
 		SPBrandEngageClient.INSTANCE.setStatusListener(this);
 		setContentView(mFrameLayout);
 	}
-	
-//	@Override
-//	public void onConfigurationChanged(Configuration newConfig) {
-////		if (Build.VERSION.SDK_INT > 11) {
-//		SponsorPayLogger.d(TAG,	"Orientation = "
-//				+ (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ? "LANDSCAPE"
-//								: "PORTRAIT"));
-////		}
-//		super.onConfigurationChanged(newConfig);
-//	}
-	
 	
 	@Override
 	protected void onStop() {
@@ -41,7 +33,7 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	
 	@Override
 	public void onBackPressed() {
-		SPBrandEngageClient.INSTANCE.cancelEngagement();
+		SPBrandEngageClient.INSTANCE.closeEngagement();
 		super.onBackPressed();
 	}
 
@@ -69,6 +61,7 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		switch (newStatus) {
 		case CLOSE_ABORTED:
 		case CLOSE_FINISHED:
+		case ERROR:
 			closeActivity();
 			break;
 		default:

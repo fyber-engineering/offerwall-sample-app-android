@@ -20,7 +20,7 @@ public class ActionCallbackSender extends AbstractCallbackSender {
 	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
 	 */
 	private static final String API_PRODUCTION_RESOURCE_URL = "https://service.sponsorpay.com/actions/v2";
-	private static final String API_STAGING_RESOURCE_URL = "https://staging.sws.sponsorpay.com/actions/v2";
+	private static final String API_STAGING_RESOURCE_URL = "https://staging-sws.sponsorpay.com/actions/v2";
 	
 	/**
 	 * The key for encoding the action id parameter.

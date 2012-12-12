@@ -19,7 +19,7 @@ public class InstallCallbackSender extends AbstractCallbackSender{
 	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
 	 */
 	private static final String API_PRODUCTION_RESOURCE_URL = "https://service.sponsorpay.com/installs/v2";
-	private static final String API_STAGING_RESOURCE_URL = "https://staging.sws.sponsorpay.com/installs/v2";
+	private static final String API_STAGING_RESOURCE_URL = "https://staging-sws.sponsorpay.com/installs/v2";
 	
 	/**
 	 * Map of custom parameters to be sent in the callback request.

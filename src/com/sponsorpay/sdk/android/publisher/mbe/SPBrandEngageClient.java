@@ -67,26 +67,25 @@ public class SPBrandEngageClient {
 	private static final String SP_REQUEST_URL_PARAMETER_KEY = "url";
 	
 	private static final int TIMEOUT = 10000 ;
-	
-	private SPBrandEngageOffersStatus mStatus = SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS;
 
-	private SPBrandEngageClientStatusListener mStatusListener;
-
+	private Activity mActivity;
 	private Context mContext;
 	private WebView mWebView;
 	private Handler mHandler;
 	
+	private boolean mShowingDialog = false;
+
 	private String mCurrency;
+	private Map<String, String> mCustomParameters;
 	
 	private boolean mShowRewardsNotification = true;
-	
+
+	private SPBrandEngageOffersStatus mStatus = SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS;
+
 	private SPCurrencyServerListener mVCSListener;
+	private SPBrandEngageClientStatusListener mStatusListener;
 	
-	private Map<String, String> mCustomParameters;
-//	private FrameLayout mLayout;
-	private boolean mShowingDialog = false;
 	private BroadcastReceiver mNetworkStateReceiver = new BroadcastReceiver() {
-		
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			boolean isConnected = !intent.getBooleanExtra(
@@ -104,8 +103,6 @@ public class SPBrandEngageClient {
 			}
 		}
 	};
-	private Activity mActivity;
-
 	
 	private SPBrandEngageClient() {
 		mHandler = new Handler();
@@ -147,9 +144,24 @@ public class SPBrandEngageClient {
 		mHandler.postDelayed(timeout, TIMEOUT);
 	}
 
-	public boolean canRequestOffers() {
-		return mStatus != SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS &&
-				mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS;
+	public boolean startEngament(Activity activity) {
+		if (canStartEngagement()) {
+
+			mWebView.loadUrl(SP_START_ENGAGEMENT);
+
+			mActivity = activity;
+			mActivity.addContentView(mWebView, new LayoutParams(
+		            LayoutParams.FILL_PARENT,
+		            LayoutParams.FILL_PARENT));
+		
+			checkEngagementStarted();
+			return true;
+		} else {
+			SponsorPayLogger.d(TAG,	"SPBrandEngageClient is not ready to show offers. " +
+					"Call requestOffers() and wait until your listener is called with the" +
+					" confirmation that offers have been received.");
+			return false;
+		}
 	}
 	
 	public void closeEngagement() {
@@ -158,8 +170,26 @@ public class SPBrandEngageClient {
 		} else {
 			changeStatus(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE);
 		}
-//		clearWebViewPage();
 	}
+
+	public boolean canRequestOffers() {
+		return mStatus != SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS &&
+				mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS;
+	}
+
+	public boolean canStartEngagement() {
+		return mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS;
+	}
+	
+	private boolean canChangeParameters() {
+		return mStatus == SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS
+				|| mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS;
+	}
+
+	public boolean isShowRewardsNotification() {
+		return mShowRewardsNotification;
+	}
+	
 	
 	private void processQueryOffersResponse(int numOFfers) {
 		boolean areOffersAvaliable = numOFfers > 0;
@@ -190,12 +220,6 @@ public class SPBrandEngageClient {
 			setStatusClient(SPBrandEngageOffersStatus.USER_ENGAGED);
 		}
 	}
-
-	private void notitfyListener(SPBrandEngageClientStatus status) {
-		if (mStatusListener != null) {
-			mStatusListener.didChangeStatus(status);
-		}
-	}
 	
 	private void clearWebViewPage() {
 		if (mWebView != null) {
@@ -206,37 +230,11 @@ public class SPBrandEngageClient {
 			mContext.unregisterReceiver(mNetworkStateReceiver);
 			mWebView = null;
 		}
-//		mLayout = null;
 		mActivity = null;
 		setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 	}
 
-	
-	public boolean startEngament(Activity activity) {
-		if (canStartEngagement()) {
-//			mLayout = layout;
-//			
-//			layout.addView(mWebView);
-//			mWebView.setLayoutParams(new LayoutParams(
-//	            LayoutParams.FILL_PARENT,
-//	            LayoutParams.FILL_PARENT));
-			mWebView.loadUrl(SP_START_ENGAGEMENT);
 
-			mActivity = activity;
-			mActivity.addContentView(mWebView, new LayoutParams(
-		            LayoutParams.FILL_PARENT,
-		            LayoutParams.FILL_PARENT));
-
-		
-			checkEngagementStarted();
-			return true;
-		} else {
-			SponsorPayLogger.d(TAG,	"SPBrandEngageClient is not ready to show offers. " +
-					"Call requestOffers() and wait until your listener is called with the" +
-					" confirmation that offers have been received.");
-			return false;
-		}
-	}
 
 	private void checkEngagementStarted() {
 		Runnable r = new Runnable() {		
@@ -258,18 +256,6 @@ public class SPBrandEngageClient {
 				.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
 	}
 
-	public boolean canStartEngagement() {
-		return mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS;
-	}
-	
-	private boolean canChangeParameters() {
-		return mStatus == SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS
-				|| mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS;
-	}
-
-	public boolean isShowRewardsNotification() {
-		return mShowRewardsNotification;
-	}
 
 	public void setShowRewardsNotification(boolean mShowRewardsNotification) {
 		this.mShowRewardsNotification = mShowRewardsNotification;
@@ -311,12 +297,16 @@ public class SPBrandEngageClient {
 		}
 	}
 	
-	
 	// Status Listener
-	
 	public void setStatusListener(SPBrandEngageClientStatusListener listener) {
 		if (canChangeParameters()) {
 			this.mStatusListener = listener;
+		}
+	}
+
+	private void notitfyListener(SPBrandEngageClientStatus status) {
+		if (mStatusListener != null) {
+			mStatusListener.didChangeStatus(status);
 		}
 	}
 	
@@ -325,72 +315,8 @@ public class SPBrandEngageClient {
 	private void setupWebView(Activity activity) {
 		//TODO check this for android version!!
 		mContext = Build.VERSION.SDK_INT < 11 ? activity : activity.getApplicationContext();
-//		mContext = activity;
 		
 		mWebView = new WebView(mContext);
-
-//		mWebView = new WebView(mContext) {
-//			
-//		@Override
-//		public void addView(View child) {
-//			Log.e(TAG, "addView 1- "+ child.getClass().getCanonicalName());
-//			super.addView(child);
-//		}
-//		
-//		@Override
-//		public void addView(View child, int index) {
-//			Log.e(TAG, "addView 2- "+ child.getClass().getCanonicalName());
-//			super.addView(child, index);
-//		}
-//		@Override
-//		public void addView(View child, int index,
-//				android.view.ViewGroup.LayoutParams params) {
-//			Log.e(TAG, "addView 3- "+ child.getClass().getCanonicalName());
-//			super.addView(child, index, params);
-//		}
-//		@Override
-//		public void addView(View child, int width, int height) {
-//			Log.e(TAG, "addView 4- "+ child.getClass().getCanonicalName());
-//			super.addView(child, width, height);
-//		}
-//		@Override
-//		public void addView(View child,
-//				android.view.ViewGroup.LayoutParams params) {
-//			Log.e(TAG, "addView 5- "+ child.getClass().getCanonicalName());
-//			super.addView(child, params);
-//		}
-//		
-//		@Override
-//		protected boolean addViewInLayout(View child, int index,
-//				android.view.ViewGroup.LayoutParams params) {
-//			Log.e(TAG, "addViewInLayout - "+ child.getClass().getCanonicalName());
-//			return super.addViewInLayout(child, index, params);
-//		}
-//		
-//		@Override
-//		protected boolean addViewInLayout(View child, int index,
-//				android.view.ViewGroup.LayoutParams params,
-//				boolean preventRequestLayout) {
-//			Log.e(TAG, "addViewInLayout - "+ child.getClass().getCanonicalName());
-//			return super.addViewInLayout(child, index, params, preventRequestLayout);
-//		}
-//		
-//		@Override
-//		protected void attachViewToParent(View child, int index,
-//				android.view.ViewGroup.LayoutParams params) {
-//			Log.e(TAG, "attachViewToParent - "+ child.getClass().getCanonicalName());
-//			super.attachViewToParent(child, index, params);
-//		}
-//		
-//		@Override
-//		protected boolean drawChild(Canvas canvas, View child,
-//				long drawingTime) {
-//			Log.e(TAG, "drawChild - "+ child.getClass().getCanonicalName());
-//			return super.drawChild(canvas, child, drawingTime);
-//		}
-//	};
-		
-		
 		
 		mWebView.setId(new Random().nextInt());
 		
@@ -404,80 +330,17 @@ public class SPBrandEngageClient {
 		
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 		
-		mWebView.setWebChromeClient(new WebChromeClient() {
-			@Override
-			public boolean onJsConfirm(WebView view, String url,
-					String message, JsResult result) {
-				showJSDialog(url, message);
-				result.cancel();
-				return true;
-			}
-			
-			private void showJSDialog(String url, String message) {
-				if (!mShowingDialog ) {
-					mShowingDialog = true;
-//					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mLayout == null ? mContext: mLayout.getContext());
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);
-					dialogBuilder.setTitle(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE)).setMessage(message).
-						setPositiveButton("OK", 
-						new OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-//								notitfyListener(SPBrandEngageClientStatus.CLOSE_ABORTED);
-//								clearWebViewPage();
-								changeStatus(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE);
-								mShowingDialog = false;
-							}
-						}).setNegativeButton("Cancel", new OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							mShowingDialog = false;
-						}
-					});
-					dialogBuilder.show();
-				}
-			}
-		});
+		mWebView.setWebChromeClient(getWebChromeClient());
 		
-		mWebView.setWebViewClient(new WebViewClient() {
-			@Override
-			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				SponsorPayLogger.d(TAG, "URL -> " + url);
-				if (url.startsWith("sponsorpay")) {
-					Uri uri = Uri.parse(url);
-					String host = uri.getHost();
-					if (host.equals(SP_REQUEST_EXIT)) {
-						String targetUrl = uri.getQueryParameter(SP_REQUEST_URL_PARAMETER_KEY);
-						processExitUrl(targetUrl);
-					} else if (host.equals(SP_REQUEST_OFFER_ANSWER)) {
-						processQueryOffersResponse(Integer.parseInt(uri
-								.getQueryParameter(SP_NUMEBER_OF_OFFERS_PARAMETER_KEY)));
-					} else if (host.equals(SP_REQUEST_START_STATUS)) {
-						changeStatus(uri.getQueryParameter(SP_REQUEST_STATUS_PARAMETER_KEY));
-					}
-					return true;
-				}
-				return false;
-			}
-			
-			@Override
-			public void onReceivedError(WebView view, int errorCode,
-					String description, String failingUrl) {
-				SponsorPayLogger.d(TAG, "onReceivedError url - " + failingUrl + " - " + description );
-				// show error dialog
-				showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
-				super.onReceivedError(view, errorCode, description, failingUrl);
-			}
-			
-		});
+		mWebView.setWebViewClient(getWebClient());
 		
 		IntentFilter filter = new IntentFilter(
 				ConnectivityManager.CONNECTIVITY_ACTION);
 		mContext.registerReceiver(mNetworkStateReceiver, filter);
-			
-		
 	}
-	
+
+	// this is copied from the OfferWebClient
+	// we should refactor this
 	private void processExitUrl(String targetUrl) {
 		if (targetUrl != null) {
 			Intent intent = new Intent();
@@ -501,7 +364,6 @@ public class SPBrandEngageClient {
 	private void showErrorDialog(String message) {
 		if (!mShowingDialog && mWebView != null) {
 			mShowingDialog = true;
-//			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mLayout == null ? mContext: mLayout.getContext());
 			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);
 			dialogBuilder.setTitle(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_TITLE)).setMessage(message).
 				setNeutralButton(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_BUTTON_TITLE_DISMISS), 
@@ -515,7 +377,6 @@ public class SPBrandEngageClient {
 				});
 			dialogBuilder.show();
 		}
-		
 	}
 	
 	private String getBaseUrl() {
@@ -547,6 +408,79 @@ public class SPBrandEngageClient {
 				}
 			}, TIMEOUT);
 		}
+	}
+	
+
+	private WebViewClient getWebClient() {
+		WebViewClient webClient = new WebViewClient() {
+			@Override
+			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				SponsorPayLogger.d(TAG, "URL -> " + url);
+				if (url.startsWith("sponsorpay")) {
+					Uri uri = Uri.parse(url);
+					String host = uri.getHost();
+					if (host.equals(SP_REQUEST_EXIT)) {
+						String targetUrl = uri.getQueryParameter(SP_REQUEST_URL_PARAMETER_KEY);
+						processExitUrl(targetUrl);
+					} else if (host.equals(SP_REQUEST_OFFER_ANSWER)) {
+						processQueryOffersResponse(Integer.parseInt(uri
+								.getQueryParameter(SP_NUMEBER_OF_OFFERS_PARAMETER_KEY)));
+					} else if (host.equals(SP_REQUEST_START_STATUS)) {
+						changeStatus(uri.getQueryParameter(SP_REQUEST_STATUS_PARAMETER_KEY));
+					}
+					return true;
+				}
+				return false;
+			}
+			
+			@Override
+			public void onReceivedError(WebView view, int errorCode,
+					String description, String failingUrl) {
+				SponsorPayLogger.d(TAG, "onReceivedError url - " + failingUrl + " - " + description );
+				// show error dialog
+				showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+				super.onReceivedError(view, errorCode, description, failingUrl);
+			}
+			
+		};
+		
+		return webClient;
+	}
+
+	private WebChromeClient getWebChromeClient() {
+		WebChromeClient chromeClient = new WebChromeClient() {
+			@Override
+			public boolean onJsConfirm(WebView view, String url,
+					String message, JsResult result) {
+				showJSDialog(url, message);
+				result.cancel();
+				return true;
+			}
+			
+			private void showJSDialog(String url, String message) {
+				if (!mShowingDialog ) {
+					mShowingDialog = true;
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);
+					dialogBuilder.setTitle(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE)).setMessage(message).
+						setPositiveButton("OK", 
+						new OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								changeStatus(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE);
+								mShowingDialog = false;
+							}
+						}).setNegativeButton("Cancel", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							mShowingDialog = false;
+						}
+					});
+					dialogBuilder.show();
+				}
+			}
+		};
+		
+		return chromeClient;
 	}
 	
 }

@@ -7,8 +7,6 @@ import android.view.WindowManager;
 
 public class SPBrandEngageActivity extends Activity implements SPBrandEngageClientStatusListener {
 	
-//	private FrameLayout mFrameLayout;
-//	private String TAG = "SPBrandEngageActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -19,21 +17,10 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
-//		mFrameLayout = new FrameLayout(this);
-//		mFrameLayout.setBackgroundResource(R.color.background_dark);
-//		setContentView(mFrameLayout);
 
 		SPBrandEngageClient.INSTANCE.setStatusListener(this);
-//		SPBrandEngageClient.INSTANCE.startEngament(mFrameLayout);
 		SPBrandEngageClient.INSTANCE.startEngament(this);
-//		setContentView(mFrameLayout);
 	}
-	
-//	@Override
-//	protected void onStop() {
-//		mFrameLayout.removeAllViews();
-//		super.onStop();
-//	}
 	
 	@Override
 	public void onBackPressed() {
@@ -41,9 +28,7 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		super.onBackPressed();
 	}
 
-	
 	private void closeActivity() {
-//		mFrameLayout.removeAllViews();
 		finish();
 	}
 	
@@ -53,8 +38,8 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		super.onDestroy();
 	}
 	
-	//Status listener
 	
+	//Status listener
 	@Override
 	public void didReceiveOffers(boolean areOffersAvaliable) {
 		//do nothing

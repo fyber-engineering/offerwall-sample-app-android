@@ -5,6 +5,7 @@ import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -15,10 +16,11 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.view.ViewGroup.LayoutParams;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.UrlBuilder;
@@ -27,6 +29,7 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
+import com.sponsorpay.sdk.android.utils.IntentHelper;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 public class SPBrandEngageClient {
@@ -35,7 +38,8 @@ public class SPBrandEngageClient {
 	    MUST_QUERY_SERVER_FOR_OFFERS,
 	    QUERYING_SERVER_FOR_OFFERS,
 	    READY_TO_SHOW_OFFERS,
-	    SHOWING_OFFERS
+	    SHOWING_OFFERS,
+	    USER_ENGAGED
 	} 
 	
 	private static final String TAG = "SPBrandEngageClient";
@@ -57,6 +61,7 @@ public class SPBrandEngageClient {
 	private static final String SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE = "CLOSE_FINISHED";
 	private static final String SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE = "CLOSE_ABORTED";
 	private static final String SP_REQUEST_STATUS_PARAMETER_ERROR = "ERROR";
+	private static final String SP_REQUEST_STATUS_PARAMETER_ENGAGED = "USER_ENGAGED";
 	
 	private static final String SP_REQUEST_EXIT = "exit";
 	private static final String SP_REQUEST_URL_PARAMETER_KEY = "url";
@@ -70,18 +75,36 @@ public class SPBrandEngageClient {
 	private Context mContext;
 	private WebView mWebView;
 	private Handler mHandler;
-//	private ViewGroup mGroup;
 	
 	private String mCurrency;
 	
-//	private boolean mCheckForRewardAfterCompletion = true;
 	private boolean mShowRewardsNotification = true;
 	
 	private SPCurrencyServerListener mVCSListener;
 	
 	private Map<String, String> mCustomParameters;
-	private FrameLayout mLayout;
+//	private FrameLayout mLayout;
 	private boolean mShowingDialog = false;
+	private BroadcastReceiver mNetworkStateReceiver = new BroadcastReceiver() {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			boolean isConnected = !intent.getBooleanExtra(
+					ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+			if (!isConnected && mStatus == SPBrandEngageOffersStatus.SHOWING_OFFERS) {
+				// show error dialog
+				SponsorPayLogger.e(TAG, "Connection has been lost");
+				mHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						showErrorDialog(SponsorPayPublisher
+								.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_OFFLINE));
+					}
+				});
+			}
+		}
+	};
+	private Activity mActivity;
 
 	
 	private SPBrandEngageClient() {
@@ -89,28 +112,11 @@ public class SPBrandEngageClient {
 	}
 
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
-//	public boolean requestOffers(SPCredentials credentials, Activity activity, ViewGroup group) {
 		if (canRequestOffers()) {
 			if (mWebView == null) {
 				setupWebView(activity);
 			}
 			
-//			if (mGroup == null && group != null && Build.VERSION.SDK_INT == 7) {
-//				mGroup = group;
-//				mWebView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT));
-//				mGroup.addView(mWebView);
-//				mWebView.setVisibility(View.VISIBLE);
-//				mWebView.loadUrl("https://www.google.com");
-////				mWebView.loadData("<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>", "text/html", "UTF-8");
-////				clearWebViewPage();
-//				try {
-//					Thread.sleep(2000);
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-
 			startQueryingOffers(credentials);
 			return true;
 		} else {
@@ -124,7 +130,8 @@ public class SPBrandEngageClient {
 	
 	private void startQueryingOffers(SPCredentials credentials) {
 		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials)
-				.setCurrency(mCurrency).addExtraKeysValues(mCustomParameters).buildUrl();
+				.setCurrency(mCurrency).addExtraKeysValues(mCustomParameters)
+				.addScreenMetrics().buildUrl();
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
 		mWebView.loadUrl(requestUrl);
 		setStatusClient(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
@@ -140,15 +147,18 @@ public class SPBrandEngageClient {
 		mHandler.postDelayed(timeout, TIMEOUT);
 	}
 
-	private boolean canRequestOffers() {
+	public boolean canRequestOffers() {
 		return mStatus != SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS &&
 				mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS;
 	}
 	
 	public void closeEngagement() {
-		clearWebViewPage();
-		//FIRE close_aborted OR close_finished, depending on the mStatus
-		notitfyListener(SPBrandEngageClientStatus.CLOSE_ABORTED);
+		if (mStatus == SPBrandEngageOffersStatus.USER_ENGAGED) {
+			changeStatus(SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE);
+		} else {
+			changeStatus(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE);
+		}
+//		clearWebViewPage();
 	}
 	
 	private void processQueryOffersResponse(int numOFfers) {
@@ -161,9 +171,6 @@ public class SPBrandEngageClient {
 		if (mStatusListener != null) {
 			mStatusListener.didReceiveOffers(areOffersAvaliable);
 		}
-//		if (mGroup != null) {
-//			mGroup.removeView(mWebView);
-//		}
 	}
 
 	private void changeStatus(String status) {
@@ -173,20 +180,14 @@ public class SPBrandEngageClient {
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE)) {
 			clearWebViewPage();
 			notitfyListener(SPBrandEngageClientStatus.CLOSE_FINISHED);
-			if (mShowRewardsNotification) {
-				Toast.makeText(mContext,
-						SponsorPayPublisher
-								.getUIString(UIStringIdentifier.MBE_REWARD_NOTIFICATION),
-						Toast.LENGTH_LONG).show();
-			}
 			checkForCoins();
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE)) {
 			clearWebViewPage();
 			notitfyListener(SPBrandEngageClientStatus.CLOSE_ABORTED);
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_ERROR)) {
 			showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
-//			clearWebViewPage();
-//			notitfyListener(SPBrandEngageClientStatus.ERROR);
+		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_ENGAGED)) {
+			setStatusClient(SPBrandEngageOffersStatus.USER_ENGAGED);
 		}
 	}
 
@@ -197,26 +198,41 @@ public class SPBrandEngageClient {
 	}
 	
 	private void clearWebViewPage() {
-		mWebView.loadUrl(ABOUT_BLANK);
+		if (mWebView != null) {
+			mWebView.loadUrl(ABOUT_BLANK);
+		}
+		if (mStatus == SPBrandEngageOffersStatus.SHOWING_OFFERS
+				|| mStatus == SPBrandEngageOffersStatus.USER_ENGAGED) {
+			mContext.unregisterReceiver(mNetworkStateReceiver);
+			mWebView = null;
+		}
+//		mLayout = null;
+		mActivity = null;
 		setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 	}
-	
-	public boolean startEngament(FrameLayout layout) {
-		if (canStartEngagement()) {
-			mLayout = layout;
-			
-			layout.addView(mWebView);
 
-			mWebView.setLayoutParams(new LayoutParams(
-	            LayoutParams.FILL_PARENT,
-	            LayoutParams.FILL_PARENT));
-		
+	
+	public boolean startEngament(Activity activity) {
+		if (canStartEngagement()) {
+//			mLayout = layout;
+//			
+//			layout.addView(mWebView);
+//			mWebView.setLayoutParams(new LayoutParams(
+//	            LayoutParams.FILL_PARENT,
+//	            LayoutParams.FILL_PARENT));
 			mWebView.loadUrl(SP_START_ENGAGEMENT);
+
+			mActivity = activity;
+			mActivity.addContentView(mWebView, new LayoutParams(
+		            LayoutParams.FILL_PARENT,
+		            LayoutParams.FILL_PARENT));
+
+		
 			checkEngagementStarted();
 			return true;
 		} else {
 			SponsorPayLogger.d(TAG,	"SPBrandEngageClient is not ready to show offers. " +
-					"Call -requestOffers: and wait until your delegate is called with the" +
+					"Call requestOffers() and wait until your listener is called with the" +
 					" confirmation that offers have been received.");
 			return false;
 		}
@@ -228,12 +244,18 @@ public class SPBrandEngageClient {
 			public void run() {
 				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS) {
 					//something went wrong, show close button
-//					showCloseButton();
+					showCloseButton();
 				}
 			}
+
 		};
 		
 		mHandler.postDelayed(r, TIMEOUT);
+	}
+
+	private void showCloseButton() {
+		showErrorDialog(SponsorPayPublisher
+				.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
 	}
 
 	public boolean canStartEngagement() {
@@ -244,16 +266,6 @@ public class SPBrandEngageClient {
 		return mStatus == SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS
 				|| mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS;
 	}
-
-
-//	public boolean isCheckForRewardAfterCompletion() {
-//		return mCheckForRewardAfterCompletion;
-//	}
-//
-//	public void setCheckForRewardAfterCompletion(
-//			boolean mCheckForRewardAfterCompletion) {
-//		this.mCheckForRewardAfterCompletion = mCheckForRewardAfterCompletion;
-//	}
 
 	public boolean isShowRewardsNotification() {
 		return mShowRewardsNotification;
@@ -293,7 +305,7 @@ public class SPBrandEngageClient {
 			setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 			return true;
 		} else {
-			SponsorPayLogger.d(TAG, "Cannot change custom parameters while a request to the " +
+			SponsorPayLogger.d(TAG, "Cannot change the currency listener while a request to the " +
 					"server is going on or an offer is being presented to the user.");
 			return false;
 		}
@@ -313,14 +325,119 @@ public class SPBrandEngageClient {
 	private void setupWebView(Activity activity) {
 		//TODO check this for android version!!
 		mContext = Build.VERSION.SDK_INT < 11 ? activity : activity.getApplicationContext();
+//		mContext = activity;
+		
 		mWebView = new WebView(mContext);
 
+//		mWebView = new WebView(mContext) {
+//			
+//		@Override
+//		public void addView(View child) {
+//			Log.e(TAG, "addView 1- "+ child.getClass().getCanonicalName());
+//			super.addView(child);
+//		}
+//		
+//		@Override
+//		public void addView(View child, int index) {
+//			Log.e(TAG, "addView 2- "+ child.getClass().getCanonicalName());
+//			super.addView(child, index);
+//		}
+//		@Override
+//		public void addView(View child, int index,
+//				android.view.ViewGroup.LayoutParams params) {
+//			Log.e(TAG, "addView 3- "+ child.getClass().getCanonicalName());
+//			super.addView(child, index, params);
+//		}
+//		@Override
+//		public void addView(View child, int width, int height) {
+//			Log.e(TAG, "addView 4- "+ child.getClass().getCanonicalName());
+//			super.addView(child, width, height);
+//		}
+//		@Override
+//		public void addView(View child,
+//				android.view.ViewGroup.LayoutParams params) {
+//			Log.e(TAG, "addView 5- "+ child.getClass().getCanonicalName());
+//			super.addView(child, params);
+//		}
+//		
+//		@Override
+//		protected boolean addViewInLayout(View child, int index,
+//				android.view.ViewGroup.LayoutParams params) {
+//			Log.e(TAG, "addViewInLayout - "+ child.getClass().getCanonicalName());
+//			return super.addViewInLayout(child, index, params);
+//		}
+//		
+//		@Override
+//		protected boolean addViewInLayout(View child, int index,
+//				android.view.ViewGroup.LayoutParams params,
+//				boolean preventRequestLayout) {
+//			Log.e(TAG, "addViewInLayout - "+ child.getClass().getCanonicalName());
+//			return super.addViewInLayout(child, index, params, preventRequestLayout);
+//		}
+//		
+//		@Override
+//		protected void attachViewToParent(View child, int index,
+//				android.view.ViewGroup.LayoutParams params) {
+//			Log.e(TAG, "attachViewToParent - "+ child.getClass().getCanonicalName());
+//			super.attachViewToParent(child, index, params);
+//		}
+//		
+//		@Override
+//		protected boolean drawChild(Canvas canvas, View child,
+//				long drawingTime) {
+//			Log.e(TAG, "drawChild - "+ child.getClass().getCanonicalName());
+//			return super.drawChild(canvas, child, drawingTime);
+//		}
+//	};
+		
+		
+		
 		mWebView.setId(new Random().nextInt());
 		
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setPluginsEnabled(true);
 		
+		//TODO check this
+		if (Build.VERSION.SDK_INT < 14) {
+			mWebView.getSettings().setUserAgent(1);
+		}
+		
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
+		
+		mWebView.setWebChromeClient(new WebChromeClient() {
+			@Override
+			public boolean onJsConfirm(WebView view, String url,
+					String message, JsResult result) {
+				showJSDialog(url, message);
+				result.cancel();
+				return true;
+			}
+			
+			private void showJSDialog(String url, String message) {
+				if (!mShowingDialog ) {
+					mShowingDialog = true;
+//					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mLayout == null ? mContext: mLayout.getContext());
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);
+					dialogBuilder.setTitle(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE)).setMessage(message).
+						setPositiveButton("OK", 
+						new OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+//								notitfyListener(SPBrandEngageClientStatus.CLOSE_ABORTED);
+//								clearWebViewPage();
+								changeStatus(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE);
+								mShowingDialog = false;
+							}
+						}).setNegativeButton("Cancel", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							mShowingDialog = false;
+						}
+					});
+					dialogBuilder.show();
+				}
+			}
+		});
 		
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
@@ -330,8 +447,8 @@ public class SPBrandEngageClient {
 					Uri uri = Uri.parse(url);
 					String host = uri.getHost();
 					if (host.equals(SP_REQUEST_EXIT)) {
-						//TODO fix this
-						uri.getQueryParameter(SP_REQUEST_URL_PARAMETER_KEY);
+						String targetUrl = uri.getQueryParameter(SP_REQUEST_URL_PARAMETER_KEY);
+						processExitUrl(targetUrl);
 					} else if (host.equals(SP_REQUEST_OFFER_ANSWER)) {
 						processQueryOffersResponse(Integer.parseInt(uri
 								.getQueryParameter(SP_NUMEBER_OF_OFFERS_PARAMETER_KEY)));
@@ -354,33 +471,38 @@ public class SPBrandEngageClient {
 			
 		});
 		
-		BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
-
-		    @Override
-		    public void onReceive(Context context, Intent intent) {
-		    	boolean isConnected = !intent.getBooleanExtra(
-						ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
-				if (!isConnected && mStatus == SPBrandEngageOffersStatus.SHOWING_OFFERS) {
-					// show error dialog
-					SponsorPayLogger.e(TAG, "Connection has been lost");
-					mHandler.post(new Runnable() {
-						@Override
-						public void run() {
-							showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_OFFLINE));
-						}
-					});
+		IntentFilter filter = new IntentFilter(
+				ConnectivityManager.CONNECTIVITY_ACTION);
+		mContext.registerReceiver(mNetworkStateReceiver, filter);
+			
+		
+	}
+	
+	private void processExitUrl(String targetUrl) {
+		if (targetUrl != null) {
+			Intent intent = new Intent();
+			intent.setAction(Intent.ACTION_VIEW);
+			Uri uri = Uri.parse(targetUrl);
+			intent.setData(uri);
+			try {
+				mActivity.startActivity(intent);
+			} catch (ActivityNotFoundException e) {
+				if (uri.getScheme().equalsIgnoreCase("market") && !IntentHelper.isIntentAvailable(mContext,
+						Intent.ACTION_VIEW, 
+						// dummy search to validate Play Store application
+						Uri.parse("market://search?q=pname:com.google"))) {
+					SponsorPayLogger.e(TAG, "Play Store is not installed on this device...");
+					showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE));
 				}
-		    }
-		};
-
-		IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);        
-		activity.registerReceiver(networkStateReceiver, filter);
+			}
+		}
 	}
 	
 	private void showErrorDialog(String message) {
-		if (!mShowingDialog ) {
+		if (!mShowingDialog && mWebView != null) {
 			mShowingDialog = true;
-			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mLayout.getContext());
+//			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mLayout == null ? mContext: mLayout.getContext());
+			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);
 			dialogBuilder.setTitle(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_TITLE)).setMessage(message).
 				setNeutralButton(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_BUTTON_TITLE_DISMISS), 
 				new OnClickListener() {
@@ -407,6 +529,12 @@ public class SPBrandEngageClient {
 	
 	private void checkForCoins() {
 		if (mVCSListener != null) {
+			if (mShowRewardsNotification) {
+				Toast.makeText(mContext,
+						SponsorPayPublisher
+								.getUIString(UIStringIdentifier.MBE_REWARD_NOTIFICATION),
+						Toast.LENGTH_LONG).show();
+			}
 			//delaying it for 10 seconds
 			mHandler.postDelayed(new Runnable() {
 				@Override

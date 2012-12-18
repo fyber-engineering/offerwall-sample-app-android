@@ -3,11 +3,11 @@ package com.sponsorpay.sdk.android.publisher.mbe;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Window;
-import android.widget.FrameLayout;
+import android.view.WindowManager;
 
 public class SPBrandEngageActivity extends Activity implements SPBrandEngageClientStatusListener {
 	
-	private FrameLayout mFrameLayout;
+//	private FrameLayout mFrameLayout;
 //	private String TAG = "SPBrandEngageActivity";
 
 	@Override
@@ -16,20 +16,24 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		
-//		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
-		mFrameLayout = new FrameLayout(this);
-		SPBrandEngageClient.INSTANCE.startEngament(mFrameLayout);
+//		mFrameLayout = new FrameLayout(this);
+//		mFrameLayout.setBackgroundResource(R.color.background_dark);
+//		setContentView(mFrameLayout);
+
 		SPBrandEngageClient.INSTANCE.setStatusListener(this);
-		setContentView(mFrameLayout);
+//		SPBrandEngageClient.INSTANCE.startEngament(mFrameLayout);
+		SPBrandEngageClient.INSTANCE.startEngament(this);
+//		setContentView(mFrameLayout);
 	}
 	
-	@Override
-	protected void onStop() {
-		mFrameLayout.removeAllViews();
-		super.onStop();
-	}
+//	@Override
+//	protected void onStop() {
+//		mFrameLayout.removeAllViews();
+//		super.onStop();
+//	}
 	
 	@Override
 	public void onBackPressed() {
@@ -39,7 +43,7 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 
 	
 	private void closeActivity() {
-		mFrameLayout.removeAllViews();
+//		mFrameLayout.removeAllViews();
 		finish();
 	}
 	

@@ -52,8 +52,6 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	
 	private static boolean showToastNotification = true;
 	
-//	private static SPCurrencyRoundingMode roundingMode = SPCurrencyRoundingMode.ROUND;
-
 	/**
 	 * {@link SPCurrencyServerListener} registered by the developer's code to be notified of the
 	 * result of requests to the Virtual Currency Server.
@@ -63,7 +61,6 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	private boolean mShouldShowNotification;
 
 	private String mCurrency;
-//	private SPCurrencyRoundingMode mRoundingMode;
 	
 	/**
 	 * Types of requests to be sent to the Virtual Currency Server.
@@ -73,12 +70,6 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		DELTA_COINS
 	}
 	
-//	public enum SPCurrencyRoundingMode {
-//		ROUND,
-//		FLOOR,
-//		CEIL
-//	}
-
 	/**
 	 * {@link AsyncTask} used to perform the HTTP requests on a background thread and be notified of
 	 * its results on the calling thread.
@@ -178,7 +169,6 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 				RequestType.DELTA_COINS, requestUrl, this);
 
 		mShouldShowNotification = showToastNotification;
-//		mRoundingMode = roundingMode;
 		
 		requestTask.execute();
 	}
@@ -275,10 +265,6 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		showToastNotification = showNotification;
 	}
 
-//	public static void setRoundingMode(SPCurrencyRoundingMode newRoundingMode) {
-//		roundingMode = newRoundingMode;
-//	}
-	
 	/**
 	 * Implemented from {@link SPCurrencyServerListener}. Forwards the call to the user listener.
 	 */
@@ -305,22 +291,5 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		}
 		mUserListener.onSPCurrencyDeltaReceived(response);
 	}
-	
-//	private int roundDeltaOfCoins(double amount) {
-//		int roundedAmount;
-//		switch (mRoundingMode) {
-//		case FLOOR:
-//			roundedAmount = (int) Math.floor(amount);
-//			break;
-//		case CEIL:
-//			roundedAmount = (int) Math.ceil(amount);
-//			break;
-//		default:
-//		case ROUND:
-//			roundedAmount = (int) Math.round(amount);
-//			break;
-//		}
-//		return roundedAmount;
-//	}
 	
 }

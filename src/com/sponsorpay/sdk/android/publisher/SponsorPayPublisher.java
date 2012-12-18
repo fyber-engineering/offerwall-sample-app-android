@@ -48,7 +48,7 @@ public class SponsorPayPublisher {
 		LOADING_INTERSTITIAL, LOADING_OFFERWALL, ERROR_PLAY_STORE_UNAVAILABLE,
 		MBE_REWARD_NOTIFICATION, VCS_COINS_NOTIFICATION, VCS_DEFAULT_CURRENCY, 
 		MBE_ERROR_DIALOG_TITLE, MBE_ERROR_DIALOG_MESSAGE_DEFAULT, MBE_ERROR_DIALOG_MESSAGE_OFFLINE,
-		MBE_ERROR_DIALOG_BUTTON_TITLE_DISMISS
+		MBE_ERROR_DIALOG_BUTTON_TITLE_DISMISS, MBE_FORFEIT_DIALOG_TITLE
 	};
 
 
@@ -92,6 +92,7 @@ public class SponsorPayPublisher {
 		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT, "We're sorry, something went wrong. Please try again.");
 		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_OFFLINE, "Your Internet connection has been lost. Please try again later.");
 		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_BUTTON_TITLE_DISMISS, "Dismiss");
+		sUIStrings.put(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE, "");
 	}
 
 	/**
@@ -866,15 +867,23 @@ public class SponsorPayPublisher {
 	public static SPBrandEngageRequest getIntentForMBEActivity(String credentialsToken, Activity activity, 
 			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters, 
 			SPCurrencyServerListener vcsListener) {
-		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
-		
-		SPBrandEngageClient.INSTANCE.setCurrencyName(currencyName);
-		SPBrandEngageClient.INSTANCE.setCustomParameters(getCustomParameters(parameters));
-		SPBrandEngageClient.INSTANCE.setCurrencyListener(vcsListener);
-		
-		SPBrandEngageRequest request = new SPBrandEngageRequest(credentials, activity, listener);
-		request.askForOffers();
-		return request;
+		if (SPBrandEngageClient.INSTANCE.canRequestOffers()) {
+
+			SPCredentials credentials = SponsorPay
+					.getCredentials(credentialsToken);
+
+			SPBrandEngageClient.INSTANCE.setCurrencyName(currencyName);
+			SPBrandEngageClient.INSTANCE
+					.setCustomParameters(getCustomParameters(parameters));
+			SPBrandEngageClient.INSTANCE.setCurrencyListener(vcsListener);
+
+			SPBrandEngageRequest request = new SPBrandEngageRequest(
+					credentials, activity, listener);
+			request.askForOffers();
+			return request;
+		} else {
+			return null;
+		}
 	}
 	
 	//================================================================================

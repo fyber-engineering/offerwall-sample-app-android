@@ -284,52 +284,27 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	/**
 	 * Triggered when the user clicks on the launch unlock offer wall button.
 	 * 
-	 * @param v
 	 */
 	public void onLaunchUnlockOfferwallClick(View v) {
-		fetchValuesFromFields();
-
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-
-		if (fragment instanceof ItemsSettingsFragment) {
-			((ItemsSettingsFragment) fragment).launchUnlockOfferWall();
-		}
+		getCurrentFragment(ItemsSettingsFragment.class).launchUnlockOfferWall();
 	}
 	
 	/**
 	 * Triggered when the user clicks on the send action button.
 	 * 
-	 * @param v
 	 */
 	public void onSendActionClick(View v) {
-		fetchValuesFromFields();
-		
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-		
-		if (fragment instanceof ActionsSettingsFragment) {
-			((ActionsSettingsFragment) fragment).sendActionCompleted();
-		}
-		
+		getCurrentFragment(ActionsSettingsFragment.class).sendActionCompleted();
 	}
 	
 
 	/**
 	 * Triggered when the user clicks on the launch interstitial button.
 	 * 
-	 * @param v
 	 */
 	public void onLaunchInsterstitialClick(View v) {
-		fetchValuesFromFields();
-
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-
-		if (fragment instanceof InterstitialSettingsFragment) {
-			((InterstitialSettingsFragment) fragment).launchInsterstitial(
-					mShouldStayOpen, mCurrencyName);
-		}
+		getCurrentFragment(InterstitialSettingsFragment.class).launchInsterstitial(
+				mShouldStayOpen, mCurrencyName);
 	}
 
 	/**
@@ -378,52 +353,25 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	 * Triggered when the user clicks on the Request SP Unlock Items button. Will send a request for
 	 * the status of the SP Unlock items to the server and register a callback object to show the
 	 * result in a dialog box. Uses the values entered for User ID, App ID and Security Token.
-	 * 
-	 * @param v
 	 */
 	public void onRequestSPUnlockItemsClick(View v) {
-		fetchValuesFromFields();
-
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-
-		if (fragment instanceof ItemsSettingsFragment) {
-			((ItemsSettingsFragment) fragment).launchUnlockItems();
-		}
+		getCurrentFragment(ItemsSettingsFragment.class).launchUnlockItems();
 	}
 
 	public void onRequestBannerClick(View v) {
-		fetchValuesFromFields();
 		SponsorPayLogger.i(TAG, "Requesting banner");
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-		if (fragment instanceof BannersSettingsFragment) {
-			((BannersSettingsFragment) fragment).requestBanner(mCurrencyName);
-		}
+		getCurrentFragment(BannersSettingsFragment.class).requestBanner(mCurrencyName);
 	}
 	
 	// MBE
 	
 	public void onRequestOffersClick(View v) {
-		fetchValuesFromFields();
 		SponsorPayLogger.d(TAG, "Requesting MBE offers...");
-		//TODO extract this and refactor 
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-		if (fragment instanceof MBESettingsFragment) {
-			((MBESettingsFragment) fragment).requestOffers();
-		}
+		getCurrentFragment(MBESettingsFragment.class).requestOffers(mCurrencyName);
 	}
 	
 	public void onStartMBEClick(View v) {
-		fetchValuesFromFields();
-		SponsorPayLogger.d(TAG, "Starting MBE engagement...");
-		//TODO extract this and refactor 
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-		if (fragment instanceof MBESettingsFragment) {
-			((MBESettingsFragment) fragment).startEngament();
-		}
+		getCurrentFragment(MBESettingsFragment.class).startEngament();
 	}
 	
 
@@ -446,6 +394,17 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	}
 	
 	// FRAGMENTS stuff
+	
+	@SuppressWarnings("unchecked")
+	private <T extends Fragment> T getCurrentFragment(Class<T> type) {
+		fetchValuesFromFields();
+		Fragment fragment = getSupportFragmentManager().findFragmentById(
+				R.id.fragment_placeholder);
+		if (fragment.getClass().isAssignableFrom(type)) {
+			return (T)fragment;
+		}
+		return null; 
+	}
 	
 	protected void replaceFragment(Fragment newFragment) {
 		FragmentTransaction transaction = getSupportFragmentManager()

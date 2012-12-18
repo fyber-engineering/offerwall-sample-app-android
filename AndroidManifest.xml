@@ -38,7 +38,7 @@
 		
         <activity 
             android:configChanges="screenSize|orientation"
-            android:name="com.sponsorpay.sdk.android.mbe.MBEActivity"
+            android:name="com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageActivity"
             android:hardwareAccelerated="true"/>
         
     </application>

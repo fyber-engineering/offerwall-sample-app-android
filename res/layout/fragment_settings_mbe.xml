@@ -13,19 +13,30 @@
         android:layout_marginBottom="@dimen/settings_menu_bottom_margin"/>
     
 	<Button
-		android:layout_width="wrap_content"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_gravity="center_horizontal"
 		android:onClick="onRequestOffersClick"
 		android:text="@string/request_offers" />
 	
 	<Button
-		android:layout_width="wrap_content"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:layout_gravity="center_horizontal"
 		android:onClick="onStartMBEClick"
 		android:text="@string/start_mbe" />
 	
+	<CheckBox 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/mbe_add_vcs_listener_checkbox"
+		android:text="VCS query?"
+	    />
+	
+	<CheckBox 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:id="@+id/mbe_show_notification_checkbox"
+		android:text="Show reward notification?"
+	    />
 	<!-- 
 	<LinearLayout
 		android:id="@+id/banner_container"

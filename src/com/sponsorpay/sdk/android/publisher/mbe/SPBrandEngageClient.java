@@ -52,6 +52,8 @@ public class SPBrandEngageClient {
 	
 	private static final String ABOUT_BLANK = "about:blank";
 	
+	private static final String SP_SCHEME = "sponsorpay";
+	
 	private static final String SP_REQUEST_OFFER_ANSWER = "requestOffers";
 	private static final String SP_NUMEBER_OF_OFFERS_PARAMETER_KEY = "n";
                                              
@@ -240,7 +242,8 @@ public class SPBrandEngageClient {
 		Runnable r = new Runnable() {		
 			@Override
 			public void run() {
-				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS) {
+				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
+						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED) {
 					//something went wrong, show close button
 					showCloseButton();
 				}
@@ -389,13 +392,13 @@ public class SPBrandEngageClient {
 	}
 	
 	private void checkForCoins() {
+		if (mShowRewardsNotification) {
+			Toast.makeText(mContext,
+					SponsorPayPublisher
+					.getUIString(UIStringIdentifier.MBE_REWARD_NOTIFICATION),
+					Toast.LENGTH_LONG).show();
+		}
 		if (mVCSListener != null) {
-			if (mShowRewardsNotification) {
-				Toast.makeText(mContext,
-						SponsorPayPublisher
-								.getUIString(UIStringIdentifier.MBE_REWARD_NOTIFICATION),
-						Toast.LENGTH_LONG).show();
-			}
 			//delaying it for 10 seconds
 			mHandler.postDelayed(new Runnable() {
 				@Override
@@ -416,7 +419,7 @@ public class SPBrandEngageClient {
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
 				SponsorPayLogger.d(TAG, "URL -> " + url);
-				if (url.startsWith("sponsorpay")) {
+				if (url.startsWith(SP_SCHEME)) {
 					Uri uri = Uri.parse(url);
 					String host = uri.getHost();
 					if (host.equals(SP_REQUEST_EXIT)) {

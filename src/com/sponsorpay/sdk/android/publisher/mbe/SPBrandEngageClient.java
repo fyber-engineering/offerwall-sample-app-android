@@ -16,6 +16,12 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnDoubleTapListener;
+import android.view.GestureDetector.OnGestureListener;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -87,6 +93,10 @@ public class SPBrandEngageClient {
 	private SPCurrencyServerListener mVCSListener;
 	private SPBrandEngageClientStatusListener mStatusListener;
 	
+	private WebViewClient mWebClient;
+	private WebChromeClient mChromeClient;	
+	private OnTouchListener mOnTouchListener;
+	
 	private BroadcastReceiver mNetworkStateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -105,6 +115,7 @@ public class SPBrandEngageClient {
 			}
 		}
 	};
+
 	
 	private SPBrandEngageClient() {
 		mHandler = new Handler();
@@ -228,10 +239,11 @@ public class SPBrandEngageClient {
 			mWebView.loadUrl(ABOUT_BLANK);
 		}
 		if (mStatus == SPBrandEngageOffersStatus.SHOWING_OFFERS
-				|| mStatus == SPBrandEngageOffersStatus.USER_ENGAGED) {
+				|| mStatus == SPBrandEngageOffersStatus.USER_ENGAGED
+				|| mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS) {
 			mContext.unregisterReceiver(mNetworkStateReceiver);
-			mWebView = null;
 		}
+		mWebView = null;
 		mActivity = null;
 		setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 	}
@@ -325,6 +337,10 @@ public class SPBrandEngageClient {
 		
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setPluginsEnabled(true);
+
+		mWebView.getSettings().setUseWideViewPort(false);
+		
+		mWebView.setBackgroundColor(0);
 		
 		//TODO check this
 		if (Build.VERSION.SDK_INT < 14) {
@@ -336,6 +352,8 @@ public class SPBrandEngageClient {
 		mWebView.setWebChromeClient(getWebChromeClient());
 		
 		mWebView.setWebViewClient(getWebClient());
+
+		mWebView.setOnTouchListener(getOnTouchListener());
 		
 		IntentFilter filter = new IntentFilter(
 				ConnectivityManager.CONNECTIVITY_ACTION);
@@ -415,75 +433,149 @@ public class SPBrandEngageClient {
 	
 
 	private WebViewClient getWebClient() {
-		WebViewClient webClient = new WebViewClient() {
-			@Override
-			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				SponsorPayLogger.d(TAG, "URL -> " + url);
-				if (url.startsWith(SP_SCHEME)) {
-					Uri uri = Uri.parse(url);
-					String host = uri.getHost();
-					if (host.equals(SP_REQUEST_EXIT)) {
-						String targetUrl = uri.getQueryParameter(SP_REQUEST_URL_PARAMETER_KEY);
-						processExitUrl(targetUrl);
-					} else if (host.equals(SP_REQUEST_OFFER_ANSWER)) {
-						processQueryOffersResponse(Integer.parseInt(uri
-								.getQueryParameter(SP_NUMEBER_OF_OFFERS_PARAMETER_KEY)));
-					} else if (host.equals(SP_REQUEST_START_STATUS)) {
-						changeStatus(uri.getQueryParameter(SP_REQUEST_STATUS_PARAMETER_KEY));
+		if (mWebClient == null) {
+				
+			mWebClient = new WebViewClient() {
+				@Override
+				public boolean shouldOverrideUrlLoading(WebView view, String url) {
+					SponsorPayLogger.d(TAG, "URL -> " + url);
+					if (url.startsWith(SP_SCHEME)) {
+						Uri uri = Uri.parse(url);
+						String host = uri.getHost();
+						if (host.equals(SP_REQUEST_EXIT)) {
+							String targetUrl = uri.getQueryParameter(SP_REQUEST_URL_PARAMETER_KEY);
+							processExitUrl(targetUrl);
+						} else if (host.equals(SP_REQUEST_OFFER_ANSWER)) {
+							processQueryOffersResponse(Integer.parseInt(uri
+									.getQueryParameter(SP_NUMEBER_OF_OFFERS_PARAMETER_KEY)));
+						} else if (host.equals(SP_REQUEST_START_STATUS)) {
+							changeStatus(uri.getQueryParameter(SP_REQUEST_STATUS_PARAMETER_KEY));
+						}
+						return true;
 					}
-					return true;
+					return false;
 				}
-				return false;
-			}
-			
-			@Override
-			public void onReceivedError(WebView view, int errorCode,
-					String description, String failingUrl) {
-				SponsorPayLogger.d(TAG, "onReceivedError url - " + failingUrl + " - " + description );
-				// show error dialog
-				showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
-				super.onReceivedError(view, errorCode, description, failingUrl);
-			}
-			
-		};
+				
+				@Override
+				public void onReceivedError(WebView view, int errorCode,
+						String description, String failingUrl) {
+					SponsorPayLogger.d(TAG, "onReceivedError url - " + failingUrl + " - " + description );
+					// show error dialog
+					showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+					super.onReceivedError(view, errorCode, description, failingUrl);
+				}
+				
+			};
 		
-		return webClient;
+		}
+		return mWebClient;
 	}
 
 	private WebChromeClient getWebChromeClient() {
-		WebChromeClient chromeClient = new WebChromeClient() {
-			@Override
-			public boolean onJsConfirm(WebView view, String url,
-					String message, JsResult result) {
-				showJSDialog(url, message);
-				result.cancel();
-				return true;
-			}
-			
-			private void showJSDialog(String url, String message) {
-				if (!mShowingDialog ) {
-					mShowingDialog = true;
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);
-					dialogBuilder.setTitle(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE)).setMessage(message).
+		if (mChromeClient == null) {
+			mChromeClient = new WebChromeClient() {
+				@Override
+				public boolean onJsConfirm(WebView view, String url,
+						String message, JsResult result) {
+					showJSDialog(url, message);
+					result.cancel();
+					return true;
+				}
+				
+				private void showJSDialog(String url, String message) {
+					if (!mShowingDialog ) {
+						mShowingDialog = true;
+						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);
+						dialogBuilder.setTitle(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE)).setMessage(message).
 						setPositiveButton("OK", 
-						new OnClickListener() {
+								new OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								changeStatus(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE);
 								mShowingDialog = false;
 							}
 						}).setNegativeButton("Cancel", new OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							mShowingDialog = false;
-						}
-					});
-					dialogBuilder.show();
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								mShowingDialog = false;
+							}
+						});
+						dialogBuilder.show();
+					}
 				}
-			}
-		};
+			};
+			
+		}
+		return mChromeClient;
+	}
 		
-		return chromeClient;
+	private OnTouchListener getOnTouchListener() {
+		if (mOnTouchListener == null) {
+			OnDoubleTapListener doubleTapListener = new OnDoubleTapListener() {
+				
+				@Override
+				public boolean onSingleTapConfirmed(MotionEvent e) {
+					return false; //Nothing
+				}
+
+				@Override
+				public boolean onDoubleTap(MotionEvent e) {
+					//consume the double tap
+					SponsorPayLogger.d(TAG, "double tap event");
+					return true;
+				}
+
+				@Override
+				public boolean onDoubleTapEvent(MotionEvent e) {
+					//consume the double tap
+					SponsorPayLogger.d(TAG, "double tap event");
+					return true;
+				}
+			};
+			
+			final GestureDetector gestureDetector = new GestureDetector(new OnGestureListener() {
+				
+				@Override
+				public boolean onSingleTapUp(MotionEvent e) {
+					return false;
+				}
+				
+				@Override
+				public void onShowPress(MotionEvent e) {
+				}
+				
+				@Override
+				public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+						float distanceY) {
+					return false;
+				}
+				
+				@Override
+				public void onLongPress(MotionEvent e) {
+				}
+				
+				@Override
+				public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+						float velocityY) {
+					return false;
+				}
+				
+				@Override
+				public boolean onDown(MotionEvent e) {
+					return false;
+				}
+			});
+			gestureDetector.setOnDoubleTapListener(doubleTapListener);
+			
+			mOnTouchListener = new OnTouchListener() {		
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					return gestureDetector.onTouchEvent(event);
+				}
+			};
+		}
+		
+		return mOnTouchListener;
 	}
 	
 }

@@ -75,6 +75,10 @@ public class HostInfo {
 		sSimulateNoHardwareSerialNumber = value;
 	}
 
+	public static void setSimulateNoAccessNetworkState(boolean value) {
+		sSimulateNoAccessNetworkState = value;
+	}
+
 	/**
 	 * The unique device ID.
 	 */

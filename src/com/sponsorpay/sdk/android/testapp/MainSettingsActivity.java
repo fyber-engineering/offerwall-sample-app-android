@@ -40,19 +40,24 @@ public class MainSettingsActivity extends Activity {
 	 * Shared preferences file name. Stores the values entered into the UI fields.
 	 */
 	public static final String PREFERENCES_EXTRA = "prefs.extra";
-	public static final String KEEP_OFFERWALL_OPEN_EXTRA = "keep.offerwall.extra.extra";
+	public static final String KEEP_OFFERWALL_OPEN_EXTRA = "keep.offerwall.open.extra";
+	public static final String SHOW_TOAST_VCS_REQUEST_EXTRA = "show.toast.vcs.request.extra";
 	
 	private static final String OVERRIDING_URL_PREFS_KEY = "OVERRIDING_URL";
 	// this is public in order to be shared with the main activity 
 	public static final String KEEP_OFFERWALL_OPEN_PREFS_KEY = "KEEP_OFFERWALL_OPEN";
+	public static final String SHOW_TOAST_VCS_REQUEST_PREFS_KEY = "SHOW_TOAST_VCS_REQUEST";
 	
 	private Button mBackButton;
 	
 	private CheckBox mKeepOfferwallOpenCheckBox;
+	private CheckBox mShowToastOnVCSRequestCheckBox;
+
 	private CheckBox mSimulateNoPhoneStatePermissionCheckBox;
 	private CheckBox mSimulateNoWifiStatePermissionCheckBox;
 	private CheckBox mSimulateInvalidAndroidIdCheckBox;
 	private CheckBox mSimulateNoSerialNumberCheckBox;
+	private CheckBox mSimulateNoNetworkAccessCheckBox;
 
 	private TextView mKeyValuesList;
 
@@ -60,6 +65,7 @@ public class MainSettingsActivity extends Activity {
 	private EditText mCustomKeyField, mCustomValueField;
 	
 	private boolean mShouldStayOpen; 
+	private boolean mShowToastOnSuccessfullVCSRequest; 
 	
 	private String mOverridingUrl;
 
@@ -79,10 +85,13 @@ public class MainSettingsActivity extends Activity {
 
 	protected void bindViews() {
 		mKeepOfferwallOpenCheckBox = (CheckBox) findViewById(R.id.keep_offerwall_open_checkbox);
+		mShowToastOnVCSRequestCheckBox = (CheckBox) findViewById(R.id.show_toast_on_vcs_successfull_checkbox);
+
 		mSimulateNoPhoneStatePermissionCheckBox = (CheckBox) findViewById(R.id.simulate_no_phone_state_permission);
 		mSimulateNoWifiStatePermissionCheckBox = (CheckBox) findViewById(R.id.simulate_no_wifi_state_permission);
 		mSimulateInvalidAndroidIdCheckBox = (CheckBox) findViewById(R.id.simulate_invalid_android_id);
 		mSimulateNoSerialNumberCheckBox = (CheckBox) findViewById(R.id.simulate_no_hw_serial_number);
+		mSimulateNoNetworkAccessCheckBox = (CheckBox) findViewById(R.id.simulate_no_network_state_permission);
 		
 		mCustomKeyValuesForRequest = new HashMap<String, String>();
 		mCustomKeyField = (EditText) findViewById(R.id.custom_key_field);
@@ -169,6 +178,8 @@ public class MainSettingsActivity extends Activity {
 					HostInfo.setSimulateInvalidAndroidId(isChecked);
 				} else if (buttonView == mSimulateNoSerialNumberCheckBox) {
 					HostInfo.setSimulateNoHardwareSerialNumber(isChecked);
+				} else if (buttonView == mSimulateNoNetworkAccessCheckBox) {
+					HostInfo.setSimulateNoAccessNetworkState(isChecked);
 				}
 			}
 		};
@@ -180,6 +191,8 @@ public class MainSettingsActivity extends Activity {
 		mSimulateInvalidAndroidIdCheckBox
 				.setOnCheckedChangeListener(simCheckboxesChangeListener);
 		mSimulateNoSerialNumberCheckBox
+				.setOnCheckedChangeListener(simCheckboxesChangeListener);
+		mSimulateNoNetworkAccessCheckBox
 				.setOnCheckedChangeListener(simCheckboxesChangeListener);
 		
 		mBackButton.setOnClickListener(new OnClickListener() {
@@ -281,6 +294,7 @@ public class MainSettingsActivity extends Activity {
 		
 		prefsEditor.putString(OVERRIDING_URL_PREFS_KEY, mOverridingUrl);
 		prefsEditor.putBoolean(KEEP_OFFERWALL_OPEN_PREFS_KEY, mShouldStayOpen);
+		prefsEditor.putBoolean(SHOW_TOAST_VCS_REQUEST_PREFS_KEY, mShowToastOnSuccessfullVCSRequest);
 
 		prefsEditor.commit();
 		
@@ -289,6 +303,8 @@ public class MainSettingsActivity extends Activity {
 
 	private void fetchValuesFromFields() {
 		mShouldStayOpen = mKeepOfferwallOpenCheckBox.isChecked();
+		
+		mShowToastOnSuccessfullVCSRequest = mShowToastOnVCSRequestCheckBox.isChecked();
 		
 		mOverridingUrl = mOverridingUrlField.getText().toString();
 		SponsorPayPublisher.setOverridingWebViewUrl(mOverridingUrl);
@@ -303,7 +319,10 @@ public class MainSettingsActivity extends Activity {
 				Context.MODE_PRIVATE);
 
 		mOverridingUrl = prefs.getString(OVERRIDING_URL_PREFS_KEY, StringUtils.EMPTY_STRING);
+		
 		mShouldStayOpen = prefs.getBoolean(KEEP_OFFERWALL_OPEN_PREFS_KEY, true);
+		mShowToastOnSuccessfullVCSRequest = prefs.getBoolean(SHOW_TOAST_VCS_REQUEST_PREFS_KEY, true);
+		
 		setValuesInFields();
 	}
 	
@@ -315,6 +334,7 @@ public class MainSettingsActivity extends Activity {
 		SponsorPayPublisher.setOverridingWebViewUrl(mOverridingUrl);
 		
 		mKeepOfferwallOpenCheckBox.setChecked(mShouldStayOpen);
+		mShowToastOnVCSRequestCheckBox.setChecked(mShowToastOnSuccessfullVCSRequest);
 
 		mSimulateNoPhoneStatePermissionCheckBox.setChecked(ExtendedHostInfo
 				.getSimulateNoReadPhoneStatePermission());
@@ -324,6 +344,8 @@ public class MainSettingsActivity extends Activity {
 				.getSimulateInvalidAndroidId());
 		mSimulateNoSerialNumberCheckBox.setChecked(ExtendedHostInfo
 				.getSimulateNoHardwareSerialNumber());
+		mSimulateNoNetworkAccessCheckBox.setChecked(ExtendedHostInfo
+				.getSimulateNoAccessNetworkState());
 	}
 
 	public void appendDefaultParamsToUrlField(View v) {
@@ -367,6 +389,10 @@ public class MainSettingsActivity extends Activity {
 		
 		public static boolean getSimulateInvalidAndroidId(){
 			return sSimulateInvalidAndroidId;
+		}
+		
+		public static boolean getSimulateNoAccessNetworkState(){
+			return sSimulateNoAccessNetworkState;
 		}
 	}
 	

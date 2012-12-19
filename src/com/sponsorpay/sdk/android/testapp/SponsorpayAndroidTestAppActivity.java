@@ -66,6 +66,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	private CheckBox mUseStagingUrlsCheckBox;
 	
 	private boolean mShouldStayOpen;
+	private boolean mShowToastOnSuccessfullVCSRequest;
 	
 	/**
 	 * Called when the activity is first created. See {@link Activity}.
@@ -158,7 +159,9 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		mCurrencyName = prefs.getString(CURRENCY_NAME_PREFS_KEY, StringUtils.EMPTY_STRING);
 		
 		mShouldStayOpen = prefs.getBoolean(MainSettingsActivity.KEEP_OFFERWALL_OPEN_PREFS_KEY, true);
+		mShowToastOnSuccessfullVCSRequest = prefs.getBoolean(MainSettingsActivity.SHOW_TOAST_VCS_REQUEST_PREFS_KEY, true);
 
+		updateVCSToastNotification();
 
 		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
 		
@@ -177,8 +180,11 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		setValuesInFields();
 
 	}
-
 	
+	private void updateVCSToastNotification() {
+		VirtualCurrencyConnector.shouldShowToastNotification(mShowToastOnSuccessfullVCSRequest);
+	}
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
@@ -186,6 +192,9 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 			case MAIN_SETTINGS_ACTIVITY_CODE:
 				mShouldStayOpen = data.getBooleanExtra(
 						MainSettingsActivity.KEEP_OFFERWALL_OPEN_EXTRA, true);
+				mShowToastOnSuccessfullVCSRequest = data.getBooleanExtra(
+						MainSettingsActivity.SHOW_TOAST_VCS_REQUEST_EXTRA, true);
+				updateVCSToastNotification();
 				break;
 			default:
 				break;

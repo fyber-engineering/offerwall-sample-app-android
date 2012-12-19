@@ -140,7 +140,8 @@
 		            android:padding="5dip"
 		            android:layout_margin="10dip"
 		            android:focusableInTouchMode="true"
-		            android:id="@+id/log_text_view" />
+		            android:id="@+id/log_text_view"
+		            android:freezesText="true"  />
 	        </LinearLayout>
 	        
         </LinearLayout>

@@ -333,7 +333,7 @@ public class SPBrandEngageClient {
 		
 		mWebView = new WebView(mContext);
 		
-		mWebView.setId(new Random().nextInt());
+		mWebView.setId(Math.abs(new Random().nextInt()));
 		
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setPluginsEnabled(true);

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="10dp" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/back_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/back" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/settings"
+                android:textColor="#FFFFFF"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/keep_offerwall_open_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Keep the offer wall / interstitial open after user is redirected" />
+
+        <CheckBox
+            android:id="@+id/simulate_no_phone_state_permission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Simulate no READ PHONE STATE permission (no access to IMEI)" />
+
+        <CheckBox
+            android:id="@+id/simulate_no_wifi_state_permission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Simulate no ACCESS WIFI STATE permission (no access to WiFi MAC Address)" />
+
+        <CheckBox
+            android:id="@+id/simulate_invalid_android_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Simulate invalid Android ID" />
+
+        <CheckBox
+            android:id="@+id/simulate_no_hw_serial_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Simulate no Hardware Serial Number" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Overriding URL" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/overriding_url_field"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="Overriding URL"
+                android:imeOptions="actionNext"
+                android:inputType="textUri"
+                android:singleLine="false" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="appendDefaultParamsToUrlField"
+                android:text="params" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Custom Variables"
+            android:textStyle="bold" />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <EditText
+                android:id="@+id/custom_key_field"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:hint="Key" />
+
+            <Button
+                android:id="@+id/add_custom_key_value_button"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:onClick="onAddCustomParameterClick"
+                android:text="Add" />
+
+            <Button
+                android:id="@+id/clear_custom_parameters_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/add_custom_key_value_button"
+                android:onClick="onClearCustomParametersClick"
+                android:text="Clear All" />
+
+            <EditText
+                android:id="@+id/custom_value_field"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/add_custom_key_value_button"
+                android:layout_toRightOf="@id/custom_key_field"
+                android:hint="Value" />
+
+            <TextView
+                android:id="@+id/key_values_list"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/clear_custom_parameters_button"
+                android:layout_below="@id/custom_value_field"
+                android:layout_toLeftOf="@id/clear_custom_parameters_button" />
+        </RelativeLayout>
+        
+        <Button android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="Clear Application Data"
+            android:onClick="onClearApplicationDataClick"/>
+    </LinearLayout>
+
+</ScrollView>

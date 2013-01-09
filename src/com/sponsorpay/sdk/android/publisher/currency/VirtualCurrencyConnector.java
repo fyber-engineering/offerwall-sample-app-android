@@ -1,7 +1,7 @@
 /**
- * SponsorPay Android Publisher SDK
+ * SponsorPay Android SDK
  *
- * Copyright 2011 SponsorPay. All rights reserved.
+ * Copyright 2012 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher.currency;
@@ -12,12 +12,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
-import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -95,20 +97,15 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * 
 	 * @param context
 	 *            Android application context.
-	 * @param userId
-	 *            ID of the user for whom the requests will be made.
+	 * @param credentialsToken
+	 *            The token identifying the {@link SPCredentials} to be used.
 	 * @param userListener
 	 *            {@link SPCurrencyServerListener} registered by the developer code to be notified
 	 *            of the result of requests to the Virtual Currency Server.
-	 * @param hostInfo
-	 *            {@link HostInfo} containing data about the host device and application, including
-	 *            its application ID.
-	 * @param securityToken
-	 *            Security token used to sign requests to the server and verify its responses.
 	 */
-	public VirtualCurrencyConnector(Context context, String userId,
-			SPCurrencyServerListener userListener, HostInfo hostInfo, String securityToken) {
-		super(context, userId, hostInfo, securityToken);
+	public VirtualCurrencyConnector(Context context, String credentialsToken,
+			SPCurrencyServerListener userListener) {
+		super(context, credentialsToken);
 		mUserListener = userListener;
 	}
 
@@ -130,7 +127,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 *            The transaction ID used as excluded lower limit to calculate the delta of coins.
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId) {
-		if (null == transactionId) {
+		if (StringUtils.nullOrEmpty(transactionId)) {
 			transactionId = fetchLatestTransactionIdForCurrentAppAndUser();
 		}
 		
@@ -150,8 +147,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 				: VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL;
 
 		String requestUrl = UrlBuilder.newBuilder(baseUrl + CURRENCY_DELTA_REQUEST_RESOURCE,
-				mHostInfo).setUserId(mUserId.toString()).addExtraKeysValues(extraKeysValues)
-				.setSecretKey(mSecurityToken).addScreenMetrics().buildUrl();
+				mCredentials).addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
 				+ requestUrl);
@@ -167,7 +163,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * received. Performs the first stage of error handling and initializes the right kind of
 	 * {@link CurrencyServerAbstractResponse}.
 	 * 
-	 * @param requestTask
+	 * @param request
 	 *            The calling {@link CurrencyServerRequestAsyncTask} with the response data.
 	 */
 	@Override
@@ -190,7 +186,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		}
 
 		response.setResponseListener(this);
-		response.parseAndCallListener(mSecurityToken);
+		response.parseAndCallListener(mCredentials.getSecurityToken());
 	}
 
 	/**
@@ -205,8 +201,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 		prefs.edit()
 				.putString(
-						generatePreferencesLatestTransactionIdKey(mUserId.toString(), mHostInfo
-								.getAppId()), transactionId).commit();
+						generatePreferencesLatestTransactionIdKey(mCredentials.getAppId(), mCredentials.getUserId()), transactionId).commit();
 	}
 
 	private static String generatePreferencesLatestTransactionIdKey(String appId, String userId) {
@@ -221,7 +216,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * @return The retrieved transaction ID or null.
 	 */
 	private String fetchLatestTransactionIdForCurrentAppAndUser() {
-		String retval = fetchLatestTransactionId(mContext, mHostInfo.getAppId(), mUserId.toString());
+		String retval = fetchLatestTransactionId(mContext, mCredentials.getCredentialsToken());
 		// SponsorPayLogger.i(getClass().getSimpleName(),
 		// String.format("fetchLatestTransactionIdForCurrentAppAndUser will return %s", retval));
 		return retval;
@@ -232,15 +227,17 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * preferences file.
 	 * 
 	 * @param context
-	 *            Android application context.
-	 * @param userId
-	 *            ID of the user related to which the fetched transaction ID must belong.
+	 *          Android application context.
+	 * @param credentialsToken
+	 * 			credentials token id 
+	 * 
 	 * @return The retrieved transaction ID or null.
 	 */
-	public static String fetchLatestTransactionId(Context context, String appId, String userId) {
+	public static String fetchLatestTransactionId(Context context, String credentialsToken) {
+		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		SharedPreferences prefs = context.getSharedPreferences(
 				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-		String retval = prefs.getString(generatePreferencesLatestTransactionIdKey(userId, appId),
+		String retval = prefs.getString(generatePreferencesLatestTransactionIdKey(credentials.getAppId(), credentials.getUserId()),
 				URL_PARAM_VALUE_NO_TRANSACTION);
 		// SponsorPayLogger.i(VirtualCurrencyConnector.class.getSimpleName(),
 		// String.format("fetchLatestTransactionId(context, appId: %s, userId: %s) = %s", appId,

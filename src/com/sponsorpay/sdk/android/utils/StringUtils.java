@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2012 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.utils;
 
 public class StringUtils {
@@ -12,4 +18,11 @@ public class StringUtils {
 		return !nullOrEmpty(string);
 	}
 
+	public static String trim(String value) {
+		if (value != null) {
+			return value.trim();
+		}
+		return null;
+	}
+	
 }

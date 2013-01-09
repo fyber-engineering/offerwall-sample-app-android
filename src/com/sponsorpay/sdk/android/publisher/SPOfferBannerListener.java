@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 SponsorPay. All rights reserved.
+ * Copyright 2012 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher;
@@ -35,7 +35,7 @@ public interface SPOfferBannerListener {
 	 * 
 	 * @param request
 	 *            The {@link OfferBannerRequest} instance which sent the request. Use
-	 *            {@link OfferBannerRequest#getRequestException()} to determine exactly the cause of
+	 *            {@link OfferBannerRequest#getRequestThrownError()} to determine exactly the cause of
 	 *            the error.
 	 */
 	public void onSPOfferBannerRequestError(OfferBannerRequest request);

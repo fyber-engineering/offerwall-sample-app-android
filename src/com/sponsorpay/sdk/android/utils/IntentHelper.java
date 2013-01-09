@@ -1,4 +1,10 @@
-package com.sponsorpay.sdk.android;
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2012 SponsorPay. All rights reserved.
+ */
+
+package com.sponsorpay.sdk.android.utils;
 
 import java.util.List;
 
@@ -8,6 +14,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 
+/**
+ * <p>
+ * Helper class to check if a specific pair of action - data can be handled by an installed intent.
+ * </p>
+ */
 public class IntentHelper {
 
 	public static boolean isIntentAvailable(Context context, String action, Uri data) {

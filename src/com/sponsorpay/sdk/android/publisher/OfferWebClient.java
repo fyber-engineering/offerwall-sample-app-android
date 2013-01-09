@@ -1,12 +1,13 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 SponsorPay. All rights reserved.
+ * Copyright 2012 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher;
 
 import java.lang.ref.WeakReference;
+import java.net.URI;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,8 +23,8 @@ import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.sponsorpay.sdk.android.IntentHelper;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.utils.IntentHelper;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
@@ -34,7 +35,8 @@ import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 public abstract class OfferWebClient extends WebViewClient {
 	public static final String LOG_TAG = "OfferWebClient";
 	
-	private static final String SPONSORPAY_EXIT_SCHEMA = "sponsorpay://exit";
+	private static final String SPONSORPAY_SCHEMA = "sponsorpay://";
+	private static final String SPONSORPAY_EXIT_SCHEMA = "exit";
 	private static final String EXIT_URL_TARGET_URL_PARAM_KEY = "url";
 	private static final String EXIT_URL_RESULT_CODE_PARAM_KEY = "status";
 	
@@ -93,15 +95,17 @@ public abstract class OfferWebClient extends WebViewClient {
 	public boolean shouldOverrideUrlLoading(WebView view, String url) {
 		SponsorPayLogger.i(LOG_TAG, "shouldOverrideUrlLoading called with url: " + url);
 
-		if (url.startsWith(SPONSORPAY_EXIT_SCHEMA)) {
-			
-			// ?status=<statusCode>&url=<url>)url is optional)
-			int resultCode = parseSponsorPayExitUrlForResultCode(url);
-			String targetUrl = parseSponsorPayExitUrlForTargetUrl(url);
-
-			SponsorPayLogger.i(LOG_TAG, "Overriding. Target Url: " + targetUrl);
-			
-			onSponsorPayExitScheme(resultCode, targetUrl);
+		if (url.startsWith(SPONSORPAY_SCHEMA)) {
+			URI uri = URI.create(url);
+			if (uri.getHost().equals(SPONSORPAY_EXIT_SCHEMA)) {
+				// ?status=<statusCode>&url=<url>)url is optional)
+				int resultCode = parseSponsorPayExitUrlForResultCode(url);
+				String targetUrl = parseSponsorPayExitUrlForTargetUrl(url);
+	
+				SponsorPayLogger.i(LOG_TAG, "Overriding. Target Url: " + targetUrl);
+				
+				onSponsorPayExitScheme(resultCode, targetUrl);
+			}
 
 			return true;
 		} else {
@@ -141,8 +145,7 @@ public abstract class OfferWebClient extends WebViewClient {
 
 	protected abstract void onSponsorPayExitScheme(int resultCode, String targetUrl);
 	
-	// copied from OfferWallActivity. Consider refactoring
-	protected void showDialog(String errorMessage) {
+	public void showDialog(String errorMessage) {
 		String errorDialogTitle = SponsorPayPublisher
 				.getUIString(UIStringIdentifier.ERROR_DIALOG_TITLE);
 		String dismissButtonCaption = SponsorPayPublisher

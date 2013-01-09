@@ -1,8 +1,7 @@
 /**
-
- * SponsorPay Android Publisher SDK
+ * SponsorPay Android SDK
  *
- * Copyright 2011 SponsorPay. All rights reserved.
+ * Copyright 2012 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher;
@@ -14,8 +13,9 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Handler;
 
-import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
@@ -62,7 +62,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		void onWillShowInterstitial();
 
 		/**
-		 * Invoked when a response has been received from SponsorPay�s backend indicating that no
+		 * Invoked when a response has been received from SponsorPay's backend indicating that no
 		 * interstitial ad is available for this particular request.
 		 */
 		void onNoInterstitialAvailable();
@@ -106,8 +106,6 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * {@link InterstitialActivity} and to attach the loading progress dialog to.
 	 */
 	private Activity mCallingActivity;
-	private UserId mUserId;
-	private HostInfo mHostInfo;
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 	private Map<String, String> mCustomParams;
 
@@ -128,28 +126,27 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 */
 	private ProgressDialog mProgressDialog;
 
+	private SPCredentials mCredentials;
+
 
 	/**
 	 * Initializes a new IntestitialLoader instance.
 	 * 
 	 * @param callingActivity
 	 *            The activity from which the loading of the interstitial is requested.
-	 * @param userId
-	 *            The current user of the host application.
-	 * @param hostInfo
-	 *            {@link HostInfo} with information from the host device and publisher application.
+	 * @param credentialsToken
+	 *            The token ID identifying the credentials to be used.
 	 * @param loadingStatusListener
 	 *            {@link InterstitialLoadingStatusListener} to register to be notified of events in
 	 *            the interstitial lifecycle.
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the result URL.
 	 */
-	public InterstitialLoader(Activity callingActivity, String userId, HostInfo hostInfo,
+	public InterstitialLoader(Activity callingActivity, String credentialsToken,
 			InterstitialLoadingStatusListener loadingStatusListener) {
 
 		mCallingActivity = callingActivity;
-		mUserId = UserId.make(callingActivity.getApplicationContext(), userId);
-		mHostInfo = hostInfo;
+		
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
+		
 		mLoadingStatusListener = loadingStatusListener;
 
 		mHandler = new Handler();
@@ -230,7 +227,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * <p>
 	 * The process will be performed in a background thread. The invocation of the
 	 * {@link InterstitialLoadingStatusListener} registered in
-	 * {@link #InterstitialLoader(Activity, String, HostInfo, InterstitialLoadingStatusListener)}
+	 * {@link #InterstitialLoader(Activity, String, InterstitialLoadingStatusListener)}
 	 * will be done in the calling thread.
 	 * </p>
 	 */
@@ -305,7 +302,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
 				: INTERSTITIAL_PRODUCTION_BASE_URL;
 
-		return UrlBuilder.newBuilder(interstitialBaseUrl, mHostInfo).setUserId(mUserId.toString())
+		return UrlBuilder.newBuilder(interstitialBaseUrl, mCredentials)
 				.addExtraKeysValues(keysValues).addScreenMetrics().buildUrl();
 	}
 
@@ -366,8 +363,8 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 * by the host publisher application of the events "Will Show Interstitial",
 	 * "Interstitial Request Error" and "No Interstitial Available"
 	 * 
-	 * @param result
-	 *            a {@link InterstitialLoadingResults} containing the status code and the contents
+	 * @param request
+	 *            a {@link AsyncRequest} containing the status code and the contents
 	 *            of the response.
 	 */
 	@Override

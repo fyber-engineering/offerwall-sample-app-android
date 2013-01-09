@@ -1,4 +1,12 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2012 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.advertiser;
+
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,7 +18,7 @@ import android.content.SharedPreferences.Editor;
 public class SponsorPayAdvertiserState {
 	/**
 	 * Shared preferences file name. We store a flag into the shared preferences which is checked on
-	 * each consecutive invocation of {@link #register()}, to keep track of whether we have already
+	 * each consecutive invocation of {@link SponsorPayAdvertiser#register(Context)}, to keep track of whether we have already
 	 * successfully contacted the Advertiser API.
 	 */
 	public static final String PREFERENCES_FILE_NAME = "SponsorPayAdvertiserState";
@@ -19,7 +27,7 @@ public class SponsorPayAdvertiserState {
 	 * The key to store in the preferences file the flag which determines if we have already
 	 * successfully contacted the Advertiser API.
 	 */
-	private static final String STATE_GOT_SUCCESSFUL_RESPONSE_KEY = "SponsorPayAdvertiserState"; // TODO
+	private static final String STATE_GOT_SUCCESSFUL_RESPONSE_KEY = "SponsorPayAdvertiserState";
 
 	/**
 	 * The key to store the install subID in the preferences file
@@ -50,9 +58,9 @@ public class SponsorPayAdvertiserState {
 	 * Persists the flag which determines if we have already successfully contacted the Advertiser
 	 * API.
 	 */
-	public void setHasAdvertiserCallbackReceivedSuccessfulResponse(boolean value) {
+	public void setCallbackReceivedSuccessfulResponse(String actionId, boolean value) {
 		Editor prefsEditor = mPrefs.edit();
-		prefsEditor.putBoolean(STATE_GOT_SUCCESSFUL_RESPONSE_KEY, value);
+		prefsEditor.putString(STATE_GOT_SUCCESSFUL_RESPONSE_KEY + actionId, value ? "1" : "0");
 		prefsEditor.commit();
 	}
 
@@ -60,8 +68,8 @@ public class SponsorPayAdvertiserState {
 	 * Retrieves the flag which determines if we have already successfully contacted the Advertiser
 	 * API.
 	 */
-	public boolean getHasAdvertiserCallbackReceivedSuccessfulResponse() {
-		return mPrefs.getBoolean(STATE_GOT_SUCCESSFUL_RESPONSE_KEY, false);
+	public String getCallbackReceivedSuccessfulResponse(String actionId) {
+		return mPrefs.getString(STATE_GOT_SUCCESSFUL_RESPONSE_KEY + actionId, "0");
 	}
 
 	/**
@@ -77,7 +85,7 @@ public class SponsorPayAdvertiserState {
 	 * Retrieves the value of the install subID.
 	 */
 	public String getInstallSubId() {
-		return mPrefs.getString(STATE_INSTALL_SUBID_KEY, "");
+		return mPrefs.getString(STATE_INSTALL_SUBID_KEY, StringUtils.EMPTY_STRING);
 	}
 
 	/**
@@ -95,6 +103,6 @@ public class SponsorPayAdvertiserState {
 	 * @return
 	 */
 	public String getInstallReferrer() {
-		return mPrefs.getString(STATE_INSTALL_REFERRER_KEY, "");
+		return mPrefs.getString(STATE_INSTALL_REFERRER_KEY, StringUtils.EMPTY_STRING);
 	}
 }

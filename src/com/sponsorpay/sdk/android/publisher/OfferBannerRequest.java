@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 SponsorPay. All rights reserved.
+ * Copyright 2012 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher;
@@ -11,8 +11,9 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
@@ -41,19 +42,9 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	private SPOfferBannerListener mListener;
 
 	/**
-	 * User ID to include in the request.
-	 */
-	private UserId mUserId;
-
-	/**
 	 * {@link AdShape} whose description will be sent to the server in the request.
 	 */
 	private OfferBanner.AdShape mOfferBannerAdShape;
-
-	/**
-	 * {@link HostInfo} instance containing the Application ID and data about the device.
-	 */
-	private HostInfo mHostInfo;
 
 	/**
 	 * Currency Name to be sent in the request.
@@ -71,16 +62,18 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * {@link AsyncRequest} used to send the request in the background.
 	 */
 	private AsyncRequest mAsyncRequest;
+	
+	
+	private SPCredentials mCredentials;
 
+	
 	/**
 	 * Initializes a new instance and sends the request immediately.
 	 * 
 	 * @param context
 	 *            Android application context.
-	 * @param userId
-	 *            ID of the user on whose behalf the banner will be requested.
-	 * @param hostInfo
-	 *            {@link HostInfo} instance containing the Application ID and data about the device.
+	 * @param credentialsToken
+	 *            the token ID identifying the credentials used to retrieve values.
 	 * @param listener
 	 *            {@link SPOfferBannerListener} which will be notified of the result of the request.
 	 * @param offerBannerAdShape
@@ -90,15 +83,14 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 */
-	public OfferBannerRequest(Context context, String userId, HostInfo hostInfo,
+	public OfferBannerRequest(Context context, String credentialsToken, 
 			SPOfferBannerListener listener, OfferBanner.AdShape offerBannerAdShape,
 			String currencyName, Map<String, String> customParams) {
-
+		
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
 		mContext = context;
 		mListener = listener;
-		mUserId = UserId.make(context, userId);
 		mOfferBannerAdShape = offerBannerAdShape;
-		mHostInfo = hostInfo;
 		mCurrencyName = currencyName;
 		mCustomParams = customParams;
 	}
@@ -129,7 +121,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 		Map<String, String> extraKeysValues = UrlBuilder.mapKeysToValues(offerBannerUrlExtraKeys,
 				offerBannerUrlExtraValues);
 
-		if (mCurrencyName != null && !"".equals(mCurrencyName)) {
+		if (StringUtils.notNullNorEmpty(mCurrencyName)) {
 			extraKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
 		}
 
@@ -145,7 +137,7 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 			baseUrl = OFFERBANNER_PRODUCTION_BASE_URL;
 		}
 
-		return UrlBuilder.newBuilder(baseUrl, mHostInfo).setUserId(mUserId.toString())
+		return UrlBuilder.newBuilder(baseUrl, mCredentials)
 				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 	}
 
@@ -229,27 +221,6 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 		} else {
 			return -1;
 		}
-	}
-
-	/**
-	 * Returns the local error thrown when trying to send the request. An exception typically means
-	 * that there was a problem connecting to the network, but checking the type of the returned
-	 * error can give a more accurate cause for the error.
-	 * 
-	 * @deprecated Use getRequestThrownError() instead, which returns a Throwable instance or null.
-	 *             This method will be removed in a future release.
-	 */
-	public Exception getRequestException() {
-		Exception retval = null;
-
-		if (mAsyncRequest != null) {
-			Throwable requestError = mAsyncRequest.getRequestThrownError();
-			if (requestError != null && Exception.class.isAssignableFrom(requestError.getClass())) {
-				retval = (Exception) requestError;
-			}
-		}
-
-		return retval;
 	}
 
 	/**

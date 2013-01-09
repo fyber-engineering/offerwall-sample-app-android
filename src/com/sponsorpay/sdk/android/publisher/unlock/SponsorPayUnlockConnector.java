@@ -1,11 +1,17 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2012 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.publisher.unlock;
 
 import java.util.Map;
 
 import android.content.Context;
 
-import com.sponsorpay.sdk.android.HostInfo;
 import com.sponsorpay.sdk.android.UrlBuilder;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse.RequestErrorType;
@@ -38,19 +44,15 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 	 * 
 	 * @param context
 	 *            Android application context.
-	 * @param userId
-	 *            User ID.
+	 * @param credentialsToken
+	 *            The token identifying the {@link SPCredentials} to be used.
 	 * @param userListener
 	 *            Listener which will be notified of asynchronous responses to the requests sent by
 	 *            this app.
-	 * @param hostInfo
-	 *            {@link HostInfo} containing information about the host app and device.
-	 * @param securityToken
-	 *            Security token used to sign the requests and verify the server responses.
 	 */
-	public SponsorPayUnlockConnector(Context context, String userId,
-			SPUnlockResponseListener userListener, HostInfo hostInfo, String securityToken) {
-		super(context, userId, hostInfo, securityToken);
+	public SponsorPayUnlockConnector(Context context, String credentialsToken, 
+			SPUnlockResponseListener userListener) {
+		super(context, credentialsToken);
 
 		mUserListener = userListener;
 	}
@@ -73,9 +75,8 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? SP_UNLOCK_SERVER_STAGING_BASE_URL
 				: SP_UNLOCK_SERVER_PRODUCTION_BASE_URL;
 
-		String requestUrl = UrlBuilder.newBuilder(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mHostInfo)
-				.setUserId(mUserId.toString()).addExtraKeysValues(extraKeysValues).setSecretKey(
-						mSecurityToken).addScreenMetrics().buildUrl();
+		String requestUrl = UrlBuilder.newBuilder(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mCredentials)
+				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(getClass().getSimpleName(),
 				"Unlock items status request will be sent to URL + params: " + requestUrl);
@@ -100,7 +101,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 		}
 
 		response.setResponseListener(this);
-		response.parseAndCallListener(mSecurityToken);
+		response.parseAndCallListener(mCredentials.getSecurityToken());
 	}
 
 	/**

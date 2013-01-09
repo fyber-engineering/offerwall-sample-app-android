@@ -1,11 +1,19 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2012 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.publisher;
 
 import java.util.Map;
 
 import android.content.Context;
 
-import com.sponsorpay.sdk.android.HostInfo;
+import com.sponsorpay.sdk.android.SponsorPay;
+import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest.AsyncRequestResultListener;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Abstract class defining some common functionality for contacting the SponsorPay's API.
@@ -25,33 +33,23 @@ public abstract class AbstractConnector implements AsyncRequestResultListener {
 	 * Android application context.
 	 */
 	protected Context mContext;
-	
-	/**
-	 * ID of the user for whom the requests will be made.
-	 */
-	protected UserId mUserId;
-	
-	/**
-	 * {@link HostInfo} containing data about the host device and application, including its
-	 * application ID.
-	 */
-	protected HostInfo mHostInfo;
-	
-	/**
-	 * Security token used to sign requests to the server and verify its responses.
-	 */
-	protected String mSecurityToken;
 
 	/**
 	 * Map of custom key/values to add to the parameters on the requests.
 	 */
 	protected Map<String, String> mCustomParameters;
+
+	/**
+	 * Credentials holding AppID, UserId and Security Token 
+	 */
+	protected SPCredentials mCredentials;
 	
-	protected AbstractConnector(Context context, String userId, HostInfo hostInfo, String securityToken) {
+	protected AbstractConnector(Context context, String credentialsToken) {
 		mContext = context;
-		mUserId = UserId.make(context, userId);
-		mHostInfo = hostInfo;
-		mSecurityToken = securityToken;
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
+		if (StringUtils.nullOrEmpty(mCredentials.getSecurityToken())) {
+			throw new IllegalArgumentException("Security token has not been set on the credentials");
+		}
 	}
 	
 	/**

@@ -123,11 +123,16 @@ public class SPBrandEngageClient {
 
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
 		if (canRequestOffers()) {
-			if (mWebView == null) {
-				setupWebView(activity);
+			if (Build.VERSION.SDK_INT < 8) {
+				//always return no offers
+				processQueryOffersResponse(0);
+			} else {
+				if (mWebView == null) {
+					setupWebView(activity);
+				}
+				
+				startQueryingOffers(credentials);
 			}
-			
-			startQueryingOffers(credentials);
 			return true;
 		} else {
 			SponsorPayLogger.d(TAG, "SPBrandEngageClient cannot request offers at this point. " +

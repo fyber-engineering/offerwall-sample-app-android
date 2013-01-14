@@ -1,6 +1,8 @@
 package com.sponsorpay.sdk.android.publisher.mbe;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -18,6 +20,13 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 
+		if (Build.VERSION.SDK_INT == 9 ||
+				Build.VERSION.SDK_INT == 10) {
+			setRequestedOrientation(
+					   ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		}
+		
+		
 		SPBrandEngageClient.INSTANCE.setStatusListener(this);
 		SPBrandEngageClient.INSTANCE.startEngament(this);
 	}

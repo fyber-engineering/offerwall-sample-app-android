@@ -375,6 +375,9 @@ public class SPBrandEngageClient {
 			intent.setData(uri);
 			try {
 				mActivity.startActivity(intent);
+				changeStatus(SP_REQUEST_STATUS_PARAMETER_ENGAGED);
+				notitfyListener(SPBrandEngageClientStatus.PENDING_CLOSE);
+//				SPBrandEngageClientStatus.CLOSE_FINISHED
 			} catch (ActivityNotFoundException e) {
 				if (uri.getScheme().equalsIgnoreCase("market") && !IntentHelper.isIntentAvailable(mContext,
 						Intent.ACTION_VIEW, 

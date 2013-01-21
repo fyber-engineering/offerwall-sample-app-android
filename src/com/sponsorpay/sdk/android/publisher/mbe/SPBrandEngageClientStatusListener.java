@@ -16,6 +16,8 @@ public interface SPBrandEngageClientStatusListener {
 	    // like an incoming phone call.
 		CLOSE_ABORTED,
 	    
+		PENDING_CLOSE,
+		
 	    // The engagement was interrupted by an error.
 		ERROR
 	};

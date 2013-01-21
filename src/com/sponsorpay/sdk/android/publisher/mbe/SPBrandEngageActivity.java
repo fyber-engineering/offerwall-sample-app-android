@@ -10,6 +10,8 @@ import android.view.WindowManager;
 public class SPBrandEngageActivity extends Activity implements SPBrandEngageClientStatusListener {
 	
 
+	private boolean mPendingClose = false;;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -29,6 +31,14 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		
 		SPBrandEngageClient.INSTANCE.setStatusListener(this);
 		SPBrandEngageClient.INSTANCE.startEngament(this);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (mPendingClose) {
+			SPBrandEngageClient.INSTANCE.closeEngagement();
+		}
 	}
 	
 	@Override
@@ -61,6 +71,9 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		case CLOSE_FINISHED:
 		case ERROR:
 			closeActivity();
+			break;
+		case PENDING_CLOSE:
+			mPendingClose  = true;
 			break;
 		default:
 			break;

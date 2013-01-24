@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2012 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher;
@@ -257,13 +257,6 @@ public class OfferWallActivity extends Activity {
 
 	private String generateUrl() {
 		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
-		//FIXME check and clean
-//		if (StringUtils.notNullNorEmpty(mCurrencyName)) {
-//			if (mCustomKeysValues == null) {
-//				mCustomKeysValues = new HashMap<String, String>();
-//			}
-//			mCustomKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
-//		}
 		String baseUrl = mTemplate.getBaseUrl();
 		return UrlBuilder.newBuilder(baseUrl, mCredentials).setCurrency(mCurrencyName)
 				.addExtraKeysValues(mCustomKeysValues).addScreenMetrics().buildUrl();

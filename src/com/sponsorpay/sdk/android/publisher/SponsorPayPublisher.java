@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2012 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher;
@@ -678,18 +678,17 @@ public class SponsorPayPublisher {
 		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
 	}
 	
-	//FIXME add documentation
+	/**
+	 * Allows the configuration of the Toast notification message that display the amount of coins
+	 * earned after a successful request to the SponsorPay's Currency server.
+	 * This is ON by default.
+	 * 
+	 * @param shouldShowNotification
+	 * 			Whether the Toast notification message should be shown or not 
+	 */
 	public static void displayNotificationForSuccessfullCoinRequest(boolean shouldShowNotification) {
-//		displayNotificationForSuccessfullCoinRequest(shouldShowNotification);
 		VirtualCurrencyConnector.shouldShowToastNotification(shouldShowNotification);
 	}
-	
-//	//FIXME add documentation
-//	public static void displayNotificationForSuccessfullCoinRequest(boolean shouldShowNotification, 
-//			SPCurrencyRoundingMode roundingMode) {
-//		VirtualCurrencyConnector.setRoundingMode(roundingMode);
-//		VirtualCurrencyConnector.shouldShowToastNotification(shouldShowNotification);
-//	}
 	
 	//================================================================================
 	// Unlock Items
@@ -853,37 +852,39 @@ public class SponsorPayPublisher {
 
 	//FIXME add documentation
 	
-	public static SPBrandEngageRequest getIntentForMBEActivity(Activity activity, 
+	public static boolean getIntentForMBEActivity(Activity activity, 
 			SPBrandEngageRequestListener listener) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
 		return getIntentForMBEActivity(credentialsToken, activity, listener);
 	}
 
-	public static SPBrandEngageRequest getIntentForMBEActivity(String credentialsToken,
+	public static boolean getIntentForMBEActivity(String credentialsToken,
 			Activity activity, SPBrandEngageRequestListener listener) {
 		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null);
 	}
 	
-	public static SPBrandEngageRequest getIntentForMBEActivity(String credentialsToken, Activity activity, 
+	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity, 
 			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters, 
 			SPCurrencyServerListener vcsListener) {
-		if (SPBrandEngageClient.INSTANCE.canRequestOffers()) {
+		SPBrandEngageClient brandEngageClient = SPBrandEngageClient.INSTANCE;
+		boolean canRequestOffers = brandEngageClient.canRequestOffers();
+		if (canRequestOffers) {
 
 			SPCredentials credentials = SponsorPay
 					.getCredentials(credentialsToken);
 
-			SPBrandEngageClient.INSTANCE.setCurrencyName(currencyName);
-			SPBrandEngageClient.INSTANCE
+			brandEngageClient.setCurrencyName(currencyName);
+			brandEngageClient
 					.setCustomParameters(getCustomParameters(parameters));
-			SPBrandEngageClient.INSTANCE.setCurrencyListener(vcsListener);
+			brandEngageClient.setCurrencyListener(vcsListener);
 
+			brandEngageClient.setOverridingURl(sOverridingWebViewUrl);
+			
 			SPBrandEngageRequest request = new SPBrandEngageRequest(
-					credentials, activity, listener);
+					credentials, activity, brandEngageClient, listener);
 			request.askForOffers();
-			return request;
-		} else {
-			return null;
 		}
+		return canRequestOffers;
 	}
 	
 	//================================================================================

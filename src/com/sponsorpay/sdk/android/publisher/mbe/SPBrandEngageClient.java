@@ -1,7 +1,12 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.publisher.mbe;
 
 import java.util.Map;
-import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -37,38 +42,9 @@ import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
 import com.sponsorpay.sdk.android.utils.IntentHelper;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class SPBrandEngageClient {
-	
-	private enum SPBrandEngageOffersStatus {
-	    MUST_QUERY_SERVER_FOR_OFFERS(false, true, true),
-	    QUERYING_SERVER_FOR_OFFERS(false, false, false),
-	    READY_TO_SHOW_OFFERS(true, true, true),
-	    SHOWING_OFFERS(true, false, false),
-	    USER_ENGAGED(true, true, false);
-	    
-	    private final boolean canShowOffers;
-	    private final boolean canChangeParameters;
-		private final boolean canRequestOffers;
-	    
-	    SPBrandEngageOffersStatus(boolean canShowOffers, boolean canRequestOffers, boolean canChangeParameters) {
-	    	this.canShowOffers = canShowOffers;
-			this.canRequestOffers = canRequestOffers;
-			this.canChangeParameters = canChangeParameters;
-	    }
-	    
-	    boolean canShowOffers() {
-	    	return this.canShowOffers;
-	    }
-	    
-	    boolean canChangeParameters() {
-	    	return this.canChangeParameters;
-	    }
-	    
-	    boolean canRequestOffers() {
-	    	return this.canRequestOffers;
-	    }
-	} 
 	
 	private static final String TAG = "SPBrandEngageClient";
 	public static final SPBrandEngageClient INSTANCE = new SPBrandEngageClient();
@@ -137,6 +113,7 @@ public class SPBrandEngageClient {
 			}
 		}
 	};
+	private String mOverridingUrl;
 
 	
 	private SPBrandEngageClient() {
@@ -171,7 +148,7 @@ public class SPBrandEngageClient {
 				.addScreenMetrics().buildUrl();
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
 		mWebView.loadUrl(requestUrl);
-		setStatusClient(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
+		setClientStatus(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
 		Runnable timeout = new Runnable() {
 			@Override
 			public void run() {
@@ -224,7 +201,7 @@ public class SPBrandEngageClient {
 		return mStatus.canChangeParameters();
 	}
 
-	public boolean isShowRewardsNotification() {
+	public boolean shouldShowRewardsNotification() {
 		return mShowRewardsNotification;
 	}
 	
@@ -232,9 +209,9 @@ public class SPBrandEngageClient {
 	private void processQueryOffersResponse(int numOffers) {
 		boolean areOffersAvailable = numOffers > 0;
 		if (areOffersAvailable) {
-			setStatusClient(SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS);
+			setClientStatus(SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS);
 		} else {
-			setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
+			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 		}
 		if (mStatusListener != null) {
 			mStatusListener.didReceiveOffers(areOffersAvailable);
@@ -243,11 +220,12 @@ public class SPBrandEngageClient {
 
 	private void changeStatus(String status) {
 		if (status.equals(SP_REQUEST_STATUS_PARAMETER_STARTED_VALUE)) {
-			setStatusClient(SPBrandEngageOffersStatus.SHOWING_OFFERS);
+			setClientStatus(SPBrandEngageOffersStatus.SHOWING_OFFERS);
 			notifyListener(SPBrandEngageClientStatus.STARTED);
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE)) {
 			clearWebViewPage();
 			notifyListener(SPBrandEngageClientStatus.CLOSE_FINISHED);
+			showRewardsNotification();
 			checkForCoins();
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE)) {
 			clearWebViewPage();
@@ -255,7 +233,7 @@ public class SPBrandEngageClient {
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_ERROR)) {
 			showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_ENGAGED)) {
-			setStatusClient(SPBrandEngageOffersStatus.USER_ENGAGED);
+			setClientStatus(SPBrandEngageOffersStatus.USER_ENGAGED);
 		}
 	}
 	
@@ -270,7 +248,7 @@ public class SPBrandEngageClient {
 		}
 		mWebView = null;
 		mActivity = null;
-		setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
+		setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 	}
 
 
@@ -281,8 +259,9 @@ public class SPBrandEngageClient {
 			public void run() {
 				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
 						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED) {
-					//something went wrong, show close button
-					showCloseButton();
+					//something went wrong, show error dialog message
+					showErrorDialog(SponsorPayPublisher
+							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
 				}
 			}
 
@@ -291,12 +270,6 @@ public class SPBrandEngageClient {
 		mHandler.postDelayed(r, TIMEOUT);
 	}
 
-	private void showCloseButton() {
-		showErrorDialog(SponsorPayPublisher
-				.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
-	}
-
-
 	public void setShowRewardsNotification(boolean mShowRewardsNotification) {
 		this.mShowRewardsNotification = mShowRewardsNotification;
 	}
@@ -304,7 +277,7 @@ public class SPBrandEngageClient {
 	public boolean setCurrencyName(String currencyName) {
 		if (canChangeParameters()) {
 			mCurrency = currencyName;
-			setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
+			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 			return true;
 		} else {
 			SponsorPayLogger.d(TAG, "Cannot change the currency while a request to the " +
@@ -316,7 +289,7 @@ public class SPBrandEngageClient {
 	public boolean setCustomParameters(Map<String, String> parameters) {
 		if (canChangeParameters()) {
 			mCustomParameters = parameters;
-			setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
+			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 			return true;
 		} else {
 			SponsorPayLogger.d(TAG, "Cannot change custom parameters while a request to the " +
@@ -328,7 +301,7 @@ public class SPBrandEngageClient {
 	public boolean setCurrencyListener(SPCurrencyServerListener listener) {
 		if (canChangeParameters()) {
 			mVCSListener = listener;
-			setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
+			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 			return true;
 		} else {
 			SponsorPayLogger.d(TAG, "Cannot change the currency listener while a request to the " +
@@ -338,10 +311,15 @@ public class SPBrandEngageClient {
 	}
 	
 	// Status Listener
-	public void setStatusListener(SPBrandEngageClientStatusListener listener) {
-		if (canChangeParameters()) {
+	public boolean setStatusListener(SPBrandEngageClientStatusListener listener) {
+		boolean canChangeParameters = canChangeParameters();
+		if (canChangeParameters) {
 			this.mStatusListener = listener;
+		} else {
+			SponsorPayLogger.d(TAG, "Cannot change the status listener while a request to the " +
+					"server is going on or an offer is being presented to the user.");
 		}
+		return canChangeParameters;
 	}
 
 	private void notifyListener(SPBrandEngageClientStatus status) {
@@ -351,14 +329,11 @@ public class SPBrandEngageClient {
 	}
 	
 	// Helper methods
-	
 	private void setupWebView(Activity activity) {
 		//TODO check this for android version!!
 		mContext = Build.VERSION.SDK_INT < 11 ? activity : activity.getApplicationContext();
 		
 		mWebView = new WebView(mContext);
-		
-		mWebView.setId(Math.abs(new Random().nextInt()));
 		
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setPluginsEnabled(true);
@@ -396,8 +371,7 @@ public class SPBrandEngageClient {
 			try {
 				mActivity.startActivity(intent);
 				changeStatus(SP_REQUEST_STATUS_PARAMETER_ENGAGED);
-				notitfyListener(SPBrandEngageClientStatus.PENDING_CLOSE);
-//				SPBrandEngageClientStatus.CLOSE_FINISHED
+				notifyListener(SPBrandEngageClientStatus.PENDING_CLOSE);
 			} catch (ActivityNotFoundException e) {
 				if (uri.getScheme().equalsIgnoreCase("market") && !IntentHelper.isIntentAvailable(mContext,
 						Intent.ACTION_VIEW, 
@@ -429,21 +403,27 @@ public class SPBrandEngageClient {
 	}
 	
 	private String getBaseUrl() {
+		if (StringUtils.notNullNorEmpty(mOverridingUrl)) {
+			return mOverridingUrl;
+		}
 		return SponsorPayPublisher.shouldUseStagingUrls() ? MBE_STAGING_BASE_URL : MBE_BASE_URL;
 	}
 	
-	private void setStatusClient(SPBrandEngageOffersStatus newStatus) {
+	private void setClientStatus(SPBrandEngageOffersStatus newStatus) {
 		mStatus = newStatus;
 		SponsorPayLogger.d(TAG, "SPBrandEngageClient mStatus -> " + newStatus.name());
 	}
 	
-	private void checkForCoins() {
+	private void showRewardsNotification() {
 		if (mShowRewardsNotification) {
 			Toast.makeText(mContext,
 					SponsorPayPublisher
 					.getUIString(UIStringIdentifier.MBE_REWARD_NOTIFICATION),
 					Toast.LENGTH_LONG).show();
 		}
+	}
+	
+	private void checkForCoins() {
 		if (mVCSListener != null) {
 			//delaying it for 10 seconds
 			mHandler.postDelayed(new Runnable() {
@@ -604,6 +584,10 @@ public class SPBrandEngageClient {
 		}
 		
 		return mOnTouchListener;
+	}
+
+	public void setOverridingURl(String overridingUrl) {
+		this.mOverridingUrl = overridingUrl;
 	}
 	
 }

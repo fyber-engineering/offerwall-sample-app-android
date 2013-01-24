@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.publisher.mbe;
 
 import android.app.Activity;
@@ -11,22 +17,24 @@ public class SPBrandEngageRequest implements SPBrandEngageClientStatusListener {
 	private static final String TAG = "SPBrandEngageRequest";
 	private Activity mActivity;
 	private SPCredentials mCredentials;
-	private SPBrandEngageRequestListener mListener; 
+	private SPBrandEngageRequestListener mListener;
+	private SPBrandEngageClient mBrandEngageClient;
 
 	public SPBrandEngageRequest(SPCredentials credentials, Activity activity,
-			SPBrandEngageRequestListener listener) {
+			SPBrandEngageClient brandEngageClient, SPBrandEngageRequestListener listener) {
 		mCredentials = credentials;
 		mActivity = activity;
+		mBrandEngageClient = brandEngageClient;
 		mListener = listener;
 	}
 	
 	public void askForOffers() {
-		SPBrandEngageClient.INSTANCE.setStatusListener(this);
-		SPBrandEngageClient.INSTANCE.requestOffers(mCredentials, mActivity);
+		mBrandEngageClient.setStatusListener(this);
+		mBrandEngageClient.requestOffers(mCredentials, mActivity);
 	}
 	
 	private Intent getMBEActivity() {
-		if (SPBrandEngageClient.INSTANCE.canStartEngagement()) {
+		if (mBrandEngageClient.canStartEngagement()) {
 			return new Intent(mActivity, SPBrandEngageActivity.class);
 		}
 		SponsorPayLogger.d(TAG, "Undefined error");
@@ -48,6 +56,5 @@ public class SPBrandEngageRequest implements SPBrandEngageClientStatusListener {
 			mListener.onSPBrandEngageError("An error happened while trying to get offers from mBE");
 		}
 	}
-	
 	
 }

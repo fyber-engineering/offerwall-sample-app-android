@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.android.publisher.mbe;
 
 import android.app.Activity;
@@ -21,13 +27,12 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
-
+		// Screen orientation locked to landscape on Gingerbread
 		if (Build.VERSION.SDK_INT == 9 ||
 				Build.VERSION.SDK_INT == 10) {
 			setRequestedOrientation(
 					   ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
-		
 		
 		SPBrandEngageClient.INSTANCE.setStatusListener(this);
 		SPBrandEngageClient.INSTANCE.startEngagement(this);

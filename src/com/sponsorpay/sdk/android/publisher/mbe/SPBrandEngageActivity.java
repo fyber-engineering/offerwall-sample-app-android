@@ -28,7 +28,7 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		
 		
 		SPBrandEngageClient.INSTANCE.setStatusListener(this);
-		SPBrandEngageClient.INSTANCE.startEngament(this);
+		SPBrandEngageClient.INSTANCE.startEngagement(this);
 	}
 	
 	@Override

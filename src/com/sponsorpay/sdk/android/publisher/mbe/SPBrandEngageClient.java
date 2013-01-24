@@ -41,11 +41,33 @@ import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 public class SPBrandEngageClient {
 	
 	private enum SPBrandEngageOffersStatus {
-	    MUST_QUERY_SERVER_FOR_OFFERS,
-	    QUERYING_SERVER_FOR_OFFERS,
-	    READY_TO_SHOW_OFFERS,
-	    SHOWING_OFFERS,
-	    USER_ENGAGED
+	    MUST_QUERY_SERVER_FOR_OFFERS(false, true, true),
+	    QUERYING_SERVER_FOR_OFFERS(false, false, false),
+	    READY_TO_SHOW_OFFERS(true, true, true),
+	    SHOWING_OFFERS(true, false, false),
+	    USER_ENGAGED(true, true, false);
+	    
+	    private final boolean canShowOffers;
+	    private final boolean canChangeParameters;
+		private final boolean canRequestOffers;
+	    
+	    SPBrandEngageOffersStatus(boolean canShowOffers, boolean canRequestOffers, boolean canChangeParameters) {
+	    	this.canShowOffers = canShowOffers;
+			this.canRequestOffers = canRequestOffers;
+			this.canChangeParameters = canChangeParameters;
+	    }
+	    
+	    boolean canShowOffers() {
+	    	return this.canShowOffers;
+	    }
+	    
+	    boolean canChangeParameters() {
+	    	return this.canChangeParameters;
+	    }
+	    
+	    boolean canRequestOffers() {
+	    	return this.canRequestOffers;
+	    }
 	} 
 	
 	private static final String TAG = "SPBrandEngageClient";
@@ -61,7 +83,7 @@ public class SPBrandEngageClient {
 	private static final String SP_SCHEME = "sponsorpay";
 	
 	private static final String SP_REQUEST_OFFER_ANSWER = "requestOffers";
-	private static final String SP_NUMEBER_OF_OFFERS_PARAMETER_KEY = "n";
+	private static final String SP_NUMBER_OF_OFFERS_PARAMETER_KEY = "n";
                                              
 	private static final String SP_REQUEST_START_STATUS = "start";
 	private static final String SP_REQUEST_STATUS_PARAMETER_KEY = "status";
@@ -162,7 +184,7 @@ public class SPBrandEngageClient {
 		mHandler.postDelayed(timeout, TIMEOUT);
 	}
 
-	public boolean startEngament(Activity activity) {
+	public boolean startEngagement(Activity activity) {
 		if (canStartEngagement()) {
 
 			mWebView.loadUrl(SP_START_ENGAGEMENT);
@@ -191,17 +213,15 @@ public class SPBrandEngageClient {
 	}
 
 	public boolean canRequestOffers() {
-		return mStatus != SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS &&
-				mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS;
+		return mStatus.canRequestOffers();
 	}
 
 	public boolean canStartEngagement() {
-		return mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS;
+		return mStatus.canShowOffers();
 	}
 	
 	private boolean canChangeParameters() {
-		return mStatus == SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS
-				|| mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS;
+		return mStatus.canChangeParameters();
 	}
 
 	public boolean isShowRewardsNotification() {
@@ -209,29 +229,29 @@ public class SPBrandEngageClient {
 	}
 	
 	
-	private void processQueryOffersResponse(int numOFfers) {
-		boolean areOffersAvaliable = numOFfers > 0;
-		if (areOffersAvaliable) {
+	private void processQueryOffersResponse(int numOffers) {
+		boolean areOffersAvailable = numOffers > 0;
+		if (areOffersAvailable) {
 			setStatusClient(SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS);
 		} else {
 			setStatusClient(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 		}
 		if (mStatusListener != null) {
-			mStatusListener.didReceiveOffers(areOffersAvaliable);
+			mStatusListener.didReceiveOffers(areOffersAvailable);
 		}
 	}
 
 	private void changeStatus(String status) {
 		if (status.equals(SP_REQUEST_STATUS_PARAMETER_STARTED_VALUE)) {
 			setStatusClient(SPBrandEngageOffersStatus.SHOWING_OFFERS);
-			notitfyListener(SPBrandEngageClientStatus.STARTED);
+			notifyListener(SPBrandEngageClientStatus.STARTED);
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE)) {
 			clearWebViewPage();
-			notitfyListener(SPBrandEngageClientStatus.CLOSE_FINISHED);
+			notifyListener(SPBrandEngageClientStatus.CLOSE_FINISHED);
 			checkForCoins();
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE)) {
 			clearWebViewPage();
-			notitfyListener(SPBrandEngageClientStatus.CLOSE_ABORTED);
+			notifyListener(SPBrandEngageClientStatus.CLOSE_ABORTED);
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_ERROR)) {
 			showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_ENGAGED)) {
@@ -324,7 +344,7 @@ public class SPBrandEngageClient {
 		}
 	}
 
-	private void notitfyListener(SPBrandEngageClientStatus status) {
+	private void notifyListener(SPBrandEngageClientStatus status) {
 		if (mStatusListener != null) {
 			mStatusListener.didChangeStatus(status);
 		}
@@ -396,7 +416,7 @@ public class SPBrandEngageClient {
 				new OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						notitfyListener(SPBrandEngageClientStatus.ERROR);
+						notifyListener(SPBrandEngageClientStatus.ERROR);
 						clearWebViewPage();
 						mShowingDialog = false;
 					}
@@ -452,7 +472,7 @@ public class SPBrandEngageClient {
 							processExitUrl(targetUrl);
 						} else if (host.equals(SP_REQUEST_OFFER_ANSWER)) {
 							processQueryOffersResponse(Integer.parseInt(uri
-									.getQueryParameter(SP_NUMEBER_OF_OFFERS_PARAMETER_KEY)));
+									.getQueryParameter(SP_NUMBER_OF_OFFERS_PARAMETER_KEY)));
 						} else if (host.equals(SP_REQUEST_START_STATUS)) {
 							changeStatus(uri.getQueryParameter(SP_REQUEST_STATUS_PARAMETER_KEY));
 						}

@@ -29,7 +29,7 @@ public class SPBrandEngageRequest implements SPBrandEngageClientStatusListener {
 		if (SPBrandEngageClient.INSTANCE.canStartEngagement()) {
 			return new Intent(mActivity, SPBrandEngageActivity.class);
 		}
-		SponsorPayLogger.d(TAG, "Undefinded error");
+		SponsorPayLogger.d(TAG, "Undefined error");
 		return null;
 	}
 

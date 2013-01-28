@@ -7,6 +7,7 @@
 package com.sponsorpay.sdk.android.publisher;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.webkit.WebView;
 
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
@@ -51,5 +52,15 @@ public class ActivityOfferWebClient extends OfferWebClient {
 		if (willCloseHostActivity) {
 			hostActivity.finish();
 		}
+	}
+
+	@Override
+	protected void processSponsorPayScheme(String host, Uri uri) {
+		// nothing more to do, everything is done by super class
+	}
+
+	@Override
+	protected void onTargetActivityStart(String targetUrl) {
+		// nothing to do 
 	}
 }

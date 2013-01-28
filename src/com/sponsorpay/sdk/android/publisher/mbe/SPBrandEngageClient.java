@@ -10,7 +10,6 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,11 +35,11 @@ import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
+import com.sponsorpay.sdk.android.publisher.OfferWebClient;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
-import com.sponsorpay.sdk.android.utils.IntentHelper;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -56,8 +55,6 @@ public class SPBrandEngageClient {
 	
 	private static final String ABOUT_BLANK = "about:blank";
 	
-	private static final String SP_SCHEME = "sponsorpay";
-	
 	private static final String SP_REQUEST_OFFER_ANSWER = "requestOffers";
 	private static final String SP_NUMBER_OF_OFFERS_PARAMETER_KEY = "n";
                                              
@@ -68,9 +65,6 @@ public class SPBrandEngageClient {
 	private static final String SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE = "CLOSE_ABORTED";
 	private static final String SP_REQUEST_STATUS_PARAMETER_ERROR = "ERROR";
 	private static final String SP_REQUEST_STATUS_PARAMETER_ENGAGED = "USER_ENGAGED";
-	
-	private static final String SP_REQUEST_EXIT = "exit";
-	private static final String SP_REQUEST_URL_PARAMETER_KEY = "url";
 	
 	private static final int TIMEOUT = 10000 ;
 
@@ -113,8 +107,8 @@ public class SPBrandEngageClient {
 			}
 		}
 	};
-	private String mOverridingUrl;
 
+	private String mOverridingUrl;
 	
 	private SPBrandEngageClient() {
 		mHandler = new Handler();
@@ -129,7 +123,6 @@ public class SPBrandEngageClient {
 				if (mWebView == null) {
 					setupWebView(activity);
 				}
-				
 				startQueryingOffers(credentials);
 			}
 			return true;
@@ -139,7 +132,6 @@ public class SPBrandEngageClient {
 					"being presented to the user.");
 			return false;
 		}
-		
 	}
 	
 	private void startQueryingOffers(SPCredentials credentials) {
@@ -205,7 +197,6 @@ public class SPBrandEngageClient {
 		return mShowRewardsNotification;
 	}
 	
-	
 	private void processQueryOffersResponse(int numOffers) {
 		boolean areOffersAvailable = numOffers > 0;
 		if (areOffersAvailable) {
@@ -251,8 +242,6 @@ public class SPBrandEngageClient {
 		setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 	}
 
-
-
 	private void checkEngagementStarted() {
 		Runnable r = new Runnable() {		
 			@Override
@@ -266,7 +255,6 @@ public class SPBrandEngageClient {
 			}
 
 		};
-		
 		mHandler.postDelayed(r, TIMEOUT);
 	}
 
@@ -330,7 +318,6 @@ public class SPBrandEngageClient {
 	
 	// Helper methods
 	private void setupWebView(Activity activity) {
-		//TODO check this for android version!!
 		mContext = Build.VERSION.SDK_INT < 11 ? activity : activity.getApplicationContext();
 		
 		mWebView = new WebView(mContext);
@@ -342,7 +329,6 @@ public class SPBrandEngageClient {
 		
 		mWebView.setBackgroundColor(0);
 		
-		//TODO check this
 		if (Build.VERSION.SDK_INT < 14) {
 			mWebView.getSettings().setUserAgent(1);
 		}
@@ -360,30 +346,6 @@ public class SPBrandEngageClient {
 		mContext.registerReceiver(mNetworkStateReceiver, filter);
 	}
 
-	// this is copied from the OfferWebClient
-	// we should refactor this
-	private void processExitUrl(String targetUrl) {
-		if (targetUrl != null) {
-			Intent intent = new Intent();
-			intent.setAction(Intent.ACTION_VIEW);
-			Uri uri = Uri.parse(targetUrl);
-			intent.setData(uri);
-			try {
-				mActivity.startActivity(intent);
-				changeStatus(SP_REQUEST_STATUS_PARAMETER_ENGAGED);
-				notifyListener(SPBrandEngageClientStatus.PENDING_CLOSE);
-			} catch (ActivityNotFoundException e) {
-				if (uri.getScheme().equalsIgnoreCase("market") && !IntentHelper.isIntentAvailable(mContext,
-						Intent.ACTION_VIEW, 
-						// dummy search to validate Play Store application
-						Uri.parse("market://search?q=pname:com.google"))) {
-					SponsorPayLogger.e(TAG, "Play Store is not installed on this device...");
-					showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE));
-				}
-			}
-		}
-	}
-	
 	private void showErrorDialog(String message) {
 		if (!mShowingDialog && mWebView != null) {
 			mShowingDialog = true;
@@ -443,25 +405,16 @@ public class SPBrandEngageClient {
 	private WebViewClient getWebClient() {
 		if (mWebClient == null) {
 				
-			mWebClient = new WebViewClient() {
+			mWebClient = new OfferWebClient(mActivity) {
+				
 				@Override
-				public boolean shouldOverrideUrlLoading(WebView view, String url) {
-					SponsorPayLogger.d(TAG, "URL -> " + url);
-					if (url.startsWith(SP_SCHEME)) {
-						Uri uri = Uri.parse(url);
-						String host = uri.getHost();
-						if (host.equals(SP_REQUEST_EXIT)) {
-							String targetUrl = uri.getQueryParameter(SP_REQUEST_URL_PARAMETER_KEY);
-							processExitUrl(targetUrl);
-						} else if (host.equals(SP_REQUEST_OFFER_ANSWER)) {
-							processQueryOffersResponse(Integer.parseInt(uri
-									.getQueryParameter(SP_NUMBER_OF_OFFERS_PARAMETER_KEY)));
-						} else if (host.equals(SP_REQUEST_START_STATUS)) {
-							changeStatus(uri.getQueryParameter(SP_REQUEST_STATUS_PARAMETER_KEY));
-						}
-						return true;
+				protected void processSponsorPayScheme(String host, Uri uri) {
+					if (host.equals(SP_REQUEST_OFFER_ANSWER)) {
+						processQueryOffersResponse(Integer.parseInt(uri
+								.getQueryParameter(SP_NUMBER_OF_OFFERS_PARAMETER_KEY)));
+					} else if (host.equals(SP_REQUEST_START_STATUS)) {
+						changeStatus(uri.getQueryParameter(SP_REQUEST_STATUS_PARAMETER_KEY));
 					}
-					return false;
 				}
 				
 				@Override
@@ -473,6 +426,33 @@ public class SPBrandEngageClient {
 					super.onReceivedError(view, errorCode, description, failingUrl);
 				}
 				
+				@Override
+				protected void onTargetActivityStart(String targetUrl) {
+					changeStatus(SP_REQUEST_STATUS_PARAMETER_ENGAGED);
+					notifyListener(SPBrandEngageClientStatus.PENDING_CLOSE);
+				}
+				
+				@Override
+				protected void onPlayStoreNotFound() {
+					showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE));
+				}
+				
+				@Override
+				protected void onSponsorPayExitScheme(int resultCode, String targetUrl) {
+					Activity hostActivity = getHostActivity();
+					
+					if (null == hostActivity) {
+						return;
+					}
+					
+					hostActivity.setResult(resultCode);
+					launchActivityWithUrl(targetUrl);
+				}
+				
+				@Override
+				protected Activity getHostActivity() {
+					return mActivity;
+				}
 			};
 		
 		}

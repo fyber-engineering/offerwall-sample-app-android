@@ -8,6 +8,7 @@ package com.sponsorpay.sdk.android.publisher;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.webkit.WebView;
@@ -133,6 +134,16 @@ public class OfferBanner {
 				@Override
 				protected void onSponsorPayExitScheme(int resultCode, String targetUrl) {
 					launchActivityWithUrl(targetUrl);
+				}
+
+				@Override
+				protected void processSponsorPayScheme(String host, Uri uri) {
+					// nothing more to do, everything is done by super class
+				}
+
+				@Override
+				protected void onTargetActivityStart(String targetUrl) {
+					// nothing to do 
 				}
 			});
 			

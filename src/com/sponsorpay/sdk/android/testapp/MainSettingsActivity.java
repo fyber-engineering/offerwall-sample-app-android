@@ -32,6 +32,7 @@ import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiserState;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
+import com.sponsorpay.sdk.android.testapp.url.TestAppUrlsProvider;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class MainSettingsActivity extends Activity {
@@ -237,9 +238,6 @@ public class MainSettingsActivity extends Activity {
 	public void onClearCustomParametersClick(View v) {
 		mCustomKeyValuesForRequest.clear();
 		
-//		mCustomKeyField.setText(StringUtils.EMPTY_STRING);
-//		mCustomValueField.setText(StringUtils.EMPTY_STRING);
-		
 		SponsorPayAdvertiser.setCustomParameters(mCustomKeyValuesForRequest);
 		SponsorPayPublisher.setCustomParameters(mCustomKeyValuesForRequest);
 
@@ -307,7 +305,7 @@ public class MainSettingsActivity extends Activity {
 		mShowToastOnSuccessfullVCSRequest = mShowToastOnVCSRequestCheckBox.isChecked();
 		
 		mOverridingUrl = mOverridingUrlField.getText().toString();
-		SponsorPayPublisher.setOverridingWebViewUrl(mOverridingUrl);
+		TestAppUrlsProvider.INSTANCE.setOverridingUrl(mOverridingUrl);
 	}
 	
 	@Override
@@ -331,7 +329,7 @@ public class MainSettingsActivity extends Activity {
 	 */
 	private void setValuesInFields() {
 		mOverridingUrlField.setText(mOverridingUrl);
-		SponsorPayPublisher.setOverridingWebViewUrl(mOverridingUrl);
+		TestAppUrlsProvider.INSTANCE.setOverridingUrl(mOverridingUrl);
 		
 		mKeepOfferwallOpenCheckBox.setChecked(mShouldStayOpen);
 		mShowToastOnVCSRequestCheckBox.setChecked(mShowToastOnSuccessfullVCSRequest);

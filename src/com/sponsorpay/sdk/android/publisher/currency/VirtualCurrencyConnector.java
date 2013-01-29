@@ -20,6 +20,7 @@ import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -32,9 +33,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	/*
 	 * VCS API Resource URLs.
 	 */
-	private static final String VIRTUAL_CURRENCY_SERVER_STAGING_BASE_URL = "https://staging.iframe.sponsorpay.com/vcs/v1/";
-	private static final String VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL = "https://api.sponsorpay.com/vcs/v1/";
-	private static final String CURRENCY_DELTA_REQUEST_RESOURCE = "new_credit.json";
+	private static final String VCS_URL_KEY = "vcs";
 
 	/*
 	 * Parameter key and default values.
@@ -156,11 +155,10 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 			extraKeysValues.putAll(mCustomParameters);
 		}
 
-		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? VIRTUAL_CURRENCY_SERVER_STAGING_BASE_URL
-				: VIRTUAL_CURRENCY_SERVER_PRODUCTION_BASE_URL;
+		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(VCS_URL_KEY);
 
-		String requestUrl = UrlBuilder.newBuilder(baseUrl + CURRENCY_DELTA_REQUEST_RESOURCE,
-				mCredentials).addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
+		String requestUrl = UrlBuilder.newBuilder(baseUrl, mCredentials)
+				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
 				+ requestUrl);

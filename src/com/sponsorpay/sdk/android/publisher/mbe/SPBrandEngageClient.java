@@ -40,16 +40,15 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
-import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class SPBrandEngageClient {
 	
 	private static final String TAG = "SPBrandEngageClient";
 	public static final SPBrandEngageClient INSTANCE = new SPBrandEngageClient();
 
-	private static final String MBE_BASE_URL = "https://iframe.sponsorpay.com/mbe";
-	private static final String MBE_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/mbe";
+	private static final String MBE_URL_KEY = "mbe";
 	
 	private static final String SP_START_ENGAGEMENT = "javascript:Sponsorpay.MBE.SDKInterface.do_start()";
 	
@@ -108,8 +107,6 @@ public class SPBrandEngageClient {
 		}
 	};
 
-	private String mOverridingUrl;
-	
 	private SPBrandEngageClient() {
 		mHandler = new Handler();
 	}
@@ -365,10 +362,7 @@ public class SPBrandEngageClient {
 	}
 	
 	private String getBaseUrl() {
-		if (StringUtils.notNullNorEmpty(mOverridingUrl)) {
-			return mOverridingUrl;
-		}
-		return SponsorPayPublisher.shouldUseStagingUrls() ? MBE_STAGING_BASE_URL : MBE_BASE_URL;
+		return SponsorPayBaseUrlProvider.getBaseUrl(MBE_URL_KEY);
 	}
 	
 	private void setClientStatus(SPBrandEngageOffersStatus newStatus) {
@@ -566,8 +560,4 @@ public class SPBrandEngageClient {
 		return mOnTouchListener;
 	}
 
-	public void setOverridingURl(String overridingUrl) {
-		this.mOverridingUrl = overridingUrl;
-	}
-	
 }

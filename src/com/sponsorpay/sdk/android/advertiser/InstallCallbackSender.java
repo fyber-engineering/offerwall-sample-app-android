@@ -9,6 +9,7 @@ package com.sponsorpay.sdk.android.advertiser;
 import java.util.Map;
 
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 
 /**
  * Runs in the background the Action Report Callback HTTP request.
@@ -18,8 +19,7 @@ public class InstallCallbackSender extends AbstractCallbackSender{
 	/**
 	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
 	 */
-	private static final String API_PRODUCTION_RESOURCE_URL = "https://service.sponsorpay.com/installs/v2";
-	private static final String API_STAGING_RESOURCE_URL = "https://staging-sws.sponsorpay.com/installs/v2";
+	private static final String INSTALLS_URL_KEY = "installs";
 	
 	/**
 	 * Map of custom parameters to be sent in the callback request.
@@ -49,8 +49,7 @@ public class InstallCallbackSender extends AbstractCallbackSender{
 
 	@Override
 	protected String getBaseUrl() {
-		return SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
-				: API_PRODUCTION_RESOURCE_URL;
+		return SponsorPayBaseUrlProvider.getBaseUrl(INSTALLS_URL_KEY);
 	}
 	
 	@Override

@@ -50,8 +50,6 @@ public class SponsorPayPublisher {
 		MBE_ERROR_DIALOG_TITLE, MBE_ERROR_DIALOG_MESSAGE_DEFAULT, MBE_ERROR_DIALOG_MESSAGE_OFFLINE,
 		MBE_ERROR_DIALOG_BUTTON_TITLE_DISMISS, MBE_FORFEIT_DIALOG_TITLE
 	};
-
-
 	
 	/**
 	 * Messages which can be displayed in the user interface.
@@ -209,22 +207,6 @@ public class SponsorPayPublisher {
 		}
 
 		return retval;
-	}
-
-	private static boolean sShouldUseStagingUrls = false;
-
-	public static void setShouldUseStagingUrls(boolean value) {
-		sShouldUseStagingUrls = value;
-	}
-
-	public static boolean shouldUseStagingUrls() {
-		return sShouldUseStagingUrls;
-	}
-
-	private static String sOverridingWebViewUrl;
-	
-	public static void setOverridingWebViewUrl(String url) {
-		sOverridingWebViewUrl = url;
 	}
 	
 	/**
@@ -389,10 +371,6 @@ public class SponsorPayPublisher {
 			intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
 		}
 
-		if (sOverridingWebViewUrl != null) {
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
-		}
-
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY,
 				getCustomParameters(customParams));
 
@@ -472,10 +450,6 @@ public class SponsorPayPublisher {
 				unlockItemId);
 		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
 				unlockItemName);
-
-		if (sOverridingWebViewUrl != null) {
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
-		}
 		
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
 
@@ -622,10 +596,6 @@ public class SponsorPayPublisher {
 			il.setCustomParameters(extraParams);
 		}
 
-		if (sOverridingWebViewUrl != null) {
-			il.setOverridingUrl(sOverridingWebViewUrl);
-		}
-		
 		il.startLoading();
 	}
 
@@ -837,10 +807,6 @@ public class SponsorPayPublisher {
 		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, credentialsToken,
 				listener, offerBannerAdShape, currencyName, getCustomParameters(customParams));
 		
-		if (sOverridingWebViewUrl != null) {
-			bannerRequest.setOverridingUrl(sOverridingWebViewUrl);
-		}
-		
 		bannerRequest.requestOfferBanner();
 		
 		return bannerRequest;
@@ -877,8 +843,6 @@ public class SponsorPayPublisher {
 			brandEngageClient
 					.setCustomParameters(getCustomParameters(parameters));
 			brandEngageClient.setCurrencyListener(vcsListener);
-
-			brandEngageClient.setOverridingURl(sOverridingWebViewUrl);
 			
 			SPBrandEngageRequest request = new SPBrandEngageRequest(
 					credentials, activity, brandEngageClient, listener);

@@ -17,6 +17,7 @@ import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -86,8 +87,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private static final int LOADING_TIMEOUT_SECONDS_DEFAULT = 5;
 	private static final String SKIN_NAME_DEFAULT = "DEFAULT";
 
-	private static final String INTERSTITIAL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/mobile";
-	private static final String INTERSTITIAL_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/mobile";
+	private static final String INTERSTITIAL_URL_KEY = "interstitial"; 
 
 	private static final String URL_PARAM_INTERSTITIAL_KEY = "interstitial";
 
@@ -109,8 +109,6 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 	private Map<String, String> mCustomParams;
 
-	private String mOverridingUrl;
-
 	private String mBackgroundUrl = "";
 	private String mSkinName = SKIN_NAME_DEFAULT;
 	private boolean mShouldStayOpen = SHOULD_INTERSTITIAL_REMAIN_OPEN_DEFAULT;
@@ -127,7 +125,6 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private ProgressDialog mProgressDialog;
 
 	private SPCredentials mCredentials;
-
 
 	/**
 	 * Initializes a new IntestitialLoader instance.
@@ -157,10 +154,6 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	 */
 	public void setCustomParameters(Map<String, String> customParams) {
 		mCustomParams = customParams;
-	}
-
-	public void setOverridingUrl(String overridingUrl) {
-		mOverridingUrl = overridingUrl;
 	}
 
 	/**
@@ -234,7 +227,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	public void startLoading() {
 		cancelInterstitialLoading();
 
-		String interstitialUrl = determineUrl();
+		String interstitialUrl = buildUrl();
 
 		SponsorPayLogger.i("interstitial", "url: " + interstitialUrl);
 
@@ -266,14 +259,6 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 		mProgressDialog.show();
 	}
 
-	private String determineUrl() {
-		if (StringUtils.notNullNorEmpty(mOverridingUrl)) {
-			return mOverridingUrl;
-		} else {
-			return buildUrl();
-		}
-	}
-
 	private String buildUrl() {
 		String[] interstitialUrlExtraKeys = new String[] { URL_PARAM_INTERSTITIAL_KEY,
 				UrlBuilder.URL_PARAM_ALLOW_CAMPAIGN_KEY, UrlBuilder.URL_PARAM_OFFSET_KEY };
@@ -299,8 +284,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 			keysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
 		}
 
-		String interstitialBaseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? INTERSTITIAL_STAGING_BASE_URL
-				: INTERSTITIAL_PRODUCTION_BASE_URL;
+		String interstitialBaseUrl = SponsorPayBaseUrlProvider.getBaseUrl(INTERSTITIAL_URL_KEY);
 
 		return UrlBuilder.newBuilder(interstitialBaseUrl, mCredentials)
 				.addExtraKeysValues(keysValues).addScreenMetrics().buildUrl();

@@ -16,7 +16,10 @@ Then /^I get an error for invalid application id$/ do
   screenshot_and_raise "Error was not displayed" unless error_invalid_appid?
 end
 
+Then /^I get an error for missing application id$/ do
+  screenshot_and_raise "Error was not displayed" unless error_missing_appid?
+end
+
 Then /^I get an error for missing credentials$/ do
   screenshot_and_raise "Error was not displayed" unless error_no_credentials?
 end
-

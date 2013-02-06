@@ -29,3 +29,8 @@ Then /^I see the item description "([^\"]*)"$/ do |description|
   screenshot_and_raise "Item description is different" unless (get_item_name =~ /\A#{description}\Z/) != nil
   sleep 1
 end
+
+And /^I wait for the Unlock OfferWall to become visible$/ do
+  wait_for_unlock_offerwall
+  sleep 1
+end

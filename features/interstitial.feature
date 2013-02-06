@@ -31,7 +31,7 @@ Feature: Interstitial
     And I manually check both screenshots
 
   Scenario: I request interstitial without any appid or userid
-    When that I launch the Interstitial
+    When I launch the Interstitial
     Then I get an error for missing credentials
 
   Scenario: I click on the download button
@@ -51,12 +51,12 @@ Feature: Interstitial
     Then I click on more apps
     * I wait for 4 seconds
     When I click on the support button
-    * I wait for 4 seconds
+    * I wait for 6 seconds
     * I take a screenshot
     Then I click on the back button
-    * I wait for 4 seconds
+    * I wait for 6 seconds
     When I click on the privacy button
-    * I wait for 4 seconds
+    * I wait for 6 seconds
     * I take a screenshot
     Then I click on the back button
     

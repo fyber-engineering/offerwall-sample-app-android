@@ -1,17 +1,17 @@
 def goto_interstitial
   if !items_interstitial? && main_activity?
-    press_button "Interstitial"
+    press_button 'Interstitial'
   end
 end
 
 def items_interstitial?
-    loaded_fragment == "Interstitial"
+    loaded_fragment == 'Interstitial'
   rescue
     false
 end
 
 def wait_for_interstitial
-  if performAction('wait_for_screen', 'InterstitialActivity', '30')["success"]
+  if performAction('wait_for_screen', 'InterstitialActivity', '30')['success']
     wait_for(30.to_f) {
       sleep 1
       interstitial_visible?
@@ -21,17 +21,12 @@ end
 
 def interstitial_visible?
   value = false
-  if interstitial?
-    begin
-      value = query("webView css:*")[0]["nodeName"].size > 0
-    rescue
-    end
-  end
+  value = query("webView").size > 0 if interstitial?
   value
 end
 
 def interstitial?
-  performAction('get_activity_name')["message"] == "InterstitialActivity"
+  performAction('get_activity_name')['message'] == 'InterstitialActivity'
 end
 
 def close_interstitial
@@ -43,15 +38,14 @@ def touch_download
 end
 
 def touch_more_apps
-  touch_button ("#more") {interstitial_visible?}
+  touch_button ('#more') {interstitial_visible?}
 end
 
 def launch_interstitial
   check_interstitial_fragment
-  press_button "Launch Interstitial"
+  press_button 'Launch Interstitial'
 end
 
-
 def check_interstitial_fragment
-  raise "Interstitial fragment not loaded" unless items_interstitial?
+  raise 'Interstitial fragment not loaded' unless items_interstitial?
 end

@@ -1,45 +1,38 @@
 def press_button (button)
-  raise "No button provided" unless !button.empty?
-  performAction('press_button_with_text', button)
+  raise 'No button provided' if button.empty? || button.nil?
+  performAction 'press_button_with_text', button
 end
 
 def press_back_button
   performAction('scroll_up')
-  performAction('press_button_with_text','Back');
+  touch("Button marked:'Back'")  
 end
 
 def use_staging_urls (staging=true)
-  if staging? ^ staging
-    performAction('toggle_numbered_checkbox', '1')
-  end
+  touch("CheckBox id:'use_staging_urls_checkbox'") if staging? ^ staging
 end
 
 def staging?
   check_main_activity
-  performAction('get_view_property', 'use_staging_urls_checkbox', 'checked')["message"].to_bool
+  query("CheckBox id:'use_staging_urls_checkbox'", :checked).first
 end
 
 def main_activity?
-  performAction('get_activity_name')["message"] == "SponsorpayAndroidTestAppActivity"
+  performAction('get_activity_name')['message'] == 'SponsorpayAndroidTestAppActivity'
 end
 
 def check_main_activity
-  raise "Not on main activity screen" unless main_activity?
+  raise 'Not on main activity screen' unless main_activity?
 end
 
 def loaded_fragment
-  check_main_activity
-  raise "No fragment loaded at the moment" unless fragment?
-  performAction('get_view_property', 'fragmentTitle', 'text')["message"]
+  raise 'No fragment loaded at the moment' unless fragment?
+  query("textView id:'fragmentTitle'", :text).first
 end
 
 def fragment?
   check_main_activity
-  begin
-    performAction('has_view', 'fragmentTitle')["success"]
-  rescue
-    false
-  end
+  query("textView id:'fragmentTitle'").size > 0
 end
 
 def generate_unique_user
@@ -47,9 +40,9 @@ def generate_unique_user
 end
 
 def currency (currency=nil)
-  enter_text currency, "currency_name_field"
+  enter_text currency, 'currency_name_field'
 end
 
 def check_offerwall
-  raise "Offerwall is not visible at the moment" unless offerwall_visible? || interstitial_visible?
+  raise 'Offerwall is not visible at the moment' unless offerwall_visible? || interstitial_visible?
 end

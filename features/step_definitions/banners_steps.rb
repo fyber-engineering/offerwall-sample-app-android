@@ -1,6 +1,6 @@
 And /^that I am on the banners page$/ do 
   goto_banners
-  sleep 1
+  sleep 0.2
 end
 
 When /^I request a banner$/ do

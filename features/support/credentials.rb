@@ -1,10 +1,8 @@
 def check_and_create_credentials (userId, appId, securityToken=nil)
   raise "Invalid appId" unless not appId.empty?
-  if (! valid_credentials? userId,  appId)
+  unless valid_credentials? userId,  appId
     create_credentials userId, appId, securityToken
-    if (! valid_credentials? userId,  appId)
-      raise "Impossible to get valid credentials"
-    end  
+    raise "Impossible to get valid credentials" unless valid_credentials? userId,  appId
   end
 end
 
@@ -16,7 +14,7 @@ def create_credentials (userId, appId, securityToken=nil)
 end
 
 def push_credentials_button
-  performAction('press_button_with_text', 'Create new credentials')
+  touch("button marked:'Create new credentials'")
 end
 
 def valid_credentials? (userId=".*", appId=".*", securityToken=".*")
@@ -26,7 +24,10 @@ def valid_credentials? (userId=".*", appId=".*", securityToken=".*")
 end
 
 def security_token_set?
-  credentialsInfo = performAction( 'get_view_property', 'credentials_info', 'text')["message"]
-  (credentialsInfo =~ /SecurityToken - N\/A/) == nil 
+  credentialsInfo = query("textView id:'credentials_info'", :text).first
+  unless credentialsInfo.nil? || credentialsInfo.empty?
+    (credentialsInfo =~ /SecurityToken - N\/A/) == nil 
+  else
+    false
+  end
 end
-

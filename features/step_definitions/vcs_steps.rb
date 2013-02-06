@@ -1,5 +1,6 @@
 Then /^I request coins$/ do
   request_coins
+  sleep 1
 end
 
 

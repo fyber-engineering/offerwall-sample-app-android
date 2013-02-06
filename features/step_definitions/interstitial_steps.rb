@@ -3,7 +3,7 @@ Given /^that I am on the interstitial page$/ do
   sleep 1
 end
 
-Given /^that I launch the Interstitial$/ do 
+Given /^(?:that |)I launch the Interstitial$/ do 
   launch_interstitial
   sleep 2
 end

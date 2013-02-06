@@ -1,4 +1,4 @@
-Given /^that I launch the OfferWall$/ do 
+Given /^(?:that |)I launch the OfferWall$/ do 
   launch_offerwall
   sleep 2
 end
@@ -15,22 +15,22 @@ end
 
 Then /^I click on the support button$/ do
   touch_support_button
-  sleep 4
+  sleep 5
 end
 
 Then /^I click on the privacy button$/ do
   touch_privacy_button
-  sleep 2
+  sleep 5
 end
 
 Then /^I click on the help button$/ do
   touch_help_button
-  sleep 2
+  sleep 5
 end
 
 Then /^I click on the back button$/ do
   touch_back_button
-  sleep 2
+  sleep 5
 end
 
 Given /^that offer with LPID (-?\d+) is available$/ do |lpid|

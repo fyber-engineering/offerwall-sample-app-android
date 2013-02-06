@@ -24,12 +24,13 @@ end
 
 def item_name (name)
   check_items
-  enter_text name, "unlock_item_name_field"
+  enter_text name, 'unlock_item_name_field'
 end
 
 def wait_for_unlock_offerwall
-  if performAction('wait_for_screen', 'OfferWallActivity', '15')["success"]
-    wait_for(30.to_f) {
+  if performAction('wait_for_screen', 'OfferWallActivity', '15')['success']
+    wait_for(30) {
+      sleep 1
       unlock_offerwall_visible?
     }
   end
@@ -37,22 +38,18 @@ end
 
 def unlock_offerwall_visible?
   value = false
-  if performAction('get_activity_name')["message"] == "OfferWallActivity"
-    begin 
-      value = query("webView css:*")[0]["nodeName"].size > 0
-    rescue
-    end 
-  end
+  value = query("webView css:'.offers_content'").size > 0 ||
+  query("webView css:'.sp_header'").size > 0 if offerwall?
   value
 end
 
 def get_item_name
   check_unlock_offerwall
-  query("webView css:header h1 strong")[0]["textContent"]
+  query("webView css:'header h1 strong'", :textContent).first
 end
 
 def no_offers?
-  query("webView css:.no_offer").size > 0
+  query("webView css:'.no_offer'").size > 0
 end
 
 def offers?
@@ -65,8 +62,9 @@ def unlock_touch_back_button
   # privacy, support, help
   buttons = ["closebtn ui-link", "ui-link"]
   buttons.each do |b|
-    if query("webView css:a[class=\"#{b}\"]").size > 0
-      touch_button_unlock("a[class=\"#{b}\"]")
+    css = "a[class=\"#{b}\"]"
+    if query("webView css:'#{css}'").size > 0
+      touch_button_unlock css
       break
     end
   end
@@ -79,12 +77,12 @@ def touch_button_unlock (button)
 end
 
 def check_unlock_offerwall
-  raise "Unlock Offerwall is not visible at the moment" unless unlock_offerwall_visible?
+  raise 'Unlock Offerwall is not visible at the moment' unless unlock_offerwall_visible?
 end
 
 def check_items 
   #(securityToken=false)
-  raise "Items fragment not loaded" unless items_fragment?
+  raise 'Items fragment not loaded' unless items_fragment?
   #raise "There's no valid credentials" unless valid_credentials?
   #raise "There's no securityToken" unless !securityToken || security_token_set?
 end

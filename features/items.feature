@@ -6,13 +6,11 @@ Feature: Unlock items, production
     And that I am on the items page
 
   Scenario: I launch unlock offerwall without Item ID
-    Given I open unlock offerwall
-    * I take a screenshot
+    When I open unlock offerwall
     Then I get an error for invalid item id
 
   Scenario: I launch unlock offerwall with an invalid Item ID
-    Given I open unlock offerwall for item "invalid id"
-    * I take a screenshot
+    When I open unlock offerwall for item "invalid id"
     Then I get an error for invalid item id
 
   Scenario: I request item status without security token
@@ -35,13 +33,13 @@ Feature: Unlock items, production
  
   Scenario: I open the unlock offerwall and see some offers
     Given I open unlock offerwall for item "DEFAULT_ITEM"
-    And I wait for the OfferWall to become visible
+    And I wait for the Unlock OfferWall to become visible
     Then I should see some offers
 
   Scenario Outline: Check item descriptions
     Given I enter <itemName> as item name
     And I open unlock offerwall for item <itemId>
-    * I wait for the OfferWall to become visible
+    * I wait for the Unlock OfferWall to become visible
     Then I see the item description <description>
 
     Examples:
@@ -54,7 +52,7 @@ Feature: Unlock items, production
   Scenario: I open the unlock offerwall with bad appid
     Given that I am user "tester" with valid credentials for "1246a"
     And I open unlock offerwall for item "DEFAULT_ITEM"
-    * I wait for the OfferWall to become visible
+    * I wait for the Unlock OfferWall to become visible
     Then I see a "Bad request!" page
 
   Scenario: I leave my user id empty and I request unlock offerwall with bad item id

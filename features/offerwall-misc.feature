@@ -25,7 +25,22 @@ Feature: Offerwall, misc
     Then I get an error for missing application id
 
   @1.12
-  Scenario:
+  Scenario: Custom parameters on OFW
+    Given that I am on production
+    And that I am a valid user with credentials
+    And that I am on the setting page
+    And that I use the following parameters:
+    | key  | value  |
+    | pub0 | value0 |
+    | pub1 | value1 |
+    When I get back to the main activity
+    And I launch the OfferWall
+    And I wait for the OfferWall to become visible
+    Given I click on the back button
+    Then I see the main activity
+    And the log shows the following:
+    | pub0=value0 |
+    | pub1=value1 |
 
   @1.13
   Scenario: Request OFW with custom currency

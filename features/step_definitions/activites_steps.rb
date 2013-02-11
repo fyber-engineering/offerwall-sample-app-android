@@ -28,3 +28,7 @@ end
 Then /^the currency is "([^\"]*)"$/ do |currency|
   screenshot_and_raise "Currency is not #{currency}" unless get_currency == currency
 end
+
+When /^I (?:get back|go) to the main activity$/ do
+  goto_main_activity
+end

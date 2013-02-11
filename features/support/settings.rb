@@ -37,11 +37,11 @@ end
 
 def add_custom_parameters (key, value)
   check_settings_page
-  raise "Invalid key provided" unless !key.empty?
-  raise "Invalid value provided" unless !value.empty?
-  enter_text(key, 'custom_key_field')
-  enter_text(value, 'custom_value_field')
-  performAction('press_button_with_text', 'Add')
+  raise 'Invalid key provided' unless !key.empty?
+  raise 'Invalid value provided' unless !value.empty?
+  enter_text key, 'custom_key_field'
+  enter_text value, 'custom_value_field'
+  press_button 'Add'
   raise "An error happened, key/value pair was not added" unless pair_added? key, value
 end
 

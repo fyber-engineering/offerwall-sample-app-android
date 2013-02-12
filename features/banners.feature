@@ -14,7 +14,7 @@ Feature: Banners, production
     When I touch the banner
     And I wait for 5 seconds
     Then I take a screenshot
-    And I manually check the the correct page is opened
+    And I manually check that the correct page is opened
 
   @4.3
   Scenario: I request a banner with invalid appid

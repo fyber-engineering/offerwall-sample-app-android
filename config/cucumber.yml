@@ -1,0 +1,5 @@
+<% common = "SCREENSHOT_PATH=screenshots/" %>
+default: <%= common %>
+html: <%= common %> --format html --out report.html
+mbe: <%= common %> TESTDATA=mbe
+device: <%= common %>  RESET_BETWEEN_SCENARIOS=1

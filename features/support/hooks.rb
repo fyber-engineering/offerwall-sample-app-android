@@ -1,7 +1,11 @@
 After do |scenario|
   kill_application
-  clear_application_data
+  clear_application_data unless ENV['RESET_BETWEEN_SCENARIOS'] == "1"
   ENV['DATA'] = nil
+end
+
+Before do
+  ENV['DATA'] = ENV['TESTDATA'] unless ENV['TESTDATA'].nil?
 end
 
 Calabash::Android::Operations

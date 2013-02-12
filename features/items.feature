@@ -9,7 +9,7 @@ Feature: Unlock items, production
   Scenario: I request item status for a new user
     Given that I am an unique user with credentials
     When I request item status
-    Then wait for the Unlock Item status to become visible
+    Then I wait for the Unlock Item status to become visible
     And I take a screenshot
 
   @6.3

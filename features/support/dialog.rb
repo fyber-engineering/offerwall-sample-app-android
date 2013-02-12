@@ -1,4 +1,5 @@
 def alert_dialog?
+    sleep 0.5
     query("dialogTitle id:'alertTitle'").size > 0
 end
 

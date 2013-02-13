@@ -31,4 +31,5 @@ end
 
 When /^I (?:get back|go) to the main activity$/ do
   goto_main_activity
+  sleep 0.5
 end

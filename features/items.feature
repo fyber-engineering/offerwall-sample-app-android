@@ -8,6 +8,7 @@ Feature: Unlock items, production
   @6.1
   Scenario: I request item status for a new user
     Given that I am an unique user with credentials
+    And that I have correct security token
     When I request item status
     Then I wait for the Unlock Item status to become visible
     And I take a screenshot
@@ -85,6 +86,6 @@ Feature: Unlock items, production
 
   @not_on_test_plan
   Scenario: I leave my user id empty and I request unlock offerwall with bad item id
-    Given that I am user "" with valid credentials for "1246"
+    Given that I am user "" with valid credentials
     And I open unlock offerwall for item "bad_item_id"
     Then I get an error for invalid item id

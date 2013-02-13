@@ -15,7 +15,7 @@ end
 
 Then /^I close the Interstitial$/ do
   close_interstitial
-  sleep 0.5
+  sleep 0.8
 end
 
 Then /^I click on more apps$/ do

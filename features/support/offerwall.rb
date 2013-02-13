@@ -17,10 +17,10 @@ end
 
 def offerwall_visible?
   value = false
-  value = query("webView css:'li'").size > 0 ||\
-    query("webView css:'.sp_header'").size > 0 ||\
+  value = query("webView css:'li'").size > 0 ||
+    query("webView css:'.sp_header'").size > 0 ||
     query("webView css:'.page-policy '")if offerwall?
-  value
+  value && !progress_dialog?
 end
 
 # def get_currency_header_text

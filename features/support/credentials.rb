@@ -14,7 +14,7 @@ def create_credentials (user_id, app_id, security_token=nil)
 end
 
 def push_credentials_button
-  touch("button marked:'Create new credentials'")
+  press_button 'Create new credentials'
 end
 
 def valid_credentials? (user_id='.*', app_id='.*', security_token='.*')

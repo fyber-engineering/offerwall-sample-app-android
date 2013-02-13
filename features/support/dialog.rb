@@ -1,6 +1,9 @@
 def alert_dialog?
-    sleep 0.5
-    query("dialogTitle id:'alertTitle'").size > 0
+  query("dialogTitle id:'alertTitle'").size > 0
+end
+
+def progress_dialog?
+  query("* id:'progress'").size > 0
 end
 
 def get_alert_error_message

@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -33,6 +34,7 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.Toast;
 
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.OfferWebClient;
@@ -164,6 +166,7 @@ public class SPBrandEngageClient {
 		            LayoutParams.FILL_PARENT));
 		
 			checkEngagementStarted();
+			mWebViewOnPause = false;
 			return true;
 		} else {
 			SponsorPayLogger.d(TAG,	"SPBrandEngageClient is not ready to show offers. " +
@@ -312,6 +315,7 @@ public class SPBrandEngageClient {
 
 	private void notifyListener(SPBrandEngageClientStatus status) {
 		if (mStatusListener != null) {
+			SponsorPayLogger.i(TAG, "SPBrandEngageClientStatus -> " + status);
 			mStatusListener.didChangeStatus(status);
 		}
 	}
@@ -392,7 +396,9 @@ public class SPBrandEngageClient {
 				@Override
 				public void run() {
 					try {
-						SponsorPayPublisher.requestNewCoins(mContext, mVCSListener);
+						SponsorPayPublisher.requestNewCoins(SponsorPay
+								.getCurrentCredentials().getCredentialsToken(),
+								mContext, mVCSListener, null, null, mCurrency);
 					} catch (RuntimeException e) {
 						SponsorPayLogger.e(TAG, "Error in VCS request", e);
 					}
@@ -406,6 +412,16 @@ public class SPBrandEngageClient {
 		if (mWebClient == null) {
 				
 			mWebClient = new OfferWebClient(mActivity) {
+				
+				@Override
+				public boolean shouldOverrideUrlLoading(WebView view, String url) {
+					if (url.contains("youtube.com")) {
+						SponsorPayLogger.d(TAG, "Preventin the opening of Youtube app");
+						return true;
+					} else {
+						return super.shouldOverrideUrlLoading(view, url);
+					}
+				}
 				
 				@Override
 				protected void processSponsorPayScheme(String host, Uri uri) {
@@ -473,6 +489,7 @@ public class SPBrandEngageClient {
 				private void showJSDialog(String url, String message) {
 					if (!mShowingDialog ) {
 						mShowingDialog = true;
+						onPause();
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);
 						dialogBuilder.setTitle(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE)).setMessage(message).
 						setPositiveButton("OK", 
@@ -486,6 +503,13 @@ public class SPBrandEngageClient {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								mShowingDialog = false;
+								onResume();
+							}
+						}).setOnCancelListener(new OnCancelListener() {
+							@Override
+							public void onCancel(DialogInterface dialog) {
+								mShowingDialog = false;
+								onResume();
 							}
 						});
 						dialogBuilder.show();
@@ -568,6 +592,50 @@ public class SPBrandEngageClient {
 
 	public void setOverridingURl(String overridingUrl) {
 		this.mOverridingUrl = overridingUrl;
+	}
+	
+	//ÊHack section - don't shop around here
+	
+	private boolean mWebViewOnPause = false;
+	
+	public void onPause() {
+		mHandler.post(new Runnable() {
+			@Override
+			public void run() {
+			    if (mWebView != null) {
+			    	try {
+						mWebViewOnPause = false;
+						Class.forName("android.webkit.WebView")
+								.getMethod("onPause", (Class[]) null)
+								.invoke(mWebView, (Object[]) null);
+						mWebViewOnPause = true;
+					} catch (Exception exception) {
+						SponsorPayLogger.e(TAG, "onPause error", exception);
+					}
+			    }
+			}
+		});
+	}
+
+	public void onResume() {
+		if (mWebViewOnPause) {
+			mHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					if (mWebView != null) {
+						try {
+							Class.forName("android.webkit.WebView")
+									.getMethod("onResume", (Class[]) null)
+									.invoke(mWebView, (Object[]) null);
+							mWebViewOnPause = false;
+						} catch (Exception exception) {
+							SponsorPayLogger
+									.e(TAG, "onResume error", exception);
+						}
+					}
+				}
+			});
+		}
 	}
 	
 }

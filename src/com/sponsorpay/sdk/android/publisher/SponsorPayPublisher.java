@@ -647,7 +647,7 @@ public class SponsorPayPublisher {
 	 */
 	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		requestNewCoins(credentialsToken, context, listener, null, null);
+		requestNewCoins(credentialsToken, context, listener, null, null, null);
 	}
 	
 	/**
@@ -669,12 +669,17 @@ public class SponsorPayPublisher {
 	 *            it to null to let the SDK use the latest transaction ID it kept track of.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
+	 * @param customCurrency
+	 * 			  A string representing the custom currency to be used by the toast message to show
+	 * 			  the amount of coins earned.
 	 */
 	public static void requestNewCoins(String credentialsToken, Context context, 
-			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams) {
+			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams, 
+			String customCurrency) {
 		
 		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, credentialsToken, listener);
 		vcc.setCustomParameters(getCustomParameters(customParams));
+		vcc.setCurrency(customCurrency);
 		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
 	}
 	
@@ -1720,7 +1725,7 @@ public class SponsorPayPublisher {
 			String applicationId, Map<String, String> customParams) {
 		
 		String credentialsToken = SponsorPay.getCredentials(applicationId, userId, securityToken, context);
-		requestNewCoins(credentialsToken, context, listener, transactionId, customParams);
+		requestNewCoins(credentialsToken, context, listener, transactionId, customParams, null);
 	}
 
 	//================================================================================

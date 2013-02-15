@@ -43,6 +43,18 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		super.onResume();
 		if (mPendingClose) {
 			SPBrandEngageClient.INSTANCE.closeEngagement();
+//		} else {
+//			SPBrandEngageClient.INSTANCE.onResume();
+		}
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (!mPendingClose) {
+			SPBrandEngageClient.INSTANCE.onPause();
+			SPBrandEngageClient.INSTANCE.closeEngagement();
+			closeActivity();
 		}
 	}
 	

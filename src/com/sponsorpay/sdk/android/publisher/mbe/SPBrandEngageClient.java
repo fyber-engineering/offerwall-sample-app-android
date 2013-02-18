@@ -166,7 +166,6 @@ public class SPBrandEngageClient {
 		            LayoutParams.FILL_PARENT));
 		
 			checkEngagementStarted();
-			mWebViewOnPause = false;
 			return true;
 		} else {
 			SponsorPayLogger.d(TAG,	"SPBrandEngageClient is not ready to show offers. " +
@@ -489,11 +488,9 @@ public class SPBrandEngageClient {
 				private void showJSDialog(String url, String message) {
 					if (!mShowingDialog ) {
 						mShowingDialog = true;
-						onPause();
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);
 						dialogBuilder.setTitle(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE)).setMessage(message).
-						setPositiveButton("OK", 
-								new OnClickListener() {
+						setPositiveButton("OK", new OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								changeStatus(SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE);
@@ -503,13 +500,11 @@ public class SPBrandEngageClient {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								mShowingDialog = false;
-								onResume();
 							}
 						}).setOnCancelListener(new OnCancelListener() {
 							@Override
 							public void onCancel(DialogInterface dialog) {
 								mShowingDialog = false;
-								onResume();
 							}
 						});
 						dialogBuilder.show();
@@ -596,46 +591,21 @@ public class SPBrandEngageClient {
 	
 	//ÊHack section - don't shop around here
 	
-	private boolean mWebViewOnPause = false;
-	
 	public void onPause() {
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
 			    if (mWebView != null) {
 			    	try {
-						mWebViewOnPause = false;
 						Class.forName("android.webkit.WebView")
 								.getMethod("onPause", (Class[]) null)
 								.invoke(mWebView, (Object[]) null);
-						mWebViewOnPause = true;
 					} catch (Exception exception) {
 						SponsorPayLogger.e(TAG, "onPause error", exception);
 					}
 			    }
 			}
 		});
-	}
-
-	public void onResume() {
-		if (mWebViewOnPause) {
-			mHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					if (mWebView != null) {
-						try {
-							Class.forName("android.webkit.WebView")
-									.getMethod("onResume", (Class[]) null)
-									.invoke(mWebView, (Object[]) null);
-							mWebViewOnPause = false;
-						} catch (Exception exception) {
-							SponsorPayLogger
-									.e(TAG, "onResume error", exception);
-						}
-					}
-				}
-			});
-		}
 	}
 	
 }

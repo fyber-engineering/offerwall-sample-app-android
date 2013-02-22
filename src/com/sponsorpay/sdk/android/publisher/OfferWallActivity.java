@@ -231,7 +231,7 @@ public class OfferWallActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		try {
-			String offerwallUrl = generateUrl();
+			String offerwallUrl = buildUrl();
 
 			SponsorPayLogger.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
 			mWebView.loadUrl(offerwallUrl);
@@ -242,7 +242,7 @@ public class OfferWallActivity extends Activity {
 		}
 	}
 
-	private String generateUrl() {
+	private String buildUrl() {
 		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
 		String baseUrl = mTemplate.getBaseUrl();
 		return UrlBuilder.newBuilder(baseUrl, mCredentials).setCurrency(mCurrencyName)

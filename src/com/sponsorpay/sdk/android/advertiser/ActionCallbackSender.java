@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 
 /**
  * Runs in the background the Action Report Callback HTTP request.
@@ -19,9 +20,8 @@ public class ActionCallbackSender extends AbstractCallbackSender {
 	/**
 	 * The API resource URL to contact when talking to the SponsorPay Advertiser API
 	 */
-	private static final String API_PRODUCTION_RESOURCE_URL = "https://service.sponsorpay.com/actions/v2";
-	private static final String API_STAGING_RESOURCE_URL = "https://staging-sws.sponsorpay.com/actions/v2";
-	
+	private static final String ACTIONS_URL_KEY = "actions"; 
+
 	/**
 	 * The key for encoding the action id parameter.
 	 */
@@ -54,8 +54,7 @@ public class ActionCallbackSender extends AbstractCallbackSender {
 	
 	@Override
 	protected String getBaseUrl() {
-		return SponsorPayAdvertiser.shouldUseStagingUrls() ? API_STAGING_RESOURCE_URL
-				: API_PRODUCTION_RESOURCE_URL;
+		return SponsorPayBaseUrlProvider.getBaseUrl(ACTIONS_URL_KEY);
 	}
 
 	@Override

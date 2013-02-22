@@ -16,7 +16,7 @@ import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse.RequestErrorType;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
-import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
@@ -29,9 +29,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 	/*
 	 * API Resource URLs.
 	 */
-	private static final String SP_UNLOCK_SERVER_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/vcs/v1/";
-	private static final String SP_UNLOCK_SERVER_PRODUCTION_BASE_URL = "https://api.sponsorpay.com/vcs/v1/";
-	private static final String SP_UNLOCK_REQUEST_RESOURCE = "items.json";
+	private static final String UNLOCK_URL_KEY = "unlock_items";
 
 	/**
 	 * {@link SPUnlockResponseListener} registered by the developer's code to be notified of the
@@ -72,10 +70,9 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 			extraKeysValues.putAll(mCustomParameters);
 		}
 
-		String baseUrl = SponsorPayPublisher.shouldUseStagingUrls() ? SP_UNLOCK_SERVER_STAGING_BASE_URL
-				: SP_UNLOCK_SERVER_PRODUCTION_BASE_URL;
-
-		String requestUrl = UrlBuilder.newBuilder(baseUrl + SP_UNLOCK_REQUEST_RESOURCE, mCredentials)
+		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(UNLOCK_URL_KEY);
+		
+		String requestUrl = UrlBuilder.newBuilder(baseUrl, mCredentials)
 				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(getClass().getSimpleName(),

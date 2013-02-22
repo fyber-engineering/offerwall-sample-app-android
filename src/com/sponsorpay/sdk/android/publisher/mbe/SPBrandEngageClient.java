@@ -42,8 +42,8 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
-import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -78,8 +78,7 @@ public class SPBrandEngageClient {
 	 */
 	public static final SPBrandEngageClient INSTANCE = new SPBrandEngageClient();
 
-	private static final String MBE_BASE_URL = "https://iframe.sponsorpay.com/mbe";
-	private static final String MBE_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/mbe";
+	private static final String MBE_URL_KEY = "mbe";
 	
 	private static final String SP_START_ENGAGEMENT = "javascript:Sponsorpay.MBE.SDKInterface.do_start()";
 	
@@ -155,8 +154,6 @@ public class SPBrandEngageClient {
 		}
 	};
 
-	private String mOverridingUrl;
-	
 	private SPBrandEngageClient() {
 		mHandler = new Handler();
 	}
@@ -245,6 +242,9 @@ public class SPBrandEngageClient {
 		}
 	}
 	
+	/**
+	 * Closes the current engagement
+	 */
 	public void closeEngagement() {
 		if (mStatus == SPBrandEngageOffersStatus.USER_ENGAGED) {
 			changeStatus(SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE);
@@ -492,10 +492,7 @@ public class SPBrandEngageClient {
 	}
 	
 	private String getBaseUrl() {
-		if (StringUtils.notNullNorEmpty(mOverridingUrl)) {
-			return mOverridingUrl;
-		}
-		return SponsorPayPublisher.shouldUseStagingUrls() ? MBE_STAGING_BASE_URL : MBE_BASE_URL;
+		return SponsorPayBaseUrlProvider.getBaseUrl(MBE_URL_KEY);
 	}
 	
 	private void setClientStatus(SPBrandEngageOffersStatus newStatus) {
@@ -709,11 +706,6 @@ public class SPBrandEngageClient {
 		return mOnTouchListener;
 	}
 
-	// used for testing purposes
-	public void setOverridingURl(String overridingUrl) {
-		this.mOverridingUrl = overridingUrl;
-	}
-	
 	//ÊHack section - don't shop around here
 	
 	public void onPause() {
@@ -732,5 +724,4 @@ public class SPBrandEngageClient {
 			}
 		});
 	}
-	
 }

@@ -35,16 +35,6 @@ public class SponsorPayAdvertiser {
 	 */
 	private static Map<String, String> sCustomParameters;
 
-	private static boolean sShouldUseStagingUrls = false;
-
-	public static void setShouldUseStagingUrls(boolean value) {
-		sShouldUseStagingUrls = value;
-	}
-
-	public static boolean shouldUseStagingUrls() {
-		return sShouldUseStagingUrls;
-	}
-
 	/**
 	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
 	 * 

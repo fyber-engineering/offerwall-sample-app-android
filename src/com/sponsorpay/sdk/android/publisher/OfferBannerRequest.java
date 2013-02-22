@@ -15,6 +15,7 @@ import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -24,9 +25,8 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
  */
 public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListener {
 
-	private static final String OFFERBANNER_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/mobile";
-	private static final String OFFERBANNER_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/mobile";
-
+	private static final String BANNER_URL_KEY = "banner";
+	
 	private static final String URL_PARAM_OFFERBANNER_KEY = "banner";
 
 	private static final String STATE_OFFSET_COUNT_KEY = "OFFERBANNER_AVAILABLE_RESPONSE_COUNT";
@@ -55,8 +55,6 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 	 * Map of custom key/values to add to the parameters on the OfferBanner request URL.
 	 */
 	private Map<String, String> mCustomParams;
-
-	private String mOverridingUrl;
 
 	/**
 	 * {@link AsyncRequest} used to send the request in the background.
@@ -95,16 +93,12 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 		mCustomParams = customParams;
 	}
 
-	public void setOverridingUrl(String overridingUrl) {
-		mOverridingUrl = overridingUrl;
-	}
-
 	/**
 	 * Generates the request URL and loads it on the background.
 	 */
 	public void requestOfferBanner() {
 
-		String offerBannerUrl = determineUrl();
+		String offerBannerUrl = buildUrl();
 
 		SponsorPayLogger.i(OfferBanner.LOG_TAG, "Offer Banner Request URL: " + offerBannerUrl);
 
@@ -129,24 +123,10 @@ public class OfferBannerRequest implements AsyncRequest.AsyncRequestResultListen
 			extraKeysValues.putAll(mCustomParams);
 		}
 
-		String baseUrl;
-
-		if (SponsorPayPublisher.shouldUseStagingUrls()) {
-			baseUrl = OFFERBANNER_STAGING_BASE_URL;
-		} else {
-			baseUrl = OFFERBANNER_PRODUCTION_BASE_URL;
-		}
+		String baseUrl =  SponsorPayBaseUrlProvider.getBaseUrl(BANNER_URL_KEY);
 
 		return UrlBuilder.newBuilder(baseUrl, mCredentials)
 				.addExtraKeysValues(extraKeysValues).addScreenMetrics().buildUrl();
-	}
-
-	private String determineUrl() {
-		if (StringUtils.notNullNorEmpty(mOverridingUrl)) {
-			return mOverridingUrl;
-		} else {
-			return buildUrl();
-		}
 	}
 
 	/**

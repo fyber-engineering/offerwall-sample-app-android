@@ -18,7 +18,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
@@ -32,6 +31,8 @@ import com.sponsorpay.sdk.android.testapp.fragments.InterstitialSettingsFragment
 import com.sponsorpay.sdk.android.testapp.fragments.ItemsSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.LauncherFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.MBESettingsFragment;
+import com.sponsorpay.sdk.android.testapp.url.TestAppUrlsProvider;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -39,7 +40,6 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
  * Example activity in order to show the usage of Sponsorpay Android SDK.
  */
 public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
-	
 	private static final String TAG = SponsorpayAndroidTestAppActivity.class.getSimpleName();
 
 	/**
@@ -85,7 +85,9 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 				+ SponsorPay.RELEASE_VERSION_STRING);
 
 		SponsorPayLogger.enableLogging(true);
-		SponsorPayLogger.setTextView((TextView)findViewById(R.id.log_text_view));
+		SponsorPayBaseUrlProvider.setProviderOverride(TestAppUrlsProvider.INSTANCE);
+		TextView loggerView = (TextView)findViewById(R.id.log_text_view);
+		SponsorPayLogger.setTextView(loggerView);
 	}
 
 	private void createLauncherFragment() {
@@ -165,9 +167,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 
 		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
 		
-		SponsorPayAdvertiser.setShouldUseStagingUrls(mUseStagingUrlsCheckBox
-				.isChecked());
-		SponsorPayPublisher.setShouldUseStagingUrls(mUseStagingUrlsCheckBox
+		TestAppUrlsProvider.INSTANCE.shouldUseStaging(mUseStagingUrlsCheckBox
 				.isChecked());
 		
 		try {
@@ -220,9 +220,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 
 		mCurrencyName = mCurrencyNameField.getText().toString();
 
-		SponsorPayAdvertiser.setShouldUseStagingUrls(mUseStagingUrlsCheckBox
-				.isChecked());
-		SponsorPayPublisher.setShouldUseStagingUrls(mUseStagingUrlsCheckBox
+		TestAppUrlsProvider.INSTANCE.shouldUseStaging(mUseStagingUrlsCheckBox
 				.isChecked());
 	}
 

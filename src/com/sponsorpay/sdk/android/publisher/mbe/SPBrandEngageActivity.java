@@ -7,15 +7,24 @@
 package com.sponsorpay.sdk.android.publisher.mbe;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 
+/**
+ * <p>
+ * One-stop-shop class that handles and is responsible for showing a MBE 
+ * engagement.
+ * </p>
+ * 
+ * When closed, it returns the BrandEngage Client status as a bundle extra with
+ * the key {@link SPBrandEngageClient.SP_ENGAGEMENT_STATUS}
+ */
 public class SPBrandEngageActivity extends Activity implements SPBrandEngageClientStatusListener {
 	
-
 	private boolean mPendingClose = false;;
 
 	@Override
@@ -82,16 +91,27 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	@Override
 	public void didChangeStatus(SPBrandEngageClientStatus newStatus) {
 		switch (newStatus) {
-		case CLOSE_ABORTED:
 		case CLOSE_FINISHED:
+			setResultAndClose(SPBrandEngageClient.SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE);
+			break;
+		case CLOSE_ABORTED:
+			setResultAndClose(SPBrandEngageClient.SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE);
+			break;
 		case ERROR:
-			closeActivity();
+			setResultAndClose(SPBrandEngageClient.SP_REQUEST_STATUS_PARAMETER_ERROR);
 			break;
 		case PENDING_CLOSE:
-			mPendingClose  = true;
+			mPendingClose = true;
 			break;
 		default:
 			break;
 		}
+	}
+	
+	private void setResultAndClose(String intentExtra) {
+		Intent intent = new Intent();
+		intent.getExtras().putString(SPBrandEngageClient.SP_ENGAGEMENT_STATUS, intentExtra);
+		setResult(RESULT_OK, intent);
+		closeActivity();
 	}
 }

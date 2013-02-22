@@ -855,26 +855,92 @@ public class SponsorPayPublisher {
 	// Mobile BrandEngage
 	//================================================================================
 
-	//FIXME add documentation
-	
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 *            
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
 	public static boolean getIntentForMBEActivity(Activity activity, 
 			SPBrandEngageRequestListener listener) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
 		return getIntentForMBEActivity(credentialsToken, activity, listener);
 	}
+	
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 * @param vcsListener
+	 * 			  The Virtual Currency Server listener that will be notified after a successful 
+	 * 			  engagement.
+	 * 
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForMBEActivity(Activity activity, 
+			SPBrandEngageRequestListener listener, SPCurrencyServerListener vcsListener) {
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, vcsListener);
+	}
 
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 * 
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
 	public static boolean getIntentForMBEActivity(String credentialsToken,
 			Activity activity, SPBrandEngageRequestListener listener) {
 		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null);
 	}
 	
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param parameters
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * @param vcsListener
+	 * 			  The Virtual Currency Server listener that will be notified after a successful 
+	 * 			  engagement.
+	 * 
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
 	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity, 
 			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters, 
 			SPCurrencyServerListener vcsListener) {
 		SPBrandEngageClient brandEngageClient = SPBrandEngageClient.INSTANCE;
 		boolean canRequestOffers = brandEngageClient.canRequestOffers();
 		if (canRequestOffers) {
-
 			SPCredentials credentials = SponsorPay
 					.getCredentials(credentialsToken);
 

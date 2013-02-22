@@ -45,9 +45,37 @@ import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListene
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
+/**
+ * <p>
+ * Provides methods to request and show BrandEngage offers and notifies its
+ * listener {@link SPBrandEngageClientStatusListener} of changes in the status
+ * of the engagement.
+ * </p>
+ * 
+ * Before requesting offers, make sure the have called the {@link
+ * SponsorPay#start(String, String, String, Context)} method. At this point you
+ * can determine if offers are available with {@link #requestOffers}.
+ * 
+ * When the engagement is over you must restart the process, querying if offers
+ * are available, before you run any engagement again. To check for new virtual
+ * coins earned by the user, given you've set your VCS key with the {@link
+ * SponsorPay#start(String, String, String, Context)}, simply set a
+ * {@link SPCurrencyServerListener} using
+ * {@link #setCurrencyListener(SPCurrencyServerListener)} and it will be
+ * notified after a successful engagement.
+ * 
+ * Note - Offer availability ({@link #requestOffers}) cannot be requested while
+ * an engagement is running. Call {@link #canRequestOffers()} if you're not sure
+ * that this instance is in a state in which a request for offers is possible.
+ * 
+ */
 public class SPBrandEngageClient {
 	
 	private static final String TAG = "SPBrandEngageClient";
+	
+	/**
+	 * Singleton instance of {@link SPBrandEngageClient}
+	 */
 	public static final SPBrandEngageClient INSTANCE = new SPBrandEngageClient();
 
 	private static final String MBE_BASE_URL = "https://iframe.sponsorpay.com/mbe";
@@ -63,10 +91,27 @@ public class SPBrandEngageClient {
 	private static final String SP_REQUEST_START_STATUS = "start";
 	private static final String SP_REQUEST_STATUS_PARAMETER_KEY = "status";
 	private static final String SP_REQUEST_STATUS_PARAMETER_STARTED_VALUE = "STARTED";
-	private static final String SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE = "CLOSE_FINISHED";
-	private static final String SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE = "CLOSE_ABORTED";
-	private static final String SP_REQUEST_STATUS_PARAMETER_ERROR = "ERROR";
 	private static final String SP_REQUEST_STATUS_PARAMETER_ENGAGED = "USER_ENGAGED";
+	
+	/**
+	 * Engagement status key used in {@link SPBrandEngageActivity}
+	 */
+	public static final String SP_ENGAGEMENT_STATUS = "ENGAGEMENT_STATUS";
+	
+	/**
+	 * Parameter used to denote a successful engagement
+	 */
+	public static final String SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE = "CLOSE_FINISHED";
+	
+	/**
+	 * Parameter used to denote that the engagement as been interrupted
+	 */
+	public static final String SP_REQUEST_STATUS_PARAMETER_ABORTED_VALUE = "CLOSE_ABORTED";
+	
+	/**
+	 * Parameter used to denote an error in the engagement 
+	 */
+	public static final String SP_REQUEST_STATUS_PARAMETER_ERROR = "ERROR";
 	
 	private static final int TIMEOUT = 10000 ;
 
@@ -116,6 +161,23 @@ public class SPBrandEngageClient {
 		mHandler = new Handler();
 	}
 
+	/**
+	 * Queries the server for BrandEngage offers availability. 
+	 * 
+	 * Offer
+	 * availability cannot be requested while an engagement is running or the
+	 * server is currently being queried. Call {@link #canRequestOffers()} if you're not
+	 * sure that this instance is in a state in which a request for offers is
+	 * possible.
+	 * 
+	 * @param credentials
+	 * 			The credentials that will be used for this query. 
+	 * 			@see SPCredentials
+	 * 			@see SponsorPay#start(String, String, String, Context)
+	 * @param activity
+	 * 			The calling activity
+	 * @return true if a request is being made, false otherwise
+	 */
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
 		if (canRequestOffers()) {
 			if (Build.VERSION.SDK_INT < 8) {
@@ -155,6 +217,14 @@ public class SPBrandEngageClient {
 		mHandler.postDelayed(timeout, TIMEOUT);
 	}
 
+	/**
+	 * Starts running an available engagement.
+	 * 
+	 * @param activity
+	 * 			The activity that will be used to show the engagement
+	 * 
+	 * @return true if the engagement can be started
+	 */
 	public boolean startEngagement(Activity activity) {
 		if (canStartEngagement()) {
 
@@ -183,10 +253,18 @@ public class SPBrandEngageClient {
 		}
 	}
 
+	/**
+	 * @return true if the client is in a state that allows to request for
+	 *         offers, false otherwise
+	 */
 	public boolean canRequestOffers() {
 		return mStatus.canRequestOffers();
 	}
 
+	/**
+	 * @return true if the client is in a state that allows to start and
+	 *         engagement, false otherwise
+	 */
 	public boolean canStartEngagement() {
 		return mStatus.canShowOffers();
 	}
@@ -195,8 +273,25 @@ public class SPBrandEngageClient {
 		return mStatus.canChangeParameters();
 	}
 
+	/**
+	 * @return true if the client shows a toast notifying the user of a
+	 *         successful engagement, false otherwise.
+	 * 
+	 * @see SPBrandEngageClient#shouldShowRewardsNotification()
+	 * @see UIStringIdentifier
+	 * @see SponsorPayPublisher#setCustomUIString(UIStringIdentifier, String)
+	 */
 	public boolean shouldShowRewardsNotification() {
 		return mShowRewardsNotification;
+	}
+	
+	/**
+	 * Sets if the toast reward message shoul be shown
+	 * 
+	 * @param mShowRewardsNotification
+	 */
+	public void setShowRewardsNotification(boolean mShowRewardsNotification) {
+		this.mShowRewardsNotification = mShowRewardsNotification;
 	}
 	
 	private void processQueryOffersResponse(int numOffers) {
@@ -259,11 +354,15 @@ public class SPBrandEngageClient {
 		};
 		mHandler.postDelayed(r, TIMEOUT);
 	}
-
-	public void setShowRewardsNotification(boolean mShowRewardsNotification) {
-		this.mShowRewardsNotification = mShowRewardsNotification;
-	}
 	
+	/**
+	 * Sets the currency name used in this engagement
+	 * 
+	 * @param currencyName
+	 * 			The currency name that will override the default one
+	 * 
+	 * @return true if successful in setting the name, false otherwise
+	 */
 	public boolean setCurrencyName(String currencyName) {
 		if (canChangeParameters()) {
 			mCurrency = currencyName;
@@ -276,6 +375,14 @@ public class SPBrandEngageClient {
 		}
 	}
 	
+	/**
+	 * Sets the additional custom parameters used for this engagement.
+	 * 
+	 * @param parameters
+	 * 			The additional parameters map
+	 * 
+	 * @return true if successful in setting the parameters, false otherwise
+	 */
 	public boolean setCustomParameters(Map<String, String> parameters) {
 		if (canChangeParameters()) {
 			mCustomParameters = parameters;
@@ -288,6 +395,16 @@ public class SPBrandEngageClient {
 		}
 	}
 	
+	/**
+	 * Sets the Virtual Currency listener that will be notified after a
+	 * successful engagement.
+	 * 
+	 * @param listener
+	 *            The listener called after a successful request at SponsorPay's
+	 *            virtual currency server
+	 * 
+	 * @return true if successful in setting the listener, false otherwise
+	 */
 	public boolean setCurrencyListener(SPCurrencyServerListener listener) {
 		if (canChangeParameters()) {
 			mVCSListener = listener;
@@ -301,6 +418,13 @@ public class SPBrandEngageClient {
 	}
 	
 	// Status Listener
+	/**
+	 * Sets the {@link SPBrandEngageClientStatusListener} that will be notified about the engagement status.
+	 * 
+	 * @param listener
+	 * 			The {@link SPBrandEngageClientStatusListener}
+	 * @return true if successful in setting the listener, false otherwise
+	 */
 	public boolean setStatusListener(SPBrandEngageClientStatusListener listener) {
 		boolean canChangeParameters = canChangeParameters();
 		if (canChangeParameters) {
@@ -585,6 +709,7 @@ public class SPBrandEngageClient {
 		return mOnTouchListener;
 	}
 
+	// used for testing purposes
 	public void setOverridingURl(String overridingUrl) {
 		this.mOverridingUrl = overridingUrl;
 	}

@@ -10,8 +10,17 @@ import android.app.Activity;
 import android.content.Intent;
 
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
+/**
+ * <p>
+ * Wrapper calls to perform a BrandEngage request and to notify a {@link SPBrandEngageClientStatusListener}
+ * of the result
+ * </p>
+ * This class is not intended to be used directly or subclassed, it is used internally
+ * by {@link SponsorPayPublisher}
+ */
 public class SPBrandEngageRequest implements SPBrandEngageClientStatusListener {
 
 	private static final String TAG = "SPBrandEngageRequest";

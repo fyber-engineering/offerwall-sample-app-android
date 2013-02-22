@@ -35,8 +35,6 @@ public class SponsorPay {
 	public static final String RELEASE_VERSION_STRING = String.format("%d.%d.%d",
 			MAJOR_RELEASE_NUMBER, MINOR_RELEASE_NUMBER, BUGFIX_RELEASE_NUMBER);
 	
-//	private static final String TAG = "SponsorPay";
-	
 	protected static SponsorPay INSTANCE = new SponsorPay();
 	
 	private HashMap<String, SPCredentials> tokensMap = new HashMap<String, SPCredentials>();
@@ -47,7 +45,6 @@ public class SponsorPay {
 	}
 
 	private SPCredentials getCredentialsFromToken(String token) {
-//		SponsorPayLogger.d(TAG, "Credentials token: " + token);
 		SPCredentials credendials = tokensMap.get(token);
 		if (credendials == null) {
 			throw new RuntimeException("There are no credentials identified by " + token +

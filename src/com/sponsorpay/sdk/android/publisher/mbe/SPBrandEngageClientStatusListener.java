@@ -8,7 +8,10 @@ package com.sponsorpay.sdk.android.publisher.mbe;
 
 public interface SPBrandEngageClientStatusListener {
 
-
+	/**
+	 * The BrandEngage client's engagement status
+	 * 
+	 */
 	public enum SPBrandEngageClientStatus {
 	     // The BrandEngage player's underlying content has been loaded and the engagement has started.
 	    STARTED,
@@ -28,8 +31,20 @@ public interface SPBrandEngageClientStatusListener {
 		ERROR
 	};
 	
+	/**
+	 * Called when the client receives the answer after requesting for offers
+	 * 
+	 * @param areOffersAvaliable
+	 * 			true if offers are available for this request, false otherwise
+	 */
 	public void didReceiveOffers(boolean areOffersAvaliable);
 
-	public void didChangeStatus( SPBrandEngageClientStatus newStatus);
+	/**
+	 * Called when the client changes to a new status.
+	 * 
+	 * @param newStatus
+	 * 			the status for the current engagement
+	 */
+	public void didChangeStatus(SPBrandEngageClientStatus newStatus);
 	
 }

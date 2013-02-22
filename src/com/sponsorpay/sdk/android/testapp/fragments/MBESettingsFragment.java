@@ -115,7 +115,6 @@ public class MBESettingsFragment extends AbstractSettingsFragment implements SPB
 			SponsorPayLogger.d(TAG, "Starting MBE engagement...");
 			startActivity(mIntent);
 		}
-		
 	}
 
 	@Override

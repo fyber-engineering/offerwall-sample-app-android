@@ -41,8 +41,16 @@ public class SPSSLSocketFactory extends SSLSocketFactory {
 			public void checkServerTrusted(X509Certificate[] chain,
 					String authType) throws CertificateException {
 				// First Certificate needs to be *.sponsorpay.com
-				if (!chain[0].getSubjectDN().getName().matches(".*\\.sponsorpay\\.com.*")) {
+				// issued by StartCom Ltd
+				if (!chain[0].getSubjectDN().getName().matches(".*\\.sponsorpay\\.com.*") ||
+						!chain[0].getIssuerDN().getName().matches(".*StartCom Ltd.*")) {
 					throw new CertificateException();
+				}
+				//Chain must be valid
+				for (int i = 0 ; i < chain.length - 1 ; i++) {
+					if (!chain[i].getIssuerDN().getName().equals(chain[i+1].getSubjectDN().getName())) {
+						throw new CertificateException();
+					}
 				}
 			}
 

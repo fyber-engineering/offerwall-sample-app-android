@@ -6,10 +6,15 @@
 
 package com.sponsorpay.sdk.android.utils;
 
+import java.io.IOException;
 import java.security.KeyStore;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -22,10 +27,9 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
-import android.os.Build;
-
 public class SPHttpClient {
 
+	private static final String TAG = "SPHttpClient";
 	private static SPHttpClient INSTANCE = new SPHttpClient();
 	
 	public static HttpClient getHttpClient() {
@@ -36,7 +40,15 @@ public class SPHttpClient {
 	
 	private HttpClient getClient() {
 		if (client == null) {
-			if (Build.VERSION.SDK_INT < 11) {
+			HttpUriRequest request = new HttpGet("https://iframe.sponsorpay.com");
+			client = new DefaultHttpClient();
+			try {
+				HttpResponse response = client.execute(request);
+				response.getStatusLine();
+			} catch (ClientProtocolException e) {
+				SponsorPayLogger.e(TAG, "Client protocol error", e);
+			} catch (IOException e1) {
+				// SSLPeerUnverifiedException - most likely, create custom http client
 				try {
 
 					KeyStore trustStore = KeyStore.getInstance(KeyStore
@@ -62,12 +74,9 @@ public class SPHttpClient {
 				} catch (Exception e) {
 					client = new DefaultHttpClient();
 				}
-			} else {
-				client = new DefaultHttpClient();
 			}
 		}
 		return client;
 	}
-	
 	
 }

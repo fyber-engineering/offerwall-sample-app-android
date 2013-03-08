@@ -110,7 +110,7 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	
 	private void setResultAndClose(String intentExtra) {
 		Intent intent = new Intent();
-		intent.getExtras().putString(SPBrandEngageClient.SP_ENGAGEMENT_STATUS, intentExtra);
+		intent.putExtra(SPBrandEngageClient.SP_ENGAGEMENT_STATUS, intentExtra);
 		setResult(RESULT_OK, intent);
 		closeActivity();
 	}

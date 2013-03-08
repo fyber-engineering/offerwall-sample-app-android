@@ -6,8 +6,8 @@
 
 package com.sponsorpay.sdk.android.utils;
 
-import java.io.IOException;
-import java.util.Properties;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 public class SponsorPayBaseUrlProvider {
 
@@ -15,13 +15,12 @@ public class SponsorPayBaseUrlProvider {
 	private static final String TAG = "SponsorPayBaseUrlProvider";
 	
 	private SPUrlProvider mUrlProviderOverride;
-	private Properties mBaseUrls;
+	private ResourceBundle mBaseUrls;
 	
 	private SponsorPayBaseUrlProvider() {
-		mBaseUrls = new Properties();
 		try {
-			mBaseUrls.load(this.getClass().getResourceAsStream("/urls.properties"));
-		} catch (IOException e) {
+			mBaseUrls = ResourceBundle.getBundle("com/sponsorpay/sdk/android/urls");
+		} catch (MissingResourceException e) {
 			SponsorPayLogger.e(TAG, "An error happened while initializing url provider", e);
 		}
 	}
@@ -32,14 +31,14 @@ public class SponsorPayBaseUrlProvider {
 			baseUrl = mUrlProviderOverride.getBaseUrl(product);
 		} 
 		if (StringUtils.nullOrEmpty(baseUrl)) {
-			baseUrl = mBaseUrls.getProperty(product);
+			baseUrl = mBaseUrls.getString(product);
 		}
 		return baseUrl;
 	}
 	
 	private void setOverride(SPUrlProvider provider) {
 		mUrlProviderOverride = provider;
-	};
+	}
 	
 	public static void setProviderOverride(SPUrlProvider provider) {
 		SponsorPayBaseUrlProvider.INSTANCE.setOverride(provider);

@@ -16,7 +16,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.net.http.SslError;
-import android.os.Build;
 import android.view.WindowManager.BadTokenException;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
@@ -184,9 +183,11 @@ public abstract class OfferWebClient extends WebViewClient {
 	
     public void onReceivedSslError(WebView view, SslErrorHandler handler,
             SslError error) {
-    	if (Build.VERSION.SDK_INT < 8) {
-    		handler.proceed();
-    	}
+    	//URL is null, relying on the certificate issues
+		if (error.getCertificate().getIssuedBy().getOName()
+				.matches(".*StartCom Ltd.*")) {
+			handler.proceed();
+		}
     }
 	
 }

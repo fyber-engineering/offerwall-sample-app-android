@@ -616,8 +616,28 @@ public class SponsorPayPublisher {
 	 *            request.
 	 */
 	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
+		requestNewCoins(context, listener, null);
+	}
+	
+	/**
+	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
+	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
+	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. The current 
+	 * credentials will be used to get the application id and user id.
+	 * 
+	 * @param context
+	 *            Android application context.
+	 * @param listener
+	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
+	 *            request.
+	 * @param customCurrency
+	 * 			  A string representing the custom currency to be used by the toast message to show
+	 * 			  the amount of coins earned.
+	 */
+	public static void requestNewCoins(Context context, SPCurrencyServerListener listener,
+			String customCurrency) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		requestNewCoins(credentialsToken, context, listener, null, null, null);
+		requestNewCoins(credentialsToken, context, listener, null, null, customCurrency);
 	}
 	
 	/**

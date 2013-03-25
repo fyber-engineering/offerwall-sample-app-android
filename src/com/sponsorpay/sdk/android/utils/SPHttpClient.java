@@ -41,8 +41,22 @@ public class SPHttpClient {
 	private HttpClient getClient() {
 		if (client == null) {
 			HttpUriRequest request = new HttpGet("https://iframe.sponsorpay.com");
-			client = new DefaultHttpClient();
+			
+			HttpParams params = new BasicHttpParams();
+			HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+			HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
+			
+			SchemeRegistry registry = new SchemeRegistry();
+			registry.register(new Scheme("http", PlainSocketFactory
+					.getSocketFactory(), 80));
+			
 			try {
+				final SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
+				registry.register(new Scheme("https", sslSocketFactory, 443));
+				
+				ClientConnectionManager cm = new ThreadSafeClientConnManager(params, registry);
+				client = new DefaultHttpClient(cm, params);
+				
 				HttpResponse response = client.execute(request);
 				response.getStatusLine();
 			} catch (ClientProtocolException e) {
@@ -58,13 +72,7 @@ public class SPHttpClient {
 					SSLSocketFactory sf = new SPSSLSocketFactory(trustStore);
 					sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
-					HttpParams params = new BasicHttpParams();
-					HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-					HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
-
-					SchemeRegistry registry = new SchemeRegistry();
-					registry.register(new Scheme("http", PlainSocketFactory
-							.getSocketFactory(), 80));
+					registry.unregister("https");
 					registry.register(new Scheme("https", sf, 443));
 
 					ClientConnectionManager ccm = new ThreadSafeClientConnManager(
@@ -72,7 +80,7 @@ public class SPHttpClient {
 
 					client = new DefaultHttpClient(ccm, params);
 				} catch (Exception e) {
-					client = new DefaultHttpClient();
+					SponsorPayLogger.e(TAG, "Unknow error, aborting...", e);
 				}
 			}
 		}

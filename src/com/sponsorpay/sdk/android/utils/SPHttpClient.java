@@ -40,7 +40,7 @@ public class SPHttpClient {
 	
 	private HttpClient getClient() {
 		if (client == null) {
-			HttpUriRequest request = new HttpGet("https://iframe.sponsorpay.com");
+			HttpUriRequest request = new HttpGet("https://service.sponsorpay.com");
 			
 			HttpParams params = new BasicHttpParams();
 			HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);

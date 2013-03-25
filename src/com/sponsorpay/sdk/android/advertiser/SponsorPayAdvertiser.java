@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2012 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.advertiser;
@@ -34,16 +34,6 @@ public class SponsorPayAdvertiser {
 	 * Map of custom key/values to add to the parameters on the requests to the REST API.
 	 */
 	private static Map<String, String> sCustomParameters;
-
-	private static boolean sShouldUseStagingUrls = false;
-
-	public static void setShouldUseStagingUrls(boolean value) {
-		sShouldUseStagingUrls = value;
-	}
-
-	public static boolean shouldUseStagingUrls() {
-		return sShouldUseStagingUrls;
-	}
 
 	/**
 	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.

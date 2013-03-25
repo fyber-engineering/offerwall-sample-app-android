@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2012 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher;
@@ -25,6 +25,7 @@ import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -51,8 +52,6 @@ public class OfferWallActivity extends Activity {
 	 * request URL from the extras bundle.
 	 */
 	public static final String EXTRA_KEYS_VALUES_MAP_KEY = "EXTRA_KEY_VALUES_MAP";
-
-	public static final String EXTRA_OVERRIDING_URL_KEY = "EXTRA_OVERRIDING_URL_KEY";
 
 	public static final String EXTRA_CURRENCY_NAME_KEY = "EXTRA_CURRENCY_NAME_KEY";
 
@@ -89,8 +88,6 @@ public class OfferWallActivity extends Activity {
 	private AlertDialog mErrorDialog;
 
 	private OfferWallTemplate mTemplate;
-
-	private String mOverridingUrl;
 
 	private String mCurrencyName;
 	
@@ -210,8 +207,6 @@ public class OfferWallActivity extends Activity {
 			mCurrencyName = currencyName;
 		}
 
-		mOverridingUrl = getIntent().getStringExtra(EXTRA_OVERRIDING_URL_KEY);
-
 		mTemplate.fetchAdditionalExtras();
 	}
 
@@ -236,7 +231,7 @@ public class OfferWallActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		try {
-			String offerwallUrl = determineUrl();
+			String offerwallUrl = buildUrl();
 
 			SponsorPayLogger.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
 			mWebView.loadUrl(offerwallUrl);
@@ -247,24 +242,10 @@ public class OfferWallActivity extends Activity {
 		}
 	}
 
-	private String determineUrl() {
-		if (StringUtils.notNullNorEmpty(mOverridingUrl)) {
-			return mOverridingUrl;
-		} else {
-			return generateUrl();
-		}
-	}
-
-	private String generateUrl() {
+	private String buildUrl() {
 		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
-		if (mCurrencyName != null && !mCurrencyName.trim().equals("")) {
-			if (mCustomKeysValues == null) {
-				mCustomKeysValues = new HashMap<String, String>();
-			}
-			mCustomKeysValues.put(UrlBuilder.URL_PARAM_CURRENCY_NAME_KEY, mCurrencyName);
-		}
 		String baseUrl = mTemplate.getBaseUrl();
-		return UrlBuilder.newBuilder(baseUrl, mCredentials)
+		return UrlBuilder.newBuilder(baseUrl, mCredentials).setCurrency(mCurrencyName)
 				.addExtraKeysValues(mCustomKeysValues).addScreenMetrics().buildUrl();
 	}
 
@@ -328,9 +309,8 @@ public class OfferWallActivity extends Activity {
 		/**
 		 * Sponsorpay's URL to contact within the web view
 		 */
-		private static final String OFFERWALL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/mobile?";
-		private static final String OFFERWALL_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/mobile?";
-
+		private static final String OFW_URL_KEY = "ofw";
+		
 		@Override
 		public void fetchAdditionalExtras() {
 
@@ -338,8 +318,7 @@ public class OfferWallActivity extends Activity {
 
 		@Override
 		public String getBaseUrl() {
-			return SponsorPayPublisher.shouldUseStagingUrls() ? OFFERWALL_STAGING_BASE_URL
-					: OFFERWALL_PRODUCTION_BASE_URL;
+			return SponsorPayBaseUrlProvider.getBaseUrl(OFW_URL_KEY);
 		}
 
 		@Override
@@ -358,9 +337,9 @@ public class OfferWallActivity extends Activity {
 		/**
 		 * Sponsorpay's URL to contact within the web view
 		 */
-		private static final String UNLOCK_OFFERWALL_PRODUCTION_BASE_URL = "https://iframe.sponsorpay.com/unlock?";
-		private static final String UNLOCK_OFFERWALL_STAGING_BASE_URL = "https://staging-iframe.sponsorpay.com/unlock?";
 
+		private static final String UNLOCK_URL_KEY = "unlock";
+		
 		/**
 		 * Key for extracting the value of {@link #mUnlockItemId} from the extras bundle.
 		 */
@@ -385,8 +364,7 @@ public class OfferWallActivity extends Activity {
 
 		@Override
 		public String getBaseUrl() {
-			return SponsorPayPublisher.shouldUseStagingUrls() ? UNLOCK_OFFERWALL_STAGING_BASE_URL
-					: UNLOCK_OFFERWALL_PRODUCTION_BASE_URL;
+			return SponsorPayBaseUrlProvider.getBaseUrl(UNLOCK_URL_KEY);
 		}
 
 		@Override

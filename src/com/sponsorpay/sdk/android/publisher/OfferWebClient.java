@@ -1,13 +1,12 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2012 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher;
 
 import java.lang.ref.WeakReference;
-import java.net.URI;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,7 +16,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.net.http.SslError;
-import android.os.Build;
 import android.view.WindowManager.BadTokenException;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
@@ -62,7 +60,7 @@ public abstract class OfferWebClient extends WebViewClient {
 	 *            the exit scheme url to parse
 	 * @return the extracted, provided & decoded URL
 	 */
-	protected static String parseSponsorPayExitUrlForTargetUrl(String url) {
+	protected String parseSponsorPayExitUrlForTargetUrl(String url) {
 		Uri uri = Uri.parse(url);
 
 		String targetUrl = uri.getQueryParameter(EXIT_URL_TARGET_URL_PARAM_KEY);
@@ -80,7 +78,7 @@ public abstract class OfferWebClient extends WebViewClient {
 	 *            the url to parsed for the status code
 	 * @return the status code
 	 */
-	protected static int parseSponsorPayExitUrlForResultCode(String url) {
+	protected int parseSponsorPayExitUrlForResultCode(String url) {
 		Uri uri = Uri.parse(url);
 
 		String resultCodeAsString = uri.getQueryParameter(EXIT_URL_RESULT_CODE_PARAM_KEY);
@@ -96,8 +94,9 @@ public abstract class OfferWebClient extends WebViewClient {
 		SponsorPayLogger.i(LOG_TAG, "shouldOverrideUrlLoading called with url: " + url);
 
 		if (url.startsWith(SPONSORPAY_SCHEMA)) {
-			URI uri = URI.create(url);
-			if (uri.getHost().equals(SPONSORPAY_EXIT_SCHEMA)) {
+			Uri uri = Uri.parse(url);
+			String host = uri.getHost();
+			if (host.equals(SPONSORPAY_EXIT_SCHEMA)) {
 				// ?status=<statusCode>&url=<url>)url is optional)
 				int resultCode = parseSponsorPayExitUrlForResultCode(url);
 				String targetUrl = parseSponsorPayExitUrlForTargetUrl(url);
@@ -105,6 +104,8 @@ public abstract class OfferWebClient extends WebViewClient {
 				SponsorPayLogger.i(LOG_TAG, "Overriding. Target Url: " + targetUrl);
 				
 				onSponsorPayExitScheme(resultCode, targetUrl);
+			} else {
+				processSponsorPayScheme(host, uri);
 			}
 
 			return true;
@@ -129,13 +130,14 @@ public abstract class OfferWebClient extends WebViewClient {
 		intent.setData(uri);
 		try {
 			hostActivity.startActivity(intent);
+			onTargetActivityStart(url);
 		} catch (ActivityNotFoundException e) {
 			if (uri.getScheme().equalsIgnoreCase("market") && !IntentHelper.isIntentAvailable(getHostActivity(),
 					Intent.ACTION_VIEW, 
 					// dummy search to validate Play Store application
 					Uri.parse("market://search?q=pname:com.google"))) {
 				SponsorPayLogger.e(LOG_TAG, "Play Store is not installed on this device...");
-				showDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE));
+				onPlayStoreNotFound();
 			}
 			// else - fail silently
 			return false;
@@ -143,7 +145,15 @@ public abstract class OfferWebClient extends WebViewClient {
 		return true;
 	}
 
+	protected abstract void processSponsorPayScheme(String host, Uri uri);
+	
 	protected abstract void onSponsorPayExitScheme(int resultCode, String targetUrl);
+	
+	protected abstract void onTargetActivityStart(String targetUrl);
+	
+	protected void onPlayStoreNotFound() {
+		showDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE));
+	}
 	
 	public void showDialog(String errorMessage) {
 		String errorDialogTitle = SponsorPayPublisher
@@ -173,9 +183,11 @@ public abstract class OfferWebClient extends WebViewClient {
 	
     public void onReceivedSslError(WebView view, SslErrorHandler handler,
             SslError error) {
-    	if (Build.VERSION.SDK_INT < 8) {
-    		handler.proceed();
-    	}
+    	//URL is null, relying on the certificate issues
+		if (error.getCertificate().getIssuedBy().getOName()
+				.matches(".*StartCom Ltd.*")) {
+			handler.proceed();
+		}
     }
 	
 }

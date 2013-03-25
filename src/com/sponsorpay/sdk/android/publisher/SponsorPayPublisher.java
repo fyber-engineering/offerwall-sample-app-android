@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2012 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android.publisher;
@@ -23,6 +23,9 @@ import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadi
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
+import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClient;
+import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageRequest;
+import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageRequestListener;
 import com.sponsorpay.sdk.android.publisher.unlock.SPUnlockResponseListener;
 import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
 import com.sponsorpay.sdk.android.utils.SPIdException;
@@ -42,9 +45,12 @@ public class SponsorPayPublisher {
 	public enum UIStringIdentifier {
 		ERROR_DIALOG_TITLE, DISMISS_ERROR_DIALOG, GENERIC_ERROR, 
 		ERROR_LOADING_OFFERWALL, ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION, 
-		LOADING_INTERSTITIAL, LOADING_OFFERWALL, ERROR_PLAY_STORE_UNAVAILABLE
+		LOADING_INTERSTITIAL, LOADING_OFFERWALL, ERROR_PLAY_STORE_UNAVAILABLE,
+		MBE_REWARD_NOTIFICATION, VCS_COINS_NOTIFICATION, VCS_DEFAULT_CURRENCY, 
+		MBE_ERROR_DIALOG_TITLE, MBE_ERROR_DIALOG_MESSAGE_DEFAULT, MBE_ERROR_DIALOG_MESSAGE_OFFLINE,
+		MBE_ERROR_DIALOG_BUTTON_TITLE_DISMISS, MBE_FORFEIT_DIALOG_TITLE
 	};
-
+	
 	/**
 	 * Messages which can be displayed in the user interface.
 	 */
@@ -76,6 +82,15 @@ public class SponsorPayPublisher {
 		sUIStrings.put(UIStringIdentifier.LOADING_INTERSTITIAL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.LOADING_OFFERWALL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE, "You don't have the Google Play Store application on your device to complete App Install offers.");
+		sUIStrings.put(UIStringIdentifier.MBE_REWARD_NOTIFICATION, "Thanks! Your reward will be payed out shortly");
+		sUIStrings.put(UIStringIdentifier.VCS_COINS_NOTIFICATION,"Congratulations! You've earned %.0f %s!");
+		sUIStrings.put(UIStringIdentifier.VCS_DEFAULT_CURRENCY, "coins");
+		
+		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_TITLE, "Error");
+		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT, "We're sorry, something went wrong. Please try again.");
+		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_OFFLINE, "Your Internet connection has been lost. Please try again later.");
+		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_BUTTON_TITLE_DISMISS, "Dismiss");
+		sUIStrings.put(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE, "");
 	}
 
 	/**
@@ -192,22 +207,6 @@ public class SponsorPayPublisher {
 		}
 
 		return retval;
-	}
-
-	private static boolean sShouldUseStagingUrls = false;
-
-	public static void setShouldUseStagingUrls(boolean value) {
-		sShouldUseStagingUrls = value;
-	}
-
-	public static boolean shouldUseStagingUrls() {
-		return sShouldUseStagingUrls;
-	}
-
-	private static String sOverridingWebViewUrl;
-	
-	public static void setOverridingWebViewUrl(String url) {
-		sOverridingWebViewUrl = url;
 	}
 	
 	/**
@@ -372,10 +371,6 @@ public class SponsorPayPublisher {
 			intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
 		}
 
-		if (sOverridingWebViewUrl != null) {
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
-		}
-
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY,
 				getCustomParameters(customParams));
 
@@ -455,10 +450,6 @@ public class SponsorPayPublisher {
 				unlockItemId);
 		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
 				unlockItemName);
-
-		if (sOverridingWebViewUrl != null) {
-			intent.putExtra(OfferWallActivity.EXTRA_OVERRIDING_URL_KEY, sOverridingWebViewUrl);
-		}
 		
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
 
@@ -605,10 +596,6 @@ public class SponsorPayPublisher {
 			il.setCustomParameters(extraParams);
 		}
 
-		if (sOverridingWebViewUrl != null) {
-			il.setOverridingUrl(sOverridingWebViewUrl);
-		}
-		
 		il.startLoading();
 	}
 
@@ -630,7 +617,7 @@ public class SponsorPayPublisher {
 	 */
 	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		requestNewCoins(credentialsToken, context, listener, null, null);
+		requestNewCoins(credentialsToken, context, listener, null, null, null);
 	}
 	
 	/**
@@ -652,13 +639,30 @@ public class SponsorPayPublisher {
 	 *            it to null to let the SDK use the latest transaction ID it kept track of.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
+	 * @param customCurrency
+	 * 			  A string representing the custom currency to be used by the toast message to show
+	 * 			  the amount of coins earned.
 	 */
 	public static void requestNewCoins(String credentialsToken, Context context, 
-			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams) {
+			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams, 
+			String customCurrency) {
 		
 		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, credentialsToken, listener);
 		vcc.setCustomParameters(getCustomParameters(customParams));
+		vcc.setCurrency(customCurrency);
 		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
+	}
+	
+	/**
+	 * Allows the configuration of the Toast notification message that display the amount of coins
+	 * earned after a successful request to the SponsorPay's Currency server.
+	 * This is ON by default.
+	 * 
+	 * @param shouldShowNotification
+	 * 			Whether the Toast notification message should be shown or not 
+	 */
+	public static void displayNotificationForSuccessfullCoinRequest(boolean shouldShowNotification) {
+		VirtualCurrencyConnector.shouldShowToastNotification(shouldShowNotification);
 	}
 	
 	//================================================================================
@@ -808,15 +812,115 @@ public class SponsorPayPublisher {
 		OfferBannerRequest bannerRequest = new OfferBannerRequest(context, credentialsToken,
 				listener, offerBannerAdShape, currencyName, getCustomParameters(customParams));
 		
-		if (sOverridingWebViewUrl != null) {
-			bannerRequest.setOverridingUrl(sOverridingWebViewUrl);
-		}
-		
 		bannerRequest.requestOfferBanner();
 		
 		return bannerRequest;
 	}
 
+	//================================================================================
+	// Mobile BrandEngage
+	//================================================================================
+
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 *            
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForMBEActivity(Activity activity, 
+			SPBrandEngageRequestListener listener) {
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForMBEActivity(credentialsToken, activity, listener);
+	}
+	
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 * @param vcsListener
+	 * 			  The Virtual Currency Server listener that will be notified after a successful 
+	 * 			  engagement.
+	 * 
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForMBEActivity(Activity activity, 
+			SPBrandEngageRequestListener listener, SPCurrencyServerListener vcsListener) {
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, vcsListener);
+	}
+
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 * 
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForMBEActivity(String credentialsToken,
+			Activity activity, SPBrandEngageRequestListener listener) {
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null);
+	}
+	
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param parameters
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * @param vcsListener
+	 * 			  The Virtual Currency Server listener that will be notified after a successful 
+	 * 			  engagement.
+	 * 
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity, 
+			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters, 
+			SPCurrencyServerListener vcsListener) {
+		SPBrandEngageClient brandEngageClient = SPBrandEngageClient.INSTANCE;
+		boolean canRequestOffers = brandEngageClient.canRequestOffers();
+		if (canRequestOffers) {
+			SPCredentials credentials = SponsorPay
+					.getCredentials(credentialsToken);
+
+			brandEngageClient.setCurrencyName(currencyName);
+			brandEngageClient
+					.setCustomParameters(getCustomParameters(parameters));
+			brandEngageClient.setCurrencyListener(vcsListener);
+			
+			SPBrandEngageRequest request = new SPBrandEngageRequest(
+					credentials, activity, brandEngageClient, listener);
+			request.askForOffers();
+		}
+		return canRequestOffers;
+	}
 	
 	//================================================================================
     // Deprecated Methods
@@ -1651,7 +1755,7 @@ public class SponsorPayPublisher {
 			String applicationId, Map<String, String> customParams) {
 		
 		String credentialsToken = SponsorPay.getCredentials(applicationId, userId, securityToken, context);
-		requestNewCoins(credentialsToken, context, listener, transactionId, customParams);
+		requestNewCoins(credentialsToken, context, listener, transactionId, customParams, null);
 	}
 
 	//================================================================================

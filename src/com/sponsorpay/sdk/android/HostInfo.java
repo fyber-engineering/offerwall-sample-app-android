@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2012 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.sdk.android;
@@ -9,19 +9,23 @@ package com.sponsorpay.sdk.android;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
-import com.sponsorpay.sdk.android.utils.StringUtils;
-
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Extracts device information from the host device in which the SDK runs and SponsorPay App ID
@@ -46,11 +50,14 @@ public class HostInfo {
 
 	private static final String UNDEFINED_VALUE = "undefined";
 
+	private static final String CONNECTION_TYPE_CELLULAR  = "cellular";
+	private static final String CONNECTION_TYPE_WIFI = "wifi";
 	
 	protected static boolean sSimulateNoReadPhoneStatePermission = false;
 	protected static boolean sSimulateNoAccessWifiStatePermission = false;
 	protected static boolean sSimulateInvalidAndroidId = false;
 	protected static boolean sSimulateNoHardwareSerialNumber = false;
+	protected static boolean sSimulateNoAccessNetworkState = false;
 
 	public static void setSimulateNoReadPhoneStatePermission(boolean value) {
 		sSimulateNoReadPhoneStatePermission = value;
@@ -66,6 +73,10 @@ public class HostInfo {
 
 	public static void setSimulateNoHardwareSerialNumber(boolean value) {
 		sSimulateNoHardwareSerialNumber = value;
+	}
+
+	public static void setSimulateNoAccessNetworkState(boolean value) {
+		sSimulateNoAccessNetworkState = value;
 	}
 
 	/**
@@ -127,6 +138,13 @@ public class HostInfo {
 	private int mScreenHeight;
 	private float mScreenDensityX;
 	private float mScreenDensityY;
+
+	private String mCarrierCountry;
+	private String mCarrierName;
+
+	private String mConnectionType;
+
+	private String mAppVersion;
 
 	private DisplayMetrics getDisplayMetrics() {
 		if (null == mDisplayMetrics) {
@@ -229,13 +247,36 @@ public class HostInfo {
 					.getSystemService(Context.TELEPHONY_SERVICE);
 			try {
 				mUDID = tManager.getDeviceId();
+				mCarrierName = tManager.getNetworkOperatorName();
+				mCarrierCountry = tManager.getNetworkCountryIso();
 			} catch (SecurityException e) {
 				mUDID = StringUtils.EMPTY_STRING;
+				mCarrierName = StringUtils.EMPTY_STRING;
+				mCarrierCountry = StringUtils.EMPTY_STRING;
 			}
 		} else {
 			mUDID = StringUtils.EMPTY_STRING;
+			mCarrierName = StringUtils.EMPTY_STRING;
+			mCarrierCountry = StringUtils.EMPTY_STRING;
 		}
 
+		if (!sSimulateNoAccessNetworkState) {
+			ConnectivityManager mConnectivity = (ConnectivityManager) mContext
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+			NetworkInfo info = mConnectivity.getActiveNetworkInfo();
+			if (info == null) {
+			    mConnectionType = StringUtils.EMPTY_STRING;
+			} else {
+				int netType = info.getType();
+				mConnectionType = netType == ConnectivityManager.TYPE_WIFI ? CONNECTION_TYPE_WIFI
+						: CONNECTION_TYPE_CELLULAR;
+			}
+
+		} else {
+			mConnectionType = StringUtils.EMPTY_STRING;
+		}
+		
 		// Get the default locale
 		mLanguageSetting = Locale.getDefault().toString();
 
@@ -433,5 +474,38 @@ public class HostInfo {
 			mScreenDensityY = getDisplayMetrics().ydpi;
 		}
 		return String.format("%d", Math.round(mScreenDensityY));
+	}
+	
+	public String getCarrierCountry() {
+		return mCarrierCountry;
+	}
+	
+	public String getCarrierName() {
+		return mCarrierName;
+	}
+	
+	public String getConnectionType() {
+		return mConnectionType;
+	}
+
+	public String getManufacturer() {
+		return Build.MANUFACTURER;
+	}
+
+	public String getAppVersion() {
+		if (mAppVersion == null) {
+			try {
+				PackageInfo pInfo = mContext.getPackageManager()
+						.getPackageInfo(mContext.getPackageName(), 0);
+				mAppVersion = pInfo.versionName;
+			} catch (NameNotFoundException e) {
+				mAppVersion = StringUtils.EMPTY_STRING;
+			}
+		}
+		return mAppVersion;
+	}
+
+	public String getAppBundleName() {
+		return mContext.getPackageName();
 	}
 }

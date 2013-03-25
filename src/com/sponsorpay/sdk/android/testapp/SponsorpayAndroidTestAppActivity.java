@@ -18,7 +18,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
@@ -31,6 +30,9 @@ import com.sponsorpay.sdk.android.testapp.fragments.BannersSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.InterstitialSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.ItemsSettingsFragment;
 import com.sponsorpay.sdk.android.testapp.fragments.LauncherFragment;
+import com.sponsorpay.sdk.android.testapp.fragments.MBESettingsFragment;
+import com.sponsorpay.sdk.android.testapp.url.TestAppUrlsProvider;
+import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -38,7 +40,6 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
  * Example activity in order to show the usage of Sponsorpay Android SDK.
  */
 public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
-	
 	private static final String TAG = SponsorpayAndroidTestAppActivity.class.getSimpleName();
 
 	/**
@@ -65,6 +66,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	private CheckBox mUseStagingUrlsCheckBox;
 	
 	private boolean mShouldStayOpen;
+	private boolean mShowToastOnSuccessfullVCSRequest;
 	
 	/**
 	 * Called when the activity is first created. See {@link Activity}.
@@ -83,6 +85,9 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 				+ SponsorPay.RELEASE_VERSION_STRING);
 
 		SponsorPayLogger.enableLogging(true);
+		SponsorPayBaseUrlProvider.setProviderOverride(TestAppUrlsProvider.INSTANCE);
+		TextView loggerView = (TextView)findViewById(R.id.log_text_view);
+		SponsorPayLogger.setTextView(loggerView);
 	}
 
 	private void createLauncherFragment() {
@@ -155,22 +160,31 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		String securityToken = prefs.getString(SECURITY_TOKEN_PREFS_KEY, StringUtils.EMPTY_STRING);
 		mCurrencyName = prefs.getString(CURRENCY_NAME_PREFS_KEY, StringUtils.EMPTY_STRING);
 		
+		mShouldStayOpen = prefs.getBoolean(MainSettingsActivity.KEEP_OFFERWALL_OPEN_PREFS_KEY, true);
+		mShowToastOnSuccessfullVCSRequest = prefs.getBoolean(MainSettingsActivity.SHOW_TOAST_VCS_REQUEST_PREFS_KEY, true);
+
+		updateVCSToastNotification();
+
+		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
+		
+		TestAppUrlsProvider.INSTANCE.shouldUseStaging(mUseStagingUrlsCheckBox
+				.isChecked());
+		
 		try {
 			SponsorPay.start(overridingAppId, userId, securityToken, getApplicationContext());
 		} catch (RuntimeException e){
 			SponsorPayLogger.d(TAG,
-						e.getLocalizedMessage());
+					e.getLocalizedMessage());
 		}
 		
-		mShouldStayOpen = prefs.getBoolean(MainSettingsActivity.KEEP_OFFERWALL_OPEN_PREFS_KEY, true);
-
 		setValuesInFields();
 
-		mUseStagingUrlsCheckBox.setChecked(prefs.getBoolean(USE_STAGING_URLS_PREFS_KEY, false));
-
+	}
+	
+	private void updateVCSToastNotification() {
+		VirtualCurrencyConnector.shouldShowToastNotification(mShowToastOnSuccessfullVCSRequest);
 	}
 
-	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
@@ -178,6 +192,9 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 			case MAIN_SETTINGS_ACTIVITY_CODE:
 				mShouldStayOpen = data.getBooleanExtra(
 						MainSettingsActivity.KEEP_OFFERWALL_OPEN_EXTRA, true);
+				mShowToastOnSuccessfullVCSRequest = data.getBooleanExtra(
+						MainSettingsActivity.SHOW_TOAST_VCS_REQUEST_EXTRA, true);
+				updateVCSToastNotification();
 				break;
 			default:
 				break;
@@ -203,9 +220,7 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 
 		mCurrencyName = mCurrencyNameField.getText().toString();
 
-		SponsorPayAdvertiser.setShouldUseStagingUrls(mUseStagingUrlsCheckBox
-				.isChecked());
-		SponsorPayPublisher.setShouldUseStagingUrls(mUseStagingUrlsCheckBox
+		TestAppUrlsProvider.INSTANCE.shouldUseStaging(mUseStagingUrlsCheckBox
 				.isChecked());
 	}
 
@@ -276,52 +291,27 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	/**
 	 * Triggered when the user clicks on the launch unlock offer wall button.
 	 * 
-	 * @param v
 	 */
 	public void onLaunchUnlockOfferwallClick(View v) {
-		fetchValuesFromFields();
-
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-
-		if (fragment instanceof ItemsSettingsFragment) {
-			((ItemsSettingsFragment) fragment).launchUnlockOfferWall();
-		}
+		getCurrentFragment(ItemsSettingsFragment.class).launchUnlockOfferWall();
 	}
 	
 	/**
 	 * Triggered when the user clicks on the send action button.
 	 * 
-	 * @param v
 	 */
 	public void onSendActionClick(View v) {
-		fetchValuesFromFields();
-		
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-		
-		if (fragment instanceof ActionsSettingsFragment) {
-			((ActionsSettingsFragment) fragment).sendActionCompleted();
-		}
-		
+		getCurrentFragment(ActionsSettingsFragment.class).sendActionCompleted();
 	}
 	
 
 	/**
 	 * Triggered when the user clicks on the launch interstitial button.
 	 * 
-	 * @param v
 	 */
 	public void onLaunchInsterstitialClick(View v) {
-		fetchValuesFromFields();
-
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-
-		if (fragment instanceof InterstitialSettingsFragment) {
-			((InterstitialSettingsFragment) fragment).launchInsterstitial(
-					mShouldStayOpen, mCurrencyName);
-		}
+		getCurrentFragment(InterstitialSettingsFragment.class).launchInsterstitial(
+				mShouldStayOpen, mCurrencyName);
 	}
 
 	/**
@@ -370,29 +360,27 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	 * Triggered when the user clicks on the Request SP Unlock Items button. Will send a request for
 	 * the status of the SP Unlock items to the server and register a callback object to show the
 	 * result in a dialog box. Uses the values entered for User ID, App ID and Security Token.
-	 * 
-	 * @param v
 	 */
 	public void onRequestSPUnlockItemsClick(View v) {
-		fetchValuesFromFields();
-
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-
-		if (fragment instanceof ItemsSettingsFragment) {
-			((ItemsSettingsFragment) fragment).launchUnlockItems();
-		}
+		getCurrentFragment(ItemsSettingsFragment.class).launchUnlockItems();
 	}
 
 	public void onRequestBannerClick(View v) {
-		fetchValuesFromFields();
 		SponsorPayLogger.i(TAG, "Requesting banner");
-		Fragment fragment = getSupportFragmentManager().findFragmentById(
-				R.id.fragment_placeholder);
-		if (fragment instanceof BannersSettingsFragment) {
-			((BannersSettingsFragment) fragment).requestBanner(mCurrencyName);
-		}
+		getCurrentFragment(BannersSettingsFragment.class).requestBanner(mCurrencyName);
 	}
+	
+	// MBE
+	
+	public void onRequestOffersClick(View v) {
+		SponsorPayLogger.d(TAG, "Requesting MBE offers...");
+		getCurrentFragment(MBESettingsFragment.class).requestOffers(mCurrencyName);
+	}
+	
+	public void onStartMBEClick(View v) {
+		getCurrentFragment(MBESettingsFragment.class).startEngament();
+	}
+	
 
 	/**
 	 * Shows an alert box with the provided title and message and a unique button to cancel it.
@@ -413,6 +401,17 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 	}
 	
 	// FRAGMENTS stuff
+	
+	@SuppressWarnings("unchecked")
+	private <T extends Fragment> T getCurrentFragment(Class<T> type) {
+		fetchValuesFromFields();
+		Fragment fragment = getSupportFragmentManager().findFragmentById(
+				R.id.fragment_placeholder);
+		if (fragment.getClass().isAssignableFrom(type)) {
+			return (T)fragment;
+		}
+		return null; 
+	}
 	
 	protected void replaceFragment(Fragment newFragment) {
 		FragmentTransaction transaction = getSupportFragmentManager()
@@ -449,5 +448,8 @@ public class SponsorpayAndroidTestAppActivity extends FragmentActivity {
 		replaceFragment(new ActionsSettingsFragment());
 	}
 	
+	public void onMBEClick(View view) {
+		replaceFragment(new MBESettingsFragment());
+	}
 	
 }

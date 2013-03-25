@@ -1,2 +1,6 @@
 bin/
 gen/
+test_servers
+.irb-history
+screenshot_*.png
+.irbrc

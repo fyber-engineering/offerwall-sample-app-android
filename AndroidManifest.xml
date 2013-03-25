@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sponsorpay.sdk.android.testapp"
-    android:versionCode="15"
-    android:versionName="2.0.0" >
+    android:versionCode="16"
+    android:versionName="3.0.0" >
 
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="14"/>
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="18"/>
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
     <application
         android:icon="@drawable/icon"
-        android:label="@string/app_name" >
+        android:label="@string/app_name"
+        android:allowBackup="false" >
         <activity
             android:label="@string/app_name"
             android:name=".SponsorpayAndroidTestAppActivity" >
@@ -31,7 +35,12 @@
             android:configChanges="orientation"
             android:name="com.sponsorpay.sdk.android.publisher.InterstitialActivity"
             android:theme="@android:style/Theme.Dialog" />
-
+		
+        <activity 
+            android:configChanges="screenSize|orientation"
+            android:name="com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageActivity"
+            android:hardwareAccelerated="true"/>
+        
     </application>
 
 

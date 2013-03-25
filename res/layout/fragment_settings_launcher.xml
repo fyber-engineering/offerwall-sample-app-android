@@ -41,4 +41,10 @@
         android:onClick="onActionsClick"
         android:text="@string/actions" />
 
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onMBEClick"
+        android:text="@string/mbe" />
+
 </LinearLayout>

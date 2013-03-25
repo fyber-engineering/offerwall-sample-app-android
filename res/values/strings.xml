@@ -22,5 +22,10 @@
     <string name="back">Back</string>
     <string name="action_id">Action ID</string>
     <string name="send_action">Report Action</string>
+    
+    
+    <string name="mbe">mBE</string>
+    <string name="request_offers">Request Offers</string>
+    <string name="start_mbe">Start MBE</string>
 
 </resources>

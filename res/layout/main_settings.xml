@@ -37,6 +37,12 @@
             android:text="Keep the offer wall / interstitial open after user is redirected" />
 
         <CheckBox
+            android:id="@+id/show_toast_on_vcs_successfull_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show a toast on successfull VCS request" />
+
+        <CheckBox
             android:id="@+id/simulate_no_phone_state_permission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,6 +66,12 @@
             android:layout_height="wrap_content"
             android:text="Simulate no Hardware Serial Number" />
 
+        <CheckBox
+            android:id="@+id/simulate_no_network_state_permission"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Simulate no ACCESS NETWORK STATE permission (no access to connection type)" />
+        
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

@@ -6,23 +6,29 @@
 
 package com.sponsorpay.sdk.android.utils;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SponsorPayBaseUrlProvider {
 
 	private static SponsorPayBaseUrlProvider INSTANCE = new SponsorPayBaseUrlProvider();
-	private static final String TAG = "SponsorPayBaseUrlProvider";
-	
+
 	private SPUrlProvider mUrlProviderOverride;
-	private ResourceBundle mBaseUrls;
+	
+	@SuppressWarnings("serial")
+	private Map<String, String> urls = new HashMap<String, String>() {{
+		put("actions", "https://service.sponsorpay.com/actions/v2");
+		put("installs", "https://service.sponsorpay.com/installs/v2");
+		put("vcs", "https://api.sponsorpay.com/vcs/v1/new_credit.json");
+		put("mbe", "https://iframe.sponsorpay.com/mbe");
+		put("unlock_items", "https://api.sponsorpay.com/vcs/v1/items.json");
+		put("interstitial", "https://iframe.sponsorpay.com/mobile");
+		put("banner", "https://iframe.sponsorpay.com/mobile");
+		put("ofw", "https://iframe.sponsorpay.com/mobile");
+		put("unlock", "https://iframe.sponsorpay.com/unlock");
+	}};
 	
 	private SponsorPayBaseUrlProvider() {
-		try {
-			mBaseUrls = ResourceBundle.getBundle("com/sponsorpay/sdk/android/urls");
-		} catch (MissingResourceException e) {
-			SponsorPayLogger.e(TAG, "An error happened while initializing url provider", e);
-		}
 	}
 
 	private String getUrl(String product) {
@@ -31,7 +37,7 @@ public class SponsorPayBaseUrlProvider {
 			baseUrl = mUrlProviderOverride.getBaseUrl(product);
 		} 
 		if (StringUtils.nullOrEmpty(baseUrl)) {
-			baseUrl = mBaseUrls.getString(product);
+			baseUrl = urls.get(product);
 		}
 		return baseUrl;
 	}

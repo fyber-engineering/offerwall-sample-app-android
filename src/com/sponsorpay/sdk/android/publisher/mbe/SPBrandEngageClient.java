@@ -35,7 +35,6 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.OfferWebClient;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
@@ -44,6 +43,7 @@ import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
  * <p>

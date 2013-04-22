@@ -8,7 +8,7 @@ package com.sponsorpay.sdk.android.publisher;
 
 import org.json.JSONObject;
 
-import com.sponsorpay.sdk.android.SignatureTools;
+import com.sponsorpay.sdk.android.utils.SignatureTools;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 

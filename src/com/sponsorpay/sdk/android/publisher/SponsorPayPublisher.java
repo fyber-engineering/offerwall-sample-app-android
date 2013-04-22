@@ -17,7 +17,6 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
@@ -32,6 +31,7 @@ import com.sponsorpay.sdk.android.utils.SPIdException;
 import com.sponsorpay.sdk.android.utils.SPIdValidator;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
  * Provides convenience calls to load and show the mobile Offer Wall and the mobile Interstitial.

@@ -14,12 +14,12 @@ import android.content.Intent;
 import android.os.Handler;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
  * <p>

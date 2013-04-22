@@ -17,7 +17,6 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.InterstitialLoader.InterstitialLoadingStatusListener;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
@@ -31,6 +30,7 @@ import com.sponsorpay.sdk.android.publisher.unlock.SponsorPayUnlockConnector;
 import com.sponsorpay.sdk.android.utils.SPIdException;
 import com.sponsorpay.sdk.android.utils.SPIdValidator;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.SponsorPayParametersProvider;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
@@ -56,10 +56,10 @@ public class SponsorPayPublisher {
 	 */
 	private static EnumMap<UIStringIdentifier, String> sUIStrings;
 
-	/**
-	 * Map of custom key/values to add to the parameters on the requests to the REST API.
-	 */
-	private static Map<String, String> sCustomKeysValues;
+//	/**
+//	 * Map of custom key/values to add to the parameters on the requests to the REST API.
+//	 */
+//	private static Map<String, String> sCustomKeysValues;
 
 	/**
 	 * Default {@link AdShape} used to request Offer Banners to the backend.
@@ -161,29 +161,29 @@ public class SponsorPayPublisher {
 		}
 	}
 
-	/**
-	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
-	 */
-	public static void setCustomParameters(Map<String, String> params) {
-		sCustomKeysValues = params;
-	}
-
-	/**
-	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
-	 * 
-	 * @param keys
-	 * @param values
-	 */
-	public static void setCustomParameters(String[] keys, String[] values) {
-		sCustomKeysValues = UrlBuilder.mapKeysToValues(keys, values);
-	}
-
-	/**
-	 * Clears the map of custom key/values to add to the parameters on the requests to the REST API.
-	 */
-	public static void clearCustomParameters() {
-		sCustomKeysValues = null;
-	}
+//	/**
+//	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
+//	 */
+//	public static void setCustomParameters(Map<String, String> params) {
+//		sCustomKeysValues = params;
+//	}
+//
+//	/**
+//	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
+//	 * 
+//	 * @param keys
+//	 * @param values
+//	 */
+//	public static void setCustomParameters(String[] keys, String[] values) {
+//		sCustomKeysValues = UrlBuilder.mapKeysToValues(keys, values);
+//	}
+//
+//	/**
+//	 * Clears the map of custom key/values to add to the parameters on the requests to the REST API.
+//	 */
+//	public static void clearCustomParameters() {
+//		sCustomKeysValues = null;
+//	}
 
 	/**
 	 * Returns the map of custom key/values to add to the parameters on the requests to the REST
@@ -196,16 +196,19 @@ public class SponsorPayPublisher {
 	 *         returned. Otherwise null is returned.
 	 */
 	private static HashMap<String, String> getCustomParameters(Map<String, String> passedParameters) {
-		HashMap<String, String> retval;
+		HashMap<String, String> retval = null;
 
-		if (passedParameters != null)
+		if (passedParameters != null){
 			retval = new HashMap<String, String>(passedParameters);
-		else if (sCustomKeysValues != null)
-			retval = new HashMap<String, String>(sCustomKeysValues);
-		else {
-			retval = null;
 		}
-
+		Map<String, String> parameters = SponsorPayParametersProvider.getParameters();
+		if (parameters != null) {
+			if (retval != null) {
+				retval.putAll(parameters);
+			} else {
+				retval = new HashMap<String, String>(parameters);
+			}
+		}
 		return retval;
 	}
 	

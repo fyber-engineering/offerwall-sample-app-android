@@ -46,8 +46,12 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 	private SPCredentials mCredentials;
 
 	protected SponsorPayAdvertiserState mState;
-	
 
+	/**
+	 * Map of custom parameters to be sent in the callback request.
+	 */
+	private Map<String, String> mCustomParams;
+	
 	/**
 	 * <p>
 	 * Constructor. Sets the request callback listener and stores the host information.
@@ -64,7 +68,12 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 		mCredentials = credentials;
 	}
 
-	
+	/**
+	 * Sets the map of custom parameters to be sent in the callback request.
+	 */
+	public void setCustomParams(Map<String, String> customParams) {
+		mCustomParams = customParams;
+	}
 
 	/**
 	 * Triggers the callback request that contacts the Sponsorpay Advertiser API. If and when a
@@ -86,6 +95,10 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 		Map<String, String> params = getParams();
 		if (params == null) {
 			params = new HashMap<String, String>();
+		}
+		
+		if (mCustomParams != null) {
+			params.putAll(mCustomParams);
 		}
 		
 		params.put(SUCCESSFUL_ANSWER_RECEIVED_KEY,

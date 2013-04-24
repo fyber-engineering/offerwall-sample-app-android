@@ -22,11 +22,6 @@ public class InstallCallbackSender extends AbstractCallbackSender{
 	private static final String INSTALLS_URL_KEY = "installs";
 	
 	/**
-	 * Map of custom parameters to be sent in the callback request.
-	 */
-	private Map<String, String> mCustomParams;
-
-	/**
 	 * <p>
 	 * Constructor. Reports an application installation.
 	 * </p>
@@ -38,13 +33,6 @@ public class InstallCallbackSender extends AbstractCallbackSender{
 	 */
 	public InstallCallbackSender(SPCredentials credentials, SponsorPayAdvertiserState state) {
 		super(credentials, state);
-	}
-
-	/**
-	 * Sets the map of custom parameters to be sent in the callback request.
-	 */
-	public void setCustomParams(Map<String, String> customParams) {
-		mCustomParams = customParams;
 	}
 
 	@Override
@@ -59,7 +47,7 @@ public class InstallCallbackSender extends AbstractCallbackSender{
 	
 	@Override
 	protected Map<String, String> getParams() {
-		return mCustomParams;
+		return null;
 	}
 	
 	@Override

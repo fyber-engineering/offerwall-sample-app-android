@@ -135,13 +135,14 @@ public class SponsorPayAdvertiser {
 		callback.trigger();
 	}
 	
-	private void notitfyActionCompletion(String credentialsToken, String actionId) {
+	private void notitfyActionCompletion(String credentialsToken, String actionId, Map<String, String> customParams) {
 		
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		
 		/* Send asynchronous call to SponsorPay's API */
 		ActionCallbackSender callback = new ActionCallbackSender(
 				actionId, credentials, mPersistedState);
+		callback.setCustomParams(customParams);
 		callback.trigger();
 	}
 	
@@ -171,6 +172,20 @@ public class SponsorPayAdvertiser {
 	 *            the id of the action
 	 */
 	public static void reportActionCompletion(String credentialsToken, String actionId) {
+		reportActionCompletion(credentialsToken, actionId, null);
+	}
+	
+	/**
+	 * Report an Action completion.
+	 * 
+	 * @param credentialsToken
+	 * 			  the token id of credentials
+	 * @param actionId
+	 *            the id of the action
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 */
+	public static void reportActionCompletion(String credentialsToken, String actionId, Map<String, String> customParams) {
 		try {
 			SPIdValidator.validate(actionId);
 		} catch (SPIdException e) {
@@ -183,7 +198,7 @@ public class SponsorPayAdvertiser {
 			throw new RuntimeException("No valid credentials object was created yet.\n" +
 					"You have to execute SponsorPay.start method first.");
 		}
-		mInstance.notitfyActionCompletion(credentialsToken, actionId);
+		mInstance.notitfyActionCompletion(credentialsToken, actionId, getCustomParameters(customParams));
 	}
 	
 	//================================================================================

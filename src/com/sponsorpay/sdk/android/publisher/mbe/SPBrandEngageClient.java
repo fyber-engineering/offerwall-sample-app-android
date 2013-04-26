@@ -112,7 +112,7 @@ public class SPBrandEngageClient {
 	 */
 	public static final String SP_REQUEST_STATUS_PARAMETER_ERROR = "ERROR";
 	
-	private static final int TIMEOUT = 10000 ;
+	private static final int TIMEOUT = 5000 ;
 
 	private Activity mActivity;
 	private Context mContext;
@@ -344,7 +344,8 @@ public class SPBrandEngageClient {
 			@Override
 			public void run() {
 				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
-						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED) {
+						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED &&
+						mWebView != null) {
 					//something went wrong, show error dialog message
 					showErrorDialog(SponsorPayPublisher
 							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));

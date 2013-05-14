@@ -15,7 +15,7 @@ import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.utils.SPIdException;
 import com.sponsorpay.sdk.android.utils.SPIdValidator;
-import com.sponsorpay.sdk.android.utils.UrlBuilder;
+import com.sponsorpay.sdk.android.utils.SponsorPayParametersProvider;
 
 /**
  * <p>
@@ -29,37 +29,6 @@ import com.sponsorpay.sdk.android.utils.UrlBuilder;
  * </p>
  */
 public class SponsorPayAdvertiser {
-
-	/**
-	 * Map of custom key/values to add to the parameters on the requests to the REST API.
-	 */
-	private static Map<String, String> sCustomParameters;
-
-	/**
-	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
-	 * 
-	 * @param params
-	 */
-	public static void setCustomParameters(Map<String, String> params) {
-		sCustomParameters = params;
-	}
-
-	/**
-	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
-	 * 
-	 * @param keys
-	 * @param values
-	 */
-	public static void setCustomParameters(String[] keys, String[] values) {
-		sCustomParameters = UrlBuilder.mapKeysToValues(keys, values);
-	}
-
-	/**
-	 * Clears the map of custom key/values to add to the parameters on the requests to the REST API.
-	 */
-	public static void clearCustomParameters() {
-		sCustomParameters = null;
-	}
 
 	/**
 	 * Keep track of the persisted state of the Advertiser part of the SDK
@@ -82,16 +51,19 @@ public class SponsorPayAdvertiser {
 	 *         returned. Otherwise null is returned.
 	 */
 	private static HashMap<String, String> getCustomParameters(Map<String, String> passedParameters) {
-		HashMap<String, String> retval;
+		HashMap<String, String> retval = null;
 
-		if (passedParameters != null) {
+		if (passedParameters != null){
 			retval = new HashMap<String, String>(passedParameters);
-		} else if (sCustomParameters != null) {
-			retval = new HashMap<String, String>(sCustomParameters);
-		} else {
-			retval = null;
 		}
-
+		Map<String, String> parameters = SponsorPayParametersProvider.getParameters();
+		if (parameters != null) {
+			if (retval != null) {
+				retval.putAll(parameters);
+			} else {
+				retval = new HashMap<String, String>(parameters);
+			}
+		}
 		return retval;
 	}
 

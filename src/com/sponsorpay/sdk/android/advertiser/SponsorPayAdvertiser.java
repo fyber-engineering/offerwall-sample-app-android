@@ -12,10 +12,10 @@ import java.util.Map;
 import android.content.Context;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.utils.SPIdException;
 import com.sponsorpay.sdk.android.utils.SPIdValidator;
+import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
  * <p>

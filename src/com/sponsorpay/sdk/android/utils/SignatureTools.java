@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android;
+package com.sponsorpay.sdk.android.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
-import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>

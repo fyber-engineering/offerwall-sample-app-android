@@ -15,11 +15,11 @@ import org.apache.http.client.methods.HttpGet;
 
 import android.os.AsyncTask;
 
-import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
  * Runs in the background the Advertiser Callback HTTP request.

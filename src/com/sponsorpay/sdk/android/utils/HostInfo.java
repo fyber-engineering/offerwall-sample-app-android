@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android;
+package com.sponsorpay.sdk.android.utils;
 
 import java.lang.reflect.Field;
 import java.util.Locale;
@@ -25,7 +25,6 @@ import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
-import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Extracts device information from the host device in which the SDK runs and SponsorPay App ID
@@ -51,6 +50,7 @@ public class HostInfo {
 	private static final String UNDEFINED_VALUE = "undefined";
 
 	private static final String CONNECTION_TYPE_CELLULAR  = "cellular";
+	
 	private static final String CONNECTION_TYPE_WIFI = "wifi";
 	
 	protected static boolean sSimulateNoReadPhoneStatePermission = false;
@@ -147,7 +147,7 @@ public class HostInfo {
 	private String mAppVersion;
 
 	private DisplayMetrics getDisplayMetrics() {
-		if (null == mDisplayMetrics) {
+		if (mDisplayMetrics == null) {
 			mDisplayMetrics = new DisplayMetrics();
 			WindowManager windowManager = (WindowManager) mContext
 					.getSystemService(Context.WINDOW_SERVICE);

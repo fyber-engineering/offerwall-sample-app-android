@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android;
+package com.sponsorpay.sdk.android.utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +12,8 @@ import java.util.Map.Entry;
 
 import android.net.Uri;
 
+import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
-import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * <p>
@@ -157,18 +157,6 @@ public class UrlBuilder {
 	}
 
 	private String mResourceUrl;
-	/**
-	 * @deprecated this field will be removed from a future release of the SDK.
-	 */
-	private HostInfo mHostInfo;
-	/**
-	 * @deprecated this field will be removed from a future release of the SDK.
-	 */
-	private String mUserId;
-	/**
-	 * @deprecated this field will be removed from a future release of the SDK.
-	 */
-	private String mSecretKey;
 
 	private Map<String, String> mExtraKeysValues;
 
@@ -179,34 +167,10 @@ public class UrlBuilder {
 	private boolean mShouldAddUserId = true;
 
 	private String mCurrency;
-
-	/**
-	 * @deprecated This method will be removed from a future SDK release.
-	 */
-	protected UrlBuilder(String resourceUrl, HostInfo hostInfo) {
-		mResourceUrl = resourceUrl;
-		mHostInfo = hostInfo;
-	}
 	
 	protected UrlBuilder(String resourceUrl, SPCredentials credentials) {
 		mResourceUrl = resourceUrl;
 		mCredentials = credentials;
-	}
-
-	/**
-	 * Sets to user id to be used in the URL generation process.
-	 * 
-	 * @param userId
-	 * 		  the user id
-	 * 
-	 * @return the instance of {@link UrlBuilder} to allow further chained methods.
-	 * 
-	 * @deprecated This method will be removed from a future SDK release. The user id
-	 * 			   will be fetched from the {@link SPCredentials}.
-	 */
-	public UrlBuilder setUserId(String userId) {
-		mUserId = userId;
-		return this;
 	}
 
 	public UrlBuilder addExtraKeysValues(Map<String, String> extraKeysValues) {
@@ -217,22 +181,6 @@ public class UrlBuilder {
 				mExtraKeysValues.putAll(extraKeysValues);
 			}
 		}
-		return this;
-	}
-
-	/**
-	 * Sets to secret key to be used in the URL generation process.
-	 * 
-	 * @param secretKey
-	 * 		  the secret key
-	 * 
-	 * @return the instance of {@link UrlBuilder} to allow further chained methods.
-	 * 
-	 * @deprecated This method will be removed from a future SDK release. The secret key
-	 * 			   will be fetched from the {@link SPCredentials}.
-	 */
-	public UrlBuilder setSecretKey(String secretKey) {
-		mSecretKey = secretKey;
 		return this;
 	}
 
@@ -262,20 +210,11 @@ public class UrlBuilder {
 		HashMap<String, String> keyValueParams = new HashMap<String, String>();
 
 		if (mShouldAddUserId) {
-			if (mCredentials != null) {
-				keyValueParams.put(USERID_KEY, mCredentials.getUserId());
-			} else if (mUserId != null) {
-				keyValueParams.put(USERID_KEY, mUserId);
-			}
+			keyValueParams.put(USERID_KEY, mCredentials.getUserId());
 		}
 
-		HostInfo hostInfo;
-		if (mCredentials != null) {
-			hostInfo = mCredentials.getHostInfo();
-		} else {
-			hostInfo = mHostInfo;
-		}
-		
+		HostInfo hostInfo = mCredentials.getHostInfo();
+
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(APPID_KEY, String.valueOf(hostInfo.getAppId()));
 		keyValueParams.put(UDID_KEY, hostInfo.getUDID());
@@ -319,12 +258,7 @@ public class UrlBuilder {
 			builder.appendQueryParameter(entry.getKey(), entry.getValue());
 		}
 
-		String secretKey;
-		if(mCredentials != null) {
-			secretKey = mCredentials.getSecurityToken();
-		} else {
-			secretKey = mSecretKey;
-		}
+		String secretKey = mCredentials.getSecurityToken();
 		if (StringUtils.notNullNorEmpty(secretKey)) {
 			builder.appendQueryParameter(URL_PARAM_SIGNATURE, SignatureTools
 					.generateSignatureForParameters(keyValueParams, secretKey));
@@ -333,24 +267,6 @@ public class UrlBuilder {
 		uri = builder.build();
 
 		return uri.toString();
-	}
-
-	/**
-	 * <p>
-	 * Used to retrieved a new {@link UrlBuilder}.
-	 * </p> 
-	 * 
-	 * @param resourceUrl
-	 * 		  The base URL for this builder.
-	 * @param hostInfo
-	 * 		 The {@link HostInfo} holding device information
-	 * @return a new {@link UrlBuilder}
-	 * 
-	 * @deprecated This method will be removed from a future SDK release. Get a UrlBuilder instance
-	 *             with {@link #newBuilder(String, SPCredentials)} instead.
-	 */
-	public static UrlBuilder newBuilder(String resourceUrl, HostInfo hostInfo) {
-		return new UrlBuilder(resourceUrl, hostInfo);
 	}
 	
 	/**

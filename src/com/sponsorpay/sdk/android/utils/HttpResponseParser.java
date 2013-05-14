@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android;
+package com.sponsorpay.sdk.android.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

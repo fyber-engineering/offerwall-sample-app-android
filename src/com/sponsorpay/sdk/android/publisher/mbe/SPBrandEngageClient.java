@@ -35,7 +35,6 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.OfferWebClient;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
@@ -44,6 +43,7 @@ import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
  * <p>
@@ -113,6 +113,7 @@ public class SPBrandEngageClient {
 	public static final String SP_REQUEST_STATUS_PARAMETER_ERROR = "ERROR";
 	
 	private static final int TIMEOUT = 10000 ;
+	private static final int VCS_TIMEOUT = 3000 ;
 
 	private Activity mActivity;
 	private Context mContext;
@@ -344,7 +345,8 @@ public class SPBrandEngageClient {
 			@Override
 			public void run() {
 				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
-						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED) {
+						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED &&
+						mWebView != null) {
 					//something went wrong, show error dialog message
 					showErrorDialog(SponsorPayPublisher
 							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
@@ -523,7 +525,7 @@ public class SPBrandEngageClient {
 						SponsorPayLogger.e(TAG, "Error in VCS request", e);
 					}
 				}
-			}, TIMEOUT);
+			}, VCS_TIMEOUT);
 		}
 	}
 	

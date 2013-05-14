@@ -15,7 +15,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 
 import android.os.AsyncTask;
 
-import com.sponsorpay.sdk.android.HttpResponseParser;
+import com.sponsorpay.sdk.android.utils.HttpResponseParser;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;

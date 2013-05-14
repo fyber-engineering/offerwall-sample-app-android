@@ -12,12 +12,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.OfferBanner.AdShape;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
  * Requests a new offer banner to the SponsorPay server and notifies the registered

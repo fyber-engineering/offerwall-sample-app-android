@@ -14,7 +14,6 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.SponsorPay;
-import com.sponsorpay.sdk.android.UrlBuilder;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
@@ -23,6 +22,7 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifi
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
  * <p>

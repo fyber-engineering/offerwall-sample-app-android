@@ -12,7 +12,6 @@ import android.content.Context;
 
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.publisher.AbstractConnector;
-import com.sponsorpay.sdk.android.publisher.AbstractResponse;
 import com.sponsorpay.sdk.android.publisher.AbstractResponse.RequestErrorType;
 import com.sponsorpay.sdk.android.publisher.AsyncRequest;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
@@ -24,18 +23,12 @@ import com.sponsorpay.sdk.android.utils.UrlBuilder;
  * Provides services to access the SponsorPay Unlock Server.
  * </p>
  */
-public class SponsorPayUnlockConnector extends AbstractConnector implements
-		SPUnlockResponseListener {
+public class SponsorPayUnlockConnector extends AbstractConnector<SPUnlockResponseListener> { 
+	
 	/*
 	 * API Resource URLs.
 	 */
 	private static final String UNLOCK_URL_KEY = "unlock_items";
-
-	/**
-	 * {@link SPUnlockResponseListener} registered by the developer's code to be notified of the
-	 * result of requests to the back end.
-	 */
-	private SPUnlockResponseListener mUserListener;
 
 	/**
 	 * Initializes a new SponsorPayUnlockConnector instance.
@@ -50,9 +43,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 	 */
 	public SponsorPayUnlockConnector(Context context, String credentialsToken, 
 			SPUnlockResponseListener userListener) {
-		super(context, credentialsToken);
-
-		mUserListener = userListener;
+		super(context, credentialsToken, userListener);
 	}
 
 	/**
@@ -97,23 +88,7 @@ public class SponsorPayUnlockConnector extends AbstractConnector implements
 					requestTask.getResponseBody(), requestTask.getResponseSignature());
 		}
 
-		response.setResponseListener(this);
+		response.setResponseListener(mUserListener);
 		response.parseAndCallListener(mCredentials.getSecurityToken());
-	}
-
-	/**
-	 * Implemented from {@link SPUnlockResponseListener}. Forwards the call to the user listener.
-	 */
-	@Override
-	public void onSPUnlockRequestError(AbstractResponse response) {
-		mUserListener.onSPUnlockRequestError(response);
-	}
-
-	/**
-	 * Implemented from {@link SPUnlockResponseListener}. Forwards the call to the user listener.
-	 */
-	@Override
-	public void onSPUnlockItemsStatusResponseReceived(UnlockedItemsResponse response) {
-		mUserListener.onSPUnlockItemsStatusResponseReceived(response);
 	}
 }

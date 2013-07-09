@@ -109,7 +109,7 @@ public class InterstitialLoader implements AsyncRequest.AsyncRequestResultListen
 	private InterstitialLoadingStatusListener mLoadingStatusListener;
 	private Map<String, String> mCustomParams;
 
-	private String mBackgroundUrl = "";
+	private String mBackgroundUrl = StringUtils.EMPTY_STRING;
 	private String mSkinName = SKIN_NAME_DEFAULT;
 	private boolean mShouldStayOpen = SHOULD_INTERSTITIAL_REMAIN_OPEN_DEFAULT;
 	private int mLoadingTimeoutSecs = LOADING_TIMEOUT_SECONDS_DEFAULT;

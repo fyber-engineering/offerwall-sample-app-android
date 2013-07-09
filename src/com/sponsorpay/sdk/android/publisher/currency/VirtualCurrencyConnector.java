@@ -10,7 +10,6 @@ import java.util.Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.SponsorPay;
@@ -29,7 +28,7 @@ import com.sponsorpay.sdk.android.utils.UrlBuilder;
  * Provides services to access SponsorPay's Virtual Currency Server.
  * </p>
  */
-public class VirtualCurrencyConnector extends AbstractConnector implements SPCurrencyServerListener {
+public class VirtualCurrencyConnector extends AbstractConnector<SPCurrencyServerListener> {
 	/*
 	 * VCS API Resource URLs.
 	 */
@@ -51,54 +50,10 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	
 	private static boolean showToastNotification = true;
 	
-	/**
-	 * {@link SPCurrencyServerListener} registered by the developer's code to be notified of the
-	 * result of requests to the Virtual Currency Server.
-	 */
-	private SPCurrencyServerListener mUserListener;
-
 	private boolean mShouldShowNotification;
 
 	private String mCurrency;
 	
-	/**
-	 * Types of requests to be sent to the Virtual Currency Server.
-	 * 
-	 */
-	public enum RequestType {
-		DELTA_COINS
-	}
-	
-	/**
-	 * {@link AsyncTask} used to perform the HTTP requests on a background thread and be notified of
-	 * its results on the calling thread.
-	 */
-	private class CurrencyServerRequestAsyncTask extends AsyncRequest {
-
-		/**
-		 * Type of the request which will be performed in the background.
-		 */
-		public RequestType requestType;
-
-		/**
-		 * Initializes a new instance whose {@link #execute()} still needs to be invoked to trigger
-		 * the request.
-		 * 
-		 * @param requestType
-		 *            Type of the request to be performed. See {@link RequestType}.
-		 * @param requestUrl
-		 *            Url of the request to be performed.
-		 * @param listener
-		 *            Listener which will be notified of the results of the request / response on
-		 *            the thread which called {@link #execute()}.
-		 */
-		public CurrencyServerRequestAsyncTask(RequestType requestType, String requestUrl,
-				AsyncRequestResultListener listener) {
-			super(requestUrl, listener);
-			CurrencyServerRequestAsyncTask.this.requestType = requestType;
-		}
-	}
-
 	/**
 	 * Initializes a new instance with the provided context and application data.
 	 * 
@@ -112,8 +67,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 */
 	public VirtualCurrencyConnector(Context context, String credentialsToken,
 			SPCurrencyServerListener userListener) {
-		super(context, credentialsToken);
-		mUserListener = userListener;
+		super(context, credentialsToken, userListener);
 	}
 
 	public VirtualCurrencyConnector setCurrency(String currency) {
@@ -163,9 +117,8 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
 				+ requestUrl);
 
-		CurrencyServerRequestAsyncTask requestTask = new CurrencyServerRequestAsyncTask(
-				RequestType.DELTA_COINS, requestUrl, this);
-
+		AsyncRequest requestTask = new AsyncRequest(requestUrl, this);
+		
 		mShouldShowNotification = showToastNotification;
 		
 		requestTask.execute();
@@ -180,9 +133,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 *            The calling {@link CurrencyServerRequestAsyncTask} with the response data.
 	 */
 	@Override
-	public void onAsyncRequestComplete(AsyncRequest request) {
-		CurrencyServerRequestAsyncTask requestTask = (CurrencyServerRequestAsyncTask) request;
-
+	public void onAsyncRequestComplete(AsyncRequest requestTask) {
 		SponsorPayLogger.d(getClass().getSimpleName(), String.format(
 				"Currency Server Response, status code: %d, response body: %s, signature: %s",
 				requestTask.getHttpStatusCode(), requestTask.getResponseBody(), requestTask
@@ -193,12 +144,12 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 		if (requestTask.didRequestThrowError()) {
 			response = new RequestErrorResponse();
 		} else {
-			response = CurrencyServerAbstractResponse.getParsingInstance(requestTask.requestType);
+			response = new CurrencyServerDeltaOfCoinsResponse(this);
 			response.setResponseData(requestTask.getHttpStatusCode(),
 					requestTask.getResponseBody(), requestTask.getResponseSignature());
 		}
 
-		response.setResponseListener(this);
+		response.setResponseListener(mUserListener);
 		response.parseAndCallListener(mCredentials.getSecurityToken());
 	}
 
@@ -229,10 +180,7 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	 * @return The retrieved transaction ID or null.
 	 */
 	private String fetchLatestTransactionIdForCurrentAppAndUser() {
-		String retval = fetchLatestTransactionId(mContext, mCredentials.getCredentialsToken());
-		// SponsorPayLogger.i(getClass().getSimpleName(),
-		// String.format("fetchLatestTransactionIdForCurrentAppAndUser will return %s", retval));
-		return retval;
+		return fetchLatestTransactionId(mContext, mCredentials.getCredentialsToken());
 	}
 
 	/**
@@ -252,9 +200,6 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 		String retval = prefs.getString(generatePreferencesLatestTransactionIdKey(credentials.getAppId(), credentials.getUserId()),
 				URL_PARAM_VALUE_NO_TRANSACTION);
-		// SponsorPayLogger.i(VirtualCurrencyConnector.class.getSimpleName(),
-		// String.format("fetchLatestTransactionId(context, appId: %s, userId: %s) = %s", appId,
-		// userId, retval));
 		return retval;
 	}
 
@@ -264,19 +209,10 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 	}
 
 	/**
-	 * Implemented from {@link SPCurrencyServerListener}. Forwards the call to the user listener.
+	 * Saves the returned latest transaction id and shows the notification
+	 * if required
 	 */
-	@Override
-	public void onSPCurrencyServerError(CurrencyServerAbstractResponse response) {
-		mUserListener.onSPCurrencyServerError(response);
-	}
-
-	/**
-	 * Implemented from {@link SPCurrencyServerListener}. Saves the returned latest transaction id
-	 * and forwards the call to the user listener.
-	 */
-	@Override
-	public void onSPCurrencyDeltaReceived(CurrencyServerDeltaOfCoinsResponse response) {
+	public void onDeltaOfCoinsResponse(CurrencyServerDeltaOfCoinsResponse response) {
 		saveLatestTransactionIdForCurrentUser(response.getLatestTransactionId());
 		if (response.getDeltaOfCoins() > 0 && mShouldShowNotification) {
 			String text = String
@@ -287,7 +223,6 @@ public class VirtualCurrencyConnector extends AbstractConnector implements SPCur
 			Toast.makeText(mContext, text,
 					Toast.LENGTH_LONG).show();
 		}
-		mUserListener.onSPCurrencyDeltaReceived(response);
 	}
 	
 }

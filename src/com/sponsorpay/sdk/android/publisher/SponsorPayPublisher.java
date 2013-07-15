@@ -76,7 +76,7 @@ public class SponsorPayPublisher {
 		sUIStrings.put(UIStringIdentifier.LOADING_INTERSTITIAL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.LOADING_OFFERWALL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE, "You don't have the Google Play Store application on your device to complete App Install offers.");
-		sUIStrings.put(UIStringIdentifier.MBE_REWARD_NOTIFICATION, "Thanks! Your reward will be payed out shortly");
+		sUIStrings.put(UIStringIdentifier.MBE_REWARD_NOTIFICATION, "Thanks! Your reward will be paid out shortly");
 		sUIStrings.put(UIStringIdentifier.VCS_COINS_NOTIFICATION,"Congratulations! You've earned %.0f %s!");
 		sUIStrings.put(UIStringIdentifier.VCS_DEFAULT_CURRENCY, "coins");
 		

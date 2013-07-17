@@ -6,7 +6,6 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
@@ -15,7 +14,6 @@ import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.utils.SPIdException;
 import com.sponsorpay.sdk.android.utils.SPIdValidator;
-import com.sponsorpay.sdk.android.utils.SponsorPayParametersProvider;
 
 /**
  * <p>
@@ -39,33 +37,6 @@ public class SponsorPayAdvertiser {
 	 * Singleton instance.
 	 */
 	private static SponsorPayAdvertiser mInstance;
-
-	/**
-	 * Returns the map of custom key/values to add to the parameters on the requests to the REST
-	 * API.
-	 * 
-	 * @param
-	 * @return If passedParameters is not null, a copy of it is returned. Otherwise if the
-	 *         parameters set with {@link #setCustomParameters(Map)} or
-	 *         {@link #setCustomParameters(String[], String[])} are not null, a copy of that map is
-	 *         returned. Otherwise null is returned.
-	 */
-	private static HashMap<String, String> getCustomParameters(Map<String, String> passedParameters) {
-		HashMap<String, String> retval = null;
-
-		if (passedParameters != null){
-			retval = new HashMap<String, String>(passedParameters);
-		}
-		Map<String, String> parameters = SponsorPayParametersProvider.getParameters();
-		if (parameters != null) {
-			if (retval != null) {
-				retval.putAll(parameters);
-			} else {
-				retval = new HashMap<String, String>(parameters);
-			}
-		}
-		return retval;
-	}
 
 	/**
 	 * Constructor. Stores the received application context and loads up the shared preferences.
@@ -170,7 +141,7 @@ public class SponsorPayAdvertiser {
 			throw new RuntimeException("No valid credentials object was created yet.\n" +
 					"You have to execute SponsorPay.start method first.");
 		}
-		mInstance.notitfyActionCompletion(credentialsToken, actionId, getCustomParameters(customParams));
+		mInstance.notitfyActionCompletion(credentialsToken, actionId, customParams);
 	}
 	
 	//================================================================================
@@ -214,7 +185,7 @@ public class SponsorPayAdvertiser {
 		getInstance(context);
 		
 		// The actual work is performed by the register() instance method.
-		mInstance.register(credentialsToken, getCustomParameters(customParams));
+		mInstance.register(credentialsToken, customParams);
 	}
 	
 }

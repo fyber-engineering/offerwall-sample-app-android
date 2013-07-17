@@ -46,7 +46,7 @@ public class SignatureTools {
 
 		Iterator<String> orderedKeysIterator = orderedKeys.iterator();
 
-		String concatenatedOrderedParams = "";
+		String concatenatedOrderedParams = StringUtils.EMPTY_STRING;
 
 		while (orderedKeysIterator.hasNext()) {
 			String key = orderedKeysIterator.next();

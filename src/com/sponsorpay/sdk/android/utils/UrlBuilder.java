@@ -250,6 +250,11 @@ public class UrlBuilder {
 			validateKeyValueParams(mExtraKeysValues);
 			keyValueParams.putAll(mExtraKeysValues);
 		}
+		
+		Map<String, String> spExtraParams = SponsorPayParametersProvider.getParameters();
+		if(!spExtraParams.isEmpty()) {
+			keyValueParams.putAll(spExtraParams);
+		}
 
 		Uri uri = Uri.parse(mResourceUrl);
 		Uri.Builder builder = uri.buildUpon();

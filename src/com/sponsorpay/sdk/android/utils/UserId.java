@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android.publisher;
+package com.sponsorpay.sdk.android.utils;
 
 import java.util.UUID;
 
@@ -12,9 +12,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
-import com.sponsorpay.sdk.android.utils.HostInfo;
-import com.sponsorpay.sdk.android.utils.SignatureTools;
-import com.sponsorpay.sdk.android.utils.StringUtils;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 
 public class UserId {
 	

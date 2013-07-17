@@ -27,6 +27,12 @@ public class CurrencyServerDeltaOfCoinsResponse extends CurrencyServerAbstractRe
 	 */
 	private double mDeltaOfCoins;
 	private String mLatestTransactionId;
+	private VirtualCurrencyConnector mVirtualCurrencyConnector;
+
+	public CurrencyServerDeltaOfCoinsResponse(
+			VirtualCurrencyConnector virtualCurrencyConnector) {
+		mVirtualCurrencyConnector = virtualCurrencyConnector;
+	}
 
 	/**
 	 * Returns the delta of coins provided by the server.
@@ -67,6 +73,7 @@ public class CurrencyServerDeltaOfCoinsResponse extends CurrencyServerAbstractRe
 	 */
 	@Override
 	public void onSuccessfulResponseParsed() {
+		mVirtualCurrencyConnector.onDeltaOfCoinsResponse(this);
 		if (mListener != null) {
 			mListener.onSPCurrencyDeltaReceived(this);
 		}

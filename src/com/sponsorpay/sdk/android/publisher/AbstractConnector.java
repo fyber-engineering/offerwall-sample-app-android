@@ -18,7 +18,7 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
 /**
  * Abstract class defining some common functionality for contacting the SponsorPay's API.
  */
-public abstract class AbstractConnector implements AsyncRequestResultListener {
+public abstract class AbstractConnector<V> implements AsyncRequestResultListener {
 	/**
 	 * Parameter key used to transmit the timestamp of the request.
 	 */
@@ -44,9 +44,12 @@ public abstract class AbstractConnector implements AsyncRequestResultListener {
 	 */
 	protected SPCredentials mCredentials;
 	
-	protected AbstractConnector(Context context, String credentialsToken) {
+	protected V mUserListener;
+	
+	protected AbstractConnector(Context context, String credentialsToken, V userListener) {
 		mContext = context;
 		mCredentials = SponsorPay.getCredentials(credentialsToken);
+		mUserListener = userListener;
 		if (StringUtils.nullOrEmpty(mCredentials.getSecurityToken())) {
 			throw new IllegalArgumentException("Security token has not been set on the credentials");
 		}

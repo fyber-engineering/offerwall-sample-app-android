@@ -26,7 +26,6 @@ import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageRequestListener;
 import com.sponsorpay.sdk.android.utils.SPIdException;
 import com.sponsorpay.sdk.android.utils.SPIdValidator;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
-import com.sponsorpay.sdk.android.utils.SponsorPayParametersProvider;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
@@ -68,7 +67,7 @@ public class SponsorPayPublisher {
 		sUIStrings.put(UIStringIdentifier.LOADING_INTERSTITIAL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.LOADING_OFFERWALL, "Loading...");
 		sUIStrings.put(UIStringIdentifier.ERROR_PLAY_STORE_UNAVAILABLE, "You don't have the Google Play Store application on your device to complete App Install offers.");
-		sUIStrings.put(UIStringIdentifier.MBE_REWARD_NOTIFICATION, "Thanks! Your reward will be payed out shortly");
+		sUIStrings.put(UIStringIdentifier.MBE_REWARD_NOTIFICATION, "Thanks! Your reward will be paid out shortly");
 		sUIStrings.put(UIStringIdentifier.VCS_COINS_NOTIFICATION,"Congratulations! You've earned %.0f %s!");
 		sUIStrings.put(UIStringIdentifier.VCS_DEFAULT_CURRENCY, "coins");
 		
@@ -76,7 +75,7 @@ public class SponsorPayPublisher {
 		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT, "We're sorry, something went wrong. Please try again.");
 		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_OFFLINE, "Your Internet connection has been lost. Please try again later.");
 		sUIStrings.put(UIStringIdentifier.MBE_ERROR_DIALOG_BUTTON_TITLE_DISMISS, "Dismiss");
-		sUIStrings.put(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE, "");
+		sUIStrings.put(UIStringIdentifier.MBE_FORFEIT_DIALOG_TITLE, StringUtils.EMPTY_STRING);
 	}
 
 	/**
@@ -147,33 +146,6 @@ public class SponsorPayPublisher {
 		}
 	}
 
-	/**
-	 * Returns the map of custom key/values to add to the parameters on the requests to the REST
-	 * API.
-	 * 
-	 * @param
-	 * @return If passedParameters is not null, a copy of it is returned. Otherwise if the
-	 *         parameters set with {@link #setCustomParameters(Map)} or
-	 *         {@link #setCustomParameters(String[], String[])} are not null, a copy of that map is
-	 *         returned. Otherwise null is returned.
-	 */
-	private static HashMap<String, String> getCustomParameters(Map<String, String> passedParameters) {
-		HashMap<String, String> retval = null;
-
-		if (passedParameters != null){
-			retval = new HashMap<String, String>(passedParameters);
-		}
-		Map<String, String> parameters = SponsorPayParametersProvider.getParameters();
-		if (parameters != null) {
-			if (retval != null) {
-				retval.putAll(parameters);
-			} else {
-				retval = new HashMap<String, String>(parameters);
-			}
-		}
-		return retval;
-	}
-	
 	/**
 	 * The default request code needed for starting the Offer Wall activity.
 	 */
@@ -337,7 +309,7 @@ public class SponsorPayPublisher {
 		}
 
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY,
-				getCustomParameters(customParams));
+				customParams);
 
 		return intent;
 	}
@@ -416,7 +388,7 @@ public class SponsorPayPublisher {
 		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
 				unlockItemName);
 		
-		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, getCustomParameters(customParams));
+		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, customParams);
 
 		return intent;
 	}
@@ -490,7 +462,7 @@ public class SponsorPayPublisher {
 			String customCurrency) {
 		
 		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, credentialsToken, listener);
-		vcc.setCustomParameters(getCustomParameters(customParams));
+		vcc.setCustomParameters(customParams);
 		vcc.setCurrency(customCurrency);
 		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
 	}
@@ -602,7 +574,7 @@ public class SponsorPayPublisher {
 
 			brandEngageClient.setCurrencyName(currencyName);
 			brandEngageClient
-					.setCustomParameters(getCustomParameters(parameters));
+					.setCustomParameters(parameters);
 			brandEngageClient.setCurrencyListener(vcsListener);
 			
 			SPBrandEngageRequest request = new SPBrandEngageRequest(

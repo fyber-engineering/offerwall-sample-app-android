@@ -10,9 +10,9 @@ import java.util.UUID;
 
 import android.content.Context;
 
-import com.sponsorpay.sdk.android.publisher.UserId;
 import com.sponsorpay.sdk.android.utils.HostInfo;
 import com.sponsorpay.sdk.android.utils.StringUtils;
+import com.sponsorpay.sdk.android.utils.UserId;
 
 /**
  * <p>

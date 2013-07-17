@@ -13,6 +13,7 @@ import android.net.UrlQuerySanitizer;
 import android.os.Bundle;
 
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Listens to the broadcast sent by the Android Market app when the host application is installed
@@ -25,7 +26,7 @@ public class InstallReferrerReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		String referrer = "";
+		String referrer = StringUtils.EMPTY_STRING;
 		Bundle extras = intent.getExtras();
 		if (extras != null) {
 			referrer = extras.getString(EXTRAS_KEY_REFERRER);

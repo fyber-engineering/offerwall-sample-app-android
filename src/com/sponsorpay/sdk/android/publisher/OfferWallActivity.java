@@ -187,8 +187,8 @@ public class OfferWallActivity extends Activity {
 		try {
 			mCredentials = SponsorPay.getCredentials(credentialsToken);
 		} catch (RuntimeException e) {
-			// occurs in the unlikelyt event when the credentials we're wiped 
-			// out of memory and the owf was left open
+			// occurs in the unlikely event when the credentials we're wiped 
+			// out of memory and the MOFW was left open
 			restoreCredentialsValues();
 			deleteCredentialsValues();
 		}

@@ -125,12 +125,12 @@ public class VirtualCurrencyConnector extends AbstractConnector<SPCurrencyServer
 	}
 
 	/**
-	 * Called by {@link CurrencyServerRequestAsyncTask} when a response from the currency server is
+	 * Called by {@link AsyncRequest} when a response from the currency server is
 	 * received. Performs the first stage of error handling and initializes the right kind of
 	 * {@link CurrencyServerAbstractResponse}.
 	 * 
-	 * @param request
-	 *            The calling {@link CurrencyServerRequestAsyncTask} with the response data.
+	 * @param requestTask
+	 *            The calling {@link AsyncRequest} with the response data.
 	 */
 	@Override
 	public void onAsyncRequestComplete(AsyncRequest requestTask) {

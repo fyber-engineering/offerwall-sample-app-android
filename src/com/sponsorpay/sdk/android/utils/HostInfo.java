@@ -10,16 +10,13 @@ import java.lang.reflect.Field;
 import java.util.Locale;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Bundle;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
@@ -113,18 +110,6 @@ public class HostInfo {
 	 * Device's hardware serial number, reported by versions of Android >=2.3
 	 */
 	private String mHardwareSerialNumber;
-
-	/**
-	 * The SponsorPay's App ID Key that is used in the AndroidManifest.xml file.
-	 * 
-	 * @deprecated this will no longer be supported in a future release of the SDK
-	 */
-	private static final String SPONSORPAY_APP_ID_KEY = "SPONSORPAY_APP_ID";
-
-	/**
-	 * The App ID value.
-	 */
-	private String mAppId;
 
 	/**
 	 * Android application context, used to retrieve the rest of the properties.
@@ -309,93 +294,6 @@ public class HostInfo {
 		} else {
 			mWifiMacAddress = StringUtils.EMPTY_STRING;
 		}
-	}
-
-	/**
-	 * Extracts a numeric or alphanumeric value from the meta-data configured in the application
-	 * manifest XML file and returns it as a String.
-	 * 
-	 * @param key
-	 *            key to identify the piece of meta-data to return.
-	 * @return the value for the given key, or null on failure.
-	 */
-	private String getValueFromAppMetadata(String key) {
-		Object retrievedValue;
-
-		ApplicationInfo ai = null;
-		Bundle appMetadata = null;
-
-		// Extract the meta data from the package manager
-		try {
-			ai = mContext.getPackageManager().getApplicationInfo(mContext.getPackageName(),
-					PackageManager.GET_META_DATA);
-		} catch (NameNotFoundException e) {
-			return null;
-		}
-
-		appMetadata = ai.metaData;
-
-		if (appMetadata == null) {
-			return null;
-		}
-
-		retrievedValue = appMetadata.get(key);
-
-		return retrievedValue == null ? null : retrievedValue.toString();
-	}
-
-	/**
-	 * <p>
-	 * Extracts the App ID from the host application's Android Manifest XML file.
-	 * </p>
-	 * 
-	 * <p>
-	 * If the App Id has already been set (i.e. by calling the {@link #setOverriddenAppId(String)}),
-	 * this method will just return the id which has been set without trying to retrieve it from the
-	 * manifest.
-	 * </p>
-	 * 
-	 * <p>
-	 * If no App ID is present in the manifest and no non-empty App ID has been set by calling the
-	 * mentioned method, this method will throw a RuntimeException.
-	 * </p>
-	 * 
-	 * @return The offer id previously set or defined in the manifest, or throws a {@link RuntimeException}.
-	 */
-	public String getAppId() {
-		if (StringUtils.nullOrEmpty(mAppId)) {
-			mAppId = getAppIdFromManifest();
-			if (StringUtils.nullOrEmpty(mAppId)) {
-				throw new RuntimeException(
-						"SponsorPay SDK: no valid App ID has been provided. "
-								+ "Please set a valid App ID in your application manifest or provide one at runtime. "
-								+ "See the integration guide or the SDK javadoc for more information.");
-			}
-		}
-		return mAppId;
-	}
-	/**
-	 * <p>
-	 * Get the Application ID set in meta-data on the AndroidManifest.xml file.
-	 * </p>
-	 * 
-	 * @return the Application id set in the AndroidManifest.xml file
-	 * 
-	 * @deprecated this will no longer be supported in a future release of the SDK
-	 */
-	private String getAppIdFromManifest() {
-		return StringUtils.trim(
-				getValueFromAppMetadata(SPONSORPAY_APP_ID_KEY));
-	}
-
-	/**
-	 * Set the application ID, overriding the one which would be read from the manifest.
-	 * 
-	 * @param appId 
-	 * 			the application ID
-	 */
-	public void setOverriddenAppId(String appId) {
-		mAppId = appId;
 	}
 
 	public String getScreenDensityCategory() {

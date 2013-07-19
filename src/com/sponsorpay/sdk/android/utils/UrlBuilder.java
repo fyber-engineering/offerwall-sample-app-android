@@ -252,7 +252,7 @@ public class UrlBuilder {
 		}
 		
 		Map<String, String> spExtraParams = SponsorPayParametersProvider.getParameters();
-		if(!spExtraParams.isEmpty()) {
+		if (!spExtraParams.isEmpty()) {
 			keyValueParams.putAll(spExtraParams);
 		}
 

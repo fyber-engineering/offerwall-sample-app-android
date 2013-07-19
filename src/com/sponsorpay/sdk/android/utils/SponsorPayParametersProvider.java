@@ -6,6 +6,7 @@
 
 package com.sponsorpay.sdk.android.utils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class SponsorPayParametersProvider {
 		synchronized (INSTANCE) {
 			Set<SPParametersProvider> providers = INSTANCE.getProviders();
 			if (providers.size() == 0) {
-				return null;
+				return Collections.emptyMap();
 			} else {
 				HashMap<String, String> map = new HashMap<String, String>();
 				for (SPParametersProvider provider : providers) {

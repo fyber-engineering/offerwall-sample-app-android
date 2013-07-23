@@ -21,7 +21,7 @@ import android.view.WindowManager;
  * </p>
  * 
  * When closed, it returns the BrandEngage Client status as a bundle extra with
- * the key {@link SPBrandEngageClient.SP_ENGAGEMENT_STATUS}
+ * the key {@link SPBrandEngageClient#SP_ENGAGEMENT_STATUS}
  */
 public class SPBrandEngageActivity extends Activity implements SPBrandEngageClientStatusListener {
 	

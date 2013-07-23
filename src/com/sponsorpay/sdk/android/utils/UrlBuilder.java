@@ -216,7 +216,7 @@ public class UrlBuilder {
 		HostInfo hostInfo = mCredentials.getHostInfo();
 
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
-		keyValueParams.put(APPID_KEY, String.valueOf(hostInfo.getAppId()));
+		keyValueParams.put(APPID_KEY, mCredentials.getAppId());
 		keyValueParams.put(UDID_KEY, hostInfo.getUDID());
 
 		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());
@@ -249,6 +249,11 @@ public class UrlBuilder {
 		if (mExtraKeysValues != null) {
 			validateKeyValueParams(mExtraKeysValues);
 			keyValueParams.putAll(mExtraKeysValues);
+		}
+		
+		Map<String, String> spExtraParams = SponsorPayParametersProvider.getParameters();
+		if (!spExtraParams.isEmpty()) {
+			keyValueParams.putAll(spExtraParams);
 		}
 
 		Uri uri = Uri.parse(mResourceUrl);

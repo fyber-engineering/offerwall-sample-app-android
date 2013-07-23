@@ -54,9 +54,9 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 	
 	/**
 	 * <p>
-	 * Constructor. Sets the request callback listener and stores the host information.
+	 * Constructor.
 	 * </p>
-	 * See {@link AdvertiserHostInfo} and {@link APIResultListener}.
+	 * See {@link SPCredentials} and {@link SponsorPayAdvertiserState}.
 	 * 
 	 * @param credentials
 	 *            the credentials used for this callback
@@ -76,10 +76,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 	}
 
 	/**
-	 * Triggers the callback request that contacts the Sponsorpay Advertiser API. If and when a
-	 * successful response is received from the server, the {@link APIResultListener} registered
-	 * through the constructor {@link #AbstractCallbackSender(SPCredentials, APIResultListener)} will
-	 * be notified.
+	 * Triggers the callback request that contacts the SponsorPay Advertiser API.
 	 */
 	public void trigger() {
 		// The final URL with parameters is built right away, to make sure that possible runtime

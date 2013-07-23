@@ -6,7 +6,6 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
@@ -15,7 +14,6 @@ import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.utils.SPIdException;
 import com.sponsorpay.sdk.android.utils.SPIdValidator;
-import com.sponsorpay.sdk.android.utils.SponsorPayParametersProvider;
 
 /**
  * <p>
@@ -39,33 +37,6 @@ public class SponsorPayAdvertiser {
 	 * Singleton instance.
 	 */
 	private static SponsorPayAdvertiser mInstance;
-
-	/**
-	 * Returns the map of custom key/values to add to the parameters on the requests to the REST
-	 * API.
-	 * 
-	 * @param
-	 * @return If passedParameters is not null, a copy of it is returned. Otherwise if the
-	 *         parameters set with {@link #setCustomParameters(Map)} or
-	 *         {@link #setCustomParameters(String[], String[])} are not null, a copy of that map is
-	 *         returned. Otherwise null is returned.
-	 */
-	private static HashMap<String, String> getCustomParameters(Map<String, String> passedParameters) {
-		HashMap<String, String> retval = null;
-
-		if (passedParameters != null){
-			retval = new HashMap<String, String>(passedParameters);
-		}
-		Map<String, String> parameters = SponsorPayParametersProvider.getParameters();
-		if (parameters != null) {
-			if (retval != null) {
-				retval.putAll(parameters);
-			} else {
-				retval = new HashMap<String, String>(parameters);
-			}
-		}
-		return retval;
-	}
 
 	/**
 	 * Constructor. Stores the received application context and loads up the shared preferences.
@@ -170,7 +141,7 @@ public class SponsorPayAdvertiser {
 			throw new RuntimeException("No valid credentials object was created yet.\n" +
 					"You have to execute SponsorPay.start method first.");
 		}
-		mInstance.notitfyActionCompletion(credentialsToken, actionId, getCustomParameters(customParams));
+		mInstance.notitfyActionCompletion(credentialsToken, actionId, customParams);
 	}
 	
 	//================================================================================
@@ -214,124 +185,7 @@ public class SponsorPayAdvertiser {
 		getInstance(context);
 		
 		// The actual work is performed by the register() instance method.
-		mInstance.register(credentialsToken, getCustomParameters(customParams));
+		mInstance.register(credentialsToken, customParams);
 	}
-	
-
-	//================================================================================
-    // Deprecated Methods
-	//================================================================================
-
-	
-	//================================================================================
-	// Callbacks
-	//================================================================================
-
-	/**
-	 * Triggers the Advertiser callback. If passed a non-null and non-empty Application ID, it will
-	 * be used. Otherwise the Application ID will be retrieved from the value defined in the host
-	 * application's Android Manifest XML file.
-	 * 
-	 * @param context
-	 *            Host application context.
-	 * @param overrideAppId
-	 *            The App ID to use.
-	 *            
-	 * @deprecated This method will be removed from a future version of the SDK. 
-	 * 				Use {@link SponsorPayAdvertiser#register(Context)} instead.
-	 */
-	public static void register(Context context, String overrideAppId) {
-		register(context, overrideAppId, null);
-	}
-
-	/**
-	 * Triggers the Advertiser callback. If passed a non-null and non-empty Application ID, it will
-	 * be used. Otherwise the Application ID will be retrieved from the value defined in the host
-	 * application's Android Manifest XML file.
-	 * 
-	 * @param context
-	 *            Host application context.
-	 * @param overrideAppId
-	 *            The App ID to use.
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the request URL.
-	 * @deprecated This method will be removed from a future version of the SDK. 
-	 * 				Use {@link SponsorPayAdvertiser#register(Context, Map)} instead.
-	 */
-	public static void register(Context context, String overrideAppId,
-			Map<String, String> customParams) {
-
-		getInstance(context);
-
-		String credentialsToken = SponsorPay.getCredentials(overrideAppId, null, null, context);
-		
-		// The actual work is performed by the register() instance method.
-		mInstance.register(credentialsToken, getCustomParameters(customParams));
-	}
-	
-
-	
-	//================================================================================
-	// Delayed callback
-	//================================================================================
-	
-	/**
-	 * Triggers the Advertiser callback after the specified delay has passed. Will retrieve the App
-	 * ID from the value defined in the host application's Android Manifest XML file.
-	 * 
-	 * @param context
-	 *            Host application context.
-	 * @param delayMin
-	 *            The delay in minutes for triggering the Advertiser callback.
-	 *            
-	 * @deprecated We no longer support delayed callbacks. This method will be 
-	 * 			   removed from a future version of the SDK
-	 */
-	public static void registerWithDelay(Context context, int delayMin) {
-		registerWithDelay(context, delayMin, null, null);
-	}
-
-	/**
-	 * Triggers the Advertiser callback after the specified delay has passed. Will use the provided
-	 * App ID instead of trying to retrieve the one defined in the host application's manifest.
-	 * 
-	 * @param context
-	 *            Host application context.
-	 * @param delayMin
-	 *            The delay in minutes for triggering the Advertiser callback.
-	 * @param overrideAppId
-	 *            The App ID to use.
-	 *            
-	 * @deprecated We no longer support delayed callbacks. This method will be 
-	 * 			   removed from a future version of the SDK
-	 */
-	public static void registerWithDelay(Context context, int delayMin, String overrideAppId) {
-		registerWithDelay(context, delayMin, overrideAppId, null);
-	}
-
-	/**
-	 * Triggers the Advertiser callback after the specified delay has passed. Will use the provided
-	 * App ID instead of trying to retrieve the one defined in the host application's manifest.
-	 * 
-	 * @param context
-	 *            Host application context.
-	 * @param delayMin
-	 *            The delay in minutes for triggering the Advertiser callback.
-	 * @param overrideAppId
-	 *            The App ID to use.
-	 * @param customParams
-	 *            Map of custom key/values to add to the parameters on the requests to the REST API.
-	 *            
-	 * @deprecated We no longer support delayed callbacks. This method will be 
-	 * 			   removed from a future version of the SDK
-	 */
-	public static void registerWithDelay(Context context, int delayMin, String overrideAppId,
-			Map<String, String> customParams) {
-
-		SponsorPayCallbackDelayer.callWithDelay(context, overrideAppId, delayMin,
-				getCustomParameters(customParams));
-	}
-	
-	
 	
 }

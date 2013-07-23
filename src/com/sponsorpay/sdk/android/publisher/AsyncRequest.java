@@ -209,11 +209,7 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 			retval = false;
 		} else {
 			String firstCookieString = mCookieStrings[0];
-			if (StringUtils.nullOrEmpty(firstCookieString)) {
-				retval = false;
-			} else {
-				retval = true;
-			}
+			retval = StringUtils.notNullNorEmpty(firstCookieString);
 		}
 		
 		return retval;

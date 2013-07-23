@@ -63,12 +63,7 @@ public abstract class OfferWebClient extends WebViewClient {
 	protected String parseSponsorPayExitUrlForTargetUrl(String url) {
 		Uri uri = Uri.parse(url);
 
-		String targetUrl = uri.getQueryParameter(EXIT_URL_TARGET_URL_PARAM_KEY);
-
-		if (targetUrl != null) {
-			return Uri.decode(targetUrl);
-		}
-		return null;
+		return uri.getQueryParameter(EXIT_URL_TARGET_URL_PARAM_KEY);
 	}
 
 	/**

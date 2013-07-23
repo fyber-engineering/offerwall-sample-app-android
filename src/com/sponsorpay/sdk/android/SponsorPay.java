@@ -14,7 +14,6 @@ import android.content.Context;
 
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
-import com.sponsorpay.sdk.android.utils.HostInfo;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 
@@ -30,9 +29,9 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
  *
  */
 public class SponsorPay {
-	public static final int MAJOR_RELEASE_NUMBER = 3;
+	public static final int MAJOR_RELEASE_NUMBER = 4;
 	public static final int MINOR_RELEASE_NUMBER = 0;
-	public static final int BUGFIX_RELEASE_NUMBER = 4;
+	public static final int BUGFIX_RELEASE_NUMBER = 0;
 	public static final String RELEASE_VERSION_STRING = String.format("%d.%d.%d",
 			MAJOR_RELEASE_NUMBER, MINOR_RELEASE_NUMBER, BUGFIX_RELEASE_NUMBER);
 	
@@ -57,14 +56,9 @@ public class SponsorPay {
 	protected String getCredentialsToken(String appId, String userId,
 			String securityToken, Context context) {
 		SPCredentials credentials;
-		// to be removed when we no longer support appid set in manifest
-		try {
-			credentials = tokensMap.get(SPCredentials.getCredentialsToken(
-					appId, userId));
-		} catch (Exception e) {
-			HostInfo hi = new HostInfo(context);
-			credentials = tokensMap.get(SPCredentials.getCredentialsToken(hi.getAppId(), userId));
-		}
+		
+		credentials = tokensMap.get(SPCredentials.getCredentialsToken(
+				appId, userId));
 		if (credentials == null) {
 			credentials = new SPCredentials(appId, userId, securityToken, context);
 			tokensMap.put(credentials.getCredentialsToken(), credentials);
@@ -74,7 +68,6 @@ public class SponsorPay {
 		currentCredentials = credentials.getCredentialsToken();
 		return currentCredentials;
 	}
-	
 	
 	/**
 	 * Return the current {@link SPCredentials} or throws a {@link RuntimeException} if there's none.
@@ -99,37 +92,6 @@ public class SponsorPay {
 	 */
 	public static SPCredentials getCredentials(String credentialsToken) {
 		return INSTANCE.getCredentialsFromToken(credentialsToken);
-	}
-	
-	/**
-	 * <p>
-	 * Gets or creates a credentials object with the provided parameters and sets it as the 
-	 * current credentials. Throws an {@link IllegalArgumentException} if appId is null.
-	 * </p>
-	 * <p>
-	 * If a matching credentials object is found for the pair appId-userId, the securityToken 
-	 * is updated with the one provided as parameter (unless null is provided).
-	 * </p>
-	 * 
-	 * @param appId
-	 *            Application ID assigned by SponsorPay. Provide null to read the Application ID
-	 *            from the Application Manifest.
-	 * @param userId
-	 *            The ID of the user for which the delta of coins will be requested.
-	 * @param securityToken
-	 *            Security Token associated with the provided Application ID. It's used to sign the
-	 *            requests and verify the server responses.
-	 * @param context
-	 *            Android application context.
-	 *            
-	 * @return the credentials token that identify the credentials for the provided
-	 * 			parameters.
-	 * 
-	 * @deprecated This method will be removed from a future release of the SDK.
-	 */
-	public static String getCredentials(String appId, String userId,
-			String securityToken, Context context) {
-		return INSTANCE.getCredentialsToken(appId, userId, securityToken, context);
 	}
 	
 	/**

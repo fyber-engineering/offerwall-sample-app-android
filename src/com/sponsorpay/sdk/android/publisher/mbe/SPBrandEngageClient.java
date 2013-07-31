@@ -27,6 +27,7 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.WindowManager.BadTokenException;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -489,7 +490,12 @@ public class SPBrandEngageClient {
 						mShowingDialog = false;
 					}
 				});
-			dialogBuilder.show();
+			try {
+				dialogBuilder.show();
+			} catch (BadTokenException e ) {
+				mShowingDialog = false;
+				SponsorPayLogger.e(TAG, "Unable to show the dialog window");
+			}
 		}
 	}
 	

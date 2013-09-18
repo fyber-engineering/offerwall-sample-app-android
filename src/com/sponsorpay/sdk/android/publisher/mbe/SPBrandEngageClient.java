@@ -460,7 +460,11 @@ public class SPBrandEngageClient {
 		mWebView.setBackgroundColor(0);
 		
 		if (Build.VERSION.SDK_INT < 14) {
-			mWebView.getSettings().setUserAgent(1);
+			mWebView.getSettings().setUserAgentString(
+							"Mozilla/5.0 (X11; CrOS i686 4319.74.0) " +
+							"AppleWebKit/537.36 (KHTML, like Gecko) " +
+							"Chrome/29.0.1547.57 " +
+							"Safari/537.36 (Sponsorpay SDK)");
 		}
 		
 		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
@@ -544,7 +548,7 @@ public class SPBrandEngageClient {
 				@Override
 				public boolean shouldOverrideUrlLoading(WebView view, String url) {
 					if (url.contains("youtube.com")) {
-						SponsorPayLogger.d(TAG, "Preventin the opening of Youtube app");
+						SponsorPayLogger.d(TAG, "Preventing Youtube app");
 						return true;
 					} else {
 						return super.shouldOverrideUrlLoading(view, url);

@@ -23,8 +23,6 @@ import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClient;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageRequest;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageRequestListener;
-import com.sponsorpay.sdk.android.utils.SPIdException;
-import com.sponsorpay.sdk.android.utils.SPIdValidator;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
@@ -314,84 +312,6 @@ public class SponsorPayPublisher {
 		return intent;
 	}
 
-	//================================================================================
-	// Unlock OfferWall
-	//================================================================================
-	
-	/**
-	 * <p>
-	 * Returns an {@link Intent} that can be used to launch the Unlock {@link OfferWallActivity}. Let the
-	 * caller specify the behavior of the Offer Wall once the user gets redirected out of the
-	 * application by clicking on an offer.
-	 * </p>
-	 * 
-	 * <p>
-	 * Will use the current credentials or throw an exception if none exists yet.
-	 * </p>
-	 * 
-	 * @param context
-	 *            The publisher application context.
-	 * @param unlockItemId
-	 * 			  The Id of the item to be used to show offer for unlocking.
-	 * @param unlockItemName
-	 * 			  An item name to override the default one set on the server
-	 * 
-	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
-	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
-	 */
-	public static Intent getIntentForUnlockOfferWallActivity(Context context,
-			String unlockItemId, String unlockItemName) {
-		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForUnlockOfferWallActivity(credentialsToken, context,
-				unlockItemId, unlockItemName, null);
-	}
-	
-	/**
-	 * <p>
-	 * Returns an {@link Intent} that can be used to launch the Unlock {@link OfferWallActivity}. Let the
-	 * caller specify the behavior of the Offer Wall once the user gets redirected out of the
-	 * application by clicking on an offer.
-	 * </p>
-	 * 
-	 * @param credentialsToken
-	 * 			  the id of the credentials hat will be used
-	 * @param context
-	 *            The publisher application context.
-	 * @param unlockItemId
-	 * 			  The Id of the item to be used to show offer for unlocking.
-	 * @param unlockItemName
-	 * 			  An item name to override the default one set on the server
-	 * @param customParams
-	 *            A map of extra key/value pairs to add to the request URL.
-	 * 
-	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
-	 *         startActivityForResult() to launch the {@link OfferWallActivity}.
-	 */
-	public static Intent getIntentForUnlockOfferWallActivity(String credentialsToken, Context context,
-			String unlockItemId, String unlockItemName,	HashMap<String, String> customParams) {
-		
-		try {
-			SPIdValidator.validate(unlockItemId);
-		} catch (SPIdException e) {
-			throw new RuntimeException("The provided Unlock Item ID is not valid. "
-					+ e.getLocalizedMessage());
-		}
-		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
-
-		Intent intent = new Intent(context, OfferWallActivity.class);
-		intent.putExtra(OfferWallActivity.EXTRA_CREDENTIALS_TOKEN_KEY, credentials.getCredentialsToken());
-
-		intent.putExtra(OfferWallActivity.EXTRA_OFFERWALL_TYPE,
-				OfferWallActivity.OFFERWALL_TYPE_UNLOCK);
-		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_ID_KEY,
-				unlockItemId);
-		intent.putExtra(OfferWallActivity.UnlockOfferWallTemplate.EXTRA_UNLOCK_ITEM_NAME_KEY,
-				unlockItemName);
-		
-		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, customParams);
-
-		return intent;
-	}
 
 	//================================================================================
 	// VCS

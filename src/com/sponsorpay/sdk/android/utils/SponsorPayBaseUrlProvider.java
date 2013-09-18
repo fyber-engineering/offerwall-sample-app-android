@@ -21,11 +21,7 @@ public class SponsorPayBaseUrlProvider {
 		put("installs", "https://service.sponsorpay.com/installs/v2");
 		put("vcs", "https://api.sponsorpay.com/vcs/v1/new_credit.json");
 		put("mbe", "https://iframe.sponsorpay.com/mbe");
-		put("unlock_items", "https://api.sponsorpay.com/vcs/v1/items.json");
-		put("interstitial", "https://iframe.sponsorpay.com/mobile");
-		put("banner", "https://iframe.sponsorpay.com/mobile");
 		put("ofw", "https://iframe.sponsorpay.com/mobile");
-		put("unlock", "https://iframe.sponsorpay.com/unlock");
 	}};
 	
 	private SponsorPayBaseUrlProvider() {

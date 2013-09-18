@@ -35,10 +35,6 @@ import com.sponsorpay.sdk.android.utils.UrlBuilder;
  * </p>
  */
 public class OfferWallActivity extends Activity {
-	public static final String EXTRA_OFFERWALL_TYPE = "EXTRA_OFFERWALL_TEMPLATE_KEY";
-	public static final String OFFERWALL_TYPE_MOBILE = "OFFERWALL_TYPE_MOBILE";
-	public static final String OFFERWALL_TYPE_UNLOCK = "OFFERWALL_TYPE_UNLOCK";
-
 	
 	public static final String EXTRA_CREDENTIALS_TOKEN_KEY = "EXTRA_CREDENTIALS_TOKEN_KEY";
 	
@@ -60,6 +56,11 @@ public class OfferWallActivity extends Activity {
 	 * status code.
 	 */
 	public static final int RESULT_CODE_NO_STATUS_CODE = -10;
+	
+	/**
+	 * Sponsorpay's URL to contact within the web view
+	 */
+	private static final String OFW_URL_KEY = "ofw";
 
 	/**
 	 * Full-size web view within the activity
@@ -86,8 +87,6 @@ public class OfferWallActivity extends Activity {
 	 * Error dialog.
 	 */
 	private AlertDialog mErrorDialog;
-
-	private OfferWallTemplate mTemplate;
 
 	private String mCurrencyName;
 	
@@ -116,8 +115,6 @@ public class OfferWallActivity extends Activity {
 		mProgressDialog.setMessage(SponsorPayPublisher
 				.getUIString(UIStringIdentifier.LOADING_OFFERWALL));
 		mProgressDialog.show();
-
-		instantiateTemplate();
 
 		fetchPassedExtras();
 
@@ -169,16 +166,6 @@ public class OfferWallActivity extends Activity {
 
 	}
 
-	private void instantiateTemplate() {
-		String templateName = getIntent().getStringExtra(EXTRA_OFFERWALL_TYPE);
-
-		if (OFFERWALL_TYPE_UNLOCK.equals(templateName)) {
-			mTemplate = new UnlockOfferWallTemplate();
-		} else {
-			mTemplate = new MobileOfferWallTemplate();
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	protected void fetchPassedExtras() {
 		// Get data from extras
@@ -194,7 +181,7 @@ public class OfferWallActivity extends Activity {
 		}
 		
 		mShouldStayOpen = getIntent().getBooleanExtra(EXTRA_SHOULD_STAY_OPEN_KEY,
-				mTemplate.shouldStayOpenByDefault());
+				shouldStayOpenByDefault());
 
 		Serializable inflatedKvMap = getIntent().getSerializableExtra(EXTRA_KEYS_VALUES_MAP_KEY);
 		if (inflatedKvMap instanceof HashMap<?, ?>) {
@@ -207,7 +194,6 @@ public class OfferWallActivity extends Activity {
 			mCurrencyName = currencyName;
 		}
 
-		mTemplate.fetchAdditionalExtras();
 	}
 
 	@Override
@@ -243,10 +229,13 @@ public class OfferWallActivity extends Activity {
 	}
 
 	private String buildUrl() {
-		mCustomKeysValues = mTemplate.addAdditionalParameters(mCustomKeysValues);
-		String baseUrl = mTemplate.getBaseUrl();
+		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(OFW_URL_KEY);
 		return UrlBuilder.newBuilder(baseUrl, mCredentials).setCurrency(mCurrencyName)
 				.addExtraKeysValues(mCustomKeysValues).addScreenMetrics().buildUrl();
+	}
+	
+	public boolean shouldStayOpenByDefault() {
+		return true;
 	}
 
 	/**
@@ -290,101 +279,5 @@ public class OfferWallActivity extends Activity {
 		SponsorPay.start(appId, userId, securityToken, getApplicationContext());
 		mCredentials = SponsorPay.getCurrentCredentials();
 	}
-	
-	//
 
-	public abstract class OfferWallTemplate {
-		
-		public abstract void fetchAdditionalExtras();
-
-		public abstract String getBaseUrl();
-		
-		public abstract Map<String, String> addAdditionalParameters(Map<String, String> params);
-
-		public abstract boolean shouldStayOpenByDefault();
-	
-	}
-
-	public class MobileOfferWallTemplate extends OfferWallTemplate {
-		/**
-		 * Sponsorpay's URL to contact within the web view
-		 */
-		private static final String OFW_URL_KEY = "ofw";
-		
-		@Override
-		public void fetchAdditionalExtras() {
-
-		}
-
-		@Override
-		public String getBaseUrl() {
-			return SponsorPayBaseUrlProvider.getBaseUrl(OFW_URL_KEY);
-		}
-
-		@Override
-		public Map<String, String> addAdditionalParameters(Map<String, String> params) {
-			return params;
-		}
-
-		@Override
-		public boolean shouldStayOpenByDefault() {
-			return true;
-		}
-
-	}
-
-	public class UnlockOfferWallTemplate extends OfferWallTemplate {
-		/**
-		 * Sponsorpay's URL to contact within the web view
-		 */
-
-		private static final String UNLOCK_URL_KEY = "unlock";
-		
-		/**
-		 * Key for extracting the value of {@link #mUnlockItemId} from the extras bundle.
-		 */
-		public static final String EXTRA_UNLOCK_ITEM_ID_KEY = "EXTRA_UNLOCK_ITEM_ID_KEY";
-
-		/**
-		 * Key for extracting the value of {@link #mUnlockItemName} from the extras bundle.
-		 */
-		public static final String EXTRA_UNLOCK_ITEM_NAME_KEY = "EXTRA_UNLOCK_ITEM_NAME_KEY";
-
-		public static final String PARAM_UNLOCK_ITEM_ID_KEY = "itemid";
-		public static final String PARAM_UNLOCK_ITEM_NAME_KEY = "item_name";
-
-		private String mUnlockItemId;
-		private String mUnlockItemName;
-
-		@Override
-		public void fetchAdditionalExtras() {
-			mUnlockItemId = getIntent().getStringExtra(EXTRA_UNLOCK_ITEM_ID_KEY);
-			mUnlockItemName = getIntent().getStringExtra(EXTRA_UNLOCK_ITEM_NAME_KEY);
-		}
-
-		@Override
-		public String getBaseUrl() {
-			return SponsorPayBaseUrlProvider.getBaseUrl(UNLOCK_URL_KEY);
-		}
-
-		@Override
-		public Map<String, String> addAdditionalParameters(Map<String, String> params) {
-			if (params == null) {
-				params = new HashMap<String, String>();
-			}
-			params.put(PARAM_UNLOCK_ITEM_ID_KEY, mUnlockItemId);
-
-			if (StringUtils.notNullNorEmpty(mUnlockItemName)) {
-				params.put(PARAM_UNLOCK_ITEM_NAME_KEY, mUnlockItemName);
-			}
-
-			return params;
-		}
-
-		@Override
-		public boolean shouldStayOpenByDefault() {
-			return false;
-		}
-
-	}
 }

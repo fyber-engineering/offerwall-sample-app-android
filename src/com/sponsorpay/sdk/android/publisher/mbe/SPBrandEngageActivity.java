@@ -25,7 +25,8 @@ import android.view.WindowManager;
  */
 public class SPBrandEngageActivity extends Activity implements SPBrandEngageClientStatusListener {
 	
-	private boolean mPendingClose = false;;
+	private boolean mPendingClose = false;
+	private boolean mEngagementAlreadyClosed = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,8 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (!mPendingClose) {
+		if (!mPendingClose && !SPBrandEngageClient.INSTANCE.playThroughMediation() 
+				&& !mEngagementAlreadyClosed) {
 			SPBrandEngageClient.INSTANCE.onPause();
 			SPBrandEngageClient.INSTANCE.closeEngagement();
 			closeActivity();
@@ -72,6 +74,7 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	}
 
 	private void closeActivity() {
+		mEngagementAlreadyClosed = true; 
 		finish();
 	}
 	
@@ -87,7 +90,7 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	public void didReceiveOffers(boolean areOffersAvaliable) {
 		//do nothing
 	}
-
+	
 	@Override
 	public void didChangeStatus(SPBrandEngageClientStatus newStatus) {
 		switch (newStatus) {

@@ -44,6 +44,7 @@ public class SPBrandEngageRequest implements SPBrandEngageClientStatusListener {
 	
 	private Intent getMBEActivity() {
 		if (mBrandEngageClient.canStartEngagement()) {
+			// check if played through a TPN
 			return new Intent(mActivity, SPBrandEngageActivity.class);
 		}
 		SponsorPayLogger.d(TAG, "Undefined error");

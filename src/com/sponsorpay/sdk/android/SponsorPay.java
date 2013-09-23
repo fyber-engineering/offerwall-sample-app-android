@@ -14,6 +14,7 @@ import android.content.Context;
 
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
+import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClient;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 
@@ -30,7 +31,7 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
  */
 public class SponsorPay {
 	public static final int MAJOR_RELEASE_NUMBER = 4;
-	public static final int MINOR_RELEASE_NUMBER = 0;
+	public static final int MINOR_RELEASE_NUMBER = 5;
 	public static final int BUGFIX_RELEASE_NUMBER = 2;
 	public static final String RELEASE_VERSION_STRING = String.format("%d.%d.%d",
 			MAJOR_RELEASE_NUMBER, MINOR_RELEASE_NUMBER, BUGFIX_RELEASE_NUMBER);
@@ -124,6 +125,7 @@ public class SponsorPay {
 		String credentialsToken = INSTANCE.getCredentialsToken(appId, userId, securityToken,
 						context);
 		if (!credentials.contains(credentialsToken)) {
+			SPBrandEngageClient.INSTANCE.startMediationAdapters();
 			SponsorPayAdvertiser.register(context);
 		}
 		return credentialsToken;

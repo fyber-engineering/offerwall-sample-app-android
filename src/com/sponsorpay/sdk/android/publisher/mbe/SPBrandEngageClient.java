@@ -6,6 +6,7 @@
 
 package com.sponsorpay.sdk.android.publisher.mbe;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
@@ -42,6 +43,11 @@ import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationCoordinator;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.UrlBuilder;
@@ -82,6 +88,7 @@ public class SPBrandEngageClient {
 	private static final String MBE_URL_KEY = "mbe";
 	
 	private static final String SP_START_ENGAGEMENT = "javascript:Sponsorpay.MBE.SDKInterface.do_start()";
+	private static final String SP_JS_NOTIFY = "javascript:Sponsorpay.MBE.SDKInterface.notify";
 	
 	private static final String ABOUT_BLANK = "about:blank";
 	
@@ -92,6 +99,12 @@ public class SPBrandEngageClient {
 	private static final String SP_REQUEST_STATUS_PARAMETER_KEY = "status";
 	private static final String SP_REQUEST_STATUS_PARAMETER_STARTED_VALUE = "STARTED";
 	private static final String SP_REQUEST_STATUS_PARAMETER_ENGAGED = "USER_ENGAGED";
+	
+	private static final String SP_REQUEST_VALIDATE = "validate";
+	private static final String SP_THIRD_PARTY_NETWORK_PARAMETER = "tpn";
+	private static final String SP_THIRD_PARTY_ID_PARAMETER = "id";
+	private static final String SP_REQUEST_PLAY = "play";
+	
 	
 	/**
 	 * Engagement status key used in {@link SPBrandEngageActivity}
@@ -116,10 +129,12 @@ public class SPBrandEngageClient {
 	private static final int TIMEOUT = 10000 ;
 	private static final int VCS_TIMEOUT = 3000 ;
 
+	private Handler mHandler;
+	private SPMediationCoordinator mMediationCoordinator;
+	
 	private Activity mActivity;
 	private Context mContext;
 	private WebView mWebView;
-	private Handler mHandler;
 	
 	private boolean mShowingDialog = false;
 
@@ -158,6 +173,12 @@ public class SPBrandEngageClient {
 
 	private SPBrandEngageClient() {
 		mHandler = new Handler();
+		mMediationCoordinator = new SPMediationCoordinator();
+	}
+	
+	public void startMediationAdapters() {
+		SponsorPayLogger.d(TAG, "Starting mediation providers...");
+		mMediationCoordinator.startThirdPartySDKs();
 	}
 
 	/**
@@ -226,13 +247,15 @@ public class SPBrandEngageClient {
 	 */
 	public boolean startEngagement(Activity activity) {
 		if (canStartEngagement()) {
-
+			
 			mWebView.loadUrl(SP_START_ENGAGEMENT);
-
+			
 			mActivity = activity;
-			mActivity.addContentView(mWebView, new LayoutParams(
-		            LayoutParams.FILL_PARENT,
-		            LayoutParams.FILL_PARENT));
+			if (!playThroughMediation()) {
+				mActivity.addContentView(mWebView, new LayoutParams(
+						LayoutParams.FILL_PARENT,
+						LayoutParams.FILL_PARENT));
+			}
 		
 			checkEngagementStarted();
 			return true;
@@ -470,6 +493,9 @@ public class SPBrandEngageClient {
 		mWebView.setWebViewClient(getWebClient());
 
 		mWebView.setOnTouchListener(getOnTouchListener());
+
+		mWebView.addJavascriptInterface(mMediationCoordinator,
+				mMediationCoordinator.getInterfaceName());
 		
 		IntentFilter filter = new IntentFilter(
 				ConnectivityManager.CONNECTIVITY_ACTION);
@@ -552,13 +578,75 @@ public class SPBrandEngageClient {
 				}
 				
 				@Override
-				protected void processSponsorPayScheme(String host, Uri uri) {
-					if (host.equals(SP_REQUEST_OFFER_ANSWER)) {
+				protected void processSponsorPayScheme(String command, Uri uri) {
+					if (command.equals(SP_REQUEST_OFFER_ANSWER)) {
 						processQueryOffersResponse(Integer.parseInt(uri
 								.getQueryParameter(SP_NUMBER_OF_OFFERS_PARAMETER_KEY)));
-					} else if (host.equals(SP_REQUEST_START_STATUS)) {
+					} else if (command.equals(SP_REQUEST_START_STATUS)) {
 						changeStatus(uri.getQueryParameter(SP_REQUEST_STATUS_PARAMETER_KEY));
+					} else if (command.equals(SP_REQUEST_VALIDATE)) {
+						String tpnName = uri.getQueryParameter(SP_THIRD_PARTY_NETWORK_PARAMETER);
+						SponsorPayLogger.d(TAG, "MBE client asks to validate a third party network: " + tpnName);
+						HashMap<String, String> contextData = new HashMap<String, String>(1);
+						contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
+						mMediationCoordinator.validateProvider(tpnName, contextData, new SPMediationValidationEvent() {
+							@Override
+							public void validationEventResult(String name, SPTPNValidationResult result, Map<String, String> contextData) {
+								String url = String.format("%s('validate', {tpn:'%s', id:%s, result:'%s'})", 
+										SP_JS_NOTIFY, name, contextData.get(SP_THIRD_PARTY_ID_PARAMETER), result);
+								SponsorPayLogger.d(TAG, "Notifying - " + url);
+								mWebView.loadUrl(url);
+
+/*
+- (void)notifyOfVideoEvent:(NSString *)videoEventName
+                    forTPN:(NSString *)tpnName
+               contextData:(NSDictionary *)contextData
+{
+    NSString *js = [NSString stringWithFormat:@"%@('play', {tpn:'%@', id:%@, result:'%@'})",
+                    kSPJsInvokationNotify, tpnName, contextData[kSPTPNIDParameter],
+                    videoEventName];
+    
+    [SPLogger log:@"%s (%x) invoking javascript in the webview: %@", __PRETTY_FUNCTION__ , [self hash], js];
+
+    [self stringByEvaluatingJavaScriptFromString:js];
+}
+								 */
+								
+							}
+						});
+					} else if (command.equals(SP_REQUEST_PLAY)) {
+//						if (mMediationCoordinator.playThroughTirdParty(mWebView)) {
+							String tpnName = uri.getQueryParameter(SP_THIRD_PARTY_NETWORK_PARAMETER);
+							HashMap<String, String> contextData = new HashMap<String, String>(1);
+							contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
+							SponsorPayLogger.d(TAG, "MBE client asks to play an offer from a third party network:" + tpnName);
+							mMediationCoordinator.startProviderEngagement(mActivity, tpnName, contextData, new SPMediationVideoEvent() {
+								
+								@Override
+								public void videoEventOccured(String name, SPTPNVideoEvent event,
+										Map<String, String> contextData) {
+									if (event == SPTPNVideoEvent.SPTPNVideoEventStarted) {
+										changeStatus(SP_REQUEST_START_STATUS);
+									}
+									String url = String.format("%s('play', {tpn:'%s', id:%s, result:'%s'})", 
+											SP_JS_NOTIFY, name, contextData.get(SP_THIRD_PARTY_ID_PARAMETER), event);
+									SponsorPayLogger.d(TAG, "Notifying - " + url);
+									mWebView.loadUrl(url);
+								}
+							});
+//						}
 					}
+					/*
+				    } else if ([command isEqualToString:kSPRequestPlay]) {
+				        NSString *tpnName = parameters[kSPThirtPartyNetworkParameter];
+				        NSDictionary *contextData = @{kSPTPNIDParameter : parameters[kSPTPNIDParameter]};
+				
+				        [SPLogger log:@"[BET] MBE client asks to play an offer from a third party network: %@", tpnName];
+				
+				        [self.brandEngageDelegate brandEngageWebView:self
+				                              requestsPlayVideoOfTPN:tpnName
+          					 */
+
 				}
 				
 				@Override
@@ -731,5 +819,9 @@ public class SPBrandEngageClient {
 			    }
 			}
 		});
+	}
+
+	public boolean playThroughMediation() {
+		return mMediationCoordinator.playThroughTirdParty(mWebView);
 	}
 }

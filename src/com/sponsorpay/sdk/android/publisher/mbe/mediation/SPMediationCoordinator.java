@@ -45,6 +45,7 @@ public class SPMediationCoordinator {
 				SPMediationAdaptor adaptor = adaptorClass.newInstance();
 				String name = adaptor.getName();
 				SponsorPayLogger.d(TAG, "Starting adaptor " + name);
+				// VERSION thingy here
 				if (adaptor.startAdaptor()) {
 					adaptors.put(name.toLowerCase(), adaptor);
 					SponsorPayLogger.d(TAG, "Adaptor started");
@@ -127,7 +128,7 @@ public class SPMediationCoordinator {
 			webView.loadUrl(code);
 	 
 			try {   
-	                        // Set a 1 second timeout in case there's an error
+	            // Set a 1 second timeout in case there's an error
 				latch.await(1, TimeUnit.SECONDS);
 				return returnValue;
 			} catch (InterruptedException e) {

@@ -18,8 +18,11 @@ public class SPMediationConfigurator {
 	private static final String TAG = "SPMediationConfigurator";
 	
 	public static SPMediationConfigurator INSTANCE = new SPMediationConfigurator();
+
+	private HashMap<String, HashMap<String, Object>> configurations;
 	
 	private SPMediationConfigurator() {
+		configurations = new HashMap<String, HashMap<String, Object>>();
 	}
 	
 	public List<String> getMediationAdaptors() {
@@ -166,12 +169,12 @@ public class SPMediationConfigurator {
 //		}
 //	}
 	
-	public HashMap<String, Object> getConfigurationForAdaptor(String adapter) {
-		return null;
+	public HashMap<String, Object> getConfigurationForAdaptor(String adaptor) {
+		return configurations.get(adaptor);
 	}
 	
 	public boolean setConfigurationForAdaptor(String adaptor, HashMap<String, Object> configurations) {
-		return false;
+		return this.configurations.put(adaptor, configurations) != null;
 	}
 	
 }

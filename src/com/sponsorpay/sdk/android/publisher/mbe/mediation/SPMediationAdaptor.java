@@ -11,13 +11,17 @@ import java.util.Map;
 import android.app.Activity;
 
 public interface SPMediationAdaptor {
-	
+
 	public boolean startAdaptor();
-	
+
 	public String getName();
-	
-	public void videosAvailable(SPMediationValidationEvent event, Map<String, String> contextData);
-	
-	public void startVideo(Activity parentActivity, SPMediationVideoEvent event, Map<String, String> contextData);
+
+	public String getVersion();
+
+	public void videosAvailable(SPMediationValidationEvent event,
+			Map<String, String> contextData);
+
+	public void startVideo(Activity parentActivity,
+			SPMediationVideoEvent event, Map<String, String> contextData);
 
 }

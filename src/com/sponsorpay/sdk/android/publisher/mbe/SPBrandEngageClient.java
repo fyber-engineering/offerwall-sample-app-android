@@ -468,6 +468,10 @@ public class SPBrandEngageClient {
 			mStatusListener.didChangeStatus(status);
 		}
 	}
+
+	public boolean playThroughMediation() {
+		return mMediationCoordinator.playThroughTirdParty(mWebView);
+	}
 	
 	// Helper methods
 	private void setupWebView(Activity activity) {
@@ -821,7 +825,4 @@ public class SPBrandEngageClient {
 		});
 	}
 
-	public boolean playThroughMediation() {
-		return mMediationCoordinator.playThroughTirdParty(mWebView);
-	}
 }

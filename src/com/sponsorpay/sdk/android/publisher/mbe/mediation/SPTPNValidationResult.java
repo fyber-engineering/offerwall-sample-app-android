@@ -15,7 +15,6 @@ public enum SPTPNValidationResult {
     SPTPNValidationError("error"),
     SPTPNValidationSuccess("success");
 
-
     private final String text;
 	
 	private SPTPNValidationResult(final String text) {

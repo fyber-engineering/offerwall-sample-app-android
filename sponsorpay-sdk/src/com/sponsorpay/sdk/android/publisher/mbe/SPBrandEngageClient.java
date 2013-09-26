@@ -600,57 +600,27 @@ public class SPBrandEngageClient {
 										SP_JS_NOTIFY, name, contextData.get(SP_THIRD_PARTY_ID_PARAMETER), result);
 								SponsorPayLogger.d(TAG, "Notifying - " + url);
 								mWebView.loadUrl(url);
-
-/*
-- (void)notifyOfVideoEvent:(NSString *)videoEventName
-                    forTPN:(NSString *)tpnName
-               contextData:(NSDictionary *)contextData
-{
-    NSString *js = [NSString stringWithFormat:@"%@('play', {tpn:'%@', id:%@, result:'%@'})",
-                    kSPJsInvokationNotify, tpnName, contextData[kSPTPNIDParameter],
-                    videoEventName];
-    
-    [SPLogger log:@"%s (%x) invoking javascript in the webview: %@", __PRETTY_FUNCTION__ , [self hash], js];
-
-    [self stringByEvaluatingJavaScriptFromString:js];
-}
-								 */
-								
 							}
 						});
 					} else if (command.equals(SP_REQUEST_PLAY)) {
-//						if (mMediationCoordinator.playThroughTirdParty(mWebView)) {
-							String tpnName = uri.getQueryParameter(SP_THIRD_PARTY_NETWORK_PARAMETER);
-							HashMap<String, String> contextData = new HashMap<String, String>(1);
-							contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
-							SponsorPayLogger.d(TAG, "MBE client asks to play an offer from a third party network:" + tpnName);
-							mMediationCoordinator.startProviderEngagement(mActivity, tpnName, contextData, new SPMediationVideoEvent() {
-								
-								@Override
-								public void videoEventOccured(String name, SPTPNVideoEvent event,
-										Map<String, String> contextData) {
-									if (event == SPTPNVideoEvent.SPTPNVideoEventStarted) {
-										changeStatus(SP_REQUEST_START_STATUS);
-									}
-									String url = String.format("%s('play', {tpn:'%s', id:%s, result:'%s'})", 
-											SP_JS_NOTIFY, name, contextData.get(SP_THIRD_PARTY_ID_PARAMETER), event);
-									SponsorPayLogger.d(TAG, "Notifying - " + url);
-									mWebView.loadUrl(url);
+						String tpnName = uri.getQueryParameter(SP_THIRD_PARTY_NETWORK_PARAMETER);
+						HashMap<String, String> contextData = new HashMap<String, String>(1);
+						contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
+						SponsorPayLogger.d(TAG, "MBE client asks to play an offer from a third party network:" + tpnName);
+						mMediationCoordinator.startProviderEngagement(mActivity, tpnName, contextData, new SPMediationVideoEvent() {
+							@Override
+							public void videoEventOccured(String name, SPTPNVideoEvent event,
+									Map<String, String> contextData) {
+								if (event == SPTPNVideoEvent.SPTPNVideoEventStarted) {
+									changeStatus(SP_REQUEST_START_STATUS);
 								}
-							});
-//						}
+								String url = String.format("%s('play', {tpn:'%s', id:%s, result:'%s'})", 
+										SP_JS_NOTIFY, name, contextData.get(SP_THIRD_PARTY_ID_PARAMETER), event);
+								SponsorPayLogger.d(TAG, "Notifying - " + url);
+								mWebView.loadUrl(url);
+							}
+						});
 					}
-					/*
-				    } else if ([command isEqualToString:kSPRequestPlay]) {
-				        NSString *tpnName = parameters[kSPThirtPartyNetworkParameter];
-				        NSDictionary *contextData = @{kSPTPNIDParameter : parameters[kSPTPNIDParameter]};
-				
-				        [SPLogger log:@"[BET] MBE client asks to play an offer from a third party network: %@", tpnName];
-				
-				        [self.brandEngageDelegate brandEngageWebView:self
-				                              requestsPlayVideoOfTPN:tpnName
-          					 */
-
 				}
 				
 				@Override

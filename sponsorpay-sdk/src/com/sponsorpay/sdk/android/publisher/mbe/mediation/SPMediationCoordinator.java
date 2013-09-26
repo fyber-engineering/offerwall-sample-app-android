@@ -26,16 +26,16 @@ public class SPMediationCoordinator {
 
 	private static final String TAG = "SPMediationCoordinator";
 
-	private boolean thirdPartySDKsStarted = false;
+	private boolean mThirdPartySDKsStarted = false;
 	
-	private HashMap<String, SPMediationAdaptor> adaptors;
+	private HashMap<String, SPMediationAdaptor> mAdaptors;
 	
 	public SPMediationCoordinator() {
-		adaptors = new HashMap<String, SPMediationAdaptor>();
+		mAdaptors = new HashMap<String, SPMediationAdaptor>();
 	}
 	
 	public void startThirdPartySDKs() {
-		if (thirdPartySDKsStarted) {
+		if (mThirdPartySDKsStarted) {
 			return;
 		}
 		for(String className : SPMediationConfigurator.INSTANCE.getMediationAdaptors() ) {
@@ -47,7 +47,7 @@ public class SPMediationCoordinator {
 				SponsorPayLogger.d(TAG, "Starting adaptor " + name);
 				// VERSION thingy here
 				if (adaptor.startAdaptor()) {
-					adaptors.put(name.toLowerCase(), adaptor);
+					mAdaptors.put(name.toLowerCase(), adaptor);
 					SponsorPayLogger.d(TAG, "Adaptor started");
 				}
 			} catch (ClassNotFoundException e) {
@@ -59,7 +59,7 @@ public class SPMediationCoordinator {
 			}
 		}
 		
-		thirdPartySDKsStarted = true;
+		mThirdPartySDKsStarted = true;
 	}
 	
 	public boolean playThroughTirdParty(WebView webView) {
@@ -77,30 +77,27 @@ public class SPMediationCoordinator {
 	}
 	
 	public boolean isProviderAvailable(String name) {
-		return adaptors.containsKey(name.toLowerCase());
+		return mAdaptors.containsKey(name.toLowerCase());
 	}
 	
-
 	public void validateProvider(String adaptorName,
 			HashMap<String, String> contextData, SPMediationValidationEvent validationEvent) {
 		if (isProviderAvailable(adaptorName)) {
-			adaptors.get(adaptorName.toLowerCase()).videosAvailable(validationEvent, contextData);
+			mAdaptors.get(adaptorName.toLowerCase()).videosAvailable(validationEvent, contextData);
 		} else {
 			validationEvent.validationEventResult(adaptorName, SPTPNValidationResult.SPTPNValidationNoVideoAvailable, contextData);
 		}
 	}
 	
-
 	public void startProviderEngagement(Activity parentActivity, String adaptorName,
 			HashMap<String, String> contextData,
 			SPMediationVideoEvent videoEvent) {
 		if (isProviderAvailable(adaptorName)) {
-			adaptors.get(adaptorName.toLowerCase()).startVideo(parentActivity, videoEvent, contextData);
+			mAdaptors.get(adaptorName.toLowerCase()).startVideo(parentActivity, videoEvent, contextData);
 		} else {
 			videoEvent.videoEventOccured(adaptorName, SPTPNVideoEvent.SPTPNVideoEventError, contextData);
 		}
 	}
-	
 	
 	// HELPER methods for sync JS reply
 	// http://www.gutterbling.com/blog/synchronous-javascript-evaluation-in-android-webview/#codesyntax_1

@@ -12,6 +12,5 @@
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=sponsorpay-mediation-mockadapter/src"/>
-        <javaElement handleIdentifier="=sponsorpay-mediation-mockadapter/resources"/>
     </selectedElements>
 </jardesc>

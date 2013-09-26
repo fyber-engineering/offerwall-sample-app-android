@@ -1,6 +1,12 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.mbe.mediation;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -19,7 +25,7 @@ public class MediationConfigurationActivity extends Activity {
 	      @Override
 	      public void onClick(View v) {
 	    	  MockSetting setting = (MockSetting) v.getTag();
-	    	  HashMap<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(MockMediatedAdaptor.ADAPTOR_NAME);
+	    	  Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(MockMediatedAdaptor.ADAPTOR_NAME);
 	    	  config.put(MockMediatedAdaptor.MOCK_PLAYING_BEHAVIOUR, setting.getBehaviour());
 	    	  config.put(MockMediatedAdaptor.VIDEO_EVENT_RESULT, setting.getVideoEvent());
 	    	  config.put(MockMediatedAdaptor.VALIDATION_RESULT, setting.getValidationResult());
@@ -34,10 +40,6 @@ public class MediationConfigurationActivity extends Activity {
 		lv.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		
 		lv.setAdapter(new MockMediationListAdapter(this, listener));
-		
-//		ListView lv = new ListView(this);
-//		lv.setAdapter(new MockMediationBaseAdapter(this));
-//		lv.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		
 		setContentView(lv);
 	}

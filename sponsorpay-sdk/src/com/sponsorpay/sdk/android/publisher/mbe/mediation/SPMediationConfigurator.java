@@ -46,7 +46,6 @@ public class SPMediationConfigurator {
 			if (StringUtils.notNullNorEmpty(readFile)) {
 
 				JSONObject json = new JSONObject(readFile);
-//				JSONArray sdks  = json.getJSONArray("sdks");
 				
 				JSONArray array = json.getJSONArray("adaptors");
 				Map<String, List<String>> map = new HashMap<String, List<String>>(array.length());
@@ -64,42 +63,13 @@ public class SPMediationConfigurator {
 				return map;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SponsorPayLogger.e(TAG, "Error occured", e);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SponsorPayLogger.e(TAG, "Error occured", e);
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SponsorPayLogger.e(TAG, "Error occured", e);
 		}
 		return Collections.emptyMap();
-	}
-	
-	//Helper method to be dropped when changing to server side information 
-	private String readFile() throws IOException, URISyntaxException {
-		String everything;
-//		URL resource = this.getClass().getClassLoader().getResource("adaptors.info");		
-//		URL resource = this.getClass().getResource("/adaptors.info");		
-//		URL resource = ClassLoader.getSystemResource("/adaptors.info");		
-//		URL resource = Thread.currentThread().getContextClassLoader().getResource("adaptors.info");
-//		BufferedReader br = new BufferedReader(new FileReader(new File(resource.toURI())));
-		InputStream is = getClass().getResourceAsStream("/"+SponsorPay.RELEASE_VERSION_STRING + "-adaptors.info");
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-	    try {
-	        StringBuilder sb = new StringBuilder();
-	        String line = br.readLine();
-
-	        while (line != null) {
-	            sb.append(line + '\n');
-//	            sb.append('\n');
-	            line = br.readLine();
-	        }
-	        everything = sb.toString();
-	    } finally {
-	        br.close();
-	    }
-	    return everything;
 	}
 	
 	public Map<String, Object> getConfigurationForAdaptor(String adaptor) {
@@ -108,6 +78,26 @@ public class SPMediationConfigurator {
 	
 	public boolean setConfigurationForAdaptor(String adaptor, Map<String, Object> configurations) {
 		return mConfigurations.put(adaptor, configurations) != null;
+	}
+	
+	//Helper method to be dropped when changing to server side information 
+	private String readFile() throws IOException, URISyntaxException {
+		String everything;
+		InputStream is = getClass().getResourceAsStream("/"+SponsorPay.RELEASE_VERSION_STRING + "-adaptors.info");
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		try {
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+			
+			while (line != null) {
+				sb.append(line + '\n');
+				line = br.readLine();
+			}
+			everything = sb.toString();
+		} finally {
+			br.close();
+		}
+		return everything;
 	}
 	
 }

@@ -47,7 +47,7 @@ public class MockMediatedAdaptor implements SPMediationAdaptor {
 	}
 	
 	@Override
-	public boolean startAdaptor() {
+	public boolean startAdaptor(Activity activity) {
 		SponsorPayLogger.d(TAG, "Starting mocking mediation adaptor");
 		SPMediationConfigurator.INSTANCE.setConfigurationForAdaptor(getName(), configs);
 		return true;

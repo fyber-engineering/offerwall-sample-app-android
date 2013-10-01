@@ -276,7 +276,7 @@ public class OfferWallActivity extends Activity {
 		String appId = preferences.getString(APPID_KEY, StringUtils.EMPTY_STRING);
 		String userId = preferences.getString(UID_KEY, StringUtils.EMPTY_STRING);
 		String securityToken = preferences.getString(SECURITY_TOKEN_KEY, StringUtils.EMPTY_STRING);
-		SponsorPay.start(appId, userId, securityToken, getApplicationContext());
+		SponsorPay.start(appId, userId, securityToken, this);
 		mCredentials = SponsorPay.getCurrentCredentials();
 	}
 

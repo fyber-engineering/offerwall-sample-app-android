@@ -7,6 +7,8 @@
 package com.sponsorpay.sdk.android.publisher.mbe.mediation;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -34,19 +36,27 @@ public class SPMediationCoordinator {
 		mAdaptors = new HashMap<String, SPMediationAdaptor>();
 	}
 	
-	public void startThirdPartySDKs() {
+	public void startThirdPartySDKs(Activity activity) {
 		if (mThirdPartySDKsStarted) {
 			return;
 		}
-		for(String className : SPMediationConfigurator.INSTANCE.getMediationAdaptors() ) {
+		for (Entry<String, List<String>> entry : SPMediationConfigurator.INSTANCE
+				.getMediationAdaptors().entrySet()) {
+			String className = entry.getKey();
 			try {
 				@SuppressWarnings("unchecked")
 				Class<SPMediationAdaptor> adaptorClass = (Class<SPMediationAdaptor>) Class.forName(className);
 				SPMediationAdaptor adaptor = adaptorClass.newInstance();
 				String name = adaptor.getName();
-				SponsorPayLogger.d(TAG, "Starting adaptor " + name);
-				// VERSION thingy here
-				if (adaptor.startAdaptor()) {
+				String version = adaptor.getVersion();
+				
+				boolean compatibleVersion = entry.getValue().contains(version);
+				boolean adaptorStarted = adaptor.startAdaptor(activity);
+
+				SponsorPayLogger.d(TAG, String.format("Starting adaptor %s version %s", name, version));
+				SponsorPayLogger.d(TAG, "Adaptor version is compatible? " + compatibleVersion);
+				SponsorPayLogger.d(TAG, "Adaptor has been started successfully? " + adaptorStarted);
+				if (compatibleVersion &&	adaptorStarted) {
 					mAdaptors.put(name.toLowerCase(), adaptor);
 					SponsorPayLogger.d(TAG, "Adaptor started");
 				}

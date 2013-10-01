@@ -12,7 +12,7 @@ import android.app.Activity;
 
 public interface SPMediationAdaptor {
 
-	public boolean startAdaptor();
+	public boolean startAdaptor(Activity activity);
 
 	public String getName();
 

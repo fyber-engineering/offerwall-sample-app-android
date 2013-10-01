@@ -176,9 +176,9 @@ public class SPBrandEngageClient {
 		mMediationCoordinator = new SPMediationCoordinator();
 	}
 	
-	public void startMediationAdapters() {
+	public void startMediationAdapters(Activity activity) {
 		SponsorPayLogger.d(TAG, "Starting mediation providers...");
-		mMediationCoordinator.startThirdPartySDKs();
+		mMediationCoordinator.startThirdPartySDKs(activity);
 	}
 
 	/**

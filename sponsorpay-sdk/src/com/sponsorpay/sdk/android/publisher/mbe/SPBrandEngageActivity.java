@@ -38,8 +38,8 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		// Screen orientation locked to landscape on Gingerbread
-		if (Build.VERSION.SDK_INT == 9 ||
-				Build.VERSION.SDK_INT == 10) {
+		if ( !SPBrandEngageClient.INSTANCE.playThroughMediation() &&
+				(Build.VERSION.SDK_INT == 9 || Build.VERSION.SDK_INT == 10)) {
 			setRequestedOrientation(
 					   ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}

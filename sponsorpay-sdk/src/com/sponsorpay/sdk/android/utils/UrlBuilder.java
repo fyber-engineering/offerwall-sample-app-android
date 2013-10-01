@@ -160,7 +160,7 @@ public class UrlBuilder {
 
 	private Map<String, String> mExtraKeysValues;
 
-	private boolean mShouldAddScreenMetrics;
+	private boolean mShouldAddScreenMetrics = false;
 
 	private SPCredentials mCredentials;
 

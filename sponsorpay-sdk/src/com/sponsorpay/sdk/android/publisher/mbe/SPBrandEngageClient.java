@@ -612,7 +612,7 @@ public class SPBrandEngageClient {
 							public void videoEventOccured(String name, SPTPNVideoEvent event,
 									Map<String, String> contextData) {
 								if (event == SPTPNVideoEvent.SPTPNVideoEventStarted) {
-									changeStatus(SP_REQUEST_START_STATUS);
+									changeStatus(SP_REQUEST_STATUS_PARAMETER_STARTED_VALUE);
 								}
 								String url = String.format("%s('play', {tpn:'%s', id:%s, result:'%s'})", 
 										SP_JS_NOTIFY, name, contextData.get(SP_THIRD_PARTY_ID_PARAMETER), event);

@@ -50,15 +50,15 @@ public class SPMediationCoordinator {
 				String name = adaptor.getName();
 				String version = adaptor.getVersion();
 				
-				boolean compatibleVersion = entry.getValue().contains(version);
-				boolean adaptorStarted = adaptor.startAdaptor(activity);
-
 				SponsorPayLogger.d(TAG, String.format("Starting adaptor %s version %s", name, version));
-				SponsorPayLogger.d(TAG, "Adaptor version is compatible? " + compatibleVersion);
-				SponsorPayLogger.d(TAG, "Adaptor has been started successfully? " + adaptorStarted);
-				if (compatibleVersion &&	adaptorStarted) {
-					mAdaptors.put(name.toLowerCase(), adaptor);
-					SponsorPayLogger.d(TAG, "Adaptor started");
+				
+				if (entry.getValue().contains(version)) {
+					SponsorPayLogger.d(TAG, "Adaptor version is compatible with SDK. Proceeding...");
+					if (adaptor.startAdaptor(activity)) {
+						SponsorPayLogger.d(TAG, "Adaptor has been started successfully");
+						mAdaptors.put(name.toLowerCase(), adaptor);
+						SponsorPayLogger.d(TAG, "Adaptor started");
+					}
 				}
 			} catch (ClassNotFoundException e) {
 				SponsorPayLogger.e(TAG, "Adaptor not found - " + className, e);

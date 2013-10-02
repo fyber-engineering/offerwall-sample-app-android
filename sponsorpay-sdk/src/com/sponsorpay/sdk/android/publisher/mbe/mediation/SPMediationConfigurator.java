@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,17 +36,48 @@ public class SPMediationConfigurator {
 	
 	private SPMediationConfigurator() {
 		mConfigurations = new HashMap<String, Map<String, Object>>();
+		
+		try {
+			SponsorPayLogger.d(TAG, "Reading config file");
+			String jsonString = readFile("/adaptors.config");
+			if (StringUtils.notNullNorEmpty(jsonString)) {
+				SponsorPayLogger.d(TAG, "Parsing configurations");
+				JSONObject json = new JSONObject(jsonString);
+				JSONArray configs = json.getJSONArray("configs");
+				for (int i = 0 ; i < configs.length() ; i++) {
+					JSONObject config = configs.getJSONObject(i);
+					String adaptorName = config.getString("adaptorName");
+					JSONObject settings = config.getJSONObject("settings");
+					Map<String,	Object> map = new HashMap<String, Object>(settings.length());
+					@SuppressWarnings("unchecked")
+					Iterator<String> itr = settings.keys();
+					while (itr.hasNext()) {
+						String key = itr.next();
+						Object value = settings.get(key);
+						map.put(key, value);
+					}
+					mConfigurations.put(adaptorName, map);
+				}
+			}
+		} catch (JSONException e) {
+			SponsorPayLogger.e(TAG, "Error occured", e);
+		} catch (IOException e) {
+			SponsorPayLogger.e(TAG, "Error occured", e);
+		} catch (URISyntaxException e) {
+			SponsorPayLogger.e(TAG, "Error occured", e);
+		}
+		
 	}
 	
 	public Map<String, List<String>> getMediationAdaptors() {
 		SponsorPayLogger.d(TAG, "Getting compatible adapters for SDK v" + SponsorPay.RELEASE_VERSION_STRING );
 		
 		try {
-			// //Use http request to get adaptors and versions
-			String readFile = readFile();
-			if (StringUtils.notNullNorEmpty(readFile)) {
+			// Use http request to get adaptors and versions
+			String jsonString = readFile("/"+SponsorPay.RELEASE_VERSION_STRING + "-adaptors.info");
+			if (StringUtils.notNullNorEmpty(jsonString)) {
 
-				JSONObject json = new JSONObject(readFile);
+				JSONObject json = new JSONObject(jsonString);
 				
 				JSONArray array = json.getJSONArray("adaptors");
 				Map<String, List<String>> map = new HashMap<String, List<String>>(array.length());
@@ -62,9 +94,9 @@ public class SPMediationConfigurator {
 					
 				return map;
 			}
-		} catch (IOException e) {
-			SponsorPayLogger.e(TAG, "Error occured", e);
 		} catch (JSONException e) {
+			SponsorPayLogger.e(TAG, "Error occured", e);
+		} catch (IOException e) {
 			SponsorPayLogger.e(TAG, "Error occured", e);
 		} catch (URISyntaxException e) {
 			SponsorPayLogger.e(TAG, "Error occured", e);
@@ -81,9 +113,9 @@ public class SPMediationConfigurator {
 	}
 	
 	//Helper method to be dropped when changing to server side information 
-	private String readFile() throws IOException, URISyntaxException {
+	private String readFile(String file) throws IOException, URISyntaxException {
 		String everything;
-		InputStream is = getClass().getResourceAsStream("/"+SponsorPay.RELEASE_VERSION_STRING + "-adaptors.info");
+		InputStream is = getClass().getResourceAsStream(file);
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		try {
 			StringBuilder sb = new StringBuilder();

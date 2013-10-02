@@ -80,7 +80,6 @@ public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifier
 	}
 
 	// IApplifierImpactListener
-	
 	@Override
 	public void onCampaignsAvailable() {
 		campaignAvailable = true;
@@ -97,12 +96,6 @@ public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifier
 			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventAborted);
 		} else {
 			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
-//			try {
-//				Thread.sleep(200);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventClosed);
 		}
 		videoEvent = null;
 		videoContextData = null;
@@ -120,6 +113,8 @@ public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifier
 
 	@Override
 	public void onVideoStarted() {
+		// if we send the event here, then we can have a 
+		// START event timeout because of the carousel
 //		sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventStarted);
 	}
 	
@@ -141,6 +136,9 @@ public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifier
 		for (String key : keys) {
 			Object value = getValueFromConfig(key);
 			if (value != null) {
+				if (!key.equals(ApplifierImpact.APPLIFIER_IMPACT_OPTION_GAMERSID_KEY)) {
+					value = Boolean.parseBoolean(value.toString());
+				}
 				optionsMap.put(key, value);
 			}
 		}

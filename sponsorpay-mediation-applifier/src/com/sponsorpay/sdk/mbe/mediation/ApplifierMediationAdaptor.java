@@ -19,8 +19,8 @@ public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IAp
 
 	private static final String ADAPTOR_VERSION = "1.0.0";
 	
-//	public static final String ADATPOR_NAME = "MockMediatedNetwork";
-	private static final String ADATPOR_NAME = "Applifier";
+//	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
+	private static final String ADAPTOR_NAME = "Applifier";
 
 	public static final Object GAME_ID_KEY = "game.id.key";
 
@@ -29,14 +29,14 @@ public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IAp
 	@Override
 	public boolean startAdaptor(Activity activity) {
 		SponsorPayLogger.d(TAG, "Starting Applifier adaptor - SDK version " + ApplifierImpact.getSDKVersion());
-		Map<String, Object> configs = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(ADATPOR_NAME);
+		Map<String, Object> configs = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(ADAPTOR_NAME);
 		new ApplifierImpact(activity, configs.get(GAME_ID_KEY).toString(), this);
 		return true;
 	}
 
 	@Override
 	public String getName() {
-		return ADATPOR_NAME;
+		return ADAPTOR_NAME;
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IAp
 	}
 	
 	private Object getValueFromConfig(String key) {
-		Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(ADATPOR_NAME);
+		Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(ADAPTOR_NAME);
 		return config != null ? config.get(key) : null;
 	}
 

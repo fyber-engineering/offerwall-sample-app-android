@@ -1,7 +1,5 @@
 package com.sponsorpay.sdk.mbe.mediation;
 
-import java.util.Map;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
@@ -15,14 +13,12 @@ import com.flurry.android.FlurryAds;
 import com.flurry.android.FlurryAgent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdaptor;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
-public class FlurryMediationAdaptor implements SPMediationAdaptor, FlurryAdListener{
+public class FlurryMediationAdaptor extends SPMediationAdaptor implements FlurryAdListener{
 			
 	private static final String TAG = "FlurryAdaptor";
 
@@ -35,16 +31,6 @@ public class FlurryMediationAdaptor implements SPMediationAdaptor, FlurryAdListe
 	private static final String AD_NAME_TYPE = "ad.name.type";
 
 	private FrameLayout mLayout;
-	private boolean mVideoPlayed = false;
-
-	private SPMediationValidationEvent mValidationEvent;
-
-	private SPMediationVideoEvent mVideoEvent;
-
-	private Map<String, String> mValidationContextData;
-
-	private Map<String, String> mVideoContextData;
-
 
 	@Override
 	public boolean startAdaptor(Activity activity) {
@@ -69,13 +55,8 @@ public class FlurryMediationAdaptor implements SPMediationAdaptor, FlurryAdListe
 	}
 
 	@Override
-	public void videosAvailable(Context context, SPMediationValidationEvent event,
-			Map<String, String> contextData) {
-		
-		mValidationEvent = event;
-		mValidationContextData = contextData;
+	public void videosAvailable(Context context) {
 		mLayout = new FrameLayout(context);
-		mVideoPlayed = false;
 		FlurryAds.fetchAd(context, SPMediationConfigurator.INSTANCE
 				.getConfiguration(ADAPTOR_NAME, AD_NAME_SPACE, String.class),
 				mLayout, FlurryAdSize.valueOf(SPMediationConfigurator.INSTANCE
@@ -83,10 +64,7 @@ public class FlurryMediationAdaptor implements SPMediationAdaptor, FlurryAdListe
 	}
 
 	@Override
-	public void startVideo(final Activity parentActivity,
-			SPMediationVideoEvent event, Map<String, String> contextData) {
-		mVideoEvent = event;
-		mVideoContextData = contextData;
+	public void startVideo(final Activity parentActivity) {
 		mLayout = new FrameLayout(parentActivity);
 
 		if (Build.VERSION.SDK_INT > 10) {
@@ -99,24 +77,9 @@ public class FlurryMediationAdaptor implements SPMediationAdaptor, FlurryAdListe
 				LayoutParams.FILL_PARENT,
 				LayoutParams.FILL_PARENT));
 		
-//		Handler h = new Handler(parentActivity.getMainLooper());
-//		h.post(new Runnable() {
-//			
-//			@Override
-//			public void run() {
-//		if (parentActivity instanceof SPBrandEngageActivity) {
-//			((SPBrandEngageActivity) parentActivity).run(new Runnable() {
-//				
-//				@Override
-//				public void run() {
 		FlurryAds.displayAd(parentActivity, SPMediationConfigurator.INSTANCE
 				.getConfiguration(ADAPTOR_NAME, AD_NAME_SPACE, String.class),
 				mLayout);
-		//				}
-//			});
-//		}
-//			}
-//		});
 	}
 
 	// FlurryAdListener
@@ -127,9 +90,7 @@ public class FlurryMediationAdaptor implements SPMediationAdaptor, FlurryAdListe
 	@Override
 	public void onAdClosed(String adSpaceName) {
 		// send video event finished or aborted
-		sendVideoEvent(mVideoPlayed ? SPTPNVideoEvent.SPTPNVideoEventFinished : SPTPNVideoEvent.SPTPNVideoEventAborted);
-		mVideoEvent = null;
-		mVideoContextData = null;
+		notifyCloseEngagement();
 		mLayout = null;
 	}
 
@@ -151,7 +112,7 @@ public class FlurryMediationAdaptor implements SPMediationAdaptor, FlurryAdListe
 	@Override
 	public void onVideoCompleted(String adSpaceName) {
 		// store video played = true
-		mVideoPlayed = true;
+		setVideoPlayed();
 	}
 
 	@Override
@@ -163,37 +124,13 @@ public class FlurryMediationAdaptor implements SPMediationAdaptor, FlurryAdListe
 	@Override
 	public void spaceDidFailToReceiveAd(String adSpaceName) {
 		// send validate event no video
-//		mLayout = null;
 		sendValidationEvent(SPTPNValidationResult.SPTPNValidationNoVideoAvailable);
 	}
 
 	@Override
 	public void spaceDidReceiveAd(String adSpaceName) {
 		// send validate event success
-//		mLayout = null;
 		sendValidationEvent(SPTPNValidationResult.SPTPNValidationSuccess);
 	}
-
-	//HELPER methods
-		
-	private void sendValidationEvent(SPTPNValidationResult validationResult) {
-		if (mValidationEvent != null) {
-			// lower case bug
-			mValidationEvent.validationEventResult(ADAPTOR_NAME.toLowerCase(), validationResult, mValidationContextData);
-		} else {
-			SponsorPayLogger.d(TAG, "No validation result listener to notify");
-		}
-		mValidationEvent = null;
-		mValidationContextData = null;
-	}
-	private void sendVideoEvent(SPTPNVideoEvent videoEvent) {
-		if (mVideoEvent != null) {
-			mVideoEvent.videoEventOccured(ADAPTOR_NAME, videoEvent, mVideoContextData);
-		} else {
-			SponsorPayLogger.d(TAG, "No video event listener to notify");
-		}
-	}
-	
-	
 	
 }

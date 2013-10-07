@@ -7,7 +7,6 @@
 package com.sponsorpay.sdk.mbe.mediation;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,13 +15,11 @@ import android.os.Handler;
 
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdaptor;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
-public class MockMediatedAdaptor implements SPMediationAdaptor {
+public class MockMediatedAdaptor extends SPMediationAdaptor {
 
 	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
 
@@ -65,17 +62,17 @@ public class MockMediatedAdaptor implements SPMediationAdaptor {
 	}
 
 	@Override
-	public void videosAvailable(Context context, SPMediationValidationEvent event, Map<String, String> contextData) {
+	public void videosAvailable(Context context) {
 		// let timeout occur, otherwise fire the event
 		SPTPNValidationResult validationResult = (SPTPNValidationResult) configs.get(VALIDATION_RESULT);
 		if (validationResult != SPTPNValidationResult.SPTPNValidationTimeout || 
 				configs.get(MOCK_PLAYING_BEHAVIOUR) == MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerResultOnce) {
-			event.validationEventResult(getName().toLowerCase(), validationResult, contextData);
+			sendValidationEvent(validationResult);
 		}
 	}
 
 	@Override
-	public void startVideo(final Activity parentActivity, final SPMediationVideoEvent event, final Map<String, String> contextData) {
+	public void startVideo(final Activity parentActivity) {
 		MockMediationPlayingBehaviour behaviour = (MockMediationPlayingBehaviour) configs.get(MOCK_PLAYING_BEHAVIOUR);
 		Handler handler = new Handler();
 		switch (behaviour) {
@@ -87,13 +84,14 @@ public class MockMediatedAdaptor implements SPMediationAdaptor {
 			Runnable runnable = new Runnable() {
 					@Override
 					public void run() {
-						event.videoEventOccured(getName(), SPTPNVideoEvent.SPTPNVideoEventStarted, contextData);
+						notifyVideoStarted();
 					}
 				};
 			handler.postDelayed(runnable, DELAY_FOR_START_PLAY_EVENT);
             break;
         case MockMediationPlayingBehaviourTriggerResultOnce:
-        	event.videoEventOccured(getName(), (SPTPNVideoEvent) configs.get(VIDEO_EVENT_RESULT), contextData);
+        	sendVideoEvent((SPTPNVideoEvent) configs.get(VIDEO_EVENT_RESULT));
+        	clearVideoEvent();
             break;
         case MockMediationPlayingBehaviourTriggerStartAndFinalResult:
             // Start event
@@ -101,7 +99,7 @@ public class MockMediatedAdaptor implements SPMediationAdaptor {
 				@Override
 				public void run() {
 					Intent intent = new Intent(parentActivity, MockMediationActivity.class);
-					event.videoEventOccured(getName(), SPTPNVideoEvent.SPTPNVideoEventStarted, contextData);
+					notifyVideoStarted();
 					parentActivity.startActivityForResult(intent, 986547);
 				}
 			};
@@ -111,7 +109,7 @@ public class MockMediatedAdaptor implements SPMediationAdaptor {
 				@Override
 				public void run() {
 					SPTPNVideoEvent eventResultToFire = (SPTPNVideoEvent) configs.get(VIDEO_EVENT_RESULT);
-					event.videoEventOccured(getName(), eventResultToFire, contextData);
+					sendVideoEvent(eventResultToFire);
 					if (eventResultToFire == SPTPNVideoEvent.SPTPNVideoEventFinished) {
 						try {
 							//Sleep is here to allow mBE client to receive the first event
@@ -119,7 +117,8 @@ public class MockMediatedAdaptor implements SPMediationAdaptor {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						event.videoEventOccured(getName(), SPTPNVideoEvent.SPTPNVideoEventClosed, contextData);
+						sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventClosed);
+						clearVideoEvent();
 					}
 					parentActivity.finishActivity(986547);
 				}

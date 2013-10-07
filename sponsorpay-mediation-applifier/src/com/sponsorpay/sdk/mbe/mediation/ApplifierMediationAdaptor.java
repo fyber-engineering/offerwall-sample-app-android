@@ -10,28 +10,21 @@ import com.applifier.impact.android.ApplifierImpact;
 import com.applifier.impact.android.IApplifierImpactListener;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdaptor;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
-public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifierImpactListener{
+public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IApplifierImpactListener{
 
 	private static final String TAG = "ApplifierAdaptor";
 
 	private static final String ADAPTOR_VERSION = "1.0.0";
+	
 //	public static final String ADATPOR_NAME = "MockMediatedNetwork";
 	private static final String ADATPOR_NAME = "Applifier";
 
 	public static final Object GAME_ID_KEY = "game.id.key";
 
 	private boolean campaignAvailable;
-
-	private SPMediationVideoEvent videoEvent;
-	private Map<String, String> videoContextData;
-
-	private boolean videoSkipped = true;
 
 	@Override
 	public boolean startAdaptor(Activity activity) {
@@ -52,30 +45,21 @@ public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifier
 	}
 
 	@Override
-	public void videosAvailable(Context context, SPMediationValidationEvent event,
-			Map<String, String> contextData) {
-		// lower case validation name bug
-		event.validationEventResult(getName().toLowerCase(),
-				campaignAvailable ? SPTPNValidationResult.SPTPNValidationSuccess
-						: SPTPNValidationResult.SPTPNValidationNoVideoAvailable,
-				contextData);
+	public void videosAvailable(Context context) {
+		sendValidationEvent(campaignAvailable ? SPTPNValidationResult.SPTPNValidationSuccess
+						: SPTPNValidationResult.SPTPNValidationNoVideoAvailable);
 	}
 
 	@Override
-	public void startVideo(Activity parentActivity,
-			SPMediationVideoEvent event, Map<String, String> contextData) {
+	public void startVideo(Activity parentActivity) {
 		if (ApplifierImpact.instance.canShowCampaigns()) {
-			videoSkipped = true;
-			videoEvent = event;
-			videoContextData = contextData;
-			
 			ApplifierImpact.instance.changeActivity(parentActivity);
 			Map<String, Object> optionsMap = getOptionsMaps();
 			if (!ApplifierImpact.instance.showImpact(optionsMap)) {
-				event.videoEventOccured(getName(), SPTPNVideoEvent.SPTPNVideoEventError, contextData);
+				notifyVideoError();
 			}
 		} else {
-			event.videoEventOccured(getName(), SPTPNVideoEvent.SPTPNVideoEventError, contextData);
+			notifyVideoError();
 		}
 	}
 
@@ -92,23 +76,19 @@ public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifier
 
 	@Override
 	public void onImpactClose() {
-		if (videoSkipped) {
-			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventAborted);
-		} else {
-			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
-		}
-		videoEvent = null;
-		videoContextData = null;
+		notifyCloseEngagement();
 	}
 
 	@Override
 	public void onImpactOpen() {
-		sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventStarted);
+		notifyVideoStarted();
 	}
 
 	@Override
 	public void onVideoCompleted(String rewardItemKey, boolean skipped) {
-		videoSkipped  = skipped;
+		if (!skipped) {
+			setVideoPlayed();
+		}
 	}
 
 	@Override
@@ -119,12 +99,6 @@ public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifier
 	}
 	
 	//HELPER method
-	private void sendVideoEvent(SPTPNVideoEvent event) {
-		if (videoEvent != null) {
-			videoEvent.videoEventOccured(getName(),
-					event, videoContextData);
-		}
-	}
 	
 	private Map<String, Object> getOptionsMaps() {
 		String[] keys = {ApplifierImpact.APPLIFIER_IMPACT_OPTION_NOOFFERSCREEN_KEY,

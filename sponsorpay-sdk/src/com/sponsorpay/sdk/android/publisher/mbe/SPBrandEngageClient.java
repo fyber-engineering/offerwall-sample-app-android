@@ -574,7 +574,7 @@ public class SPBrandEngageClient {
 				@Override
 				public boolean shouldOverrideUrlLoading(WebView view, String url) {
 					if (url.contains("youtube.com")) {
-						SponsorPayLogger.d(TAG, "Preventin the opening of Youtube app");
+						SponsorPayLogger.d(TAG, "Preventing Youtube app");
 						return true;
 					} else {
 						return super.shouldOverrideUrlLoading(view, url);
@@ -593,7 +593,7 @@ public class SPBrandEngageClient {
 						SponsorPayLogger.d(TAG, "MBE client asks to validate a third party network: " + tpnName);
 						HashMap<String, String> contextData = new HashMap<String, String>(1);
 						contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
-						mMediationCoordinator.validateProvider(tpnName, contextData, new SPMediationValidationEvent() {
+						mMediationCoordinator.validateProvider(mContext, tpnName, contextData, new SPMediationValidationEvent() {
 							@Override
 							public void validationEventResult(String name, SPTPNValidationResult result, Map<String, String> contextData) {
 								String url = String.format("%s('validate', {tpn:'%s', id:%s, result:'%s'})", 

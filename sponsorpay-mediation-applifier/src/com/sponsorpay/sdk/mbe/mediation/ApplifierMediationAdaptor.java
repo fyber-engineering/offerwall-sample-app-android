@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
+import android.content.Context;
 
 import com.applifier.impact.android.ApplifierImpact;
 import com.applifier.impact.android.IApplifierImpactListener;
@@ -37,7 +38,6 @@ public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifier
 		SponsorPayLogger.d(TAG, "Starting Applifier adaptor - SDK version " + ApplifierImpact.getSDKVersion());
 		Map<String, Object> configs = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(ADATPOR_NAME);
 		new ApplifierImpact(activity, configs.get(GAME_ID_KEY).toString(), this);
-//		new ApplifierImpact(activity, "16", this);
 		return true;
 	}
 
@@ -52,7 +52,7 @@ public class ApplifierMediationAdaptor implements SPMediationAdaptor, IApplifier
 	}
 
 	@Override
-	public void videosAvailable(SPMediationValidationEvent event,
+	public void videosAvailable(Context context, SPMediationValidationEvent event,
 			Map<String, String> contextData) {
 		// lower case validation name bug
 		event.validationEventResult(getName().toLowerCase(),

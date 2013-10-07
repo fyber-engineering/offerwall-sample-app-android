@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 
@@ -64,7 +65,7 @@ public class MockMediatedAdaptor implements SPMediationAdaptor {
 	}
 
 	@Override
-	public void videosAvailable(SPMediationValidationEvent event, Map<String, String> contextData) {
+	public void videosAvailable(Context context, SPMediationValidationEvent event, Map<String, String> contextData) {
 		// let timeout occur, otherwise fire the event
 		SPTPNValidationResult validationResult = (SPTPNValidationResult) configs.get(VALIDATION_RESULT);
 		if (validationResult != SPTPNValidationResult.SPTPNValidationTimeout || 

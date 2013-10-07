@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import android.webkit.WebView;
 
@@ -90,10 +91,10 @@ public class SPMediationCoordinator {
 		return mAdaptors.containsKey(name.toLowerCase());
 	}
 	
-	public void validateProvider(String adaptorName,
+	public void validateProvider(Context context, String adaptorName,
 			HashMap<String, String> contextData, SPMediationValidationEvent validationEvent) {
 		if (isProviderAvailable(adaptorName)) {
-			mAdaptors.get(adaptorName.toLowerCase()).videosAvailable(validationEvent, contextData);
+			mAdaptors.get(adaptorName.toLowerCase()).videosAvailable(context, validationEvent, contextData);
 		} else {
 			validationEvent.validationEventResult(adaptorName, SPTPNValidationResult.SPTPNValidationNoVideoAvailable, contextData);
 		}
@@ -153,7 +154,10 @@ public class SPMediationCoordinator {
 	public void setValue(String value)
 	{
 		returnValue = value;
-		try { latch.countDown(); } catch (Exception e) {} 
+		try {
+			latch.countDown();
+		} catch (Exception e) {
+		}
 	}
  
 	/**

@@ -112,6 +112,19 @@ public class SPMediationConfigurator {
 		return mConfigurations.put(adaptor, configurations) != null;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <T extends Object> T getConfiguration(String adaptor, String key, Class<T> clasz) {
+		Map<String, Object> configs = getConfigurationForAdaptor(adaptor);
+		if (configs != null && !configs.isEmpty()) {
+			Object retValue = configs.get(key);
+			if (retValue.getClass().isAssignableFrom(clasz)) {
+				return (T) retValue;
+			}
+		}
+		return null;
+	}
+	
+	
 	//Helper method to be dropped when changing to server side information 
 	private String readFile(String file) throws IOException, URISyntaxException {
 		String everything;

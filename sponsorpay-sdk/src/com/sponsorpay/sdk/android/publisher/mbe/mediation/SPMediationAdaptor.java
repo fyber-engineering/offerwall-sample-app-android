@@ -9,6 +9,7 @@ package com.sponsorpay.sdk.android.publisher.mbe.mediation;
 import java.util.Map;
 
 import android.app.Activity;
+import android.content.Context;
 
 public interface SPMediationAdaptor {
 
@@ -18,7 +19,7 @@ public interface SPMediationAdaptor {
 
 	public String getVersion();
 
-	public void videosAvailable(SPMediationValidationEvent event,
+	public void videosAvailable(Context context, SPMediationValidationEvent event,
 			Map<String, String> contextData);
 
 	public void startVideo(Activity parentActivity,

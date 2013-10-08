@@ -80,39 +80,42 @@ public class MockMediatedAdaptor extends SPMediationAdaptor {
 			// Ignore call and let it time out
 			break;
 
-       case MockMediationPlayingBehaviourTriggerStartAndTimeOut:
+		case MockMediationPlayingBehaviourTriggerStartAndTimeOut:
 			Runnable runnable = new Runnable() {
-					@Override
-					public void run() {
-						notifyVideoStarted();
-					}
-				};
+				@Override
+				public void run() {
+					notifyVideoStarted();
+				}
+			};
 			handler.postDelayed(runnable, DELAY_FOR_START_PLAY_EVENT);
-            break;
-        case MockMediationPlayingBehaviourTriggerResultOnce:
-        	sendVideoEvent((SPTPNVideoEvent) configs.get(VIDEO_EVENT_RESULT));
-        	clearVideoEvent();
-            break;
-        case MockMediationPlayingBehaviourTriggerStartAndFinalResult:
-            // Start event
+			break;
+		case MockMediationPlayingBehaviourTriggerResultOnce:
+			sendVideoEvent((SPTPNVideoEvent) configs.get(VIDEO_EVENT_RESULT));
+			clearVideoEvent();
+			break;
+		case MockMediationPlayingBehaviourTriggerStartAndFinalResult:
+			// Start event
 			runnable = new Runnable() {
 				@Override
 				public void run() {
-					Intent intent = new Intent(parentActivity, MockMediationActivity.class);
+					Intent intent = new Intent(parentActivity,
+							MockMediationActivity.class);
 					notifyVideoStarted();
 					parentActivity.startActivityForResult(intent, 986547);
 				}
 			};
 			handler.postDelayed(runnable, DELAY_FOR_START_PLAY_EVENT);
-            // Result event
+			// Result event
 			runnable = new Runnable() {
 				@Override
 				public void run() {
-					SPTPNVideoEvent eventResultToFire = (SPTPNVideoEvent) configs.get(VIDEO_EVENT_RESULT);
+					SPTPNVideoEvent eventResultToFire = (SPTPNVideoEvent) configs
+							.get(VIDEO_EVENT_RESULT);
 					sendVideoEvent(eventResultToFire);
 					if (eventResultToFire == SPTPNVideoEvent.SPTPNVideoEventFinished) {
 						try {
-							//Sleep is here to allow mBE client to receive the first event
+							// Sleep is here to allow mBE client to receive the
+							// first event
 							Thread.sleep(600);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
@@ -124,7 +127,7 @@ public class MockMediatedAdaptor extends SPMediationAdaptor {
 				}
 			};
 			handler.postDelayed(runnable, DELAY_FOR_VIDEO_EVENT);
-            break;
+			break;
 		}	
 	}
 

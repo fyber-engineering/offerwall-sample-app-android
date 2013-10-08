@@ -22,6 +22,7 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Message;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
@@ -129,6 +130,9 @@ public class SPBrandEngageClient {
 	private static final int TIMEOUT = 10000 ;
 	private static final int VCS_TIMEOUT = 3000 ;
 
+	protected static final int VIDEO_EVENT = 1;
+	protected static final int VALIDATION_RESULT = 2;
+
 	private Handler mHandler;
 	private SPMediationCoordinator mMediationCoordinator;
 	
@@ -171,8 +175,33 @@ public class SPBrandEngageClient {
 		}
 	};
 
+//	private int mValidationTimeoutMatching;
+//
+//	private int mVideoTimeoutMatching;
+
 	private SPBrandEngageClient() {
-		mHandler = new Handler();
+		mHandler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case VALIDATION_RESULT:
+//					if (mStatus == SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS) {
+					SponsorPayLogger.d(TAG, "Timeout reached, canceling request...");
+					clearWebViewPage();
+//					}
+					break;
+				case VIDEO_EVENT:
+//					if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
+//						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED &&
+//						mWebView != null) {
+					//something went wrong, show error dialog message
+					showErrorDialog(SponsorPayPublisher
+							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+//					}
+					break;
+				}
+			}
+		};
 		mMediationCoordinator = new SPMediationCoordinator();
 	}
 	
@@ -225,16 +254,33 @@ public class SPBrandEngageClient {
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
 		mWebView.loadUrl(requestUrl);
 		setClientStatus(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
-		Runnable timeout = new Runnable() {
-			@Override
-			public void run() {
-				if (mStatus == SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS) {
-					SponsorPayLogger.d(TAG, "Timeout reached, canceling request...");
-					clearWebViewPage();
-				}
-			}
-		};
-		mHandler.postDelayed(timeout, TIMEOUT);
+		
+		mHandler.sendEmptyMessageDelayed(VALIDATION_RESULT, TIMEOUT);
+//		mValidationTimeoutMatching = SPTimeoutChecker.getTimeoutMatcher();
+//		SPTimeoutChecker timeout = new SPTimeoutChecker(mValidationTimeoutMatching) {
+//			@Override
+//			public int getMatchingNumber() {
+//				return mValidationTimeoutMatching;
+//			}
+//			
+//			@Override
+//			public void doRun() {
+//				if (mStatus == SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS) {
+//					SponsorPayLogger.d(TAG, "Timeout reached, canceling request...");
+//					clearWebViewPage();
+//				}
+//			}
+//		};
+//		Runnable timeout = new Runnable() {
+//			@Override
+//			public void run() {
+//				if (mStatus == SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS) {
+//					SponsorPayLogger.d(TAG, "Timeout reached, canceling request...");
+//					clearWebViewPage();
+//				}
+//			}
+//		};
+//		mHandler.postDelayed(timeout, TIMEOUT);
 	}
 
 	/**
@@ -320,6 +366,7 @@ public class SPBrandEngageClient {
 	}
 	
 	private void processQueryOffersResponse(int numOffers) {
+		mHandler.removeMessages(VALIDATION_RESULT);
 		boolean areOffersAvailable = numOffers > 0;
 		if (areOffersAvailable) {
 			setClientStatus(SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS);
@@ -333,6 +380,7 @@ public class SPBrandEngageClient {
 
 	private void changeStatus(String status) {
 		if (status.equals(SP_REQUEST_STATUS_PARAMETER_STARTED_VALUE)) {
+			mHandler.removeMessages(VIDEO_EVENT);
 			setClientStatus(SPBrandEngageOffersStatus.SHOWING_OFFERS);
 			notifyListener(SPBrandEngageClientStatus.STARTED);
 		} else if (status.equals(SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE)) {
@@ -365,20 +413,39 @@ public class SPBrandEngageClient {
 	}
 
 	private void checkEngagementStarted() {
-		Runnable r = new Runnable() {		
-			@Override
-			public void run() {
-				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
-						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED &&
-						mWebView != null) {
-					//something went wrong, show error dialog message
-					showErrorDialog(SponsorPayPublisher
-							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
-				}
-			}
-
-		};
-		mHandler.postDelayed(r, TIMEOUT);
+		mHandler.sendEmptyMessageDelayed(VIDEO_EVENT, TIMEOUT);
+//		mVideoTimeoutMatching = SPTimeoutChecker.getTimeoutMatcher();
+//		SPTimeoutChecker r = new SPTimeoutChecker(mVideoTimeoutMatching) {
+//			@Override
+//			public int getMatchingNumber() {
+//				return mVideoTimeoutMatching;
+//			}
+//			
+//			@Override
+//			public void doRun() {
+//				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
+//						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED &&
+//						mWebView != null) {
+//					//something went wrong, show error dialog message
+//					showErrorDialog(SponsorPayPublisher
+//							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+//				}
+//			}
+//		};
+//		Runnable r = new Runnable() {		
+//			@Override
+//			public void run() {
+//				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
+//						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED &&
+//						mWebView != null) {
+//					//something went wrong, show error dialog message
+//					showErrorDialog(SponsorPayPublisher
+//							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+//				}
+//			}
+//
+//		};
+//		mHandler.postDelayed(r, TIMEOUT);
 	}
 	
 	/**

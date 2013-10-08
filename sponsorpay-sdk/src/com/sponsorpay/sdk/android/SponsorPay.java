@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
@@ -33,8 +34,8 @@ public class SponsorPay {
 	public static final int MAJOR_RELEASE_NUMBER = 5;
 	public static final int MINOR_RELEASE_NUMBER = 0;
 	public static final int BUGFIX_RELEASE_NUMBER = 0;
-	public static final String RELEASE_VERSION_STRING = String.format("%d.%d.%d",
-			MAJOR_RELEASE_NUMBER, MINOR_RELEASE_NUMBER, BUGFIX_RELEASE_NUMBER);
+	public static final String RELEASE_VERSION_STRING = MAJOR_RELEASE_NUMBER + "." + 
+				MINOR_RELEASE_NUMBER + "." + BUGFIX_RELEASE_NUMBER;
 	
 	protected static SponsorPay INSTANCE = new SponsorPay();
 	
@@ -113,19 +114,20 @@ public class SponsorPay {
 	 * @param securityToken
 	 *            Security Token associated with the provided Application ID. It's used to sign the
 	 *            requests and verify the server responses.
-	 * @param context
-	 *            Android application context.
+	 * @param activity
+	 *            Current Android activity.
 	 *            
 	 * @return the credentials token that identify the credentials for the provided
 	 * 			parameters.
 	 */
 	public static String start(String appId, String userId,
-			String securityToken, Context context) {
+			String securityToken, Activity activity) {
 		Set<String> credentials = new HashSet<String>(SponsorPay.getAllCredentials());
+		Context context = activity.getApplicationContext();
 		String credentialsToken = INSTANCE.getCredentialsToken(appId, userId, securityToken,
 						context);
 		if (!credentials.contains(credentialsToken)) {
-			SPBrandEngageClient.INSTANCE.startMediationAdapters();
+			SPBrandEngageClient.INSTANCE.startMediationAdapters(activity);
 			SponsorPayAdvertiser.register(context);
 		}
 		return credentialsToken;

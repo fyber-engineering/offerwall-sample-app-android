@@ -350,28 +350,28 @@ public class HostInfo {
 		if (0 == mScreenWidth) {
 			mScreenWidth = getDisplayMetrics().widthPixels;
 		}
-		return String.format("%d", mScreenWidth);
+		return Integer.toString(mScreenWidth);
 	}
 	
 	public String getScreenHeight() {
 		if (0 == mScreenHeight) {
 			mScreenHeight = getDisplayMetrics().heightPixels;
 		}
-		return String.format("%d", mScreenHeight);
+		return Integer.toString(mScreenHeight);
 	}
 	
 	public String getScreenDensityX() {
 		if (0 == mScreenDensityX) {
 			mScreenDensityX = getDisplayMetrics().xdpi;
 		}
-		return String.format("%d", Math.round(mScreenDensityX));
+		return Integer.toString(Math.round(mScreenDensityX));
 	}
 	
 	public String getScreenDensityY() {
 		if (0 == mScreenDensityY) {
 			mScreenDensityY = getDisplayMetrics().ydpi;
 		}
-		return String.format("%d", Math.round(mScreenDensityY));
+		return Integer.toString(Math.round(mScreenDensityY));
 	}
 	
 	public String getCarrierCountry() {

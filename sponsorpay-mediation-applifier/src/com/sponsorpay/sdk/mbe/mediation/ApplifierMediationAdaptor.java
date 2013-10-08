@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.mbe.mediation;
 
 import java.util.HashMap;
@@ -59,6 +65,8 @@ public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IAp
 				notifyVideoError();
 			}
 		} else {
+			//assume that no more videos are available
+			campaignAvailable = false;
 			notifyVideoError();
 		}
 	}

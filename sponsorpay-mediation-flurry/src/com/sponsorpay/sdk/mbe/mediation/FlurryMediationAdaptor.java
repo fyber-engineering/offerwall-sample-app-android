@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.sdk.mbe.mediation;
 
 import android.app.Activity;
@@ -41,6 +47,7 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 			FlurryAds.setAdListener(this);
 			return true;
 		}
+		SponsorPayLogger.d(TAG, "API key must have a valid value!");
 		return false;
 	}
 
@@ -57,30 +64,37 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public void videosAvailable(Context context) {
 		mLayout = new FrameLayout(context);
-		FlurryAds.fetchAd(context, SPMediationConfigurator.INSTANCE
-				.getConfiguration(ADAPTOR_NAME, AD_NAME_SPACE, String.class),
+		FlurryAds.fetchAd(context, getAdSpaceFromConfig(),
 				mLayout, FlurryAdSize.valueOf(SPMediationConfigurator.INSTANCE
 				.getConfiguration(ADAPTOR_NAME, AD_NAME_TYPE, String.class)));
 	}
 
 	@Override
 	public void startVideo(final Activity parentActivity) {
-		mLayout = new FrameLayout(parentActivity);
-
-		if (Build.VERSION.SDK_INT > 10) {
-			// REALLY BAD WORKAROUND
-			FlurryAds.fetchAd(parentActivity, SPMediationConfigurator.INSTANCE
-					.getConfiguration(ADAPTOR_NAME, AD_NAME_SPACE, String.class), 
-					mLayout, FlurryAdSize.FULLSCREEN);
+		if (FlurryAds.isAdReady(getAdSpaceFromConfig())) {
+			
+			mLayout = new FrameLayout(parentActivity);
+	
+			if (Build.VERSION.SDK_INT > 10) {
+				// REALLY BAD WORKAROUND
+				// starting on Honeycomb, the start activity must occur on the same 
+				// context in which the fetchad method occured 
+				FlurryAds.fetchAd(parentActivity, getAdSpaceFromConfig(), 
+						mLayout, FlurryAdSize.FULLSCREEN);
+			}
+			parentActivity.addContentView(mLayout, new LayoutParams(
+					LayoutParams.FILL_PARENT,
+					LayoutParams.FILL_PARENT));
+			
+			FlurryAds.displayAd(parentActivity, getAdSpaceFromConfig(),
+					mLayout);
+		} else {
+			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventNoVideo);
+			clearVideoEvent();
 		}
-		parentActivity.addContentView(mLayout, new LayoutParams(
-				LayoutParams.FILL_PARENT,
-				LayoutParams.FILL_PARENT));
-		
-		FlurryAds.displayAd(parentActivity, SPMediationConfigurator.INSTANCE
-				.getConfiguration(ADAPTOR_NAME, AD_NAME_SPACE, String.class),
-				mLayout);
 	}
+
+
 
 	// FlurryAdListener
 	@Override
@@ -97,7 +111,7 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public void onAdOpened(String adSpaceName) {
 		// send video event started
-		sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventStarted);
+		notifyVideoStarted();
 	}
 
 	@Override
@@ -107,6 +121,7 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public void onRenderFailed(String adSpaceName) {
 		// send video event error
+		notifyVideoError();
 	}
 
 	@Override
@@ -118,6 +133,7 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public boolean shouldDisplayAd(String adSpaceName, FlurryAdType type) {
 //		return type.equals(FlurryAdType.VIDEO_TAKEOVER);
+		// fire error? or no video? should this occur?
 		return true;
 	}
 
@@ -131,6 +147,12 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	public void spaceDidReceiveAd(String adSpaceName) {
 		// send validate event success
 		sendValidationEvent(SPTPNValidationResult.SPTPNValidationSuccess);
+	}
+	
+	//HELPER method
+	private String getAdSpaceFromConfig() {
+		return SPMediationConfigurator.INSTANCE
+				.getConfiguration(ADAPTOR_NAME, AD_NAME_SPACE, String.class);
 	}
 	
 }

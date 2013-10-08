@@ -47,16 +47,21 @@ public class SPMediationConfigurator {
 				for (int i = 0 ; i < configs.length() ; i++) {
 					JSONObject config = configs.getJSONObject(i);
 					String adaptorName = config.getString("adaptorName");
-					JSONObject settings = config.getJSONObject("settings");
-					Map<String,	Object> map = new HashMap<String, Object>(settings.length());
-					@SuppressWarnings("unchecked")
-					Iterator<String> itr = settings.keys();
-					while (itr.hasNext()) {
-						String key = itr.next();
-						Object value = settings.get(key);
-						map.put(key, value);
-					}
-					mConfigurations.put(adaptorName, map);
+					if (config.has("settings")) {
+						JSONObject settings = config.getJSONObject("settings");
+						Map<String,	Object> map = new HashMap<String, Object>(settings.length());
+						@SuppressWarnings("unchecked")
+						Iterator<String> itr = settings.keys();
+						while (itr.hasNext()) {
+							String key = itr.next();
+							Object value = settings.get(key);
+							map.put(key, value);
+						}
+						mConfigurations.put(adaptorName, map);
+ 					} else {
+ 						Map<String, Object> map = Collections.emptyMap(); 
+ 						mConfigurations.put(adaptorName, map);
+ 					}
 				}
 			}
 		} catch (JSONException e) {

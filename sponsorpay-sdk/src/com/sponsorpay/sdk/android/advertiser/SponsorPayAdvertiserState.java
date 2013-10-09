@@ -6,11 +6,11 @@
 
 package com.sponsorpay.sdk.android.advertiser;
 
-import com.sponsorpay.sdk.android.utils.StringUtils;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
  * Persists and retrieves the state of the Advertiser part of the SDK.

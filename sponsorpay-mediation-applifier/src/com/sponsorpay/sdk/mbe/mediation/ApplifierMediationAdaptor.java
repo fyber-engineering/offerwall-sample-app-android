@@ -18,6 +18,7 @@ import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdaptor;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 
 public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IApplifierImpactListener{
 
@@ -28,16 +29,20 @@ public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IAp
 //	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
 	private static final String ADAPTOR_NAME = "Applifier";
 
-	public static final Object GAME_ID_KEY = "game.id.key";
+	public static final String GAME_ID_KEY = "game.id.key";
 
 	private boolean campaignAvailable;
 
 	@Override
 	public boolean startAdaptor(Activity activity) {
 		SponsorPayLogger.d(TAG, "Starting Applifier adaptor - SDK version " + ApplifierImpact.getSDKVersion());
-		Map<String, Object> configs = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(ADAPTOR_NAME);
-		new ApplifierImpact(activity, configs.get(GAME_ID_KEY).toString(), this);
-		return true;
+		String gameKey = SPMediationConfigurator.getConfiguration(ADAPTOR_NAME, GAME_ID_KEY, String.class);
+		if (StringUtils.notNullNorEmpty(gameKey)) {
+			new ApplifierImpact(activity, gameKey, this);
+			return true;
+		}
+		SponsorPayLogger.i(TAG, "Game key value is not valid");
+		return false;
 	}
 
 	@Override

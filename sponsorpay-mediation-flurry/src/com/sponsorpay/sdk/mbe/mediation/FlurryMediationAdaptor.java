@@ -41,7 +41,7 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public boolean startAdaptor(Activity activity) {
 		SponsorPayLogger.d(TAG, "Starting Flurry adaptor - SDK version " + FlurryAgent.getReleaseVersion());
-		String apiKey = SPMediationConfigurator.INSTANCE.getConfiguration(ADAPTOR_NAME, API_KEY, String.class);
+		String apiKey = SPMediationConfigurator.getConfiguration(ADAPTOR_NAME, API_KEY, String.class);
 		if (StringUtils.notNullNorEmpty(apiKey)) {
 			SponsorPayLogger.i(TAG, "Using API key = " + apiKey);
 			FlurryAgent.onStartSession(activity, apiKey);
@@ -65,9 +65,9 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public void videosAvailable(Context context) {
 		mLayout = new FrameLayout(context);
-		FlurryAds.fetchAd(context, getAdSpaceFromConfig(),
-				mLayout, FlurryAdSize.valueOf(SPMediationConfigurator.INSTANCE
-				.getConfiguration(ADAPTOR_NAME, AD_NAME_TYPE, String.class)));
+		FlurryAds.fetchAd(context, getAdSpaceFromConfig(), mLayout,
+				FlurryAdSize.valueOf(SPMediationConfigurator.getConfiguration(
+						ADAPTOR_NAME, AD_NAME_TYPE, String.class)));
 	}
 
 	@Override
@@ -152,8 +152,7 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	
 	//HELPER method
 	private String getAdSpaceFromConfig() {
-		return SPMediationConfigurator.INSTANCE
-				.getConfiguration(ADAPTOR_NAME, AD_NAME_SPACE, String.class);
+		return SPMediationConfigurator.getConfiguration(ADAPTOR_NAME, AD_NAME_SPACE, String.class);
 	}
 	
 }

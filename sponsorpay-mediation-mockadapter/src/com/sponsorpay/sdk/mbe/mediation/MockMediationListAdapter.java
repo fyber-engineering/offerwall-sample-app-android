@@ -57,15 +57,15 @@ public class MockMediationListAdapter extends BaseExpandableListAdapter {
 	@Override
 	public View getChildView(int groupPosition, int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
-	    final MockSetting children = (MockSetting) getChild(groupPosition, childPosition);
+	    final MockSetting child = (MockSetting) getChild(groupPosition, childPosition);
 	    TextView text = null;
 	    if (convertView == null) {
 	      convertView = inflater.inflate(android.R.layout.simple_expandable_list_item_1, null);
 	      convertView.setOnClickListener(listener);
 	    }
-	    convertView.setTag(children);
+	    convertView.setTag(child);
 	    text = (TextView) convertView.findViewById(android.R.id.text1);
-	    text.setText(children.toString());
+	    text.setText(child.toString());
 
 	    return convertView;
 	}

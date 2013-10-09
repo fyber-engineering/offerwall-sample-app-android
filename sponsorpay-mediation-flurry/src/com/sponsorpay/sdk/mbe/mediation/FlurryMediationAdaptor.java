@@ -29,8 +29,8 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	private static final String TAG = "FlurryAdaptor";
 
 	private static final String ADAPTOR_VERSION = "1.0.0";
-	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
-//	private static final String ADATPOR_NAME = "flurryappcircleclips";
+//	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
+	private static final String ADAPTOR_NAME = "flurryappcircleclips";
 	
 	private static final String API_KEY = "api.key";
 	private static final String AD_NAME_SPACE = "ad.name.space";
@@ -43,6 +43,7 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 		SponsorPayLogger.d(TAG, "Starting Flurry adaptor - SDK version " + FlurryAgent.getReleaseVersion());
 		String apiKey = SPMediationConfigurator.INSTANCE.getConfiguration(ADAPTOR_NAME, API_KEY, String.class);
 		if (StringUtils.notNullNorEmpty(apiKey)) {
+			SponsorPayLogger.i(TAG, "Using API key = " + apiKey);
 			FlurryAgent.onStartSession(activity, apiKey);
 			FlurryAds.setAdListener(this);
 			return true;

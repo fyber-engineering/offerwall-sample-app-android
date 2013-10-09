@@ -175,29 +175,19 @@ public class SPBrandEngageClient {
 		}
 	};
 
-//	private int mValidationTimeoutMatching;
-//
-//	private int mVideoTimeoutMatching;
-
 	private SPBrandEngageClient() {
 		mHandler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case VALIDATION_RESULT:
-//					if (mStatus == SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS) {
 					SponsorPayLogger.d(TAG, "Timeout reached, canceling request...");
 					clearWebViewPage();
-//					}
 					break;
 				case VIDEO_EVENT:
-//					if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
-//						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED &&
-//						mWebView != null) {
 					//something went wrong, show error dialog message
 					showErrorDialog(SponsorPayPublisher
 							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
-//					}
 					break;
 				}
 			}
@@ -256,31 +246,6 @@ public class SPBrandEngageClient {
 		setClientStatus(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
 		
 		mHandler.sendEmptyMessageDelayed(VALIDATION_RESULT, TIMEOUT);
-//		mValidationTimeoutMatching = SPTimeoutChecker.getTimeoutMatcher();
-//		SPTimeoutChecker timeout = new SPTimeoutChecker(mValidationTimeoutMatching) {
-//			@Override
-//			public int getMatchingNumber() {
-//				return mValidationTimeoutMatching;
-//			}
-//			
-//			@Override
-//			public void doRun() {
-//				if (mStatus == SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS) {
-//					SponsorPayLogger.d(TAG, "Timeout reached, canceling request...");
-//					clearWebViewPage();
-//				}
-//			}
-//		};
-//		Runnable timeout = new Runnable() {
-//			@Override
-//			public void run() {
-//				if (mStatus == SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS) {
-//					SponsorPayLogger.d(TAG, "Timeout reached, canceling request...");
-//					clearWebViewPage();
-//				}
-//			}
-//		};
-//		mHandler.postDelayed(timeout, TIMEOUT);
 	}
 
 	/**
@@ -414,38 +379,6 @@ public class SPBrandEngageClient {
 
 	private void checkEngagementStarted() {
 		mHandler.sendEmptyMessageDelayed(VIDEO_EVENT, TIMEOUT);
-//		mVideoTimeoutMatching = SPTimeoutChecker.getTimeoutMatcher();
-//		SPTimeoutChecker r = new SPTimeoutChecker(mVideoTimeoutMatching) {
-//			@Override
-//			public int getMatchingNumber() {
-//				return mVideoTimeoutMatching;
-//			}
-//			
-//			@Override
-//			public void doRun() {
-//				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
-//						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED &&
-//						mWebView != null) {
-//					//something went wrong, show error dialog message
-//					showErrorDialog(SponsorPayPublisher
-//							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
-//				}
-//			}
-//		};
-//		Runnable r = new Runnable() {		
-//			@Override
-//			public void run() {
-//				if (mStatus != SPBrandEngageOffersStatus.SHOWING_OFFERS &&
-//						mStatus != SPBrandEngageOffersStatus.USER_ENGAGED &&
-//						mWebView != null) {
-//					//something went wrong, show error dialog message
-//					showErrorDialog(SponsorPayPublisher
-//							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
-//				}
-//			}
-//
-//		};
-//		mHandler.postDelayed(r, TIMEOUT);
 	}
 	
 	/**
@@ -844,7 +777,6 @@ public class SPBrandEngageClient {
 	}
 
 	//ÊHack section - don't shop around here
-	
 	public void onPause() {
 		mHandler.post(new Runnable() {
 			@Override

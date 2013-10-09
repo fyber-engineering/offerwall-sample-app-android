@@ -29,9 +29,11 @@ public class MockMediatedAdaptor extends SPMediationAdaptor {
 	public static final String MOCK_PLAYING_BEHAVIOUR = "mock.playing.behaviour";
 	public static final String VALIDATION_RESULT = "validation.event.result";
 	public static final String VIDEO_EVENT_RESULT = "video.event.result";
+	private static final String CLASS_NAME = "class.name";
 	
 	private static final int DELAY_FOR_START_PLAY_EVENT = 500;
 	private static final int DELAY_FOR_VIDEO_EVENT = 4500;
+
 
 	private HashMap<String, Object> configs;
 
@@ -42,6 +44,7 @@ public class MockMediatedAdaptor extends SPMediationAdaptor {
 		configs.put(MOCK_PLAYING_BEHAVIOUR,
 				MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerStartAndFinalResult);
 		configs.put(VIDEO_EVENT_RESULT, SPTPNVideoEvent.SPTPNVideoEventFinished);
+		configs.put(CLASS_NAME, MediationConfigurationActivity.class.getCanonicalName());
 	}
 	
 	@Override

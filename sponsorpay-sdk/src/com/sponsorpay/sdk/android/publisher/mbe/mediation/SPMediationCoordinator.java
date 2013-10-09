@@ -6,7 +6,10 @@
 
 package com.sponsorpay.sdk.android.publisher.mbe.mediation;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
@@ -58,7 +61,6 @@ public class SPMediationCoordinator {
 					if (adaptor.startAdaptor(activity)) {
 						SponsorPayLogger.d(TAG, "Adaptor has been started successfully");
 						mAdaptors.put(name.toLowerCase(), adaptor);
-						SponsorPayLogger.d(TAG, "Adaptor started");
 					}
 				}
 			} catch (ClassNotFoundException e) {
@@ -70,9 +72,11 @@ public class SPMediationCoordinator {
 			}
 		}
 		
+		notifyAdaptorsList(activity);
 		mThirdPartySDKsStarted = true;
 	}
 	
+
 	public boolean playThroughTirdParty(WebView webView) {
 		String jsResult = 
 				getJSValue(webView, SP_GET_OFFERS);
@@ -168,4 +172,17 @@ public class SPMediationCoordinator {
 		return this.interfaceName;
 	}
 	
+	// 
+	private void notifyAdaptorsList(Activity activity) {
+		try {
+			Method method = activity.getClass().getDeclaredMethod("notifyAdaptorsList", List.class);
+			List<String> list = new LinkedList<String>(mAdaptors.keySet());
+			method.invoke(activity, list);
+		} catch (SecurityException e) {
+		} catch (NoSuchMethodException e) {
+		} catch (IllegalArgumentException e) {
+		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
+		}
+	}
 }

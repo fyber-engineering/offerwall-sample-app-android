@@ -46,7 +46,7 @@ public class SPMediationConfigurator {
 				JSONArray configs = json.getJSONArray("configs");
 				for (int i = 0 ; i < configs.length() ; i++) {
 					JSONObject config = configs.getJSONObject(i);
-					String adaptorName = config.getString("adaptorName");
+					String adaptorName = config.getString("adaptorName").toLowerCase();
 					if (config.has("settings")) {
 						JSONObject settings = config.getJSONObject("settings");
 						Map<String,	Object> map = new HashMap<String, Object>(settings.length());
@@ -79,7 +79,7 @@ public class SPMediationConfigurator {
 		
 		try {
 			// Use http request to get adaptors and versions
-			String jsonString = readFile("/"+SponsorPay.RELEASE_VERSION_STRING + "-adaptors.info");
+			String jsonString = readFile("/adaptors.info");
 			if (StringUtils.notNullNorEmpty(jsonString)) {
 
 				JSONObject json = new JSONObject(jsonString);
@@ -110,11 +110,11 @@ public class SPMediationConfigurator {
 	}
 	
 	public Map<String, Object> getConfigurationForAdaptor(String adaptor) {
-		return mConfigurations.get(adaptor);
+		return mConfigurations.get(adaptor.toLowerCase());
 	}
 	
 	public boolean setConfigurationForAdaptor(String adaptor, Map<String, Object> configurations) {
-		return mConfigurations.put(adaptor, configurations) != null;
+		return mConfigurations.put(adaptor.toLowerCase(), configurations) != null;
 	}
 	
 	@SuppressWarnings("unchecked")

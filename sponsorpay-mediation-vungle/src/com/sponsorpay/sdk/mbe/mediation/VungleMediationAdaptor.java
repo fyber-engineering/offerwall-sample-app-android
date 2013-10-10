@@ -23,8 +23,8 @@ public class VungleMediationAdaptor extends SPMediationAdaptor implements EventL
 	private static final String TAG = "VungleAdaptor";
 
 	private static final String ADAPTOR_VERSION = "1.0.0";
-	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
-//	private static final String ADAPTOR_NAME = "vungle";
+
+	private static final String ADAPTOR_NAME = "vungle";
 	
 	private static final String APP_ID = "app.id";
 	private static final String SHOW_CLOSE_BUTTON = "show.close.button";

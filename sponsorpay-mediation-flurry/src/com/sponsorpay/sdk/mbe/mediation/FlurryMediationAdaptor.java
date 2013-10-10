@@ -29,7 +29,7 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	private static final String TAG = "FlurryAdaptor";
 
 	private static final String ADAPTOR_VERSION = "1.0.0";
-//	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
+
 	private static final String ADAPTOR_NAME = "flurryappcircleclips";
 	
 	private static final String API_KEY = "api.key";
@@ -78,8 +78,8 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	
 			if (Build.VERSION.SDK_INT > 10) {
 				// REALLY BAD WORKAROUND
-				// starting on Honeycomb, the start activity must occur on the same 
-				// context in which the fetchad method occured 
+				// from Honeycomb onwards, the start activity must take place 
+				// on the same context in which the fetchad method occured 
 				FlurryAds.fetchAd(parentActivity, getAdSpaceFromConfig(), 
 						mLayout, FlurryAdSize.FULLSCREEN);
 			}
@@ -94,8 +94,6 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 			clearVideoEvent();
 		}
 	}
-
-
 
 	// FlurryAdListener
 	@Override
@@ -112,7 +110,9 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public void onAdOpened(String adSpaceName) {
 		// send video event started
-		notifyVideoStarted();
+		if (adSpaceName.equals(getAdSpaceFromConfig())) {
+			notifyVideoStarted();
+		}
 	}
 
 	@Override
@@ -128,13 +128,15 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public void onVideoCompleted(String adSpaceName) {
 		// store video played = true
-		setVideoPlayed();
+		if (adSpaceName.equals(getAdSpaceFromConfig())) {
+			setVideoPlayed();
+		}
 	}
 
 	@Override
 	public boolean shouldDisplayAd(String adSpaceName, FlurryAdType type) {
-//		return type.equals(FlurryAdType.VIDEO_TAKEOVER);
-		// fire error? or no video? should this occur?
+		// always return true. if some non video offer are shown, then we must ask 
+		// flurry to filter them on their side
 		return true;
 	}
 
@@ -147,7 +149,11 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public void spaceDidReceiveAd(String adSpaceName) {
 		// send validate event success
-		sendValidationEvent(SPTPNValidationResult.SPTPNValidationSuccess);
+		if (adSpaceName.equals(getAdSpaceFromConfig())) {
+			sendValidationEvent(SPTPNValidationResult.SPTPNValidationSuccess);
+		} else {
+			sendValidationEvent(SPTPNValidationResult.SPTPNValidationNoVideoAvailable);
+		}
 	}
 	
 	//HELPER method

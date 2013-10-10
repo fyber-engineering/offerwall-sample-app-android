@@ -26,7 +26,6 @@ public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IAp
 
 	private static final String ADAPTOR_VERSION = "1.0.0";
 	
-//	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
 	private static final String ADAPTOR_NAME = "Applifier";
 
 	public static final String GAME_ID_KEY = "game.id.key";

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="MacRoman" standalone="no"?>
 <jardesc>
-    <jar path="sponsorpay-mediation-mockadapter/mbe-mediation-mockadaptor.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/sponsorpay-mediation-mockadapter/generate-mock.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="sponsorpay-mediation-mockadaptor/mbe-mediation-mockadaptor.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/sponsorpay-mediation-mockadaptor/generate-mock.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,6 +11,6 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=sponsorpay-mediation-mockadapter/src"/>
+        <javaElement handleIdentifier="=sponsorpay-mediation-mockadaptor/src"/>
     </selectedElements>
 </jardesc>

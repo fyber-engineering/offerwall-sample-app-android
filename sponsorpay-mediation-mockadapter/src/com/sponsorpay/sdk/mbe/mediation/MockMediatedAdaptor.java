@@ -21,9 +21,10 @@ import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 public class MockMediatedAdaptor extends SPMediationAdaptor {
 
+	private static final String TAG = "MockMediatedAdaptor";
+
 	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
 
-	private static final String TAG = "MockMediatedAdaptor";
 	private static final String VERSION_STRING = "1.0.0";
 
 	public static final String MOCK_PLAYING_BEHAVIOUR = "mock.playing.behaviour";
@@ -33,7 +34,6 @@ public class MockMediatedAdaptor extends SPMediationAdaptor {
 	
 	private static final int DELAY_FOR_START_PLAY_EVENT = 500;
 	private static final int DELAY_FOR_VIDEO_EVENT = 4500;
-
 
 	private HashMap<String, Object> configs;
 

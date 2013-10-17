@@ -15,31 +15,61 @@ import android.os.Message;
 
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
+/**
+ * <p>
+ * Base class for mobile BrandEngage Mediation adaptor
+ * </p>
+ * 
+ * This class defines the required specific methods to every adaptor and provides convenience methods
+ * handling timeouts, validation and events notifications. The {@link SPMediationCoordinator} will
+ * communicate the results back to the {@link SPBrandEngageClientz}.
+ * 
+ */
 public abstract class SPMediationAdaptor {
 
 	private static final String TAG = "SPMediationAdaptor";
 
+	/*
+	 * Validation event message.what field
+	 */
 	private static final short VALIDATION_RESULT = 1;
+	/*
+	 * Video event message.what field
+	 */
 	private static final short VIDEO_EVENT = 2;
+	
+	/*
+	 * Timeout delay, in nanoseconds
+	 */
 	private static final int TIMEOUT_DELAY = 4500;
 	
+	/*
+	 * The mediation validation event listener 
+	 */
 	private SPMediationValidationEvent mValidationEvent;
+	/*
+	 * The mediation validation context data for this request 
+	 */
 	private Map<String, String> mValidationContextData;
+	
+	/*
+	 * The mediation video event listener 
+	 */
 	private SPMediationVideoEvent mVideoEvent;
+	/*
+	 * The mediation video context data for this request 
+	 */
 	private Map<String, String> mVideoContextData;
+	
+	/*
+	 * Boolean storing the 'play' status of the video
+	 */
 	private boolean mVideoPlayed = false;
 
+	/*
+	 * Handler queue for validation and video timeouts 
+	 */
 	private Handler mHandler;
-
-	public abstract boolean startAdaptor(Activity activity);
-
-	public abstract String getName();
-
-	public abstract String getVersion();
-
-	public abstract void videosAvailable(Context context);
-	
-	public abstract void startVideo(Activity parentActivity);
 	
 	public SPMediationAdaptor() {
 		mHandler = new Handler() {
@@ -56,28 +86,108 @@ public abstract class SPMediationAdaptor {
 			}
 		};
 	}
+
+	/* ======================================================
+	 *              Adaptor specific methods
+	 * ======================================================
+	 */
 	
+	/**
+	 * Initializes the wrapped SDK, usually with the necessary credentials.
+	 * @param activity
+	 * 			The parent activity calling this method
+	 * @return 
+	 * 			true if the adaptor was successfully started, false otherwise
+	 */
+	public abstract boolean startAdaptor(Activity activity);
+	
+	/**
+	 * @return the name of the wrapped video network.
+	 */
+	public abstract String getName();
+	
+	/**
+	 * @return the current version of the adaptor
+	 */
+	public abstract String getVersion();
+	
+	/**
+	 * Checks whether there are videos available to start playing. This is expected
+	 * to be asynchronous, and the answer should be delivered through the
+	 * {@link #sendValidationEvent(SPTPNValidationResult)}.
+	 */
+	public abstract void videosAvailable(Context context);
+
+	/**
+	 * Instructs the wrapped video network SDK to start playing a video.
+	 * @param parentActivity 
+	 * 		If the wrapped SDK needs a parent activity, it can use the provided one.
+	 */
+	public abstract void startVideo(Activity parentActivity);
+
+	/**
+	 * Method called from the {@link SPMediationCoordinator} to check for videos
+	 * availability for this provider. The result of the method is returned asynchronously
+	 * to the provided {@link SPMediationValidationEvent}.
+	 * This method also stores the listener and the context data information to send it back
+	 * when needed and starts the validation timeout.
+	 *   
+	 * @param context
+	 * 			The activity context
+	 * @param event
+	 * 			The {@link SPMediationValidationEvent} to be notified.
+	 * @param contextData
+	 * 			The context data used in this request
+	 */
 	public void videosAvailable(Context context, SPMediationValidationEvent event,
 			Map<String, String> contextData) {
 		mValidationEvent = event;
 		mValidationContextData = contextData;
-		videosAvailable(context);
 		mHandler.sendEmptyMessageDelayed(VALIDATION_RESULT, TIMEOUT_DELAY);
+		videosAvailable(context);
 	}
 
+	/**
+	 * Method called from the {@link SPMediationCoordinator} to start videos
+	 * engagement for this provider. The video status is returned asynchronously
+	 * to the provided {@link SPMediationVideoEvent}.
+	 * This method also stores the listener and the context data information to send it back
+	 * when needed and starts the video validation timeout.
+	 * 
+	 * @param parentActivity
+	 * 			The parent activity 
+	 * @param event
+	 * 			The {@link SPMediationVideoEvent} to be notified.
+	 * @param contextData
+	 * 			The context data used in this request
+	 */
 	public void startVideo(Activity parentActivity,
 			SPMediationVideoEvent event, Map<String, String> contextData){ 
 		mVideoPlayed = false;
 		mVideoEvent = event;
 		mVideoContextData = contextData;
-		startVideo(parentActivity);
 		mHandler.sendEmptyMessageDelayed(VIDEO_EVENT, TIMEOUT_DELAY);
+		startVideo(parentActivity);
 	}
 	
+	/* ======================================================
+	 *               Convenience methods
+	 * ======================================================
+	 */
+
+	/**
+    * Convenience method that sends a validation event if there is a listener 
+    * to be notified, remove the timeout message from the queue and clears
+    * the validation events related data, preventing more events from this
+    * provider to be sent.
+    * 
+    * @param event
+    * 		The {@link SPTPNVideoEvent} to be sent.
+    */
    protected void sendValidationEvent(SPTPNValidationResult result) {
 	   if (mValidationEvent != null) {
 		   mHandler.removeMessages(VALIDATION_RESULT);
-		   // due to mbe bug, we need to send validation in lower case
+		   // due to mbe bug, we need to send tpn name in lower case
 		   mValidationEvent.validationEventResult(getName().toLowerCase(), result, mValidationContextData);
 		   mValidationEvent = null;
 		   mValidationContextData = null;
@@ -86,6 +196,14 @@ public abstract class SPMediationAdaptor {
 	   }
    }
    
+   /**
+    * Convenience method that sends a video event if there is a listener 
+    * to be notified and remove the timeout message from the queue if it is a 
+    * {@link #SPTPNVideoEvent.SPTPNVideoEventStarted}
+    * 
+    * @param event
+    * 		The {@link SPTPNVideoEvent} to be sent.
+    */
    protected void sendVideoEvent(SPTPNVideoEvent event) {
 	   if (mVideoEvent != null) {
 		   if (event.equals(SPTPNVideoEvent.SPTPNVideoEventStarted)) {
@@ -97,25 +215,43 @@ public abstract class SPMediationAdaptor {
 	   }
    }
    
+   /**
+    * Convenience method that clears all video events related data.
+    * This method is called automatically after an engagement close or video 
+    * error event, preventing more events from this provider to be sent.
+    */
    protected void clearVideoEvent() {
 	   mVideoEvent = null;
 	   mVideoContextData = null;
    }
 
+   /**
+    * Convenience method to mark a video as fully watched, thus
+    * considering that the engagement was successful
+    */
    protected void setVideoPlayed() {
 	   mVideoPlayed = true;
    }
    
+   /**
+    * Convenience method to notify that a video has been started 
+    */
    protected void notifyVideoStarted() {
 	   sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventStarted);
    }
    
+   /**
+    * Convenience method to notify that an engagement has been closed 
+    */
    protected void notifyCloseEngagement() {
 		sendVideoEvent(mVideoPlayed ? SPTPNVideoEvent.SPTPNVideoEventFinished
 				: SPTPNVideoEvent.SPTPNVideoEventAborted);
 		clearVideoEvent();
    }
    
+   /**
+    * Convenience method to notify that an error occurred while the video was playing
+    */
    protected void notifyVideoError() {
 	   sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventError);
 	   clearVideoEvent();

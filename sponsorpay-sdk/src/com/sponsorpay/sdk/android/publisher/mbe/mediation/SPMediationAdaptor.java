@@ -187,8 +187,7 @@ public abstract class SPMediationAdaptor {
    protected void sendValidationEvent(SPTPNValidationResult result) {
 	   if (mValidationEvent != null) {
 		   mHandler.removeMessages(VALIDATION_RESULT);
-		   // due to mbe bug, we need to send tpn name in lower case
-		   mValidationEvent.validationEventResult(getName().toLowerCase(), result, mValidationContextData);
+		   mValidationEvent.validationEventResult(getName(), result, mValidationContextData);
 		   mValidationEvent = null;
 		   mValidationContextData = null;
 	   } else {

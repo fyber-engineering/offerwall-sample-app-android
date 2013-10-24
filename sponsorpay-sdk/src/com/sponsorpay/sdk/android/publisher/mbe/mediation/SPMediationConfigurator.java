@@ -122,7 +122,7 @@ public class SPMediationConfigurator {
 		Map<String, Object> configs = INSTANCE.getConfigurationForAdaptor(adaptor);
 		if (configs != null && !configs.isEmpty()) {
 			Object retValue = configs.get(key);
-			if (retValue.getClass().isAssignableFrom(clasz)) {
+			if (retValue != null && retValue.getClass().isAssignableFrom(clasz)) {
 				return (T) retValue;
 			}
 		}
@@ -136,20 +136,22 @@ public class SPMediationConfigurator {
 	
 	//Helper method to be dropped when changing to server side information 
 	private String readFile(String file) throws IOException, URISyntaxException {
-		String everything;
+		String everything = null;
 		InputStream is = getClass().getResourceAsStream(file);
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		try {
-			StringBuilder sb = new StringBuilder();
-			String line = br.readLine();
-			
-			while (line != null) {
-				sb.append(line + '\n');
-				line = br.readLine();
+		if (is != null) {
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			try {
+				StringBuilder sb = new StringBuilder();
+				String line = br.readLine();
+
+				while (line != null) {
+					sb.append(line + '\n');
+					line = br.readLine();
+				}
+				everything = sb.toString();
+			} finally {
+				br.close();
 			}
-			everything = sb.toString();
-		} finally {
-			br.close();
 		}
 		return everything;
 	}

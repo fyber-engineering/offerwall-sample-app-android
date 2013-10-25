@@ -44,6 +44,7 @@ public class SPMediationCoordinator {
 		if (mThirdPartySDKsStarted) {
 			return;
 		}
+		SponsorPayLogger.d(TAG, "Starting mediation providers...");
 		for (Entry<String, List<String>> entry : SPMediationConfigurator.INSTANCE
 				.getMediationAdaptors().entrySet()) {
 			String className = entry.getKey();

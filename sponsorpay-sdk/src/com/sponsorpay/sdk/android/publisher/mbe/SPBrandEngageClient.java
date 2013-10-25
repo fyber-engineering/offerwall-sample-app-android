@@ -196,7 +196,6 @@ public class SPBrandEngageClient {
 	}
 	
 	public void startMediationAdapters(Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting mediation providers...");
 		mMediationCoordinator.startThirdPartySDKs(activity);
 	}
 
@@ -675,12 +674,14 @@ public class SPBrandEngageClient {
 				@Override
 				public boolean onJsConfirm(WebView view, String url,
 						String message, JsResult result) {
+					SponsorPayLogger.d(TAG, "js alert - " + message);
 					showJSDialog(url, message);
 					result.cancel();
 					return true;
 				}
 				
 				private void showJSDialog(String url, String message) {
+					SponsorPayLogger.d(TAG, "js alert - " + message);
 					if (!mShowingDialog ) {
 						mShowingDialog = true;
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mActivity == null ? mContext: mActivity);

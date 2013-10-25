@@ -229,6 +229,7 @@ public abstract class SPMediationAdaptor {
     * considering that the engagement was successful
     */
    protected void setVideoPlayed() {
+	   sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
 	   mVideoPlayed = true;
    }
    
@@ -243,7 +244,7 @@ public abstract class SPMediationAdaptor {
     * Convenience method to notify that an engagement has been closed 
     */
    protected void notifyCloseEngagement() {
-		sendVideoEvent(mVideoPlayed ? SPTPNVideoEvent.SPTPNVideoEventFinished
+		sendVideoEvent(mVideoPlayed ? SPTPNVideoEvent.SPTPNVideoEventClosed
 				: SPTPNVideoEvent.SPTPNVideoEventAborted);
 		clearVideoEvent();
    }

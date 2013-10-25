@@ -108,6 +108,7 @@ public class VungleMediationAdaptor extends SPMediationAdaptor implements EventL
 	// Vungle EventListener interface 
 	@Override
 	public void onVungleAdEnd() {
+		// this is fired before onVungleView method
 //		notifyCloseEngagement();
 	}
 
@@ -120,9 +121,13 @@ public class VungleMediationAdaptor extends SPMediationAdaptor implements EventL
 	public void onVungleView(double watchedSeconds, double totalAdSeconds) {
         final double watchedPercent = watchedSeconds / totalAdSeconds;
         if (watchedPercent >= mVideoWatchedAt) {
-        	setVideoPlayed();
+        	// we notify only about the finished event tdue to the lack of event separation
+        	// the mediation offer will do the conversion and the close
+        	sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
+        } else {
+        	sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventAborted);
         }
-		notifyCloseEngagement();
+        clearVideoEvent();
 	}
 	
 }

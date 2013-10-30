@@ -22,6 +22,7 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnDoubleTapListener;
@@ -130,10 +131,13 @@ public class SPBrandEngageClient {
 	private static final int TIMEOUT = 10000 ;
 	private static final int VCS_TIMEOUT = 3000 ;
 
-	protected static final int VIDEO_EVENT = 1;
-	protected static final int VALIDATION_RESULT = 2;
+	private static final int VIDEO_EVENT = 1;
+	private static final int VALIDATION_RESULT = 2;
+	private static final int LOAD_URL = 123;
 
 	private Handler mHandler;
+	private Handler mWebViewHandler;
+	
 	private SPMediationCoordinator mMediationCoordinator;
 	
 	private Activity mActivity;
@@ -175,6 +179,7 @@ public class SPBrandEngageClient {
 		}
 	};
 
+
 	private SPBrandEngageClient() {
 		mHandler = new Handler() {
 			@Override
@@ -188,6 +193,23 @@ public class SPBrandEngageClient {
 					//something went wrong, show error dialog message
 					showErrorDialog(SponsorPayPublisher
 							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+					break;
+				}
+			}
+		};
+		mWebViewHandler = new Handler(Looper.getMainLooper()) {
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case LOAD_URL:
+					if (mWebView != null) {
+						mWebView.loadUrl(msg.obj.toString());
+					} else {
+						SponsorPayLogger.e(TAG, "Webview is not avavilable");
+					}
+					break;
+				default:
+					SponsorPayLogger.e(TAG, "Unknow message what field");
 					break;
 				}
 			}
@@ -241,7 +263,7 @@ public class SPBrandEngageClient {
 				.setCurrency(mCurrency).addExtraKeysValues(mCustomParameters)
 				.addScreenMetrics().buildUrl();
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
-		mWebView.loadUrl(requestUrl);
+		loadUrl(requestUrl);
 		setClientStatus(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
 		
 		mHandler.sendEmptyMessageDelayed(VALIDATION_RESULT, TIMEOUT);
@@ -258,7 +280,7 @@ public class SPBrandEngageClient {
 	public boolean startEngagement(Activity activity) {
 		if (canStartEngagement()) {
 			
-			mWebView.loadUrl(SP_START_ENGAGEMENT);
+			loadUrl(SP_START_ENGAGEMENT);
 			
 			mActivity = activity;
 			if (!playThroughMediation()) {
@@ -364,7 +386,7 @@ public class SPBrandEngageClient {
 	
 	private void clearWebViewPage() {
 		if (mWebView != null) {
-			mWebView.loadUrl(ABOUT_BLANK);
+			loadUrl(ABOUT_BLANK);
 		}
 		if (mStatus == SPBrandEngageOffersStatus.SHOWING_OFFERS
 				|| mStatus == SPBrandEngageOffersStatus.USER_ENGAGED
@@ -374,6 +396,13 @@ public class SPBrandEngageClient {
 		mWebView = null;
 		mActivity = null;
 		setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
+	}
+	
+	private void loadUrl(String url) {
+		Message m = Message.obtain(mWebViewHandler);
+		m.what = LOAD_URL;
+		m.obj = url;
+		m.sendToTarget();
 	}
 
 	private void checkEngagementStarted() {
@@ -602,7 +631,7 @@ public class SPBrandEngageClient {
 								String url = String.format("%s('validate', {tpn:'%s', id:%s, result:'%s'})", 
 										SP_JS_NOTIFY, name, contextData.get(SP_THIRD_PARTY_ID_PARAMETER), result);
 								SponsorPayLogger.d(TAG, "Notifying - " + url);
-								mWebView.loadUrl(url);
+								loadUrl(url);
 							}
 						});
 					} else if (command.equals(SP_REQUEST_PLAY)) {
@@ -620,7 +649,7 @@ public class SPBrandEngageClient {
 								String url = String.format("%s('play', {tpn:'%s', id:%s, result:'%s'})", 
 										SP_JS_NOTIFY, name, contextData.get(SP_THIRD_PARTY_ID_PARAMETER), event);
 								SponsorPayLogger.d(TAG, "Notifying - " + url);
-								mWebView.loadUrl(url);
+								loadUrl(url);
 							}
 						});
 					}

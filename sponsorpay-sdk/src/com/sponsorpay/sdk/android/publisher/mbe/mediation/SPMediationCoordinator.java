@@ -21,6 +21,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
@@ -156,6 +157,7 @@ public class SPMediationCoordinator {
 	 * Receives the value from the javascript.
 	 * @param value
 	 */
+	@JavascriptInterface
 	public void setValue(String value)
 	{
 		returnValue = value;

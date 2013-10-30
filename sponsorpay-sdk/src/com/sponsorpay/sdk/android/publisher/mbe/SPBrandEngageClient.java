@@ -204,8 +204,6 @@ public class SPBrandEngageClient {
 				case LOAD_URL:
 					if (mWebView != null) {
 						mWebView.loadUrl(msg.obj.toString());
-					} else {
-						SponsorPayLogger.e(TAG, "Webview is not avavilable");
 					}
 					break;
 				default:

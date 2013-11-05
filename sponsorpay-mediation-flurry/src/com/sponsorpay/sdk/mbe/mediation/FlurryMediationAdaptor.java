@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
+import android.graphics.Color;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
@@ -70,6 +70,7 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	@Override
 	public void videosAvailable(Context context) {
 		mLayout = new FrameLayout(context);
+		mLayout.setBackgroundColor(Color.BLACK);
 		FlurryAds.fetchAd(actRef.get(), getAdSpaceFromConfig(), mLayout,
 				getAdSizeFromConfig());
 	}

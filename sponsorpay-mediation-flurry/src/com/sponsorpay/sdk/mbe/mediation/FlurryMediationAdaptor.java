@@ -41,12 +41,9 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	private FrameLayout mLayout;
 
 	private WeakReference<Activity> actRef;
-
-//	private ContextWrapper mContextWrapper;
 	
 	@Override
 	public boolean startAdaptor(Activity activity) {
-//		mContextWrapper = new ContextWrapper(activity);
 		actRef = new WeakReference<Activity>(activity);
 		SponsorPayLogger.d(TAG, "Starting Flurry adaptor - SDK version " + FlurryAgent.getReleaseVersion());
 		String apiKey = SPMediationConfigurator.getConfiguration(ADAPTOR_NAME, API_KEY, String.class);
@@ -81,56 +78,6 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	public void startVideo(final Activity parentActivity) {
 		final String adSpaceFromConfig = getAdSpaceFromConfig();
 		if (FlurryAds.isAdReady(adSpaceFromConfig)) {
-		
-//			mLayout = new FrameLayout(parentActivity);
-			
-			if (Build.VERSION.SDK_INT > 10) {
-				// REALLY BAD WORKAROUND
-				// from Honeycomb onwards, the start activity must take place 
-				// on the same context in which the fetchad method occurred 
-//				String apiKey = SPMediationConfigurator.getConfiguration(ADAPTOR_NAME, API_KEY, String.class);
-//				FlurryAgent.onStartSession(parentActivity, apiKey);
-//				FlurryAds.fetchAd(parentActivity, adSpaceFromConfig, 
-//						mLayout, getAdSizeFromConfig());
-//				SponsorPayLogger.i(TAG, "isAdReady? - " + FlurryAds.isAdReady(adSpaceFromConfig));
-				
-//				final Intent intent =  new Intent(parentActivity, FlurryMediationActivity.class);
-////				intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-////				parentActivity.startActivityForResult(intent, 1245);
-//				mContextWrapper.startActivity(intent);
-				
-//				parentActivity.startActivityFromChild(parentActivity, intent, 1245);
-				
-//				parentActivity.runOnUiThread(new Runnable() {
-//					
-//					@Override
-//					public void run() {
-//						parentActivity.startActivity(intent);
-//					}
-//				});
-				
-//				Handler handler = new Handler(parentActivity.getMainLooper()) {
-//					@Override
-//					public void handleMessage(Message msg) {
-//						FlurryAds.displayAd(parentActivity, adSpaceFromConfig,
-//								mLayout);
-//					}
-//				};
-//				Message obtainMessage = handler.obtainMessage();
-//				obtainMessage.sendToTarget();
-				
-				
-//			} else {
-//				
-//				mLayout = new FrameLayout(parentActivity);
-//				
-//				parentActivity.addContentView(mLayout, new LayoutParams(
-//						LayoutParams.FILL_PARENT,
-//						LayoutParams.FILL_PARENT));
-//				
-//				FlurryAds.displayAd(parentActivity, adSpaceFromConfig,
-//						mLayout);
-			}
 			
 			parentActivity.addContentView(mLayout, new LayoutParams(
 					LayoutParams.FILL_PARENT,
@@ -138,13 +85,6 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 			
 			FlurryAds.displayAd(actRef.get(), adSpaceFromConfig,
 					mLayout);
-//			parentActivity.addContentView(mLayout, new LayoutParams(
-//					LayoutParams.FILL_PARENT,
-//					LayoutParams.FILL_PARENT));
-//			
-//			FlurryAds.displayAd(parentActivity, adSpaceFromConfig,
-//					mLayout);
-			
 			
 		} else {
 			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventNoVideo);
@@ -174,13 +114,10 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 
 	@Override
 	public void onApplicationExit(String adSpaceName) {
-		SponsorPayLogger.d(TAG, "BLAAAAA");
 	}
 
 	@Override
 	public void onRendered(String adSpaceName) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -222,7 +159,8 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	
 	//HELPER method
 	private String getAdSpaceFromConfig() {
-		return SPMediationConfigurator.getConfiguration(ADAPTOR_NAME, AD_NAME_SPACE, String.class);
+		return SPMediationConfigurator.getConfiguration(ADAPTOR_NAME,
+				AD_NAME_SPACE, String.class);
 	}
 	
 

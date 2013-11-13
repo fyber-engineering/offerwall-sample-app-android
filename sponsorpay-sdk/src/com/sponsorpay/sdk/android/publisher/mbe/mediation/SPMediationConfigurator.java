@@ -43,10 +43,10 @@ public class SPMediationConfigurator {
 			if (StringUtils.notNullNorEmpty(jsonString)) {
 				SponsorPayLogger.d(TAG, "Parsing configurations");
 				JSONObject json = new JSONObject(jsonString);
-				JSONArray configs = json.getJSONArray("configs");
+				JSONArray configs = json.getJSONArray("adaptors");
 				for (int i = 0 ; i < configs.length() ; i++) {
 					JSONObject config = configs.getJSONObject(i);
-					String adaptorName = config.getString("adaptorName").toLowerCase();
+					String adaptorName = config.getString("name").toLowerCase();
 					if (config.has("settings")) {
 						JSONObject settings = config.getJSONObject("settings");
 						Map<String,	Object> map = new HashMap<String, Object>(settings.length());

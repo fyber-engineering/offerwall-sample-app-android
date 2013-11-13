@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android.publisher;
+package com.sponsorpay.sdk.android.utils;
 
 import java.lang.ref.WeakReference;
 
@@ -21,17 +21,16 @@ import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
-import com.sponsorpay.sdk.android.utils.IntentHelper;
-import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * {@link WebViewClient} implementing common functionality for {@link WebView} instances displaying
  * SponsorPay offers.  
  *
  */
-public abstract class OfferWebClient extends WebViewClient {
-	public static final String LOG_TAG = "OfferWebClient";
+public abstract class SPWebClient extends WebViewClient {
+	public static final String LOG_TAG = "SPWebClient";
 	
 	private static final String SPONSORPAY_SCHEMA = "sponsorpay://";
 	private static final String SPONSORPAY_EXIT_SCHEMA = "exit";
@@ -45,7 +44,7 @@ public abstract class OfferWebClient extends WebViewClient {
 
 	private WeakReference<Activity>  mHostActivityRef;
 	
-	public OfferWebClient(Activity hostActivity) {
+	public SPWebClient(Activity hostActivity) {
 		mHostActivityRef = new WeakReference<Activity>(hostActivity);
 	}
 	

@@ -89,6 +89,8 @@ public class UrlBuilder {
 	private static final String APP_VERSION_KEY = "app_version";
 	
 	private static final String CURRENCY_KEY = "currency";
+	
+	private static final String TIMESTAMP_KEY = "timestamp";
 
 	/**
 	 * Request signature parameter key.
@@ -161,10 +163,12 @@ public class UrlBuilder {
 	private Map<String, String> mExtraKeysValues;
 
 	private boolean mShouldAddScreenMetrics = false;
+	
+	private boolean mShouldAddUserId = true;
+	
+	private boolean mShouldAddTimestamp = false;
 
 	private SPCredentials mCredentials;
-
-	private boolean mShouldAddUserId = true;
 
 	private String mCurrency;
 	
@@ -183,6 +187,8 @@ public class UrlBuilder {
 		}
 		return this;
 	}
+	
+
 
 	public UrlBuilder addScreenMetrics() {
 		mShouldAddScreenMetrics = true;
@@ -196,6 +202,11 @@ public class UrlBuilder {
 	
 	public UrlBuilder setCurrency(String currency) {
 		mCurrency = currency;
+		return this;
+	}
+	
+	public UrlBuilder addTimestamp() {
+		mShouldAddTimestamp  = true;
 		return this;
 	}
 
@@ -250,19 +261,23 @@ public class UrlBuilder {
 			validateKeyValueParams(mExtraKeysValues);
 			keyValueParams.putAll(mExtraKeysValues);
 		}
+
+		if (mShouldAddTimestamp) {
+			keyValueParams.put(TIMESTAMP_KEY, getCurrentUnixTimestampAsString());
+		}
 		
 		Map<String, String> spExtraParams = SponsorPayParametersProvider.getParameters();
 		if (!spExtraParams.isEmpty()) {
 			keyValueParams.putAll(spExtraParams);
 		}
-
+		
 		Uri uri = Uri.parse(mResourceUrl);
 		Uri.Builder builder = uri.buildUpon();
 
 		for (Entry<String, String> entry : keyValueParams.entrySet()) {
 			builder.appendQueryParameter(entry.getKey(), entry.getValue());
 		}
-
+		
 		String secretKey = mCredentials.getSecurityToken();
 		if (StringUtils.notNullNorEmpty(secretKey)) {
 			builder.appendQueryParameter(URL_PARAM_SIGNATURE, SignatureTools
@@ -272,6 +287,17 @@ public class UrlBuilder {
 		uri = builder.build();
 
 		return uri.toString();
+	}
+	
+	
+	/**
+	 * Gets the current UNIX timestamp (in seconds) for the outbound requests.
+	 * 
+	 * @return
+	 */
+	private String getCurrentUnixTimestampAsString() {
+		final int MILLISECONDS_IN_SECOND = 1000;
+		return String.valueOf(System.currentTimeMillis() / MILLISECONDS_IN_SECOND);
 	}
 	
 	/**
@@ -290,4 +316,6 @@ public class UrlBuilder {
 	public static UrlBuilder newBuilder(String resourceUrl, SPCredentials credentials) {
 		return new UrlBuilder(resourceUrl, credentials);
 	}
+
+	
 }

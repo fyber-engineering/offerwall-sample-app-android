@@ -13,8 +13,6 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
@@ -23,7 +21,7 @@ import com.sponsorpay.sdk.android.publisher.currency.VirtualCurrencyConnector;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClient;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageRequest;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageRequestListener;
-import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.publisher.ofw.OfferWallActivity;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 /**
@@ -144,63 +142,6 @@ public class SponsorPayPublisher {
 		}
 	}
 
-	/**
-	 * The default request code needed for starting the Offer Wall activity.
-	 */
-	public static final int DEFAULT_OFFERWALL_REQUEST_CODE = 0xFF;
-
-	/**
-	 * The default request code needed for starting the Unlock Offer Wall activity.
-	 */
-	public static final int DEFAULT_UNLOCK_OFFERWALL_REQUEST_CODE = 0xFE;
-
-	
-	/**
-	 * Sets the provided cookie strings into the application's cookie manager for the given base
-	 * URL.
-	 * 
-	 * @param cookies
-	 *            An array of cookie strings.
-	 * @param baseUrl
-	 *            The base URL to set the cookies for.
-	 * @param context
-	 *            Android application context.
-	 */
-	public static void setCookiesIntoCookieManagerInstance(String[] cookies, String baseUrl,
-			Context context) {
-		if (cookies == null || cookies.length == 0) {
-			return;
-		}
-
-		CookieManager instance;
-
-		// CookieSyncManager.getInstance() has to be called before we get CookieManager's
-		try {
-			CookieSyncManager.getInstance();
-		} catch (IllegalStateException e) {
-			CookieSyncManager.createInstance(context);
-		}
-
-		instance = CookieManager.getInstance();
-
-		SponsorPayLogger.v(AsyncRequest.LOG_TAG, "Setting the following cookies into CookieManager instance "
-				+ instance + " for base URL " + baseUrl + ": ");
-
-		for (String cookieString : cookies) {
-			instance.setCookie(baseUrl, cookieString);
-			SponsorPayLogger.v(AsyncRequest.LOG_TAG, cookieString);
-		}
-	}
-
-	/**
-	 * Converts device pixels into screen pixels.
-	 */
-	public static int convertDevicePixelsIntoPixelsMeasurement(float dps, Context context) {
-		final float scale = context.getResources().getDisplayMetrics().density;
-		int pixels = (int) (dps * scale + 0.5f);
-		return pixels;
-	}
-	
 	//================================================================================
 	// OfferWall
 	//================================================================================
@@ -298,13 +239,13 @@ public class SponsorPayPublisher {
 		Intent intent = new Intent(context, OfferWallActivity.class);
 		intent.putExtra(OfferWallActivity.EXTRA_CREDENTIALS_TOKEN_KEY, credentials.getCredentialsToken());
 
-		if (shouldStayOpen != null) {
+//		if (shouldStayOpen != null) {
 			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
-		}
+//		}
 
-		if (StringUtils.notNullNorEmpty(currencyName)) {
+//		if (StringUtils.notNullNorEmpty(currencyName)) {
 			intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
-		}
+//		}
 
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY,
 				customParams);

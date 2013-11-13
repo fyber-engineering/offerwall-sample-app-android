@@ -40,7 +40,6 @@ import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
-import com.sponsorpay.sdk.android.publisher.OfferWebClient;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
@@ -50,6 +49,7 @@ import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationE
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
+import com.sponsorpay.sdk.android.utils.SPWebClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.UrlBuilder;
@@ -238,7 +238,7 @@ public class SPBrandEngageClient {
 	 */
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
 		if (canRequestOffers()) {
-			if (Build.VERSION.SDK_INT < 8) {
+			if (Build.VERSION.SDK_INT < 9) {
 				//always return no offers
 				processQueryOffersResponse(0);
 			} else {
@@ -599,7 +599,7 @@ public class SPBrandEngageClient {
 	private WebViewClient getWebClient() {
 		if (mWebClient == null) {
 				
-			mWebClient = new OfferWebClient(mActivity) {
+			mWebClient = new SPWebClient(mActivity) {
 				
 				@Override
 				public boolean shouldOverrideUrlLoading(WebView view, String url) {

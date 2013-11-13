@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android.publisher;
+package com.sponsorpay.sdk.android.publisher.ofw;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -23,6 +23,7 @@ import android.webkit.WebView;
 
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
+import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
@@ -126,32 +127,9 @@ public class OfferWallActivity extends Activity {
 		mWebView.getSettings().setPluginsEnabled(true);
 
 		mActivityOfferWebClient = new ActivityOfferWebClient(OfferWallActivity.this,
-				mShouldStayOpen) {
-			
-			@Override
-			public void onReceivedError(WebView view, int errorCode, String description,
-					String failingUrl) {
-				SponsorPayLogger.e(getClass().getSimpleName(), String.format(
-						"OfferWall WebView triggered an error. "
-								+ "Error code: %d, error description: %s. Failing URL: %s",
-						errorCode, description, failingUrl));
+				mShouldStayOpen);
 
-				UIStringIdentifier error;
-
-				switch (errorCode) {
-				case ERROR_HOST_LOOKUP:
-				case ERROR_IO:
-					error = UIStringIdentifier.ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION;
-					break;
-				default:
-					error = UIStringIdentifier.ERROR_LOADING_OFFERWALL;
-					break;
-				}
-				showErrorDialog(error);
-			}
-		};
 		mWebView.setWebViewClient(mActivityOfferWebClient);
-		
 		
 		mWebView.setWebChromeClient(new WebChromeClient() {
 			@Override
@@ -238,19 +216,7 @@ public class OfferWallActivity extends Activity {
 		return true;
 	}
 
-	/**
-	 * Displays an error dialog with the passed error message on top of the activity.
-	 * 
-	 * @param error
-	 *            Error message to show.
-	 */
-	protected void showErrorDialog(UIStringIdentifier error) {
-		String errorMessage = SponsorPayPublisher.getUIString(error);
-		mActivityOfferWebClient.showDialog(errorMessage);
-	}
-
 	// Credentials helper methods
-	
 	private static final String UID_KEY = "user.id.key";
 	private static final String APPID_KEY = "app.id.key";
 	private static final String SECURITY_TOKEN_KEY = "security.token.key";

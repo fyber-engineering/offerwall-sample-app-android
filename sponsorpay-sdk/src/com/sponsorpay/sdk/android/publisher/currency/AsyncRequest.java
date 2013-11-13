@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android.publisher;
+package com.sponsorpay.sdk.android.publisher.currency;
 import java.util.Locale;
 
 import org.apache.http.Header;

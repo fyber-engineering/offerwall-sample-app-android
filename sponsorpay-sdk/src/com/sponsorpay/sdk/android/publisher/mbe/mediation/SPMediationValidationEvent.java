@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface SPMediationValidationEvent {
 
-	public void validationEventResult(String adaptorName,
+	public void validationEventResult(String adapterName,
 			SPTPNValidationResult result, Map<String, String> contextData);
 
 }

@@ -13,17 +13,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdaptor;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
-public class MockMediatedAdaptor extends SPMediationAdaptor {
+public class MockMediatedAdapter extends SPMediationAdapter {
 
-	private static final String TAG = "MockMediatedAdaptor";
+	private static final String TAG = "MockMediatedAdapter";
 
-	public static final String ADAPTOR_NAME = "MockMediatedNetwork";
+	public static final String ADAPTER_NAME = "MockMediatedNetwork";
 
 	private static final String VERSION_STRING = "1.0.0";
 
@@ -37,7 +37,7 @@ public class MockMediatedAdaptor extends SPMediationAdaptor {
 
 	private HashMap<String, Object> configs;
 
-	public MockMediatedAdaptor() {
+	public MockMediatedAdapter() {
 		configs = new HashMap<String, Object>(3);
 		configs.put(VALIDATION_RESULT,
 				SPTPNValidationResult.SPTPNValidationSuccess);
@@ -48,15 +48,15 @@ public class MockMediatedAdaptor extends SPMediationAdaptor {
 	}
 	
 	@Override
-	public boolean startAdaptor(Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting mocking mediation adaptor");
-		SPMediationConfigurator.INSTANCE.setConfigurationForAdaptor(getName(), configs);
+	public boolean startAdapter(Activity activity) {
+		SponsorPayLogger.d(TAG, "Starting mocking mediation adapter");
+		SPMediationConfigurator.INSTANCE.setConfigurationForAdapter(getName(), configs);
 		return true;
 	}
 	
 	@Override
 	public String getName() {
-		return ADAPTOR_NAME;
+		return ADAPTER_NAME;
 	}
 	
 	@Override

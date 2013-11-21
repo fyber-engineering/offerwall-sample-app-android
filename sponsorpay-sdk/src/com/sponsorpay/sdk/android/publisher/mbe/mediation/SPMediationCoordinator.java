@@ -35,10 +35,10 @@ public class SPMediationCoordinator {
 
 	private boolean mThirdPartySDKsStarted = false;
 	
-	private HashMap<String, SPMediationAdaptor> mAdaptors;
+	private HashMap<String, SPMediationAdapter> mAdapters;
 	
 	public SPMediationCoordinator() {
-		mAdaptors = new HashMap<String, SPMediationAdaptor>();
+		mAdapters = new HashMap<String, SPMediationAdapter>();
 	}
 	
 	public void startThirdPartySDKs(Activity activity) {
@@ -47,26 +47,26 @@ public class SPMediationCoordinator {
 		}
 		SponsorPayLogger.d(TAG, "Starting mediation providers...");
 		for (Entry<String, List<String>> entry : SPMediationConfigurator.INSTANCE
-				.getMediationAdaptors().entrySet()) {
+				.getMediationAdapters().entrySet()) {
 			String className = entry.getKey();
 			try {
 				@SuppressWarnings("unchecked")
-				Class<SPMediationAdaptor> adaptorClass = (Class<SPMediationAdaptor>) Class.forName(className);
-				SPMediationAdaptor adaptor = adaptorClass.newInstance();
-				String name = adaptor.getName();
-				String version = adaptor.getVersion();
+				Class<SPMediationAdapter> adapterClass = (Class<SPMediationAdapter>) Class.forName(className);
+				SPMediationAdapter adapter = adapterClass.newInstance();
+				String name = adapter.getName();
+				String version = adapter.getVersion();
 				
-				SponsorPayLogger.d(TAG, String.format("Starting adaptor %s version %s", name, version));
+				SponsorPayLogger.d(TAG, String.format("Starting adapter %s version %s", name, version));
 				
 				if (entry.getValue().contains(version)) {
-					SponsorPayLogger.d(TAG, "Adaptor version is compatible with SDK. Proceeding...");
-					if (adaptor.startAdaptor(activity)) {
-						SponsorPayLogger.d(TAG, "Adaptor has been started successfully");
-						mAdaptors.put(name.toLowerCase(), adaptor);
+					SponsorPayLogger.d(TAG, "Adapter version is compatible with SDK. Proceeding...");
+					if (adapter.startAdapter(activity)) {
+						SponsorPayLogger.d(TAG, "Adapter has been started successfully");
+						mAdapters.put(name.toLowerCase(), adapter);
 					}
 				}
 			} catch (ClassNotFoundException e) {
-				SponsorPayLogger.e(TAG, "Adaptor not found - " + className, e);
+				SponsorPayLogger.e(TAG, "Adapter not found - " + className, e);
 			} catch (IllegalAccessException e) {
 				SponsorPayLogger.e(TAG, "An error occured", e);
 			} catch (InstantiationException e) {
@@ -74,7 +74,7 @@ public class SPMediationCoordinator {
 			}
 		}
 		
-		notifyAdaptorsList(activity);
+		notifyAdaptersList(activity);
 		mThirdPartySDKsStarted = true;
 	}
 	
@@ -94,25 +94,25 @@ public class SPMediationCoordinator {
 	}
 	
 	public boolean isProviderAvailable(String name) {
-		return mAdaptors.containsKey(name.toLowerCase());
+		return mAdapters.containsKey(name.toLowerCase());
 	}
 	
-	public void validateProvider(Context context, String adaptorName,
+	public void validateProvider(Context context, String adapterName,
 			HashMap<String, String> contextData, SPMediationValidationEvent validationEvent) {
-		if (isProviderAvailable(adaptorName)) {
-			mAdaptors.get(adaptorName.toLowerCase()).videosAvailable(context, validationEvent, contextData);
+		if (isProviderAvailable(adapterName)) {
+			mAdapters.get(adapterName.toLowerCase()).videosAvailable(context, validationEvent, contextData);
 		} else {
-			validationEvent.validationEventResult(adaptorName, SPTPNValidationResult.SPTPNValidationNoVideoAvailable, contextData);
+			validationEvent.validationEventResult(adapterName, SPTPNValidationResult.SPTPNValidationNoVideoAvailable, contextData);
 		}
 	}
 	
-	public void startProviderEngagement(Activity parentActivity, String adaptorName,
+	public void startProviderEngagement(Activity parentActivity, String adapterName,
 			HashMap<String, String> contextData,
 			SPMediationVideoEvent videoEvent) {
-		if (isProviderAvailable(adaptorName)) {
-			mAdaptors.get(adaptorName.toLowerCase()).startVideo(parentActivity, videoEvent, contextData);
+		if (isProviderAvailable(adapterName)) {
+			mAdapters.get(adapterName.toLowerCase()).startVideo(parentActivity, videoEvent, contextData);
 		} else {
-			videoEvent.videoEventOccured(adaptorName, SPTPNVideoEvent.SPTPNVideoEventError, contextData);
+			videoEvent.videoEventOccured(adapterName, SPTPNVideoEvent.SPTPNVideoEventError, contextData);
 		}
 	}
 	
@@ -176,10 +176,10 @@ public class SPMediationCoordinator {
 	}
 	
 	// 
-	private void notifyAdaptorsList(Activity activity) {
+	private void notifyAdaptersList(Activity activity) {
 		try {
-			Method method = activity.getClass().getDeclaredMethod("notifyAdaptorsList", List.class);
-			List<String> list = new LinkedList<String>(mAdaptors.keySet());
+			Method method = activity.getClass().getDeclaredMethod("notifyAdaptersList", List.class);
+			List<String> list = new LinkedList<String>(mAdapters.keySet());
 			method.invoke(activity, list);
 		} catch (SecurityException e) {
 		} catch (NoSuchMethodException e) {

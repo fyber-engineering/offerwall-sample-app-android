@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface SPMediationVideoEvent {
 
-	public void videoEventOccured(String adaptorName, SPTPNVideoEvent event,
+	public void videoEventOccured(String adapterName, SPTPNVideoEvent event,
 			Map<String, String> contextData);
 
 }

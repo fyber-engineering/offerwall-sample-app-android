@@ -17,17 +17,17 @@ import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
- * Base class for mobile BrandEngage Mediation adaptor
+ * Base class for mobile BrandEngage Mediation adapter
  * </p>
  * 
- * This class defines the required specific methods to every adaptor and provides convenience methods
+ * This class defines the required specific methods to every adapter and provides convenience methods
  * handling timeouts, validation and events notifications. The {@link SPMediationCoordinator} will
  * communicate the results back to the {@link SPBrandEngageClientz}.
  * 
  */
-public abstract class SPMediationAdaptor {
+public abstract class SPMediationAdapter {
 
-	private static final String TAG = "SPMediationAdaptor";
+	private static final String TAG = "SPMediationAdapter";
 
 	/*
 	 * Validation event message.what field
@@ -71,7 +71,7 @@ public abstract class SPMediationAdaptor {
 	 */
 	private Handler mHandler;
 	
-	public SPMediationAdaptor() {
+	public SPMediationAdapter() {
 		mHandler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -88,7 +88,7 @@ public abstract class SPMediationAdaptor {
 	}
 
 	/* ======================================================
-	 *              Adaptor specific methods
+	 *              Adapter specific methods
 	 * ======================================================
 	 */
 	
@@ -97,9 +97,9 @@ public abstract class SPMediationAdaptor {
 	 * @param activity
 	 * 			The parent activity calling this method
 	 * @return 
-	 * 			true if the adaptor was successfully started, false otherwise
+	 * 			true if the adapter was successfully started, false otherwise
 	 */
-	public abstract boolean startAdaptor(Activity activity);
+	public abstract boolean startAdapter(Activity activity);
 	
 	/**
 	 * @return the name of the wrapped video network.
@@ -107,7 +107,7 @@ public abstract class SPMediationAdaptor {
 	public abstract String getName();
 	
 	/**
-	 * @return the current version of the adaptor
+	 * @return the current version of the adapter
 	 */
 	public abstract String getVersion();
 	

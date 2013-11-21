@@ -14,28 +14,28 @@ import android.content.Context;
 
 import com.applifier.impact.android.ApplifierImpact;
 import com.applifier.impact.android.IApplifierImpactListener;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdaptor;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
-public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IApplifierImpactListener{
+public class ApplifierMediationAdapter extends SPMediationAdapter implements IApplifierImpactListener{
 
-	private static final String TAG = "ApplifierAdaptor";
+	private static final String TAG = "ApplifierAdapter";
 
-	private static final String ADAPTOR_VERSION = "1.0.0";
+	private static final String ADAPTER_VERSION = "1.0.0";
 	
-	private static final String ADAPTOR_NAME = "Applifier";
+	private static final String ADAPTER_NAME = "Applifier";
 
 	public static final String GAME_ID_KEY = "game.id.key";
 
 	private boolean campaignAvailable;
 
 	@Override
-	public boolean startAdaptor(Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting Applifier adaptor - SDK version " + ApplifierImpact.getSDKVersion());
-		String gameKey = SPMediationConfigurator.getConfiguration(ADAPTOR_NAME, GAME_ID_KEY, String.class);
+	public boolean startAdapter(Activity activity) {
+		SponsorPayLogger.d(TAG, "Starting Applifier adapter - SDK version " + ApplifierImpact.getSDKVersion());
+		String gameKey = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, GAME_ID_KEY, String.class);
 		if (StringUtils.notNullNorEmpty(gameKey)) {
 			new ApplifierImpact(activity, gameKey, this);
 			return true;
@@ -46,12 +46,12 @@ public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IAp
 
 	@Override
 	public String getName() {
-		return ADAPTOR_NAME;
+		return ADAPTER_NAME;
 	}
 
 	@Override
 	public String getVersion() {
-		return ADAPTOR_VERSION;
+		return ADAPTER_VERSION;
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class ApplifierMediationAdaptor extends SPMediationAdaptor implements IAp
 	}
 	
 	private Object getValueFromConfig(String key) {
-		Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(ADAPTOR_NAME);
+		Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdapter(ADAPTER_NAME);
 		return config != null ? config.get(key) : null;
 	}
 

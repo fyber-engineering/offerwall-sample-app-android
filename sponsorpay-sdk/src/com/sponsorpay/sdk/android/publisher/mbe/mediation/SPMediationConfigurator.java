@@ -39,14 +39,14 @@ public class SPMediationConfigurator {
 		
 		try {
 			SponsorPayLogger.d(TAG, "Reading config file");
-			String jsonString = readFile("/adaptors.config");
+			String jsonString = readFile("/adapters.config");
 			if (StringUtils.notNullNorEmpty(jsonString)) {
 				SponsorPayLogger.d(TAG, "Parsing configurations");
 				JSONObject json = new JSONObject(jsonString);
-				JSONArray configs = json.getJSONArray("adaptors");
+				JSONArray configs = json.getJSONArray("adapters");
 				for (int i = 0 ; i < configs.length() ; i++) {
 					JSONObject config = configs.getJSONObject(i);
-					String adaptorName = config.getString("name").toLowerCase();
+					String adapterName = config.getString("name").toLowerCase();
 					if (config.has("settings")) {
 						JSONObject settings = config.getJSONObject("settings");
 						Map<String,	Object> map = new HashMap<String, Object>(settings.length());
@@ -57,10 +57,10 @@ public class SPMediationConfigurator {
 							Object value = settings.get(key);
 							map.put(key, value);
 						}
-						mConfigurations.put(adaptorName, map);
+						mConfigurations.put(adapterName, map);
  					} else {
  						Map<String, Object> map = Collections.emptyMap(); 
- 						mConfigurations.put(adaptorName, map);
+ 						mConfigurations.put(adapterName, map);
  					}
 				}
 			}
@@ -74,17 +74,17 @@ public class SPMediationConfigurator {
 		
 	}
 	
-	public Map<String, List<String>> getMediationAdaptors() {
+	public Map<String, List<String>> getMediationAdapters() {
 		SponsorPayLogger.d(TAG, "Getting compatible adapters for SDK v" + SponsorPay.RELEASE_VERSION_STRING );
 		
 		try {
-			// Use http request to get adaptors and versions
-			String jsonString = readFile("/adaptors.info");
+			// Use http request to get adapters and versions
+			String jsonString = readFile("/adapters.info");
 			if (StringUtils.notNullNorEmpty(jsonString)) {
 
 				JSONObject json = new JSONObject(jsonString);
 				
-				JSONArray array = json.getJSONArray("adaptors");
+				JSONArray array = json.getJSONArray("adapters");
 				Map<String, List<String>> map = new HashMap<String, List<String>>(array.length());
 				
 				for (int i = 0 ; i < array.length() ; i++) {
@@ -109,17 +109,17 @@ public class SPMediationConfigurator {
 		return Collections.emptyMap();
 	}
 	
-	public Map<String, Object> getConfigurationForAdaptor(String adaptor) {
-		return mConfigurations.get(adaptor.toLowerCase());
+	public Map<String, Object> getConfigurationForAdapter(String adapter) {
+		return mConfigurations.get(adapter.toLowerCase());
 	}
 	
-	public boolean setConfigurationForAdaptor(String adaptor, Map<String, Object> configurations) {
-		return mConfigurations.put(adaptor.toLowerCase(), configurations) != null;
+	public boolean setConfigurationForAdapter(String adapter, Map<String, Object> configurations) {
+		return mConfigurations.put(adapter.toLowerCase(), configurations) != null;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T extends Object> T getConfiguration(String adaptor, String key, Class<T> clasz) {
-		Map<String, Object> configs = INSTANCE.getConfigurationForAdaptor(adaptor);
+	public static <T extends Object> T getConfiguration(String adapter, String key, Class<T> clasz) {
+		Map<String, Object> configs = INSTANCE.getConfigurationForAdapter(adapter);
 		if (configs != null && !configs.isEmpty()) {
 			Object retValue = configs.get(key);
 			if (retValue != null && retValue.getClass().isAssignableFrom(clasz)) {
@@ -129,14 +129,14 @@ public class SPMediationConfigurator {
 		return null;
 	}
 	
-	public static <T extends Object> T getConfiguration(String adaptor, String key, T defaultValue, Class<T> clasz) {
-		T config = getConfiguration(adaptor, key, clasz);
+	public static <T extends Object> T getConfiguration(String adapter,
+			String key, T defaultValue, Class<T> clasz) {
+		T config = getConfiguration(adapter, key, clasz);
 		return config == null ? defaultValue : config;
 	}
 	
-	//Helper method to be dropped when changing to server side information 
 	private String readFile(String file) throws IOException, URISyntaxException {
-		String everything = null;
+		String content = null;
 		InputStream is = getClass().getResourceAsStream(file);
 		if (is != null) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -148,12 +148,12 @@ public class SPMediationConfigurator {
 					sb.append(line + '\n');
 					line = br.readLine();
 				}
-				everything = sb.toString();
+				content = sb.toString();
 			} finally {
 				br.close();
 			}
 		}
-		return everything;
+		return content;
 	}
 	
 }

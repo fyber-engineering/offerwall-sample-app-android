@@ -62,13 +62,13 @@ import com.sponsorpay.sdk.android.utils.UrlBuilder;
  * </p>
  * 
  * Before requesting offers, make sure the have called the {@link
- * SponsorPay#start(String, String, String, Context)} method. At this point you
+ * SponsorPay#start(String, String, String, Activity)} method. At this point you
  * can determine if offers are available with {@link #requestOffers}.
  * 
  * When the engagement is over you must restart the process, querying if offers
  * are available, before you run any engagement again. To check for new virtual
  * coins earned by the user, given you've set your VCS key with the {@link
- * SponsorPay#start(String, String, String, Context)}, simply set a
+ * SponsorPay#start(String, String, String, Activity)}, simply set a
  * {@link SPCurrencyServerListener} using
  * {@link #setCurrencyListener(SPCurrencyServerListener)} and it will be
  * notified after a successful engagement.
@@ -231,7 +231,7 @@ public class SPBrandEngageClient {
 	 * @param credentials
 	 * 			The credentials that will be used for this query. 
 	 * 			@see SPCredentials
-	 * 			@see SponsorPay#start(String, String, String, Context)
+	 * 			@see SponsorPay#start(String, String, String, Activity)
 	 * @param activity
 	 * 			The calling activity
 	 * @return true if a request is being made, false otherwise

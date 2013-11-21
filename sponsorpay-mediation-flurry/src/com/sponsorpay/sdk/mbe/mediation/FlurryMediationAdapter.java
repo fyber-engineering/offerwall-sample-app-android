@@ -19,20 +19,20 @@ import com.flurry.android.FlurryAdSize;
 import com.flurry.android.FlurryAdType;
 import com.flurry.android.FlurryAds;
 import com.flurry.android.FlurryAgent;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdaptor;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
-public class FlurryMediationAdaptor extends SPMediationAdaptor implements FlurryAdListener{
+public class FlurryMediationAdapter extends SPMediationAdapter implements FlurryAdListener{
 			
-	private static final String TAG = "FlurryAdaptor";
+	private static final String TAG = "FlurryAdapter";
 
-	private static final String ADAPTOR_VERSION = "1.0.0";
+	private static final String ADAPTER_VERSION = "1.0.0";
 
-	private static final String ADAPTOR_NAME = "FlurryAppCircleClips";
+	private static final String ADAPTER_NAME = "FlurryAppCircleClips";
 	
 	private static final String API_KEY = "api.key";
 	private static final String AD_NAME_SPACE = "ad.name.space";
@@ -43,10 +43,10 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	private WeakReference<Activity> actRef;
 	
 	@Override
-	public boolean startAdaptor(Activity activity) {
+	public boolean startAdapter(Activity activity) {
 		actRef = new WeakReference<Activity>(activity);
-		SponsorPayLogger.d(TAG, "Starting Flurry adaptor - SDK version " + FlurryAgent.getReleaseVersion());
-		String apiKey = SPMediationConfigurator.getConfiguration(ADAPTOR_NAME, API_KEY, String.class);
+		SponsorPayLogger.d(TAG, "Starting Flurry adapter - SDK version " + FlurryAgent.getReleaseVersion());
+		String apiKey = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, API_KEY, String.class);
 		if (StringUtils.notNullNorEmpty(apiKey)) {
 			SponsorPayLogger.i(TAG, "Using API key = " + apiKey);
 			FlurryAgent.onStartSession(actRef.get(), apiKey);
@@ -59,12 +59,12 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 
 	@Override
 	public String getName() {
-		return ADAPTOR_NAME;
+		return ADAPTER_NAME;
 	}
 
 	@Override
 	public String getVersion() {
-		return ADAPTOR_VERSION;
+		return ADAPTER_VERSION;
 	}
 
 	@Override
@@ -160,14 +160,14 @@ public class FlurryMediationAdaptor extends SPMediationAdaptor implements Flurry
 	
 	//HELPER method
 	private String getAdSpaceFromConfig() {
-		return SPMediationConfigurator.getConfiguration(ADAPTOR_NAME,
+		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME,
 				AD_NAME_SPACE, String.class);
 	}
 	
 
 	private FlurryAdSize getAdSizeFromConfig() {
 		return FlurryAdSize.valueOf(SPMediationConfigurator.getConfiguration(
-				ADAPTOR_NAME, AD_NAME_TYPE, "FULLSCREEN", String.class));
+				ADAPTER_NAME, AD_NAME_TYPE, "FULLSCREEN", String.class));
 	}
 	
 }

@@ -9,7 +9,7 @@ package com.sponsorpay.sdk.mbe.mediation;
 import android.app.Activity;
 import android.content.Context;
 
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdaptor;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
@@ -18,15 +18,15 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
 import com.vungle.sdk.VunglePub;
 import com.vungle.sdk.VunglePub.EventListener;
 
-public class VungleMediationAdaptor extends SPMediationAdaptor implements EventListener {
+public class VungleMediationAdapter extends SPMediationAdapter implements EventListener {
 			
 	private static final float MIN_PLAY_REQUIRED = 0.1f;
 
-	private static final String TAG = "VungleAdaptor";
+	private static final String TAG = "VungleAdapter";
 
-	private static final String ADAPTOR_VERSION = "1.0.0";
+	private static final String ADAPTER_VERSION = "1.0.0";
 
-	private static final String ADAPTOR_NAME = "Vungle";
+	private static final String ADAPTER_NAME = "Vungle";
 	
 	private static final String APP_ID = "app.id";
 	private static final String SHOW_CLOSE_BUTTON = "show.close.button";
@@ -39,17 +39,17 @@ public class VungleMediationAdaptor extends SPMediationAdaptor implements EventL
 	
 
 	@Override
-	public boolean startAdaptor(Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting Vungle adaptor - SDK version " + VunglePub.getVersionString());
-		String appId = SPMediationConfigurator.getConfiguration(ADAPTOR_NAME, APP_ID, String.class);
+	public boolean startAdapter(Activity activity) {
+		SponsorPayLogger.d(TAG, "Starting Vungle adapter - SDK version " + VunglePub.getVersionString());
+		String appId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID, String.class);
 		if (StringUtils.notNullNorEmpty(appId)) {
 			SponsorPayLogger.i(TAG, "Using App ID = " + appId);
 			VunglePub.setSoundEnabled(SPMediationConfigurator.getConfiguration(
-					ADAPTOR_NAME, SOUND_ENABLED, Boolean.TRUE, Boolean.class));
+					ADAPTER_NAME, SOUND_ENABLED, Boolean.TRUE, Boolean.class));
 			VunglePub.setAutoRotation(SPMediationConfigurator.getConfiguration(
-					ADAPTOR_NAME, AUTO_ROTATION_ENABLED, Boolean.FALSE,	Boolean.class));
+					ADAPTER_NAME, AUTO_ROTATION_ENABLED, Boolean.FALSE,	Boolean.class));
 			VunglePub.setBackButtonEnabled(SPMediationConfigurator.getConfiguration(
-					ADAPTOR_NAME, BACK_BUTTON_ENABLED, Boolean.FALSE, Boolean.class));
+					ADAPTER_NAME, BACK_BUTTON_ENABLED, Boolean.FALSE, Boolean.class));
 			setVideoWatchedAt();
 			VunglePub.init(activity, appId);
 			VunglePub.setEventListener(this);
@@ -61,12 +61,12 @@ public class VungleMediationAdaptor extends SPMediationAdaptor implements EventL
 
 	@Override
 	public String getName() {
-		return ADAPTOR_NAME;
+		return ADAPTER_NAME;
 	}
 
 	@Override
 	public String getVersion() {
-		return ADAPTOR_VERSION;
+		return ADAPTER_VERSION;
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class VungleMediationAdaptor extends SPMediationAdaptor implements EventL
 	public void startVideo(final Activity parentActivity) {
 		if (VunglePub.isVideoAvailable()) {
 			Boolean showClose = SPMediationConfigurator.getConfiguration(
-					ADAPTOR_NAME, SHOW_CLOSE_BUTTON, Boolean.FALSE,	Boolean.class);
+					ADAPTER_NAME, SHOW_CLOSE_BUTTON, Boolean.FALSE,	Boolean.class);
 			VunglePub.displayIncentivizedAdvert(showClose);
 		} else {
 			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventNoVideo);
@@ -91,7 +91,7 @@ public class VungleMediationAdaptor extends SPMediationAdaptor implements EventL
 	private void setVideoWatchedAt() {
 		try {
 			mVideoWatchedAt = Float.parseFloat(SPMediationConfigurator
-					.getConfiguration(ADAPTOR_NAME, VIDEO_WATCHED_AT,
+					.getConfiguration(ADAPTER_NAME, VIDEO_WATCHED_AT,
 							"0.9", String.class));
 			if (mVideoWatchedAt < MIN_PLAY_REQUIRED) {
 				mVideoWatchedAt = MIN_PLAY_REQUIRED;

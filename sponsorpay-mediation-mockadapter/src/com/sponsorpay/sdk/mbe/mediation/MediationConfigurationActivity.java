@@ -29,10 +29,10 @@ public class MediationConfigurationActivity extends Activity {
 	      @Override
 	      public void onClick(View v) {
 	    	  MockSetting setting = (MockSetting) v.getTag();
-	    	  Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdaptor(MockMediatedAdaptor.ADAPTOR_NAME);
-	    	  config.put(MockMediatedAdaptor.MOCK_PLAYING_BEHAVIOUR, setting.getBehaviour());
-	    	  config.put(MockMediatedAdaptor.VIDEO_EVENT_RESULT, setting.getVideoEvent());
-	    	  config.put(MockMediatedAdaptor.VALIDATION_RESULT, setting.getValidationResult());
+	    	  Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdapter(MockMediatedAdapter.ADAPTER_NAME);
+	    	  config.put(MockMediatedAdapter.MOCK_PLAYING_BEHAVIOUR, setting.getBehaviour());
+	    	  config.put(MockMediatedAdapter.VIDEO_EVENT_RESULT, setting.getVideoEvent());
+	    	  config.put(MockMediatedAdapter.VALIDATION_RESULT, setting.getValidationResult());
 	    	  ConfigHolder.INSTANCE.setCurrentConfig(setting);
 	    	  finish();
 	      }

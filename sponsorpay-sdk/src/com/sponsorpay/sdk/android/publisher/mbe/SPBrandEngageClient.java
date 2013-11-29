@@ -52,6 +52,7 @@ import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SPWebClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
@@ -134,6 +135,7 @@ public class SPBrandEngageClient {
 	private static final int VIDEO_EVENT = 1;
 	private static final int VALIDATION_RESULT = 2;
 	private static final int LOAD_URL = 123;
+	private static final int ON_PAUSE = 522;
 
 	private Handler mHandler;
 	private Handler mWebViewHandler;
@@ -203,8 +205,16 @@ public class SPBrandEngageClient {
 				switch (msg.what) {
 				case LOAD_URL:
 					if (mWebView != null) {
-						mWebView.loadUrl(msg.obj.toString());
+						String url = msg.obj.toString();
+						mWebView.loadUrl(url);
+						if (url.equals(ABOUT_BLANK)) {
+							mWebView = null;
+							mActivity = null;
+						}
 					}
+					break;
+				case ON_PAUSE:
+					doPauseWebView();
 					break;
 				default:
 					SponsorPayLogger.e(TAG, "Unknow message what field");
@@ -214,7 +224,7 @@ public class SPBrandEngageClient {
 		};
 		mMediationCoordinator = new SPMediationCoordinator();
 	}
-	
+
 	public void startMediationAdapters(Activity activity) {
 		mMediationCoordinator.startThirdPartySDKs(activity);
 	}
@@ -332,7 +342,7 @@ public class SPBrandEngageClient {
 	 * @return true if the client shows a toast notifying the user of a
 	 *         successful engagement, false otherwise.
 	 * 
-	 * @see SPBrandEngageClient#shouldShowRewardsNotification()
+	 * @see SPBrandEngageClient#setShowRewardsNotification(boolean)
 	 * @see UIStringIdentifier
 	 * @see SponsorPayPublisher#setCustomUIString(UIStringIdentifier, String)
 	 */
@@ -341,7 +351,7 @@ public class SPBrandEngageClient {
 	}
 	
 	/**
-	 * Sets if the toast reward message shoul be shown
+	 * Sets if the toast reward message should be shown
 	 * 
 	 * @param mShowRewardsNotification
 	 */
@@ -389,18 +399,22 @@ public class SPBrandEngageClient {
 		if (mStatus == SPBrandEngageOffersStatus.SHOWING_OFFERS
 				|| mStatus == SPBrandEngageOffersStatus.USER_ENGAGED
 				|| mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS) {
-			mContext.unregisterReceiver(mNetworkStateReceiver);
+			try {
+				mContext.unregisterReceiver(mNetworkStateReceiver);
+			} catch (IllegalArgumentException e) {
+				SponsorPayLogger.e(TAG, e.getMessage(), e);
+			}
 		}
-		mWebView = null;
-		mActivity = null;
 		setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 	}
 	
 	private void loadUrl(String url) {
-		Message m = Message.obtain(mWebViewHandler);
-		m.what = LOAD_URL;
-		m.obj = url;
-		m.sendToTarget();
+		if (StringUtils.notNullNorEmpty(url)) {
+			Message m = Message.obtain(mWebViewHandler);
+			m.what = LOAD_URL;
+			m.obj = url;
+			m.sendToTarget();
+		}
 	}
 
 	private void checkEngagementStarted() {
@@ -810,20 +824,21 @@ public class SPBrandEngageClient {
 
 	//ÊHack section - don't shop around here
 	public void onPause() {
-		mHandler.post(new Runnable() {
-			@Override
-			public void run() {
-			    if (mWebView != null) {
-			    	try {
-						Class.forName("android.webkit.WebView")
-								.getMethod("onPause", (Class[]) null)
-								.invoke(mWebView, (Object[]) null);
-					} catch (Exception exception) {
-						SponsorPayLogger.e(TAG, "onPause error", exception);
-					}
-			    }
+		Message m = Message.obtain(mWebViewHandler);
+		m.what = ON_PAUSE;
+		m.sendToTarget();
+	}
+	
+	private void doPauseWebView() {
+		if (mWebView != null) {
+			try {
+				Class.forName("android.webkit.WebView")
+						.getMethod("onPause", (Class[]) null)
+						.invoke(mWebView, (Object[]) null);
+			} catch (Exception exception) {
+				SponsorPayLogger.e(TAG, "onPause error", exception);
 			}
-		});
+		}
 	}
 
 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="lib" path="/sponsorpay-android-sdk/sponsorpay-android-sdk.jar" sourcepath="/sponsorpay-android-sdk"/>
+	<classpathentry kind="lib" path="libs/applifier-impact-android.jar" sourcepath="/applifier-impact-mobile/src"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

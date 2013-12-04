@@ -162,6 +162,7 @@ public class SPBrandEngageClient {
 	private WebChromeClient mChromeClient;	
 	private OnTouchListener mOnTouchListener;
 	
+	private IntentFilter mIntentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
 	private BroadcastReceiver mNetworkStateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -295,6 +296,7 @@ public class SPBrandEngageClient {
 				mActivity.addContentView(mWebView, new LayoutParams(
 						LayoutParams.FILL_PARENT,
 						LayoutParams.FILL_PARENT));
+				mContext.registerReceiver(mNetworkStateReceiver, mIntentFilter);
 			}
 		
 			checkEngagementStarted();
@@ -311,6 +313,11 @@ public class SPBrandEngageClient {
 	 * Closes the current engagement
 	 */
 	public void closeEngagement() {
+		try {
+			mContext.unregisterReceiver(mNetworkStateReceiver);
+		} catch (IllegalArgumentException e) {
+			SponsorPayLogger.e(TAG, e.getMessage(), e);
+		}
 		if (mStatus == SPBrandEngageOffersStatus.USER_ENGAGED) {
 			changeStatus(SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE);
 		} else {
@@ -396,15 +403,15 @@ public class SPBrandEngageClient {
 		if (mWebView != null) {
 			loadUrl(ABOUT_BLANK);
 		}
-		if (mStatus == SPBrandEngageOffersStatus.SHOWING_OFFERS
-				|| mStatus == SPBrandEngageOffersStatus.USER_ENGAGED
-				|| mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS) {
-			try {
-				mContext.unregisterReceiver(mNetworkStateReceiver);
-			} catch (IllegalArgumentException e) {
-				SponsorPayLogger.e(TAG, e.getMessage(), e);
-			}
-		}
+//		if (mStatus == SPBrandEngageOffersStatus.SHOWING_OFFERS
+//				|| mStatus == SPBrandEngageOffersStatus.USER_ENGAGED
+//				|| mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS) {
+//			try {
+//				mContext.unregisterReceiver(mNetworkStateReceiver);
+//			} catch (IllegalArgumentException e) {
+//				SponsorPayLogger.e(TAG, e.getMessage(), e);
+//			}
+//		}
 		setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 	}
 	
@@ -544,10 +551,6 @@ public class SPBrandEngageClient {
 
 		mWebView.addJavascriptInterface(mMediationCoordinator,
 				mMediationCoordinator.getInterfaceName());
-		
-		IntentFilter filter = new IntentFilter(
-				ConnectivityManager.CONNECTIVITY_ACTION);
-		mContext.registerReceiver(mNetworkStateReceiver, filter);
 	}
 
 	private void showErrorDialog(String message) {

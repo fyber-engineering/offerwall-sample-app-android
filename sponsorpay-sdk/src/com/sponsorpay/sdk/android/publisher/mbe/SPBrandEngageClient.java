@@ -403,15 +403,6 @@ public class SPBrandEngageClient {
 		if (mWebView != null) {
 			loadUrl(ABOUT_BLANK);
 		}
-//		if (mStatus == SPBrandEngageOffersStatus.SHOWING_OFFERS
-//				|| mStatus == SPBrandEngageOffersStatus.USER_ENGAGED
-//				|| mStatus == SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS) {
-//			try {
-//				mContext.unregisterReceiver(mNetworkStateReceiver);
-//			} catch (IllegalArgumentException e) {
-//				SponsorPayLogger.e(TAG, e.getMessage(), e);
-//			}
-//		}
 		setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 	}
 	

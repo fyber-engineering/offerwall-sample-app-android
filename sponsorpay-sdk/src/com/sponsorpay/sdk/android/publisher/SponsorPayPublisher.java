@@ -235,18 +235,11 @@ public class SponsorPayPublisher {
 
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 
-
 		Intent intent = new Intent(context, OfferWallActivity.class);
+
 		intent.putExtra(OfferWallActivity.EXTRA_CREDENTIALS_TOKEN_KEY, credentials.getCredentialsToken());
-
-//		if (shouldStayOpen != null) {
-			intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
-//		}
-
-//		if (StringUtils.notNullNorEmpty(currencyName)) {
-			intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
-//		}
-
+		intent.putExtra(OfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
+		intent.putExtra(OfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
 		intent.putExtra(OfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY,
 				customParams);
 

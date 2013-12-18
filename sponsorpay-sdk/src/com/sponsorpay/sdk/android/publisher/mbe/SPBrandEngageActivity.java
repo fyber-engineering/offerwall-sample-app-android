@@ -25,7 +25,10 @@ import android.view.WindowManager;
  */
 public class SPBrandEngageActivity extends Activity implements SPBrandEngageClientStatusListener {
 	
+	//used to prevent the activity closed after a redirect
 	private boolean mPendingClose = false;
+	
+	// variable used to prevent double STATUS notification 
 	private boolean mEngagementAlreadyClosed = false;
 
 	@Override
@@ -63,16 +66,9 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 				&& !mEngagementAlreadyClosed) {
 			SPBrandEngageClient.INSTANCE.onPause();
 			SPBrandEngageClient.INSTANCE.closeEngagement();
-			closeActivity();
 		}
 	}
 	
-	@Override
-	public void onBackPressed() {
-		SPBrandEngageClient.INSTANCE.closeEngagement();
-		super.onBackPressed();
-	}
-
 	private void closeActivity() {
 		mEngagementAlreadyClosed = true; 
 		finish();

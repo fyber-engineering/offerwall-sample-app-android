@@ -4,10 +4,11 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android.publisher.mbe.mediation;
+package com.sponsorpay.sdk.android.mediation;
 
 public enum SPTPNValidationResult {
 
+//	SPTPNValidationAdapterNotIntegrated("not_integrated"),
 	SPTPNValidationNoVideoAvailable("no_video"),
     SPTPNValidationTimeout("timeout"),
     SPTPNValidationNetworkError("network_error"),

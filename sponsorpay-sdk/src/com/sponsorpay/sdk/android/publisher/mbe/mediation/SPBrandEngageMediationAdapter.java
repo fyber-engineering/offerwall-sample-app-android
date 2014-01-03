@@ -13,6 +13,9 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 
+import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
+import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
+import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
@@ -22,12 +25,12 @@ import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
  * 
  * This class defines the required specific methods to every adapter and provides convenience methods
  * handling timeouts, validation and events notifications. The {@link SPMediationCoordinator} will
- * communicate the results back to the {@link SPBrandEngageClientz}.
+ * communicate the results back to the {@link SPBrandEngageClient}.
  * 
  */
-public abstract class SPMediationAdapter {
+public abstract class SPBrandEngageMediationAdapter {
 
-	private static final String TAG = "SPMediationAdapter";
+	private static final String TAG = "SPBrandEngageMediationAdapter";
 
 	/*
 	 * Validation event message.what field
@@ -70,8 +73,11 @@ public abstract class SPMediationAdapter {
 	 * Handler queue for validation and video timeouts 
 	 */
 	private Handler mHandler;
+
+	private SPMediationAdapter mAdapter;
 	
-	public SPMediationAdapter() {
+	public SPBrandEngageMediationAdapter(SPMediationAdapter adapter) {
+		mAdapter = adapter;
 		mHandler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
@@ -92,24 +98,10 @@ public abstract class SPMediationAdapter {
 	 * ======================================================
 	 */
 	
-	/**
-	 * Initializes the wrapped SDK, usually with the necessary credentials.
-	 * @param activity
-	 * 			The parent activity calling this method
-	 * @return 
-	 * 			true if the adapter was successfully started, false otherwise
-	 */
-	public abstract boolean startAdapter(Activity activity);
-	
-	/**
-	 * @return the name of the wrapped video network.
-	 */
-	public abstract String getName();
-	
-	/**
-	 * @return the current version of the adapter
-	 */
-	public abstract String getVersion();
+//	/**
+//	 * @return the name of the wrapped video network.
+//	 */
+//	public abstract String getName();
 	
 	/**
 	 * Checks whether there are videos available to start playing. This is expected
@@ -255,6 +247,10 @@ public abstract class SPMediationAdapter {
    protected void notifyVideoError() {
 	   sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventError);
 	   clearVideoEvent();
+   }
+   
+   protected String getName() {
+	   return mAdapter.getName();
    }
    
 }

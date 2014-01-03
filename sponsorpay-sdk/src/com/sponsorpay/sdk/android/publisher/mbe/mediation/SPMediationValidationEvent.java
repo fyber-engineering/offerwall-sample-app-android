@@ -8,6 +8,8 @@ package com.sponsorpay.sdk.android.publisher.mbe.mediation;
 
 import java.util.Map;
 
+import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
+
 public interface SPMediationValidationEvent {
 
 	public void validationEventResult(String adapterName,

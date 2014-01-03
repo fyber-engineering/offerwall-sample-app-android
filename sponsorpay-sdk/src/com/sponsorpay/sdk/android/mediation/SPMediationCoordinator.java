@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android.publisher.mbe.mediation;
+package com.sponsorpay.sdk.android.mediation;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,12 +24,12 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 public class SPMediationCoordinator {
-
-	private static final String SP_GET_OFFERS = "Sponsorpay.MBE.SDKInterface.do_getOffer()";
-	private static final String SP_TPN_JSON_KEY = "uses_tpn";
 
 	private static final String TAG = "SPMediationCoordinator";
 
@@ -62,7 +62,7 @@ public class SPMediationCoordinator {
 					SponsorPayLogger.d(TAG, "Adapter version is compatible with SDK. Proceeding...");
 					if (adapter.startAdapter(activity)) {
 						SponsorPayLogger.d(TAG, "Adapter has been started successfully");
-						mAdapters.put(name.toLowerCase(), adapter);
+						mAdapters.put(name, adapter);
 					}
 				}
 			} catch (ClassNotFoundException e) {
@@ -78,29 +78,14 @@ public class SPMediationCoordinator {
 		mThirdPartySDKsStarted = true;
 	}
 	
-
-	public boolean playThroughTirdParty(WebView webView) {
-		String jsResult = 
-				getJSValue(webView, SP_GET_OFFERS);
-		if (jsResult != null) {
-			try {
-				JSONObject json = new JSONObject(jsResult);
-				return json.getBoolean(SP_TPN_JSON_KEY);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		}
-		return false;
-	}
-	
 	public boolean isProviderAvailable(String name) {
-		return mAdapters.containsKey(name.toLowerCase());
+		return mAdapters.containsKey(name);
 	}
 	
 	public void validateProvider(Context context, String adapterName,
 			HashMap<String, String> contextData, SPMediationValidationEvent validationEvent) {
 		if (isProviderAvailable(adapterName)) {
-			mAdapters.get(adapterName.toLowerCase()).videosAvailable(context, validationEvent, contextData);
+			mAdapters.get(adapterName).videosAvailable(context, validationEvent, contextData);
 		} else {
 			validationEvent.validationEventResult(adapterName, SPTPNValidationResult.SPTPNValidationNoVideoAvailable, contextData);
 		}
@@ -110,70 +95,13 @@ public class SPMediationCoordinator {
 			HashMap<String, String> contextData,
 			SPMediationVideoEvent videoEvent) {
 		if (isProviderAvailable(adapterName)) {
-			mAdapters.get(adapterName.toLowerCase()).startVideo(parentActivity, videoEvent, contextData);
+			mAdapters.get(adapterName).startVideo(parentActivity, videoEvent, contextData);
 		} else {
 			videoEvent.videoEventOccured(adapterName, SPTPNVideoEvent.SPTPNVideoEventError, contextData);
 		}
 	}
 	
-	// HELPER methods for sync JS reply
-	// http://www.gutterbling.com/blog/synchronous-javascript-evaluation-in-android-webview/#codesyntax_1
-	/** The javascript interface name for adding to web view. */
-	private final String interfaceName = "SynchJS";
- 
-	/** Countdown latch used to wait for result. */
-	private CountDownLatch latch = null;
- 
-	/** Return value to wait for. */
-	private String returnValue;
-	
-	/**
-	 * Evaluates the expression and returns the value.
-	 * @param webView
-	 * @param expression
-	 * @return
-	 */
-	private String getJSValue(WebView webView, String expression)
-	{
-		if (webView != null) {
-			latch = new CountDownLatch(1); 
-			String code = "javascript:window." + interfaceName + ".setValue((function(){try{return " + expression
-				+ "+\"\";}catch(js_eval_err){return '';}})());";
-			webView.loadUrl(code);
-	 
-			try {   
-	            // Set a 1 second timeout in case there's an error
-				latch.await(1, TimeUnit.SECONDS);
-				return returnValue;
-			} catch (InterruptedException e) {
-				Log.e(TAG, "Interrupted", e);
-			}
-		}
-		return null;
-	}
- 
- 
-	/**
-	 * Receives the value from the javascript.
-	 * @param value
-	 */
-	@JavascriptInterface
-	public void setValue(String value)
-	{
-		returnValue = value;
-		try {
-			latch.countDown();
-		} catch (Exception e) {
-		}
-	}
- 
-	/**
-	 * Gets the interface name
-	 * @return
-	 */
-	public String getInterfaceName(){
-		return this.interfaceName;
-	}
+
 	
 	// 
 	private void notifyAdaptersList(Activity activity) {

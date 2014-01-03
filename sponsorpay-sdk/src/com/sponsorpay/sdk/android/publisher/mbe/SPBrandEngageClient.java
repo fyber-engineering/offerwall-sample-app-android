@@ -40,14 +40,15 @@ import android.widget.Toast;
 
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
+import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
+import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationCoordinator;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationUtils;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SPWebClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
@@ -182,6 +183,7 @@ public class SPBrandEngageClient {
 		}
 	};
 
+	private SPBrandEngageMediationUtils mMediationUtils;
 
 	private SPBrandEngageClient() {
 		mHandler = new Handler() {
@@ -223,6 +225,7 @@ public class SPBrandEngageClient {
 				}
 			}
 		};
+		mMediationUtils = new SPBrandEngageMediationUtils();
 		mMediationCoordinator = new SPMediationCoordinator();
 	}
 
@@ -508,7 +511,7 @@ public class SPBrandEngageClient {
 	}
 
 	public boolean playThroughMediation() {
-		return mMediationCoordinator.playThroughTirdParty(mWebView);
+		return mMediationUtils.playThroughTirdParty(mWebView);
 	}
 	
 	// Helper methods
@@ -541,7 +544,7 @@ public class SPBrandEngageClient {
 		mWebView.setOnTouchListener(getOnTouchListener());
 
 		mWebView.addJavascriptInterface(mMediationCoordinator,
-				mMediationCoordinator.getInterfaceName());
+				mMediationUtils.getInterfaceName());
 	}
 
 	private void showErrorDialog(String message) {
@@ -816,6 +819,7 @@ public class SPBrandEngageClient {
 		return mOnTouchListener;
 	}
 
+	
 	//ÊHack section - don't shop around here
 	public void onPause() {
 		Message m = Message.obtain(mWebViewHandler);

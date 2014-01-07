@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.mbe.mediation;
+package com.sponsorpay.sdk.mediation;
 
 import java.util.Map;
 
@@ -19,8 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.mbe.mediation.helpers.ConfigHolder;
-import com.sponsorpay.sdk.mbe.mediation.helpers.MockSetting;
+import com.sponsorpay.sdk.mediation.helpers.ConfigHolder;
+import com.sponsorpay.sdk.mediation.helpers.MockSetting;
+import com.sponsorpay.sdk.mediation.mbe.MockMediatedVideoAdapter;
 
 public class MediationConfigurationActivity extends Activity {
 	
@@ -30,9 +31,9 @@ public class MediationConfigurationActivity extends Activity {
 	      public void onClick(View v) {
 	    	  MockSetting setting = (MockSetting) v.getTag();
 	    	  Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdapter(MockMediatedAdapter.ADAPTER_NAME);
-	    	  config.put(MockMediatedAdapter.MOCK_PLAYING_BEHAVIOUR, setting.getBehaviour());
-	    	  config.put(MockMediatedAdapter.VIDEO_EVENT_RESULT, setting.getVideoEvent());
-	    	  config.put(MockMediatedAdapter.VALIDATION_RESULT, setting.getValidationResult());
+	    	  config.put(MockMediatedVideoAdapter.MOCK_PLAYING_BEHAVIOUR, setting.getBehaviour());
+	    	  config.put(MockMediatedVideoAdapter.VIDEO_EVENT_RESULT, setting.getVideoEvent());
+	    	  config.put(MockMediatedVideoAdapter.VALIDATION_RESULT, setting.getValidationResult());
 	    	  ConfigHolder.INSTANCE.setCurrentConfig(setting);
 	    	  finish();
 	      }

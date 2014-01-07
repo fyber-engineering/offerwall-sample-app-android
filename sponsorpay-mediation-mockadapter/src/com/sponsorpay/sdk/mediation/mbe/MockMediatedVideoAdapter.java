@@ -4,47 +4,38 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.mbe.mediation;
+package com.sponsorpay.sdk.mediation.mbe;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 
-import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
-import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.mediation.SPMediationEngagementEvent;
-import com.sponsorpay.sdk.android.mediation.SPMediationFormat;
-import com.sponsorpay.sdk.android.mediation.SPMediationValidationEvent;
 import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
-import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.mediation.MediationConfigurationActivity;
+import com.sponsorpay.sdk.mediation.MockMediatedAdapter;
+import com.sponsorpay.sdk.mediation.MockMediationActivity;
+import com.sponsorpay.sdk.mediation.MockMediationPlayingBehaviour;
 
-public class MockMediatedAdapter extends SPBrandEngageMediationAdapter implements SPMediationAdapter {
+public class MockMediatedVideoAdapter extends SPBrandEngageMediationAdapter<MockMediatedAdapter>{
 
-	private static final String TAG = "MockMediatedAdapter";
-
-	public static final String ADAPTER_NAME = "MockMediatedNetwork";
-
-	private static final String VERSION_STRING = "2.0.0";
+	private static final int DELAY_FOR_START_PLAY_EVENT = 500;
+	private static final int DELAY_FOR_VIDEO_EVENT = 4500;
 
 	public static final String MOCK_PLAYING_BEHAVIOUR = "mock.playing.behaviour";
 	public static final String VALIDATION_RESULT = "validation.event.result";
 	public static final String VIDEO_EVENT_RESULT = "video.event.result";
 	private static final String CLASS_NAME = "class.name";
 	
-	private static final int DELAY_FOR_START_PLAY_EVENT = 500;
-	private static final int DELAY_FOR_VIDEO_EVENT = 4500;
-
 	private HashMap<String, Object> configs;
 
-	public MockMediatedAdapter() {
-		super(null);
-		mAdapter = this;
+	public MockMediatedVideoAdapter(MockMediatedAdapter adapter) {
+		super(adapter);
 		configs = new HashMap<String, Object>(3);
 		configs.put(VALIDATION_RESULT,
 				SPTPNValidationResult.SPTPNValidationSuccess);
@@ -54,23 +45,6 @@ public class MockMediatedAdapter extends SPBrandEngageMediationAdapter implement
 		configs.put(CLASS_NAME, MediationConfigurationActivity.class.getCanonicalName());
 	}
 	
-	@Override
-	public boolean startAdapter(Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting mocking mediation adapter");
-		SPMediationConfigurator.INSTANCE.setConfigurationForAdapter(getName(), configs);
-		return true;
-	}
-	
-	@Override
-	public String getName() {
-		return ADAPTER_NAME;
-	}
-	
-	@Override
-	public String getVersion() {
-		return VERSION_STRING;
-	}
-
 	@Override
 	public void videosAvailable(Context context) {
 		// let timeout occur, otherwise fire the event
@@ -140,42 +114,9 @@ public class MockMediatedAdapter extends SPBrandEngageMediationAdapter implement
 			break;
 		}	
 	}
-	
-	@Override
-	public boolean supportMediationFormat(SPMediationFormat format) {
-		switch (format) {
-		case BrandEngage:
-			return true;
-		default:
-			return false;
-		}
-	}
 
-	@Override
-	public void validate(Context context, SPMediationFormat adFormat,
-			SPMediationValidationEvent validationEvent,
-			HashMap<String, String> contextData) {
-		switch (adFormat) {
-		case BrandEngage:
-			videosAvailable(context, validationEvent, contextData);
-			break;
-		default:
-			validationEvent.validationEventResult(getName(), SPTPNValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
-		}
-	}
-
-	@Override
-	public void startEngagement(Activity parentActivity,
-			SPMediationFormat adFormat,
-			SPMediationEngagementEvent engagementEvent,
-			HashMap<String, String> contextData) {
-		switch (adFormat) {
-		case BrandEngage:
-			startVideo(parentActivity, (SPMediationVideoEvent) engagementEvent, contextData);
-			break;
-		default:
-//			engagementEvent.validationEventResult(getName(), SPTPNValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
-		}
+	public Map<String, Object> getConfigs() {
+		return configs;
 	}
 
 }

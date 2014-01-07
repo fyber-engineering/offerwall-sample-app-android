@@ -30,7 +30,7 @@ import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
  * communicate the results back to the {@link SPBrandEngageClient}.
  * 
  */
-public abstract class SPBrandEngageMediationAdapter {
+public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter> {
 
 	private static final String TAG = "SPBrandEngageMediationAdapter";
 
@@ -76,9 +76,9 @@ public abstract class SPBrandEngageMediationAdapter {
 	 */
 	private Handler mHandler;
 
-	protected SPMediationAdapter mAdapter;
+	protected V mAdapter;
 	
-	public SPBrandEngageMediationAdapter(SPMediationAdapter adapter) {
+	public SPBrandEngageMediationAdapter(V adapter) {
 		mAdapter = adapter;
 
 		mHandler = new Handler(Looper.getMainLooper()) {
@@ -94,6 +94,10 @@ public abstract class SPBrandEngageMediationAdapter {
 				}
 			}
 		};
+	}
+	
+	public V getMediationAdapter() {
+		return mAdapter;
 	}
 
 	/* ======================================================

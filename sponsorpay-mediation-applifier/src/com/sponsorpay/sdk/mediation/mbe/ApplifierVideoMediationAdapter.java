@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.mbe.mediation;
+package com.sponsorpay.sdk.mediation.mbe;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,54 +14,18 @@ import android.content.Context;
 
 import com.applifier.impact.android.ApplifierImpact;
 import com.applifier.impact.android.IApplifierImpactListener;
-import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.mediation.SPMediationEngagementEvent;
-import com.sponsorpay.sdk.android.mediation.SPMediationFormat;
-import com.sponsorpay.sdk.android.mediation.SPMediationValidationEvent;
 import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
-import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
-import com.sponsorpay.sdk.android.utils.StringUtils;
+import com.sponsorpay.sdk.mediation.ApplifierMediationAdapter;
 
-public class ApplifierMediationAdapter extends SPBrandEngageMediationAdapter implements SPMediationAdapter, IApplifierImpactListener{
-
-	public ApplifierMediationAdapter() {
-		super(null);
-		mAdapter = this;
-	}
-
-	private static final String TAG = "ApplifierAdapter";
-
-	private static final String ADAPTER_VERSION = "2.0.0";
+public class ApplifierVideoMediationAdapter extends SPBrandEngageMediationAdapter<ApplifierMediationAdapter> 
+	implements IApplifierImpactListener{
 	
-	private static final String ADAPTER_NAME = "Applifier";
-
-	public static final String GAME_ID_KEY = "game.id.key";
-
 	private boolean campaignAvailable;
 
-	@Override
-	public boolean startAdapter(Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting Applifier adapter - SDK version " + ApplifierImpact.getSDKVersion());
-		String gameKey = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, GAME_ID_KEY, String.class);
-		if (StringUtils.notNullNorEmpty(gameKey)) {
-			new ApplifierImpact(activity, gameKey, this);
-			return true;
-		}
-		SponsorPayLogger.i(TAG, "Game key value is not valid");
-		return false;
-	}
-
-	@Override
-	public String getName() {
-		return ADAPTER_NAME;
-	}
-
-	@Override
-	public String getVersion() {
-		return ADAPTER_VERSION;
+	public ApplifierVideoMediationAdapter(ApplifierMediationAdapter adapter) {
+		super(adapter);
 	}
 
 	@Override
@@ -142,45 +106,8 @@ public class ApplifierMediationAdapter extends SPBrandEngageMediationAdapter imp
 	}
 	
 	private Object getValueFromConfig(String key) {
-		Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdapter(ADAPTER_NAME);
+		Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdapter(getName());
 		return config != null ? config.get(key) : null;
-	}
-
-	@Override
-	public boolean supportMediationFormat(SPMediationFormat format) {
-		switch (format) {
-		case BrandEngage:
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	@Override
-	public void validate(Context context, SPMediationFormat adFormat,
-			SPMediationValidationEvent validationEvent,
-			HashMap<String, String> contextData) {
-		switch (adFormat) {
-		case BrandEngage:
-			videosAvailable(context, validationEvent, contextData);
-			break;
-		default:
-			validationEvent.validationEventResult(getName(), SPTPNValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
-		}
-	}
-
-	@Override
-	public void startEngagement(Activity parentActivity,
-			SPMediationFormat adFormat,
-			SPMediationEngagementEvent engagementEvent,
-			HashMap<String, String> contextData) {
-		switch (adFormat) {
-		case BrandEngage:
-			startVideo(parentActivity, (SPMediationVideoEvent) engagementEvent, contextData);
-			break;
-		default:
-//			engagementEvent.validationEventResult(getName(), SPTPNValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
-		}
 	}
 
 }

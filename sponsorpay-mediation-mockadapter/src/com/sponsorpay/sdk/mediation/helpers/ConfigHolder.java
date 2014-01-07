@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.mbe.mediation.helpers;
+package com.sponsorpay.sdk.mediation.helpers;
 
 
 public class ConfigHolder {

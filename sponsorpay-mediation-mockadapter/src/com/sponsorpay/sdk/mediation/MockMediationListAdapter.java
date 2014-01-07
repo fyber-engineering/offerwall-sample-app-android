@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.mbe.mediation;
+package com.sponsorpay.sdk.mediation;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import com.sponsorpay.sdk.mbe.mediation.helpers.MockSetting;
+import com.sponsorpay.sdk.mediation.helpers.MockSetting;
 
 public class MockMediationListAdapter extends BaseExpandableListAdapter {
 

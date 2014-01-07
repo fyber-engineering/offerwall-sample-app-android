@@ -86,7 +86,7 @@ public class SponsorPayLogger {
 		}
 	}
 	
-	// Log to text view methods
+	// 
 	private static SponsorPayLogger INSTANCE = new SponsorPayLogger();
 	
 	private Set<SPLoggerListener> listeners = new HashSet<SPLoggerListener>();
@@ -97,6 +97,8 @@ public class SponsorPayLogger {
 	public void log(final Level level, final String tag, final String message,
 			final Exception exception) {
 		if (!listeners.isEmpty()) {
+			// this should have been taken care with thread, looper and handler, 
+			// but then we need to destroy it
 			new Thread(new Runnable() {
 				@Override
 				public void run() {

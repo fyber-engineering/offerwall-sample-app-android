@@ -7,6 +7,7 @@
 package com.sponsorpay.sdk.mbe.mediation;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,18 +20,23 @@ import com.flurry.android.FlurryAdSize;
 import com.flurry.android.FlurryAdType;
 import com.flurry.android.FlurryAds;
 import com.flurry.android.FlurryAgent;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdapter;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
+import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
+import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
+import com.sponsorpay.sdk.android.mediation.SPMediationEngagementEvent;
+import com.sponsorpay.sdk.android.mediation.SPMediationFormat;
+import com.sponsorpay.sdk.android.mediation.SPMediationValidationEvent;
+import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
-public class FlurryMediationAdapter extends SPMediationAdapter implements FlurryAdListener{
+public class FlurryMediationAdapter extends SPBrandEngageMediationAdapter implements SPMediationAdapter, FlurryAdListener{
 			
 	private static final String TAG = "FlurryAdapter";
 
-	private static final String ADAPTER_VERSION = "1.0.0";
+	private static final String ADAPTER_VERSION = "2.0.0";
 
 	private static final String ADAPTER_NAME = "FlurryAppCircleClips";
 	
@@ -41,6 +47,11 @@ public class FlurryMediationAdapter extends SPMediationAdapter implements Flurry
 	private FrameLayout mLayout;
 
 	private WeakReference<Activity> actRef;
+	
+	public FlurryMediationAdapter() {
+		super(null);
+		mAdapter = this;
+	}
 	
 	@Override
 	public boolean startAdapter(Activity activity) {
@@ -168,6 +179,43 @@ public class FlurryMediationAdapter extends SPMediationAdapter implements Flurry
 	private FlurryAdSize getAdSizeFromConfig() {
 		return FlurryAdSize.valueOf(SPMediationConfigurator.getConfiguration(
 				ADAPTER_NAME, AD_NAME_TYPE, "FULLSCREEN", String.class));
+	}
+
+	@Override
+	public boolean supportMediationFormat(SPMediationFormat format) {
+		switch (format) {
+		case BrandEngage:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	@Override
+	public void validate(Context context, SPMediationFormat adFormat,
+			SPMediationValidationEvent validationEvent,
+			HashMap<String, String> contextData) {
+		switch (adFormat) {
+		case BrandEngage:
+			videosAvailable(context, validationEvent, contextData);
+			break;
+		default:
+			validationEvent.validationEventResult(getName(), SPTPNValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
+		}
+	}
+
+	@Override
+	public void startEngagement(Activity parentActivity,
+			SPMediationFormat adFormat,
+			SPMediationEngagementEvent engagementEvent,
+			HashMap<String, String> contextData) {
+		switch (adFormat) {
+		case BrandEngage:
+			startVideo(parentActivity, (SPMediationVideoEvent) engagementEvent, contextData);
+			break;
+		default:
+//			engagementEvent.validationEventResult(getName(), SPTPNValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
+		}
 	}
 	
 }

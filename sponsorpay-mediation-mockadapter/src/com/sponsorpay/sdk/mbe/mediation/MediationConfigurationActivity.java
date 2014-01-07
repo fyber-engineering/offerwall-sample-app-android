@@ -18,7 +18,7 @@ import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
+import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
 import com.sponsorpay.sdk.mbe.mediation.helpers.ConfigHolder;
 import com.sponsorpay.sdk.mbe.mediation.helpers.MockSetting;
 

@@ -6,11 +6,6 @@
 
 package com.sponsorpay.sdk.android.mediation;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,9 +24,10 @@ import com.sponsorpay.sdk.android.utils.StringUtils;
 public class SPMediationConfigurator {
 
 	private static final String TAG = "SPMediationConfigurator";
+
 	
 	public static SPMediationConfigurator INSTANCE = new SPMediationConfigurator();
-
+	
 	private Map<String, Map<String, Object>> mConfigurations;
 	
 	private SPMediationConfigurator() {
@@ -39,7 +35,7 @@ public class SPMediationConfigurator {
 		
 		try {
 			SponsorPayLogger.d(TAG, "Reading config file");
-			String jsonString = readFile("/adapters.config");
+			String jsonString = SPMediationConfigurationFiles.getAdaptersConfig();
 			if (StringUtils.notNullNorEmpty(jsonString)) {
 				SponsorPayLogger.d(TAG, "Parsing configurations");
 				JSONObject json = new JSONObject(jsonString);
@@ -66,10 +62,6 @@ public class SPMediationConfigurator {
 			}
 		} catch (JSONException e) {
 			SponsorPayLogger.e(TAG, "Error occured", e);
-		} catch (IOException e) {
-			SponsorPayLogger.e(TAG, "Error occured", e);
-		} catch (URISyntaxException e) {
-			SponsorPayLogger.e(TAG, "Error occured", e);
 		}
 		
 	}
@@ -79,7 +71,7 @@ public class SPMediationConfigurator {
 		
 		try {
 			// Use http request to get adapters and versions
-			String jsonString = readFile("/adapters.info");
+			String jsonString = SPMediationConfigurationFiles.getAdapterInfo();
 			if (StringUtils.notNullNorEmpty(jsonString)) {
 
 				JSONObject json = new JSONObject(jsonString);
@@ -100,10 +92,6 @@ public class SPMediationConfigurator {
 				return map;
 			}
 		} catch (JSONException e) {
-			SponsorPayLogger.e(TAG, "Error occured", e);
-		} catch (IOException e) {
-			SponsorPayLogger.e(TAG, "Error occured", e);
-		} catch (URISyntaxException e) {
 			SponsorPayLogger.e(TAG, "Error occured", e);
 		}
 		return Collections.emptyMap();
@@ -133,27 +121,6 @@ public class SPMediationConfigurator {
 			String key, T defaultValue, Class<T> clasz) {
 		T config = getConfiguration(adapter, key, clasz);
 		return config == null ? defaultValue : config;
-	}
-	
-	private String readFile(String file) throws IOException, URISyntaxException {
-		String content = null;
-		InputStream is = getClass().getResourceAsStream(file);
-		if (is != null) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			try {
-				StringBuilder sb = new StringBuilder();
-				String line = br.readLine();
-
-				while (line != null) {
-					sb.append(line + '\n');
-					line = br.readLine();
-				}
-				content = sb.toString();
-			} finally {
-				br.close();
-			}
-		}
-		return content;
 	}
 	
 }

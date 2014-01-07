@@ -8,7 +8,7 @@ package com.sponsorpay.sdk.android.mediation;
 
 public enum SPTPNValidationResult {
 
-//	SPTPNValidationAdapterNotIntegrated("not_integrated"),
+	SPTPNValidationAdapterNotIntegrated("no_sdk"),
 	SPTPNValidationNoVideoAvailable("no_video"),
     SPTPNValidationTimeout("timeout"),
     SPTPNValidationNetworkError("network_error"),

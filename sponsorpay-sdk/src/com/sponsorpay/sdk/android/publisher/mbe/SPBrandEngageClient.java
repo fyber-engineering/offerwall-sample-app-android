@@ -41,13 +41,14 @@ import android.widget.Toast;
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
+import com.sponsorpay.sdk.android.mediation.SPMediationFormat;
+import com.sponsorpay.sdk.android.mediation.SPMediationValidationEvent;
 import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListener.SPBrandEngageClientStatus;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationUtils;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationJSInterface;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SPWebClient;
@@ -141,8 +142,6 @@ public class SPBrandEngageClient {
 	private Handler mHandler;
 	private Handler mWebViewHandler;
 	
-	private SPMediationCoordinator mMediationCoordinator;
-	
 	private Activity mActivity;
 	private Context mContext;
 	private WebView mWebView;
@@ -183,7 +182,7 @@ public class SPBrandEngageClient {
 		}
 	};
 
-	private SPBrandEngageMediationUtils mMediationUtils;
+	private SPBrandEngageMediationJSInterface mJSInterface;
 
 	private SPBrandEngageClient() {
 		mHandler = new Handler() {
@@ -225,12 +224,7 @@ public class SPBrandEngageClient {
 				}
 			}
 		};
-		mMediationUtils = new SPBrandEngageMediationUtils();
-		mMediationCoordinator = new SPMediationCoordinator();
-	}
-
-	public void startMediationAdapters(Activity activity) {
-		mMediationCoordinator.startThirdPartySDKs(activity);
+		mJSInterface = new SPBrandEngageMediationJSInterface();
 	}
 
 	/**
@@ -511,7 +505,7 @@ public class SPBrandEngageClient {
 	}
 
 	public boolean playThroughMediation() {
-		return mMediationUtils.playThroughTirdParty(mWebView);
+		return mJSInterface.playThroughTirdParty(mWebView);
 	}
 	
 	// Helper methods
@@ -543,8 +537,8 @@ public class SPBrandEngageClient {
 
 		mWebView.setOnTouchListener(getOnTouchListener());
 
-		mWebView.addJavascriptInterface(mMediationCoordinator,
-				mMediationUtils.getInterfaceName());
+		mWebView.addJavascriptInterface(mJSInterface,
+				mJSInterface.getInterfaceName());
 	}
 
 	private void showErrorDialog(String message) {
@@ -634,7 +628,8 @@ public class SPBrandEngageClient {
 						SponsorPayLogger.d(TAG, "MBE client asks to validate a third party network: " + tpnName);
 						HashMap<String, String> contextData = new HashMap<String, String>(1);
 						contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
-						mMediationCoordinator.validateProvider(mContext, tpnName, contextData, new SPMediationValidationEvent() {
+						SPMediationCoordinator.INSTANCE.validateProvider(mContext, tpnName, SPMediationFormat.BrandEngage, 
+								contextData, new SPMediationValidationEvent() {
 							@Override
 							public void validationEventResult(String name, SPTPNValidationResult result, Map<String, String> contextData) {
 								String url = String.format("%s('validate', {tpn:'%s', id:%s, result:'%s'})", 
@@ -648,7 +643,8 @@ public class SPBrandEngageClient {
 						HashMap<String, String> contextData = new HashMap<String, String>(1);
 						contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
 						SponsorPayLogger.d(TAG, "MBE client asks to play an offer from a third party network:" + tpnName);
-						mMediationCoordinator.startProviderEngagement(mActivity, tpnName, contextData, new SPMediationVideoEvent() {
+						SPMediationCoordinator.INSTANCE.startProviderEngagement(mActivity, tpnName, SPMediationFormat.BrandEngage,
+								contextData, new SPMediationVideoEvent() {
 							@Override
 							public void videoEventOccured(String name, SPTPNVideoEvent event,
 									Map<String, String> contextData) {

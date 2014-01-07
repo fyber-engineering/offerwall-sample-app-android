@@ -11,10 +11,12 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
+import com.sponsorpay.sdk.android.mediation.SPMediationValidationEvent;
 import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
@@ -74,11 +76,12 @@ public abstract class SPBrandEngageMediationAdapter {
 	 */
 	private Handler mHandler;
 
-	private SPMediationAdapter mAdapter;
+	protected SPMediationAdapter mAdapter;
 	
 	public SPBrandEngageMediationAdapter(SPMediationAdapter adapter) {
 		mAdapter = adapter;
-		mHandler = new Handler() {
+
+		mHandler = new Handler(Looper.getMainLooper()) {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
@@ -97,11 +100,6 @@ public abstract class SPBrandEngageMediationAdapter {
 	 *              Adapter specific methods
 	 * ======================================================
 	 */
-	
-//	/**
-//	 * @return the name of the wrapped video network.
-//	 */
-//	public abstract String getName();
 	
 	/**
 	 * Checks whether there are videos available to start playing. This is expected

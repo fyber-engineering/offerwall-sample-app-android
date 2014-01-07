@@ -6,7 +6,7 @@
 
 package com.sponsorpay.sdk.mbe.mediation.helpers;
 
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
+import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.mbe.mediation.MockMediationPlayingBehaviour;
 

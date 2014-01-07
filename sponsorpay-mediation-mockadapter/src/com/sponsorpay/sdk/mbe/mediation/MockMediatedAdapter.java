@@ -13,19 +13,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationAdapter;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNValidationResult;
+import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
+import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
+import com.sponsorpay.sdk.android.mediation.SPMediationEngagementEvent;
+import com.sponsorpay.sdk.android.mediation.SPMediationFormat;
+import com.sponsorpay.sdk.android.mediation.SPMediationValidationEvent;
+import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
-public class MockMediatedAdapter extends SPMediationAdapter {
+public class MockMediatedAdapter extends SPBrandEngageMediationAdapter implements SPMediationAdapter {
 
 	private static final String TAG = "MockMediatedAdapter";
 
 	public static final String ADAPTER_NAME = "MockMediatedNetwork";
 
-	private static final String VERSION_STRING = "1.0.0";
+	private static final String VERSION_STRING = "2.0.0";
 
 	public static final String MOCK_PLAYING_BEHAVIOUR = "mock.playing.behaviour";
 	public static final String VALIDATION_RESULT = "validation.event.result";
@@ -38,6 +43,8 @@ public class MockMediatedAdapter extends SPMediationAdapter {
 	private HashMap<String, Object> configs;
 
 	public MockMediatedAdapter() {
+		super(null);
+		mAdapter = this;
 		configs = new HashMap<String, Object>(3);
 		configs.put(VALIDATION_RESULT,
 				SPTPNValidationResult.SPTPNValidationSuccess);
@@ -132,6 +139,43 @@ public class MockMediatedAdapter extends SPMediationAdapter {
 			handler.postDelayed(runnable, DELAY_FOR_VIDEO_EVENT);
 			break;
 		}	
+	}
+	
+	@Override
+	public boolean supportMediationFormat(SPMediationFormat format) {
+		switch (format) {
+		case BrandEngage:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	@Override
+	public void validate(Context context, SPMediationFormat adFormat,
+			SPMediationValidationEvent validationEvent,
+			HashMap<String, String> contextData) {
+		switch (adFormat) {
+		case BrandEngage:
+			videosAvailable(context, validationEvent, contextData);
+			break;
+		default:
+			validationEvent.validationEventResult(getName(), SPTPNValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
+		}
+	}
+
+	@Override
+	public void startEngagement(Activity parentActivity,
+			SPMediationFormat adFormat,
+			SPMediationEngagementEvent engagementEvent,
+			HashMap<String, String> contextData) {
+		switch (adFormat) {
+		case BrandEngage:
+			startVideo(parentActivity, (SPMediationVideoEvent) engagementEvent, contextData);
+			break;
+		default:
+//			engagementEvent.validationEventResult(getName(), SPTPNValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
+		}
 	}
 
 }

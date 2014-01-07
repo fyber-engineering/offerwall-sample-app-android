@@ -15,7 +15,7 @@ import android.content.Context;
 
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
-import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClient;
+import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 
@@ -127,7 +127,7 @@ public class SponsorPay {
 		String credentialsToken = INSTANCE.getCredentialsToken(appId, userId, securityToken,
 						context);
 		if (!credentials.contains(credentialsToken)) {
-			SPBrandEngageClient.INSTANCE.startMediationAdapters(activity);
+			SPMediationCoordinator.INSTANCE.startMediationAdapters(activity);
 			SponsorPayAdvertiser.register(context);
 		}
 		return credentialsToken;

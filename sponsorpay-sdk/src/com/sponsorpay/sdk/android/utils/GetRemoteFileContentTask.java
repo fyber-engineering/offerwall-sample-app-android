@@ -16,8 +16,11 @@ import android.os.AsyncTask;
 
 public class GetRemoteFileContentTask extends AsyncTask<String, Void, String> {
 
+	private static final String TAG = "GetRemoteFileContentTask";
+
 	@Override
 	protected String doInBackground(String... params) {
+		Thread.currentThread().setName(TAG);
 		try {
 			HttpClient httpClient = SPHttpClient.getHttpClient();
 			HttpUriRequest request = new HttpGet(params[0]);
@@ -39,11 +42,9 @@ public class GetRemoteFileContentTask extends AsyncTask<String, Void, String> {
 
 			return sb.toString();
 		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SponsorPayLogger.e(TAG, e.getMessage(), e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SponsorPayLogger.e(TAG, e.getMessage(), e);
 		}
 		return null;
 	}

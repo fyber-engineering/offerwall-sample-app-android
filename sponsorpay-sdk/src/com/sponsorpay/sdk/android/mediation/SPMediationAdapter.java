@@ -14,7 +14,7 @@ import java.util.Set;
 import android.app.Activity;
 import android.content.Context;
 
-import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialMediationAdapter;
+import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 
@@ -44,9 +44,9 @@ public abstract class SPMediationAdapter {
 	 */
 	public abstract String getVersion();
 	
-	public abstract SPBrandEngageMediationAdapter<? extends SPMediationAdapter> getVideoMediationAdapter();
+	public abstract SPBrandEngageMediationAdapter<SPMediationAdapter> getVideoMediationAdapter();
 	
-	public abstract SPInterstitialMediationAdapter getInterstitialMediationAdapter();
+	public abstract SPInterstitialMediationAdapter<SPMediationAdapter> getInterstitialMediationAdapter();
 	
 	public boolean supportMediationFormat(SPMediationFormat format) {
 		switch (format) {
@@ -59,33 +59,42 @@ public abstract class SPMediationAdapter {
 		}
 	}
 
-	public void validate(Context context, SPMediationFormat adFormat,
+	public boolean validate(Context context, SPMediationFormat adFormat,
 			SPMediationValidationEvent validationEvent,
 			HashMap<String, String> contextData) {
+		// validation is not required here, as SPMediationCoordinator is performing it before, but...
 		switch (adFormat) {
 		case BrandEngage:
-			// no validation is required here, as SPMediationCoordinator is performing it before, but...
 			if (supportMediationFormat(adFormat)) {
 				getVideoMediationAdapter().videosAvailable(context, validationEvent, contextData);
+				return true;
 			}
 			break;
 		case Interstitial:
+			if (supportMediationFormat(adFormat)) {
+				return getInterstitialMediationAdapter().interstitialAvailable(context, validationEvent, contextData);
+			}
 		default:
 			break;
 		}
+		return false;
 	}
 
 	public void startEngagement(Activity parentActivity,SPMediationFormat adFormat, 
 			SPMediationEngagementEvent engagementEvent,
 			HashMap<String, String> contextData) {
 		switch (adFormat) {
+		// validation is not required here, as SPMediationCoordinator is performing it before, but...
 		case BrandEngage:
-			// no validation is required here, as SPMediationCoordinator is performing it before, but...
 			if (supportMediationFormat(adFormat)) {
 				getVideoMediationAdapter().startVideo(parentActivity, (SPMediationVideoEvent)engagementEvent, contextData);
 			}
 			break;
 		case Interstitial:
+			if (supportMediationFormat(adFormat)) {
+				getInterstitialMediationAdapter().show(parentActivity, (SPMediationEngagementEvent)engagementEvent, contextData);
+			}
+			break;
 		default:
 			break;
 		}

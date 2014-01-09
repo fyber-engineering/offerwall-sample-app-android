@@ -13,7 +13,7 @@ import android.app.Activity;
 import com.applifier.impact.android.ApplifierImpact;
 import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialMediationAdapter;
+import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 import com.sponsorpay.sdk.mediation.mbe.ApplifierVideoMediationAdapter;
@@ -56,7 +56,7 @@ public class ApplifierMediationAdapter extends SPMediationAdapter {
 	}
 	
 	@Override
-	public SPInterstitialMediationAdapter getInterstitialMediationAdapter() {
+	public SPInterstitialMediationAdapter<SPMediationAdapter> getInterstitialMediationAdapter() {
 		return null;
 	}
 

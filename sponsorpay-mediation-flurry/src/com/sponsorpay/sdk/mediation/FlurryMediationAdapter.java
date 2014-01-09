@@ -17,7 +17,7 @@ import com.flurry.android.FlurryAds;
 import com.flurry.android.FlurryAgent;
 import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialMediationAdapter;
+import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 import com.sponsorpay.sdk.mediation.mbe.FlurryVideoMediationAdapter;
@@ -68,7 +68,7 @@ public class FlurryMediationAdapter extends SPMediationAdapter implements Flurry
 	}
 	
 	@Override
-	public SPInterstitialMediationAdapter getInterstitialMediationAdapter() {
+	public SPInterstitialMediationAdapter<SPMediationAdapter> getInterstitialMediationAdapter() {
 		return null;
 	}
 	

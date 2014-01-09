@@ -52,7 +52,7 @@ public class SPMediationCoordinator {
 		mThirdPartySDKsStarted = true;
 		
 		// not using new thread handler because of the required Looper.quit to kill it 
-		new Thread("coordinatorrrr") {
+		new Thread("SPMediationCoordinator") {
 			public void run() {
 				SponsorPayLogger.d(TAG, "Starting mediation providers...");
 				for (Entry<String, List<String>> entry : SPMediationConfigurator.INSTANCE

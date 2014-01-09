@@ -12,7 +12,7 @@ import android.app.Activity;
 
 import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialMediationAdapter;
+import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.mediation.mbe.MockMediatedVideoAdapter;
 
@@ -53,7 +53,7 @@ public class MockMediatedAdapter extends SPMediationAdapter {
 	}
 
 	@Override
-	public SPInterstitialMediationAdapter getInterstitialMediationAdapter() {
+	public SPInterstitialMediationAdapter<SPMediationAdapter> getInterstitialMediationAdapter() {
 		return null;
 	}
 

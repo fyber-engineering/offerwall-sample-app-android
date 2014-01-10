@@ -6,8 +6,8 @@
 
 package com.sponsorpay.sdk.mediation.helpers;
 
-import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.sponsorpay.sdk.mediation.MockMediationPlayingBehaviour;
 
 
@@ -16,67 +16,67 @@ public enum MockSetting {
 	SPValidationTimeout("Timeout (SP SDK side)", 
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTimeOut,
 			SPTPNVideoEvent.SPTPNVideoEventNoVideo,
-			SPTPNValidationResult.SPTPNValidationTimeout),
+			SPTPNVideoValidationResult.SPTPNValidationTimeout),
 	TPNValidationTimeout("Timeout (3rd party SDK side)", 
 			// overusing the playing behaviour 
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerResultOnce,
 			SPTPNVideoEvent.SPTPNVideoEventNoVideo,
-			SPTPNValidationResult.SPTPNValidationTimeout),
+			SPTPNVideoValidationResult.SPTPNValidationTimeout),
 	NoVideoAvailable("No video available", 
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTimeOut,
 			SPTPNVideoEvent.SPTPNVideoEventNoVideo,
-			SPTPNValidationResult.SPTPNValidationNoVideoAvailable),
+			SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable),
 	NetowrokError("Network error", 
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTimeOut,
 			SPTPNVideoEvent.SPTPNVideoEventNoVideo,
-			SPTPNValidationResult.SPTPNValidationNetworkError),
+			SPTPNVideoValidationResult.SPTPNValidationNetworkError),
 	DiskError("Disk error", 
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTimeOut,
 			SPTPNVideoEvent.SPTPNVideoEventNoVideo,
-			SPTPNValidationResult.SPTPNValidationDiskError),
+			SPTPNVideoValidationResult.SPTPNValidationDiskError),
 	OtherError("Other error", 
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTimeOut,
 			SPTPNVideoEvent.SPTPNVideoEventNoVideo,
-			SPTPNValidationResult.SPTPNValidationError),
+			SPTPNVideoValidationResult.SPTPNValidationError),
 			
 	PlayingTimeout("Timeout (3rd party SDK side)",
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerResultOnce,
 			SPTPNVideoEvent.SPTPNVideoEventTimeout,
-			SPTPNValidationResult.SPTPNValidationSuccess),
+			SPTPNVideoValidationResult.SPTPNValidationSuccess),
 	PlayingStartAndTimeout("Started + Timeout (3rd party SDK)",
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerStartAndFinalResult,
 			SPTPNVideoEvent.SPTPNVideoEventTimeout,
-			SPTPNValidationResult.SPTPNValidationSuccess),
+			SPTPNVideoValidationResult.SPTPNValidationSuccess),
 	PlayingStartedAborted("Started + Aborted",
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerStartAndFinalResult,
 			SPTPNVideoEvent.SPTPNVideoEventAborted,
-			SPTPNValidationResult.SPTPNValidationSuccess),
+			SPTPNVideoValidationResult.SPTPNValidationSuccess),
 	PlayingStartedFinishedClosed("Started + Finished + Closed",
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerStartAndFinalResult,
 			SPTPNVideoEvent.SPTPNVideoEventFinished,
-			SPTPNValidationResult.SPTPNValidationSuccess),
+			SPTPNVideoValidationResult.SPTPNValidationSuccess),
 	PlayingNoVideo("No video on play",
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerResultOnce,
 			SPTPNVideoEvent.SPTPNVideoEventNoVideo,
-			SPTPNValidationResult.SPTPNValidationSuccess),
+			SPTPNVideoValidationResult.SPTPNValidationSuccess),
 	PlayingOtherError("Other error",
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerResultOnce,
 			SPTPNVideoEvent.SPTPNVideoEventError,
-			SPTPNValidationResult.SPTPNValidationSuccess),
+			SPTPNVideoValidationResult.SPTPNValidationSuccess),
 	PlayingStartedOtherError("Started + other error",
 			MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerStartAndFinalResult,
 			SPTPNVideoEvent.SPTPNVideoEventError,
-			SPTPNValidationResult.SPTPNValidationSuccess);
+			SPTPNVideoValidationResult.SPTPNValidationSuccess);
 	
     private final String text;
     private final MockMediationPlayingBehaviour behaviour;
     private final SPTPNVideoEvent videoEvent;
-    private final SPTPNValidationResult validationResult;
+    private final SPTPNVideoValidationResult validationResult;
 	
 	private MockSetting(final String text,
 			MockMediationPlayingBehaviour behaviour,
 			SPTPNVideoEvent videoEvent,
-			SPTPNValidationResult validationResult) {
+			SPTPNVideoValidationResult validationResult) {
 		this.text = text;
 		this.behaviour = behaviour;
 		this.videoEvent = videoEvent;
@@ -96,7 +96,7 @@ public enum MockSetting {
 		return videoEvent;
 	}
 	
-	public SPTPNValidationResult getValidationResult() {
+	public SPTPNVideoValidationResult getValidationResult() {
 		return validationResult;
 	}
 	

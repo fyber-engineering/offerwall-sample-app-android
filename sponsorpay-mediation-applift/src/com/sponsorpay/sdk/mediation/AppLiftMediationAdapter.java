@@ -22,16 +22,23 @@ public class AppLiftMediationAdapter extends SPMediationAdapter{
 	public static final String APP_ID = "app.id";
 	public static final String APP_SECRET = "app.secret";
 	
-	private AppLiftInterstitialMediationAdapter mInterstitialAdapter = new AppLiftInterstitialMediationAdapter(this);
+	private AppLiftInterstitialMediationAdapter mInterstitialAdapter;
 	
 	@Override
-	public boolean startAdapter(Activity activity) {
+	public boolean startAdapter(final Activity activity) {
 		SponsorPayLogger.d(TAG, "Starting AppLift adapter");// - SDK version " + PlayAds.getSDKVersion());
-		Integer appId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID, Integer.class);
-		String appSecret = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_SECRET, String.class);
+		final Integer appId = Integer.decode(SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID, String.class));
+		final String appSecret = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_SECRET, String.class);
 		if (appId != null && StringUtils.notNullNorEmpty(appSecret)) {
-			PlayAds.init(activity, appId, appSecret);
-			PlayAds.addListener(mInterstitialAdapter);
+			mInterstitialAdapter = new AppLiftInterstitialMediationAdapter(this);
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					PlayAds.init(activity, appId, appSecret);
+					mInterstitialAdapter.start();
+					PlayAds.addListener(mInterstitialAdapter);
+				}
+			});
 			return true;
 		}
 		SponsorPayLogger.i(TAG, "One of the provided values (appId/appSecret) is not valid");
@@ -55,7 +62,7 @@ public class AppLiftMediationAdapter extends SPMediationAdapter{
 
 	@Override
 	public AppLiftInterstitialMediationAdapter getInterstitialMediationAdapter() {
-		return null;
+		return mInterstitialAdapter;
 	}
 
 	@Override

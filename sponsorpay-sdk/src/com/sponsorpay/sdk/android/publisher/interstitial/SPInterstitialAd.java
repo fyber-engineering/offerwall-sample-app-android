@@ -1,5 +1,8 @@
 package com.sponsorpay.sdk.android.publisher.interstitial;
 
+import java.util.Collections;
+import java.util.Map;
+
 public class SPInterstitialAd {
 
 	private String mProviderType;
@@ -16,6 +19,10 @@ public class SPInterstitialAd {
 
 	public String getAdId() {
 		return mAdId;
+	}
+
+	public Map<String, String> getContextData() {
+		return Collections.emptyMap();
 	}
 
 }

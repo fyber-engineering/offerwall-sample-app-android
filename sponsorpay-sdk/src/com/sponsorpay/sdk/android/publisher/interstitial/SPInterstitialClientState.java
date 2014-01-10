@@ -43,7 +43,7 @@ public enum SPInterstitialClientState {
     
     /**
      * 
-     * @return true if this state allows to change BrandEngage parameters
+     * @return true if this state allows to change RewardedVideo parameters
      */
     boolean canChangeParameters() {
     	return this.canChangeParameters;

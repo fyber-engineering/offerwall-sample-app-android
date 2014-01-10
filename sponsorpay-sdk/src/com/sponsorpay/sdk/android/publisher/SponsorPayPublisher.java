@@ -334,11 +334,11 @@ public class SponsorPayPublisher {
 	}
 	
 	//================================================================================
-	// Mobile BrandEngage
+	// Mobile RewardedVideo
 	//================================================================================
 
 	/**
-	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * Requests a Mobile RewardedVideo Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
 	 * 
 	 * @param activity
@@ -356,7 +356,7 @@ public class SponsorPayPublisher {
 	}
 	
 	/**
-	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * Requests a Mobile RewardedVideo Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
 	 * 
 	 * @param activity
@@ -377,7 +377,7 @@ public class SponsorPayPublisher {
 	}
 
 	/**
-	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * Requests a Mobile RewardedVideo Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
 	 * 
 	 * @param credentialsToken
@@ -396,7 +396,7 @@ public class SponsorPayPublisher {
 	}
 	
 	/**
-	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * Requests a Mobile RewardedVideo Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
 	 * 
 	 * @param credentialsToken

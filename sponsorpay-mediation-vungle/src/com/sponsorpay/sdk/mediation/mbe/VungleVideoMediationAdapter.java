@@ -10,9 +10,9 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.sponsorpay.sdk.mediation.VungleMediationAdapter;
 import com.vungle.sdk.VunglePub;
 import com.vungle.sdk.VunglePub.EventListener;
@@ -35,8 +35,8 @@ public class VungleVideoMediationAdapter extends
 
 	@Override
 	public void videosAvailable(Context context) {
-		sendValidationEvent(VunglePub.isVideoAvailable() ? SPTPNValidationResult.SPTPNValidationSuccess
-				: SPTPNValidationResult.SPTPNValidationNoVideoAvailable);
+		sendValidationEvent(VunglePub.isVideoAvailable() ? SPTPNVideoValidationResult.SPTPNValidationSuccess
+				: SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 	}
 
 	@Override

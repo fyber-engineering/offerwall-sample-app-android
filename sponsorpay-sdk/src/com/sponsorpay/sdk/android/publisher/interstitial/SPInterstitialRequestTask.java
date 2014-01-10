@@ -1,14 +1,8 @@
 package com.sponsorpay.sdk.android.publisher.interstitial;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -20,6 +14,7 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
+import com.sponsorpay.sdk.android.utils.HttpResponseParser;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.StringUtils;
@@ -36,26 +31,12 @@ public class SPInterstitialRequestTask extends AsyncTask<String, Void, SPInterst
 			HttpClient httpClient = SPHttpClient.getHttpClient();
 			HttpUriRequest request = new HttpGet(params[0]);
 			HttpResponse response = httpClient.execute(request);
-			HttpEntity responseEntity = response.getEntity();
-			InputStream inStream = responseEntity.getContent();
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					inStream));
-			StringBuilder sb = new StringBuilder();
-
-			String line = null;
-
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-
-			inStream.close();
-
-			String bodyContent = sb.toString();
 	
+			String bodyContent = HttpResponseParser.extractResponseString(response);
+			
 			//parsing offers
 			if (StringUtils.notNullNorEmpty(bodyContent)) {
-				SponsorPayLogger.d(TAG, "Parsing ads");
+				SponsorPayLogger.d(TAG, "Parsing ads reponse\n" + bodyContent);
 				try {
 					JSONObject json = new JSONObject(bodyContent);
 					JSONArray ads = json.getJSONArray("ads");

@@ -44,6 +44,8 @@ public class HttpResponseParser {
 
 			inStream.close();
 
+			responseEntity.consumeContent();
+			
 			responseString = sb.toString();
 		} catch (IOException e) {
 			responseString = null;

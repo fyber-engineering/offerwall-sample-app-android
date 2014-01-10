@@ -14,9 +14,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 
-import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.sponsorpay.sdk.mediation.MediationConfigurationActivity;
 import com.sponsorpay.sdk.mediation.MockMediatedAdapter;
 import com.sponsorpay.sdk.mediation.MockMediationActivity;
@@ -38,7 +38,7 @@ public class MockMediatedVideoAdapter extends SPBrandEngageMediationAdapter<Mock
 		super(adapter);
 		configs = new HashMap<String, Object>(3);
 		configs.put(VALIDATION_RESULT,
-				SPTPNValidationResult.SPTPNValidationSuccess);
+				SPTPNVideoValidationResult.SPTPNValidationSuccess);
 		configs.put(MOCK_PLAYING_BEHAVIOUR,
 				MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerStartAndFinalResult);
 		configs.put(VIDEO_EVENT_RESULT, SPTPNVideoEvent.SPTPNVideoEventFinished);
@@ -48,8 +48,8 @@ public class MockMediatedVideoAdapter extends SPBrandEngageMediationAdapter<Mock
 	@Override
 	public void videosAvailable(Context context) {
 		// let timeout occur, otherwise fire the event
-		SPTPNValidationResult validationResult = (SPTPNValidationResult) configs.get(VALIDATION_RESULT);
-		if (validationResult != SPTPNValidationResult.SPTPNValidationTimeout || 
+		SPTPNVideoValidationResult validationResult = (SPTPNVideoValidationResult) configs.get(VALIDATION_RESULT);
+		if (validationResult != SPTPNVideoValidationResult.SPTPNValidationTimeout || 
 				configs.get(MOCK_PLAYING_BEHAVIOUR) == MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerResultOnce) {
 			sendValidationEvent(validationResult);
 		}

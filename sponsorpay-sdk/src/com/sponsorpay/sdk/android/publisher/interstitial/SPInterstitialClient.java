@@ -7,12 +7,12 @@
 package com.sponsorpay.sdk.android.publisher.interstitial;
 
 import java.util.Map;
+import java.util.UUID;
 
 import android.app.Activity;
 
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
-import com.sponsorpay.sdk.android.mediation.SPMediationFormat;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 import com.sponsorpay.sdk.android.utils.UrlBuilder;
@@ -24,7 +24,7 @@ public class SPInterstitialClient {
 	public static final SPInterstitialClient INSTANCE = new SPInterstitialClient();
 	
 	private static final String INTERSTITIAL_URL_KEY = "interstitial";
-//	private static final String SP_REQUEST_ID_PARAMETER_KEY = "request_id";
+	private static final String SP_REQUEST_ID_PARAMETER_KEY = "request_id";
 	
 //	private static final int TIMEOUT = 10000 ;
 
@@ -38,6 +38,12 @@ public class SPInterstitialClient {
 	private SPInterstitialClientState mState;
 
 	private SPInterstitialAd mAd;
+
+	private Activity mActivity;
+	private SPCredentials mCredentials;
+	private String mRequestId;
+	
+	private SPInterstitialRequestListener mListener;
 	
 	private SPInterstitialClient() {
 //		mHandler = new Handler() {
@@ -56,11 +62,12 @@ public class SPInterstitialClient {
 //				}
 //			}
 //		};
+		mState = SPInterstitialClientState.READY_TO_CHECK_OFFERS;
 	}
 	
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
 		if (canRequestOffers()) {
-			startQueryingOffers(credentials);
+			startQueryingOffers(credentials, activity);
 			return true;
 		} else {
 			SponsorPayLogger.d(TAG, "SPInterstitialClient cannot request offers at this point. " +
@@ -70,10 +77,13 @@ public class SPInterstitialClient {
 		}
 	}
 
-	private void startQueryingOffers(SPCredentials credentials) {
-		//FIXME add request_id
+	private void startQueryingOffers(SPCredentials credentials, Activity activity) {
+		mCredentials = credentials;
+		mActivity = activity;
+		mRequestId = UUID.randomUUID().toString();
 		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials)
 				.addExtraKeysValues(mCustomParameters)
+				.addKeyValue(SP_REQUEST_ID_PARAMETER_KEY, mRequestId)
 				.addScreenMetrics().buildUrl();
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
 		loadUrl(requestUrl);
@@ -121,6 +131,19 @@ public class SPInterstitialClient {
 
 	private void setState(SPInterstitialClientState newState) {
 		mState = newState;
+		switch (mState) {
+		case READY_TO_CHECK_OFFERS:
+			mAd = null;
+			mActivity = null;
+			mRequestId = null;
+			break;
+		case READY_TO_SHOW_OFFERS:
+			break;
+		case SHOWING_OFFERS:
+			break;
+		default:
+			break;
+		}
 	}
 
 	public void processAds(SPInterstitialAd[] ads) {
@@ -131,13 +154,66 @@ public class SPInterstitialClient {
 	public void availableAd(SPInterstitialAd ad) {
 		if (ad != null) {
 			mAd = ad;
+			if(mListener != null) {
+				mListener.onSPInterstitialAdAvailable(true);
+			}
 			setState(SPInterstitialClientState.READY_TO_SHOW_OFFERS);
+			// listener offer available true
+		} else {
+			if(mListener != null) {
+				mListener.onSPInterstitialAdAvailable(false);
+			}
+			setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
+			// listener offer available false
 		}
 	}
 
 	public boolean validateAd(SPInterstitialAd ad) {
-		return SPMediationCoordinator.INSTANCE.validateProvider(context, ad.getProviderType(), 
-				SPMediationFormat.BrandEngage, null, null);
+		return SPMediationCoordinator.INSTANCE.validateInterstitialProvider(
+				mActivity, ad);
+	}
+
+	public boolean showInterstitial(Activity parentActivity) {
+		if (mState.canShowOffers()) {
+			boolean showAd = SPMediationCoordinator.INSTANCE.showInterstitial(parentActivity,
+					mAd);
+			if (showAd) {
+				if (mListener != null) {
+					mListener.onSPInterstitialAdShown();
+				}
+				setState(SPInterstitialClientState.SHOWING_OFFERS);
+			}
+			return showAd;
+		} else {
+			return false;
+		}
+	}
+
+	public void fireEvent(SPInterstitialAd ad,
+			SPInterstitialEvent event) {
+		SPInterstitialEventDispatcher.trigger(mCredentials, mRequestId, ad, event);
+		if (mListener != null) {
+			switch (event) {
+			case ShowClick:
+				mListener.onSPInterstitialAdClosed(SPInterstitialAdCloseReason.ReasonUserClickedOnAd);
+				setState(SPInterstitialClientState.READY_TO_SHOW_OFFERS);
+				break;
+			case ShowClose:
+				setState(SPInterstitialClientState.READY_TO_SHOW_OFFERS);
+				mListener.onSPInterstitialAdClosed(SPInterstitialAdCloseReason.ReasonUserClosedAd);
+				break;
+			case Error:
+				setState(SPInterstitialClientState.READY_TO_SHOW_OFFERS);
+				mListener.onSPInterstitialAdError("Some error occurred");
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	public void setListener(SPInterstitialRequestListener mListener) {
+		this.mListener = mListener;
 	}
 
 }

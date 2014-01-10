@@ -9,11 +9,11 @@ package com.sponsorpay.sdk.android.publisher.mbe;
 public interface SPBrandEngageClientStatusListener {
 
 	/**
-	 * The BrandEngage client's engagement status
+	 * The RewardedVideo client's engagement status
 	 * 
 	 */
 	public enum SPBrandEngageClientStatus {
-	     // The BrandEngage player's underlying content has been loaded and the engagement has started.
+	     // The RewardedVideo player's underlying content has been loaded and the engagement has started.
 	    STARTED,
 	    
 	    // The engagement has finished after completing. User will be rewarded.

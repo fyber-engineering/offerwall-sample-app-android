@@ -15,8 +15,8 @@ import android.content.Context;
 import com.applifier.impact.android.ApplifierImpact;
 import com.applifier.impact.android.IApplifierImpactListener;
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.sponsorpay.sdk.mediation.ApplifierMediationAdapter;
 
 public class ApplifierVideoMediationAdapter extends SPBrandEngageMediationAdapter<ApplifierMediationAdapter> 
@@ -30,8 +30,8 @@ public class ApplifierVideoMediationAdapter extends SPBrandEngageMediationAdapte
 
 	@Override
 	public void videosAvailable(Context context) {
-		sendValidationEvent(campaignAvailable ? SPTPNValidationResult.SPTPNValidationSuccess
-						: SPTPNValidationResult.SPTPNValidationNoVideoAvailable);
+		sendValidationEvent(campaignAvailable ? SPTPNVideoValidationResult.SPTPNValidationSuccess
+						: SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 	}
 
 	@Override

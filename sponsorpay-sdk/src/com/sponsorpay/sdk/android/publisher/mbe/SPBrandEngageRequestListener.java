@@ -9,7 +9,7 @@ package com.sponsorpay.sdk.android.publisher.mbe;
 import android.content.Intent;
 
 /**
- * Interface to be implemented by listeners notified of the results of a SponsorPay BrandEngage 
+ * Interface to be implemented by listeners notified of the results of a SponsorPay RewardedVideo 
  * request.
  */
 public interface SPBrandEngageRequestListener {

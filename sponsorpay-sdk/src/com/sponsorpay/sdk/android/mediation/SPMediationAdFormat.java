@@ -1,8 +1,8 @@
 package com.sponsorpay.sdk.android.mediation;
 
-public enum SPMediationFormat {
+public enum SPMediationAdFormat {
 	
-	BrandEngage,
+	RewardedVideo,
 	Interstitial
 	
 }

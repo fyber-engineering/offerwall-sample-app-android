@@ -179,16 +179,17 @@ public class UrlBuilder {
 
 	public UrlBuilder addExtraKeysValues(Map<String, String> extraKeysValues) {
 		if (extraKeysValues != null) {
-			if (mExtraKeysValues == null) {
-				mExtraKeysValues = new HashMap<String, String>(extraKeysValues);
-			} else {
-				mExtraKeysValues.putAll(extraKeysValues);
-			}
+			getExtraKeys().putAll(extraKeysValues);
 		}
 		return this;
 	}
 	
-
+	public UrlBuilder addKeyValue(String key, String value) {
+		if (StringUtils.notNullNorEmpty(key)) {
+			getExtraKeys().put(key, value);
+		}
+		return this;
+	}
 
 	public UrlBuilder addScreenMetrics() {
 		mShouldAddScreenMetrics = true;
@@ -289,6 +290,12 @@ public class UrlBuilder {
 		return uri.toString();
 	}
 	
+	private Map<String, String> getExtraKeys() {
+		if (mExtraKeysValues == null) {
+			mExtraKeysValues = new HashMap<String, String>();
+		}
+		return mExtraKeysValues;
+	}
 	
 	/**
 	 * Gets the current UNIX timestamp (in seconds) for the outbound requests.

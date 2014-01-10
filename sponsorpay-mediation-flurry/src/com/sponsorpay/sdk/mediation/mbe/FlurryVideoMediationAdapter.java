@@ -17,9 +17,9 @@ import com.flurry.android.FlurryAdSize;
 import com.flurry.android.FlurryAdType;
 import com.flurry.android.FlurryAds;
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.sponsorpay.sdk.mediation.FlurryMediationAdapter;
 
 public class FlurryVideoMediationAdapter extends SPBrandEngageMediationAdapter<FlurryMediationAdapter> 
@@ -113,7 +113,7 @@ public class FlurryVideoMediationAdapter extends SPBrandEngageMediationAdapter<F
 	public void spaceDidFailToReceiveAd(String adSpaceName) {
 		// send validate event no video
 		if (adSpaceName.equals(getAdSpaceFromConfig())) {
-			sendValidationEvent(SPTPNValidationResult.SPTPNValidationNoVideoAvailable);
+			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 		}
 	}
 
@@ -121,7 +121,7 @@ public class FlurryVideoMediationAdapter extends SPBrandEngageMediationAdapter<F
 	public void spaceDidReceiveAd(String adSpaceName) {
 		// send validate event success
 		if (adSpaceName.equals(getAdSpaceFromConfig())) {
-			sendValidationEvent(SPTPNValidationResult.SPTPNValidationSuccess);
+			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationSuccess);
 		}
 	}
 	

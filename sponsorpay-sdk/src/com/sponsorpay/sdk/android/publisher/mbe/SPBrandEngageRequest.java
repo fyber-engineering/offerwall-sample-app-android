@@ -15,7 +15,7 @@ import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
- * Wrapper calls to perform a BrandEngage request and to notify a {@link SPBrandEngageClientStatusListener}
+ * Wrapper calls to perform a RewardedVideo request and to notify a {@link SPBrandEngageClientStatusListener}
  * of the result
  * </p>
  * This class is not intended to be used directly or subclassed, it is used internally

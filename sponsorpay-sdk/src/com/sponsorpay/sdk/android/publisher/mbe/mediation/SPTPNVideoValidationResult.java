@@ -4,9 +4,9 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.android.mediation;
+package com.sponsorpay.sdk.android.publisher.mbe.mediation;
 
-public enum SPTPNValidationResult {
+public enum SPTPNVideoValidationResult {
 
 	SPTPNValidationAdapterNotIntegrated("no_sdk"),
 	SPTPNValidationNoVideoAvailable("no_video"),
@@ -18,7 +18,7 @@ public enum SPTPNValidationResult {
 
     private final String text;
 	
-	private SPTPNValidationResult(final String text) {
+	private SPTPNVideoValidationResult(final String text) {
         this.text = text;
     }
 

@@ -16,13 +16,11 @@ import android.os.Message;
 
 import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
-import com.sponsorpay.sdk.android.mediation.SPMediationValidationEvent;
-import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 /**
  * <p>
- * Base class for mobile BrandEngage Mediation adapter
+ * Base class for mobile RewardedVideo Mediation adapter
  * </p>
  * 
  * This class defines the required specific methods to every adapter and provides convenience methods
@@ -39,7 +37,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 	 */
 	private static final short VALIDATION_RESULT = 1;
 	/*
-	 * Video event message.what field
+	 * RewardedVideo event message.what field
 	 */
 	private static final short VIDEO_EVENT = 2;
 	
@@ -51,7 +49,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 	/*
 	 * The mediation validation event listener 
 	 */
-	private SPMediationValidationEvent mValidationEvent;
+	private SPVideoMediationValidationEvent mValidationEvent;
 	/*
 	 * The mediation validation context data for this request 
 	 */
@@ -86,7 +84,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case VALIDATION_RESULT:
-					sendValidationEvent(SPTPNValidationResult.SPTPNValidationTimeout);
+					sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationTimeout);
 					break;
 				case VIDEO_EVENT:
 					sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventTimeout);
@@ -108,7 +106,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 	/**
 	 * Checks whether there are videos available to start playing. This is expected
 	 * to be asynchronous, and the answer should be delivered through the
-	 * {@link #sendValidationEvent(SPTPNValidationResult)}.
+	 * {@link #sendValidationEvent(SPTPNVideoValidationResult)}.
 	 */
 	public abstract void videosAvailable(Context context);
 
@@ -122,18 +120,18 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 	/**
 	 * Method called from the {@link SPMediationCoordinator} to check for videos
 	 * availability for this provider. The result of the method is returned asynchronously
-	 * to the provided {@link SPMediationValidationEvent}.
+	 * to the provided {@link SPVideoMediationValidationEvent}.
 	 * This method also stores the listener and the context data information to send it back
 	 * when needed and starts the validation timeout.
 	 *   
 	 * @param context
 	 * 			The activity context
 	 * @param event
-	 * 			The {@link SPMediationValidationEvent} to be notified.
+	 * 			The {@link SPVideoMediationValidationEvent} to be notified.
 	 * @param contextData
 	 * 			The context data used in this request
 	 */
-	public void videosAvailable(Context context, SPMediationValidationEvent event,
+	public void videosAvailable(Context context, SPVideoMediationValidationEvent event,
 			Map<String, String> contextData) {
 		mValidationEvent = event;
 		mValidationContextData = contextData;
@@ -178,7 +176,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
     * @param event
     * 		The {@link SPTPNVideoEvent} to be sent.
     */
-   protected void sendValidationEvent(SPTPNValidationResult result) {
+   protected void sendValidationEvent(SPTPNVideoValidationResult result) {
 	   if (mValidationEvent != null) {
 		   mHandler.removeMessages(VALIDATION_RESULT);
 		   mValidationEvent.validationEventResult(getName(), result, mValidationContextData);

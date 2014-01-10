@@ -41,9 +41,6 @@ import android.widget.Toast;
 import com.sponsorpay.sdk.android.SponsorPay;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
-import com.sponsorpay.sdk.android.mediation.SPMediationFormat;
-import com.sponsorpay.sdk.android.mediation.SPMediationValidationEvent;
-import com.sponsorpay.sdk.android.mediation.SPTPNValidationResult;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher;
 import com.sponsorpay.sdk.android.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.sdk.android.publisher.currency.SPCurrencyServerListener;
@@ -51,6 +48,8 @@ import com.sponsorpay.sdk.android.publisher.mbe.SPBrandEngageClientStatusListene
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationJSInterface;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPVideoMediationValidationEvent;
 import com.sponsorpay.sdk.android.utils.SPWebClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
@@ -59,7 +58,7 @@ import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 /**
  * <p>
- * Provides methods to request and show BrandEngage offers and notifies its
+ * Provides methods to request and show RewardedVideo offers and notifies its
  * listener {@link SPBrandEngageClientStatusListener} of changes in the status
  * of the engagement.
  * </p>
@@ -228,7 +227,7 @@ public class SPBrandEngageClient {
 	}
 
 	/**
-	 * Queries the server for BrandEngage offers availability. 
+	 * Queries the server for RewardedVideo offers availability. 
 	 * 
 	 * Offer
 	 * availability cannot be requested while an engagement is running or the
@@ -628,10 +627,10 @@ public class SPBrandEngageClient {
 						SponsorPayLogger.d(TAG, "MBE client asks to validate a third party network: " + tpnName);
 						HashMap<String, String> contextData = new HashMap<String, String>(1);
 						contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
-						SPMediationCoordinator.INSTANCE.validateProvider(mContext, tpnName, SPMediationFormat.BrandEngage, 
-								contextData, new SPMediationValidationEvent() {
+						SPMediationCoordinator.INSTANCE.validateVideoProvider(mContext, tpnName,
+								contextData, new SPVideoMediationValidationEvent() {
 							@Override
-							public void validationEventResult(String name, SPTPNValidationResult result, Map<String, String> contextData) {
+							public void validationEventResult(String name, SPTPNVideoValidationResult result, Map<String, String> contextData) {
 								String url = String.format("%s('validate', {tpn:'%s', id:%s, result:'%s'})", 
 										SP_JS_NOTIFY, name, contextData.get(SP_THIRD_PARTY_ID_PARAMETER), result);
 								SponsorPayLogger.d(TAG, "Notifying - " + url);
@@ -643,7 +642,7 @@ public class SPBrandEngageClient {
 						HashMap<String, String> contextData = new HashMap<String, String>(1);
 						contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
 						SponsorPayLogger.d(TAG, "MBE client asks to play an offer from a third party network:" + tpnName);
-						SPMediationCoordinator.INSTANCE.startProviderEngagement(mActivity, tpnName, SPMediationFormat.BrandEngage,
+						SPMediationCoordinator.INSTANCE.startVideoEngagement(mActivity, tpnName,
 								contextData, new SPMediationVideoEvent() {
 							@Override
 							public void videoEventOccured(String name, SPTPNVideoEvent event,

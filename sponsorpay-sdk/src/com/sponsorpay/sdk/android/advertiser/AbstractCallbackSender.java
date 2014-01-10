@@ -26,11 +26,13 @@ import com.sponsorpay.sdk.android.utils.UrlBuilder;
  */
 public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boolean> {
 
+	private static final String TAG = AbstractCallbackSender.class.getSimpleName();
+
 	/**
 	 * HTTP status code that the response should have in order to determine that the API has been
 	 * contacted successfully.
 	 */
-	protected static final int SUCCESFUL_HTTP_STATUS_CODE = 200;
+	protected static final int SUCCESSFUL_HTTP_STATUS_CODE = 200;
 
 	/**
 	 * SubID URL parameter key
@@ -110,7 +112,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 		String callbackUrl = UrlBuilder.newBuilder(getBaseUrl(), mCredentials).addExtraKeysValues(
 				params).sendUserId(false).addScreenMetrics().buildUrl();
 
-		SponsorPayLogger.d(AbstractCallbackSender.class.getSimpleName(),
+		SponsorPayLogger.d(TAG,
 				"Callback will be sent to: " + callbackUrl);
 
 		return callbackUrl;
@@ -134,6 +136,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 	 */
 	@Override
 	protected Boolean doInBackground(String... params) {
+		Thread.currentThread().setName(TAG);
 		Boolean returnValue = null;
 
 		String callbackUrl = params[0];
@@ -150,17 +153,17 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 			
 			httpResponse.getEntity().consumeContent();
 			
-			if (responseStatusCode == SUCCESFUL_HTTP_STATUS_CODE) {
+			if (responseStatusCode == SUCCESSFUL_HTTP_STATUS_CODE) {
 				returnValue = true;
 			} else {
 				returnValue = false;
 			}
 
-			SponsorPayLogger.d(AbstractCallbackSender.class.getSimpleName(), "Server returned status code: "
+			SponsorPayLogger.d(TAG, "Server returned status code: "
 					+ responseStatusCode);
 		} catch (Exception e) {
 			returnValue = false;
-			SponsorPayLogger.e(AbstractCallbackSender.class.getSimpleName(),
+			SponsorPayLogger.e(TAG,
 					"An exception occurred when trying to send advertiser callback: " + e);
 		}
 		return returnValue;
@@ -174,7 +177,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 	 * 
 	 * @param callbackWasSuccessful
 	 *            true if the response has a successful status code (equal to
-	 *            {@link #SUCCESFUL_HTTP_STATUS_CODE}). false otherwise.
+	 *            {@link #SUCCESSFUL_HTTP_STATUS_CODE}). false otherwise.
 	 */
 	@Override
 	protected void onPostExecute(Boolean callbackWasSuccessful) {

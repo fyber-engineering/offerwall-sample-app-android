@@ -16,6 +16,11 @@ import java.util.Map.Entry;
 import android.app.Activity;
 import android.content.Context;
 
+import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialAd;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPVideoMediationValidationEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 public class SPMediationCoordinator {
@@ -89,8 +94,8 @@ public class SPMediationCoordinator {
 		}.start();
 	}
 	
-	public boolean isProviderAvailable(String name, SPMediationFormat adFormat) {
-		SPMediationAdapter adapter = mAdapters.get(name.toLowerCase());
+	public boolean isProviderAvailable(String name, SPMediationAdFormat adFormat) {
+		SPMediationAdapter adapter = mAdapters.get(name);
 		if (adapter != null) {
 			return adapter.supportMediationFormat(adFormat);
 		} else {
@@ -98,23 +103,44 @@ public class SPMediationCoordinator {
 		}
 	}
 	
-	public void validateProvider(Context context, String adapterName, SPMediationFormat adFormat,
-			HashMap<String, String> contextData, SPMediationValidationEvent validationEvent) {
-		if (isProviderAvailable(adapterName, adFormat)) {
-			mAdapters.get(adapterName).validate(context, adFormat, validationEvent, contextData);
+	
+	// Rewarded Videos
+	public void validateVideoProvider(Context context, String adapterName,
+			HashMap<String, String> contextData,
+			SPVideoMediationValidationEvent validationEvent) {
+		if (isProviderAvailable(adapterName, SPMediationAdFormat.RewardedVideo)) {
+			mAdapters.get(adapterName).validateVideoProvider(context, validationEvent, contextData);
 		} else {
-			validationEvent.validationEventResult(adapterName, SPTPNValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
+			validationEvent.validationEventResult(adapterName, SPTPNVideoValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
 		}
 	}
 	
-	public void startProviderEngagement(Activity parentActivity, String adapterName, SPMediationFormat adFormat,
+	public void startVideoEngagement(Activity parentActivity, String adapterName, 
 			HashMap<String, String> contextData,
-			SPMediationEngagementEvent engagementEvent) {
-		if (isProviderAvailable(adapterName, adFormat)) {
-			mAdapters.get(adapterName).startEngagement(parentActivity, adFormat, engagementEvent, contextData);
+			SPMediationVideoEvent videoEvent) {
+		if (isProviderAvailable(adapterName, SPMediationAdFormat.RewardedVideo)) {
+			mAdapters.get(adapterName).startVideoEngagement(parentActivity, videoEvent, contextData);
 		} else {
-			//FIXME this should be generic
-//			videoEvent.videoEventOccured(adapterName, SPTPNVideoEvent.SPTPNVideoEventError, contextData);
+			videoEvent.videoEventOccured(adapterName, SPTPNVideoEvent.SPTPNVideoEventError, contextData);
+		}
+	}
+	
+	// Interstitials
+	public boolean validateInterstitialProvider(Context context, SPInterstitialAd ad) {
+		String adapterName = ad.getProviderType();
+		if (isProviderAvailable(adapterName, SPMediationAdFormat.Interstitial)) {
+			return mAdapters.get(adapterName).validateInterstitialProvider(context, ad);
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean showInterstitial(Activity parentActivity, SPInterstitialAd ad) {
+		String adapterName = ad.getProviderType();
+		if (isProviderAvailable(adapterName, SPMediationAdFormat.Interstitial)) {
+			return mAdapters.get(adapterName).showInterstitial(parentActivity, ad);
+		} else {
+			return false;
 		}
 	}
 	

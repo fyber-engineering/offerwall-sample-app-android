@@ -14,9 +14,11 @@ import java.util.Set;
 import android.app.Activity;
 import android.content.Context;
 
+import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPVideoMediationValidationEvent;
 
 /**
  * <p>
@@ -44,13 +46,13 @@ public abstract class SPMediationAdapter {
 	 */
 	public abstract String getVersion();
 	
-	public abstract SPBrandEngageMediationAdapter<SPMediationAdapter> getVideoMediationAdapter();
+	public abstract SPBrandEngageMediationAdapter<? extends SPMediationAdapter> getVideoMediationAdapter();
 	
-	public abstract SPInterstitialMediationAdapter<SPMediationAdapter> getInterstitialMediationAdapter();
+	public abstract SPInterstitialMediationAdapter<? extends SPMediationAdapter> getInterstitialMediationAdapter();
 	
-	public boolean supportMediationFormat(SPMediationFormat format) {
+	public boolean supportMediationFormat(SPMediationAdFormat format) {
 		switch (format) {
-		case BrandEngage:
+		case RewardedVideo:
 			return getVideoMediationAdapter() != null;
 		case Interstitial:
 			return getInterstitialMediationAdapter() != null;
@@ -59,50 +61,47 @@ public abstract class SPMediationAdapter {
 		}
 	}
 
-	public boolean validate(Context context, SPMediationFormat adFormat,
-			SPMediationValidationEvent validationEvent,
+	// Rewarded videos
+	public void validateVideoProvider(Context context, SPVideoMediationValidationEvent validationEvent,
 			HashMap<String, String> contextData) {
 		// validation is not required here, as SPMediationCoordinator is performing it before, but...
-		switch (adFormat) {
-		case BrandEngage:
-			if (supportMediationFormat(adFormat)) {
-				getVideoMediationAdapter().videosAvailable(context, validationEvent, contextData);
-				return true;
-			}
-			break;
-		case Interstitial:
-			if (supportMediationFormat(adFormat)) {
-				return getInterstitialMediationAdapter().interstitialAvailable(context, validationEvent, contextData);
-			}
-		default:
-			break;
+		SPBrandEngageMediationAdapter<? extends SPMediationAdapter> videoMediationAdapter = getVideoMediationAdapter();
+		if (videoMediationAdapter != null) {
+			videoMediationAdapter.videosAvailable(context, validationEvent, contextData);
+		}
+	}
+
+	public void startVideoEngagement(Activity parentActivity, SPMediationVideoEvent engagementEvent,
+			HashMap<String, String> contextData) {
+		// validation is not required here, as SPMediationCoordinator is performing it before, but...
+		SPBrandEngageMediationAdapter<? extends SPMediationAdapter> videoMediationAdapter = getVideoMediationAdapter();
+		if (videoMediationAdapter != null) {
+			getVideoMediationAdapter().startVideo(parentActivity,
+					(SPMediationVideoEvent) engagementEvent, contextData);
+		}
+	}
+	
+	//Interstitial
+	public boolean validateInterstitialProvider(Context context, SPInterstitialAd ad) {
+		// validation is not required here, as SPMediationCoordinator is performing it before, but...
+		SPInterstitialMediationAdapter<? extends SPMediationAdapter> interstitialMediationAdapter = getInterstitialMediationAdapter();
+		if (interstitialMediationAdapter != null) {
+			return interstitialMediationAdapter.interstitialAvailable(context, ad);
 		}
 		return false;
 	}
-
-	public void startEngagement(Activity parentActivity,SPMediationFormat adFormat, 
-			SPMediationEngagementEvent engagementEvent,
-			HashMap<String, String> contextData) {
-		switch (adFormat) {
+	
+	public boolean showInterstitial(Activity parentActivity, SPInterstitialAd ad) {
 		// validation is not required here, as SPMediationCoordinator is performing it before, but...
-		case BrandEngage:
-			if (supportMediationFormat(adFormat)) {
-				getVideoMediationAdapter().startVideo(parentActivity, (SPMediationVideoEvent)engagementEvent, contextData);
-			}
-			break;
-		case Interstitial:
-			if (supportMediationFormat(adFormat)) {
-				getInterstitialMediationAdapter().show(parentActivity, (SPMediationEngagementEvent)engagementEvent, contextData);
-			}
-			break;
-		default:
-			break;
+		SPInterstitialMediationAdapter<? extends SPMediationAdapter> interstitialMediationAdapter = getInterstitialMediationAdapter();
+		if (interstitialMediationAdapter != null) {
+			return interstitialMediationAdapter.show(parentActivity, ad);
 		}
+		return false;
 	}
 	
 	
 	//Helper
-	
 	protected abstract Set<? extends Object> getListeners();
 	
 	@SuppressWarnings("rawtypes")
@@ -128,11 +127,6 @@ public abstract class SPMediationAdapter {
 	private void runNotifyingThread(final Object[] args, final Class[] classes) {
 		StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
 		StackTraceElement e = stacktrace[4];//maybe this number needs to be corrected
-//		String name = e.getMethodName();
-//		if (e.getMethodName().equals("runInThread")) {
-//			 e = stacktrace[4];//maybe this number needs to be corrected
-//			name = e.getMethodName();
-//		}
 		final String methodName = e.getMethodName();
 		new Thread("EventBroadcaster") {
 			public void run() {

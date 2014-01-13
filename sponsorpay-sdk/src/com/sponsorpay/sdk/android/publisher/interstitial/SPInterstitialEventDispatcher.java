@@ -24,12 +24,12 @@ public class SPInterstitialEventDispatcher extends AsyncTask<String, Void, Boole
 			SPInterstitialAd ad, SPInterstitialEvent event) {
 		if (ad != null) {
 			SponsorPayLogger.d(TAG,	String.format(
-					"Notifiying tracker of %s event with %s request id for ad_id %s and provider_type %s ",
+					"Notifiying tracker of event=%s with request_id=%s for ad_id=%s and provider_type=%s ",
 					event, requestId, ad.getAdId(),
 					ad.getProviderType()));
 		} else {
 			SponsorPayLogger.d(TAG,	String.format(
-					"Notifiying tracker of %s event with %s request id",
+					"Notifiying tracker of event=%s with request_id=%s",
 					event, requestId));
 		}
 		new SPInterstitialEventDispatcher().execute(buildUrl(credentials, requestId, ad,
@@ -55,7 +55,7 @@ public class SPInterstitialEventDispatcher extends AsyncTask<String, Void, Boole
 	@Override
 	protected Boolean doInBackground(String... params) {
 		Thread.currentThread().setName(TAG);
-		Boolean returnValue = null;
+		Boolean returnValue = false;
 
 		String url = params[0];
 		
@@ -73,16 +73,8 @@ public class SPInterstitialEventDispatcher extends AsyncTask<String, Void, Boole
 			
 			httpResponse.getEntity().consumeContent();
 			
-			if (responseStatusCode == SUCCESSFUL_HTTP_STATUS_CODE) {
-				returnValue = true;
-			} else {
-				returnValue = false;
-			}
-
-			SponsorPayLogger.d(TAG, "Server returned status code: "
-					+ responseStatusCode);
+			returnValue = responseStatusCode == SUCCESSFUL_HTTP_STATUS_CODE;
 		} catch (Exception e) {
-			returnValue = false;
 			SponsorPayLogger.e(AbstractCallbackSender.class.getSimpleName(),
 					"An exception occurred when trying to send advertiser callback: " + e);
 		}

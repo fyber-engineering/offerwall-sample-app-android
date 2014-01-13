@@ -61,7 +61,11 @@ public abstract class SPMediationAdapter {
 		}
 	}
 
-	// Rewarded videos
+	/* ======================================================
+	 *                   Rewarded videos
+	 * ======================================================
+	 */
+
 	public void validateVideoProvider(Context context, SPVideoMediationValidationEvent validationEvent,
 			HashMap<String, String> contextData) {
 		// validation is not required here, as SPMediationCoordinator is performing it before, but...
@@ -81,7 +85,11 @@ public abstract class SPMediationAdapter {
 		}
 	}
 	
-	//Interstitial
+	/* ======================================================
+	 *                   Interstitials
+	 * ======================================================
+	 */
+	
 	public boolean validateInterstitialProvider(Context context, SPInterstitialAd ad) {
 		// validation is not required here, as SPMediationCoordinator is performing it before, but...
 		SPInterstitialMediationAdapter<? extends SPMediationAdapter> interstitialMediationAdapter = getInterstitialMediationAdapter();

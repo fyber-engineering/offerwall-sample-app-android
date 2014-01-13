@@ -121,7 +121,7 @@ public class SPMediationCoordinator {
 		if (isProviderAvailable(adapterName, SPMediationAdFormat.RewardedVideo)) {
 			mAdapters.get(adapterName).startVideoEngagement(parentActivity, videoEvent, contextData);
 		} else {
-			videoEvent.videoEventOccured(adapterName, SPTPNVideoEvent.SPTPNVideoEventError, contextData);
+			videoEvent.videoEventOccured(adapterName, SPTPNVideoEvent.SPTPNVideoEventAdapterNotIntegrated, contextData);
 		}
 	}
 	
@@ -147,7 +147,7 @@ public class SPMediationCoordinator {
 	// 
 	private void notifyAdaptersList(Activity activity) {
 		try {
-			Method method = activity.getClass().getDeclaredMethod("notifyAdaptersList", List.class);
+			Method method = activity.getClass().getDeclaredMethod("notifyMediationAdaptersList", List.class);
 			List<String> list = new LinkedList<String>(mAdapters.keySet());
 			method.invoke(activity, list);
 		} catch (SecurityException e) {

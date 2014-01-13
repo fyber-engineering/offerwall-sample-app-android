@@ -195,15 +195,15 @@ public class SPInterstitialClient {
 		if (mListener != null) {
 			switch (event) {
 			case ShowClick:
+				setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
 				mListener.onSPInterstitialAdClosed(SPInterstitialAdCloseReason.ReasonUserClickedOnAd);
-				setState(SPInterstitialClientState.READY_TO_SHOW_OFFERS);
 				break;
 			case ShowClose:
-				setState(SPInterstitialClientState.READY_TO_SHOW_OFFERS);
+				setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
 				mListener.onSPInterstitialAdClosed(SPInterstitialAdCloseReason.ReasonUserClosedAd);
 				break;
 			case Error:
-				setState(SPInterstitialClientState.READY_TO_SHOW_OFFERS);
+				setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
 				mListener.onSPInterstitialAdError("Some error occurred");
 				break;
 			default:

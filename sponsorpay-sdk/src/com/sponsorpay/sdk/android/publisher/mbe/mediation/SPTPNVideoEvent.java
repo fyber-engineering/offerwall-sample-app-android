@@ -14,7 +14,8 @@ public enum SPTPNVideoEvent {
     SPTPNVideoEventClosed("closed"),
     SPTPNVideoEventNoVideo("no_video"),
     SPTPNVideoEventTimeout("timeout"),
-    SPTPNVideoEventError("error");
+    SPTPNVideoEventError("error"),
+    SPTPNVideoEventAdapterNotIntegrated("no_sdk");
 
     private final String text;
 	

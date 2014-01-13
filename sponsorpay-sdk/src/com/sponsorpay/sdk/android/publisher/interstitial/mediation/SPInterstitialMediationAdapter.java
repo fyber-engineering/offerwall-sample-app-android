@@ -20,10 +20,13 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 	private SPInterstitialAd mAd;
 	private boolean mAdAvailable;
 	private Activity mActivity;
+	private boolean mHasClickOccured = false;
 
 	public SPInterstitialMediationAdapter(V adapter) {
 		mAdapter = adapter;
 	}
+	
+	public abstract boolean show(Activity parentActivity);
 
 	public abstract boolean interstitialAvailable(Context context,
 			SPInterstitialAd ad);
@@ -31,6 +34,7 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 	public boolean show(Activity parentActivity,
 			SPInterstitialAd ad) {
 		if (isAdAvailable()) {
+			mHasClickOccured = false;
 			mActivity = parentActivity;
 			mAd = ad;
 			return show(parentActivity);
@@ -38,8 +42,6 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 		interstitialAvailable(parentActivity, ad);
 		return false;
 	}
-	
-	public abstract boolean show(Activity parentActivity);
 	
 	// Convenience methods
 	
@@ -52,9 +54,9 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 	}
 	
 	protected void requestAd() {
-		interstitialAvailable(mActivity, null);
 		mAd = null;
 		mAdAvailable = false;
+		interstitialAvailable(mActivity, null);
 		mActivity = null;
 //		interstitialAvailable(context, ad)
 	}
@@ -64,12 +66,14 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 	}
 	
 	protected void fireClickEvent() {
+		mHasClickOccured = true;
 		fireEvent(SPInterstitialEvent.ShowClick);
 	}
 	
 	protected void fireCloseEvent() {
-		fireEvent(SPInterstitialEvent.ShowClose);
-//		mAd = null;
+		if (!mHasClickOccured) {
+			fireEvent(SPInterstitialEvent.ShowClose);
+		}
 		requestAd();
 	}
 	

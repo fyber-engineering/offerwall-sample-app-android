@@ -1,7 +1,5 @@
 package com.sponsorpay.sdk.mediation.interstitial;
 
-import java.util.Map;
-
 import android.app.Activity;
 import android.content.Context;
 

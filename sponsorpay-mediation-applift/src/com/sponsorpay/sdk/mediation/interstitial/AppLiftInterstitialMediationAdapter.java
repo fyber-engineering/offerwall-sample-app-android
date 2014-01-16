@@ -55,4 +55,10 @@ public class AppLiftInterstitialMediationAdapter extends
 		PlayAds.cache();
 	}
 
+	@Override
+	public void onClosed(PlayAdsType arg0) {
+		fireCloseEvent();
+		PlayAds.cache();
+	}
+
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.content.Intent;
 
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
@@ -26,13 +27,6 @@ public class SPInterstitialClient {
 	private static final String INTERSTITIAL_URL_KEY = "interstitial";
 	private static final String SP_REQUEST_ID_PARAMETER_KEY = "request_id";
 	
-//	private static final int TIMEOUT = 10000 ;
-
-//	private static final int ENGAGEMENT_EVENT = 1;
-//	private static final int VALIDATION_RESULT = 2;
-
-//	private Handler mHandler;
-
 	private Map<String, String> mCustomParameters;
 
 	private SPInterstitialClientState mState;
@@ -43,25 +37,10 @@ public class SPInterstitialClient {
 	private SPCredentials mCredentials;
 	private String mRequestId;
 	
-	private SPInterstitialRequestListener mListener;
+	private SPInterstitialAdStateListener mAdStateListener;
+	private SPInterstitialRequestListener mRequestListener;
 	
 	private SPInterstitialClient() {
-//		mHandler = new Handler() {
-//			@Override
-//			public void handleMessage(Message msg) {
-//				switch (msg.what) {
-//				case VALIDATION_RESULT:
-//					SponsorPayLogger.d(TAG, "Timeout reached, canceling request...");
-////					clearWebViewPage();
-//					break;
-//				case ENGAGEMENT_EVENT:
-//					//something went wrong, show error dialog message
-////					showErrorDialog(SponsorPayPublisher
-////							.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
-//					break;
-//				}
-//			}
-//		};
 		mState = SPInterstitialClientState.READY_TO_CHECK_OFFERS;
 	}
 	
@@ -88,8 +67,6 @@ public class SPInterstitialClient {
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
 		loadUrl(requestUrl);
 		setState(SPInterstitialClientState.REQUESTING_OFFERS);
-		
-//		mHandler.sendEmptyMessageDelayed(VALIDATION_RESULT, TIMEOUT);
 	}
 
 
@@ -106,7 +83,7 @@ public class SPInterstitialClient {
 	}
 	
 	/**
-	 * Sets the additional custom parameters used for this engagement.
+	 * Sets the additional custom parameters used for this ad.
 	 * 
 	 * @param parameters
 	 * 			The additional parameters map
@@ -154,14 +131,14 @@ public class SPInterstitialClient {
 	public void availableAd(SPInterstitialAd ad) {
 		if (ad != null) {
 			mAd = ad;
-			if(mListener != null) {
-				mListener.onSPInterstitialAdAvailable(true);
+			if(mRequestListener != null) {
+				mRequestListener.onSPInterstitialAdAvailable(new Intent(mActivity, SPInterstitialActivity.class));
 			}
 			setState(SPInterstitialClientState.READY_TO_SHOW_OFFERS);
 			// listener offer available true
 		} else {
-			if(mListener != null) {
-				mListener.onSPInterstitialAdAvailable(false);
+			if(mRequestListener != null) {
+				mRequestListener.onSPInterstitialAdNotAvailable();
 			}
 			setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
 			// listener offer available false
@@ -178,8 +155,8 @@ public class SPInterstitialClient {
 			boolean showAd = SPMediationCoordinator.INSTANCE.showInterstitial(parentActivity,
 					mAd);
 			if (showAd) {
-				if (mListener != null) {
-					mListener.onSPInterstitialAdShown();
+				if (mAdStateListener != null) {
+					mAdStateListener.onSPInterstitialAdShown();
 				}
 				setState(SPInterstitialClientState.SHOWING_OFFERS);
 			}
@@ -191,29 +168,42 @@ public class SPInterstitialClient {
 
 	public void fireEvent(SPInterstitialAd ad,
 			SPInterstitialEvent event) {
+		fireEvent(ad, event, null);
+	}
+	
+	public void fireEvent(SPInterstitialAd ad,
+			SPInterstitialEvent event, String message) {
 		SPInterstitialEventDispatcher.trigger(mCredentials, mRequestId, ad, event);
-		if (mListener != null) {
-			switch (event) {
-			case ShowClick:
-				setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
-				mListener.onSPInterstitialAdClosed(SPInterstitialAdCloseReason.ReasonUserClickedOnAd);
-				break;
-			case ShowClose:
-				setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
-				mListener.onSPInterstitialAdClosed(SPInterstitialAdCloseReason.ReasonUserClosedAd);
-				break;
-			case Error:
-				setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
-				mListener.onSPInterstitialAdError("Some error occurred");
-				break;
-			default:
-				break;
+		switch (event) {
+		case ShowClick:
+			setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
+			if (mAdStateListener != null) {
+				mAdStateListener.onSPInterstitialAdClosed(SPInterstitialAdCloseReason.ReasonUserClickedOnAd);
 			}
+			break;
+		case ShowClose:
+			setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
+			if (mAdStateListener != null) {
+				mAdStateListener.onSPInterstitialAdClosed(SPInterstitialAdCloseReason.ReasonUserClosedAd);
+			}
+			break;
+		case Error:
+			setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
+			if (mAdStateListener != null) {
+				mAdStateListener.onSPInterstitialAdError(message);
+			}
+			break;
+		default:
+			break;
 		}
 	}
 
-	public void setListener(SPInterstitialRequestListener mListener) {
-		this.mListener = mListener;
+	public void setRequestListener(SPInterstitialRequestListener listener) {
+		mRequestListener = listener;
+	}
+	
+	public void setAdStateListener(SPInterstitialAdStateListener listener) {
+		mAdStateListener = listener;
 	}
 
 }

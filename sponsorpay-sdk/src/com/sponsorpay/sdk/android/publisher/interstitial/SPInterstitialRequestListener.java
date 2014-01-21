@@ -6,13 +6,13 @@
 
 package com.sponsorpay.sdk.android.publisher.interstitial;
 
+import android.content.Intent;
+
 public interface SPInterstitialRequestListener {
 	
-	public void onSPInterstitialAdAvailable(boolean isAdAvailable);
+	public void onSPInterstitialAdAvailable(Intent interstitialActivity);
 	
-	public void onSPInterstitialAdShown();
-	
-	public void onSPInterstitialAdClosed(SPInterstitialAdCloseReason reason);
+	public void onSPInterstitialAdNotAvailable();
 	
 	public void onSPInterstitialAdError(String error);
 	

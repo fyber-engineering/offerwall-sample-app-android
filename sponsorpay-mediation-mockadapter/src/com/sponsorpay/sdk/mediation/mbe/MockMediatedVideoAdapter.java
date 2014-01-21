@@ -7,57 +7,59 @@
 package com.sponsorpay.sdk.mediation.mbe;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 
+import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
-import com.sponsorpay.sdk.mediation.MediationConfigurationActivity;
 import com.sponsorpay.sdk.mediation.MockMediatedAdapter;
-import com.sponsorpay.sdk.mediation.MockMediationActivity;
-import com.sponsorpay.sdk.mediation.MockMediationPlayingBehaviour;
 
 public class MockMediatedVideoAdapter extends SPBrandEngageMediationAdapter<MockMediatedAdapter>{
 
+
+//	public static final String VIDEO_MOCK_BEHAVIOUR = "video.mock.behaviour";
+//	public static final String VIDEO_VALIDATION_RESULT = "validation.event.result";
+//	public static final String VIDEO_EVENT_RESULT = "video.event.result";
+	public static final String VIDEO_MOCK_SETTING = "video.mock.setting";
+	private static final String VIDEO_CLASS_NAME = "video.class.name";
+	
 	private static final int DELAY_FOR_START_PLAY_EVENT = 500;
 	private static final int DELAY_FOR_VIDEO_EVENT = 4500;
 
-	public static final String MOCK_PLAYING_BEHAVIOUR = "mock.playing.behaviour";
-	public static final String VALIDATION_RESULT = "validation.event.result";
-	public static final String VIDEO_EVENT_RESULT = "video.event.result";
-	private static final String CLASS_NAME = "class.name";
-	
-	private HashMap<String, Object> configs;
 
-	public MockMediatedVideoAdapter(MockMediatedAdapter adapter) {
+	public MockMediatedVideoAdapter(MockMediatedAdapter adapter, HashMap<String, Object> configs) {
 		super(adapter);
-		configs = new HashMap<String, Object>(3);
-		configs.put(VALIDATION_RESULT,
-				SPTPNVideoValidationResult.SPTPNValidationSuccess);
-		configs.put(MOCK_PLAYING_BEHAVIOUR,
-				MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerStartAndFinalResult);
-		configs.put(VIDEO_EVENT_RESULT, SPTPNVideoEvent.SPTPNVideoEventFinished);
-		configs.put(CLASS_NAME, MediationConfigurationActivity.class.getCanonicalName());
+//		configs.put(VIDEO_VALIDATION_RESULT,
+//				SPTPNVideoValidationResult.SPTPNValidationSuccess);
+//		configs.put(VIDEO_MOCK_BEHAVIOUR,
+//				MockVideoMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerStartAndFinalResult);
+//		configs.put(VIDEO_EVENT_RESULT, SPTPNVideoEvent.SPTPNVideoEventFinished);
+		configs.put(VIDEO_MOCK_SETTING, MockVideoSetting.PlayingStartedFinishedClosed);
+		configs.put(VIDEO_CLASS_NAME, VideoMediationConfigurationActivity.class.getCanonicalName());
 	}
 	
 	@Override
 	public void videosAvailable(Context context) {
 		// let timeout occur, otherwise fire the event
-		SPTPNVideoValidationResult validationResult = (SPTPNVideoValidationResult) configs.get(VALIDATION_RESULT);
+//		SPTPNVideoValidationResult validationResult = (SPTPNVideoValidationResult) getConfig(VIDEO_VALIDATION_RESULT);
+		SPTPNVideoValidationResult validationResult = (SPTPNVideoValidationResult) getConfig().getValidationResult();
 		if (validationResult != SPTPNVideoValidationResult.SPTPNValidationTimeout || 
-				configs.get(MOCK_PLAYING_BEHAVIOUR) == MockMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerResultOnce) {
+//				getConfig(VIDEO_MOCK_BEHAVIOUR) == MockVideoMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerResultOnce) {
+				getConfig().getBehaviour() == MockVideoMediationPlayingBehaviour.MockMediationPlayingBehaviourTriggerResultOnce) {
 			sendValidationEvent(validationResult);
 		}
 	}
 
 	@Override
 	public void startVideo(final Activity parentActivity) {
-		MockMediationPlayingBehaviour behaviour = (MockMediationPlayingBehaviour) configs.get(MOCK_PLAYING_BEHAVIOUR);
+		MockVideoMediationPlayingBehaviour behaviour = (MockVideoMediationPlayingBehaviour) 
+//				getConfig(VIDEO_MOCK_BEHAVIOUR);
+				getConfig().getBehaviour();
 		Handler handler = new Handler();
 		switch (behaviour) {
 		case MockMediationPlayingBehaviourTimeOut:
@@ -74,7 +76,8 @@ public class MockMediatedVideoAdapter extends SPBrandEngageMediationAdapter<Mock
 			handler.postDelayed(runnable, DELAY_FOR_START_PLAY_EVENT);
 			break;
 		case MockMediationPlayingBehaviourTriggerResultOnce:
-			sendVideoEvent((SPTPNVideoEvent) configs.get(VIDEO_EVENT_RESULT));
+//			sendVideoEvent((SPTPNVideoEvent) getConfig(VIDEO_EVENT_RESULT));
+			sendVideoEvent((SPTPNVideoEvent) getConfig().getVideoEvent());
 			clearVideoEvent();
 			break;
 		case MockMediationPlayingBehaviourTriggerStartAndFinalResult:
@@ -83,7 +86,7 @@ public class MockMediatedVideoAdapter extends SPBrandEngageMediationAdapter<Mock
 				@Override
 				public void run() {
 					Intent intent = new Intent(parentActivity,
-							MockMediationActivity.class);
+							MockVideoMediationActivity.class);
 					notifyVideoStarted();
 					parentActivity.startActivityForResult(intent, 986547);
 				}
@@ -93,8 +96,8 @@ public class MockMediatedVideoAdapter extends SPBrandEngageMediationAdapter<Mock
 			runnable = new Runnable() {
 				@Override
 				public void run() {
-					SPTPNVideoEvent eventResultToFire = (SPTPNVideoEvent) configs
-							.get(VIDEO_EVENT_RESULT);
+//					SPTPNVideoEvent eventResultToFire = (SPTPNVideoEvent) getConfig(VIDEO_EVENT_RESULT);
+					SPTPNVideoEvent eventResultToFire = (SPTPNVideoEvent) getConfig().getVideoEvent();
 					sendVideoEvent(eventResultToFire);
 					if (eventResultToFire == SPTPNVideoEvent.SPTPNVideoEventFinished) {
 						try {
@@ -115,8 +118,13 @@ public class MockMediatedVideoAdapter extends SPBrandEngageMediationAdapter<Mock
 		}	
 	}
 
-	public Map<String, Object> getConfigs() {
-		return configs;
+	private MockVideoSetting getConfig() {
+		return (MockVideoSetting) SPMediationConfigurator.getConfiguration(
+				getName(), VIDEO_MOCK_SETTING, Object.class);
 	}
+//	private Object getConfig(String key) {
+//		return SPMediationConfigurator.getConfiguration(getName(), key, Object.class);
+//	}
 
+	
 }

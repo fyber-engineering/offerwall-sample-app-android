@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.mediation;
+package com.sponsorpay.sdk.mediation.mbe;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -17,7 +17,7 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class MockMediationActivity extends Activity{
+public class MockVideoMediationActivity extends Activity{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -6,34 +6,38 @@
 
 package com.sponsorpay.sdk.mediation;
 
+import java.util.HashMap;
 import java.util.Set;
 
 import android.app.Activity;
 
 import com.sponsorpay.sdk.android.mediation.SPMediationAdapter;
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.mediation.interstitial.MockMediatedInterstitialAdapter;
 import com.sponsorpay.sdk.mediation.mbe.MockMediatedVideoAdapter;
 
 public class MockMediatedAdapter extends SPMediationAdapter {
 
 	private static final String TAG = "MockMediatedAdapter";
-
 	public static final String ADAPTER_NAME = "MockMediatedNetwork";
-
 	private static final String VERSION_STRING = "2.0.0";
 
 	private MockMediatedVideoAdapter mVideoMediationAdapter;
+	private MockMediatedInterstitialAdapter mInterstitialMediationAdapter;
+
+	private HashMap<String, Object> mConfigs;
 	
 	public MockMediatedAdapter() {
-		mVideoMediationAdapter = new MockMediatedVideoAdapter(this);
+		mConfigs = new HashMap<String, Object>();
+		mVideoMediationAdapter = new MockMediatedVideoAdapter(this, mConfigs);
+		mInterstitialMediationAdapter = new MockMediatedInterstitialAdapter(this, mConfigs);
 	}
 	
 	@Override
 	public boolean startAdapter(Activity activity) {
 		SponsorPayLogger.d(TAG, "Starting mock mediated network adapter");
-		SPMediationConfigurator.INSTANCE.setConfigurationForAdapter(getName(), mVideoMediationAdapter.getConfigs());
+		SPMediationConfigurator.INSTANCE.setConfigurationForAdapter(getName(), mConfigs);
 		return true;
 	}
 	
@@ -49,12 +53,12 @@ public class MockMediatedAdapter extends SPMediationAdapter {
 
 	@Override
 	public MockMediatedVideoAdapter getVideoMediationAdapter() {
-		return null;
+		return mVideoMediationAdapter;
 	}
 
 	@Override
-	public SPInterstitialMediationAdapter<SPMediationAdapter> getInterstitialMediationAdapter() {
-		return null;
+	public MockMediatedInterstitialAdapter getInterstitialMediationAdapter() {
+		return mInterstitialMediationAdapter;
 	}
 
 	@Override

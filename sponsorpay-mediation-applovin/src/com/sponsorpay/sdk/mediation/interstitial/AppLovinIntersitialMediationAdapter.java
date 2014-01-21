@@ -11,7 +11,6 @@ import com.applovin.sdk.AppLovinAdDisplayListener;
 import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
-import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.mediation.AppLovinMediationAdapter;
 
@@ -35,19 +34,24 @@ public class AppLovinIntersitialMediationAdapter extends
 
 	@Override
 	public boolean show(Activity parentActivity) {
-//		AppLovinInterstitialAd.show( parentActivity );
 		mInterstitialDialog.showAndRender(mAppLovinAd);
 		return true;
 	}
 
+
 	@Override
-	public boolean interstitialAvailable(Context context, SPInterstitialAd ad) {
-		if (isAdAvailable()) {
-			return true;
-		};
+	protected void checkForAds(Context context) {
 		mAppLovinSdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
-		return false;
 	}
+	
+//	@Override
+//	public boolean interstitialAvailable(Context context, SPInterstitialAd ad) {
+//		if (isAdAvailable()) {
+//			return true;
+//		};
+//		mAppLovinSdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
+//		return false;
+//	}
 
 	// AppLovinAdLoadListener
 	@Override
@@ -62,7 +66,6 @@ public class AppLovinIntersitialMediationAdapter extends
 	}
 
 	// AppLovinAdDisplayListener
-	
 	@Override
 	public void adDisplayed(AppLovinAd ad) {
 		fireImpressionEvent();
@@ -71,14 +74,12 @@ public class AppLovinIntersitialMediationAdapter extends
 	@Override
 	public void adHidden(AppLovinAd ad) {
 		fireCloseEvent();
-//		mAppLovinSdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
 	}
 
 	// AppLovinAdClickListener
 	@Override
 	public void adClicked(AppLovinAd ad) {
 		fireClickEvent();
-//		mAppLovinSdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
 	}
 
 }

@@ -25,7 +25,6 @@ import com.appia.sdk.Appia;
 import com.appia.sdk.BannerAdResult;
 import com.appia.sdk.BannerAdSize;
 import com.sponsorpay.sdk.android.mediation.SPMediationConfigurator;
-import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.mediation.AppiaMediationAdapter;
 
@@ -33,9 +32,9 @@ public class AppiaIntersitialMediationAdapter extends
 		SPInterstitialMediationAdapter<AppiaMediationAdapter>  {
 
 	private static final String PLACEMENT_ID = "placementId";
+
 	private Appia mAppia;
 	private AdParameters mAdParameters;
-	private WeakReference<Activity> mActivityRef;
 	private BannerAdResult mAdResult;
 
 	public AppiaIntersitialMediationAdapter(AppiaMediationAdapter adapter,
@@ -46,57 +45,48 @@ public class AppiaIntersitialMediationAdapter extends
 		String placementId = SPMediationConfigurator.getConfiguration(adapter.getName(), PLACEMENT_ID, String.class);
 		mAdParameters.getAppiaParameters().put(PLACEMENT_ID, placementId );
 		this.mActivityRef = new WeakReference<Activity>(activity);
-		checkForOffers();
-//		setAdAvailable();
-	}
-
-	private void checkForOffers() {
-		mActivityRef.get().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mAdResult = mAppia.getBannerAd(mActivityRef.get(), mAdParameters, BannerAdSize.SIZE_768x1024);
-				setAdAvailable();
-			}
-		});		
+		checkForAds(activity);
 	}
 
 	@Override
 	public boolean show(Activity parentActivity) {
-//		mAppia.displayInterstitial(parentActivity, mAdParameters, BannerAdSize.SIZE_768x1024);
-//		return true;
-		
-		if (mAdResult != null && !mAdResult.hasError()) {
-//			parentActivity.addContentView(mAdResult.getView(),  new LayoutParams(
-//							LayoutParams.WRAP_CONTENT,
-//							LayoutParams.WRAP_CONTENT));
-			AppiaDialog myDialog = new AppiaDialog(parentActivity);
-			myDialog.show(mAdResult);
-			myDialog.setOnDismissListener(new OnDismissListener() {
-				
-				@Override
-				public void onDismiss(DialogInterface dialog) {
-					fireCloseEvent();
-				}
-			});
-			return true;
-		} else {
-			return false;
+		if (mAdResult != null){
+			if (!mAdResult.hasError()) {
+				AppiaDialog myDialog = new AppiaDialog(parentActivity);
+				myDialog.show(mAdResult);
+				myDialog.setOnDismissListener(new OnDismissListener() {
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						fireCloseEvent();
+					}
+				});
+				return true;
+			} else {
+				fireErrorEvent(mAdResult.getErrorText());
+			}
 		}
+		return false;
 	}
+
 
 	@Override
-	public boolean interstitialAvailable(Context context, SPInterstitialAd ad) {
-//		if (mAdResult != null && !mAdResult.hasError()) {
-//			setAdAvailable();
-//			return true;
-//		} else {
-//			checkForOffers();
-//			return false;
-//		}
-		checkForOffers();
-		return true;
+	protected void checkForAds(Context context) {
+		Activity activity = mActivityRef.get();
+		if (activity != null) {
+			activity.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					mAdResult = mAppia.getBannerAd(mActivityRef.get(),
+							mAdParameters, BannerAdSize.SIZE_768x1024);
+					if (mAdResult.hasError()) {
+						fireErrorEvent(mAdResult.getErrorText());
+					} else {
+						setAdAvailable();
+					}
+				}
+			});
+		}
 	}
-
 	
 	private class AppiaDialog extends Dialog {
 
@@ -159,10 +149,10 @@ public class AppiaIntersitialMediationAdapter extends
 				touchFrame.setOnTouchListener(new OnTouchListener() {
 					@Override
 					public boolean onTouch(View v, MotionEvent event) {
-						fireClickEvent();
 						v.postDelayed(new Runnable() {
 							@Override
 							public void run() {
+								fireClickEvent();
 								dismiss();
 							}
 						}, 200);
@@ -175,11 +165,7 @@ public class AppiaIntersitialMediationAdapter extends
 				layout.addView(touchFrame, frameLayoutParams);
 			}
 			show();
-
 		}
-  	
-		
     }
-	
 
 }

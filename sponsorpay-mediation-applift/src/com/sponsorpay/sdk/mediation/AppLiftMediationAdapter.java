@@ -27,6 +27,8 @@ public class AppLiftMediationAdapter extends SPMediationAdapter{
 	@Override
 	public boolean startAdapter(final Activity activity) {
 		SponsorPayLogger.d(TAG, "Starting AppLift adapter");// - SDK version " + PlayAds.getSDKVersion());
+		try {
+			
 		final Integer appId = Integer.decode(SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID, String.class));
 		final String appSecret = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_SECRET, String.class);
 		if (appId != null && StringUtils.notNullNorEmpty(appSecret)) {
@@ -40,6 +42,9 @@ public class AppLiftMediationAdapter extends SPMediationAdapter{
 				}
 			});
 			return true;
+		}
+		} catch (Exception e) {
+			SponsorPayLogger.e(TAG, e.getLocalizedMessage(), e);
 		}
 		SponsorPayLogger.i(TAG, "One of the provided values (appId/appSecret) is not valid");
 		return false;

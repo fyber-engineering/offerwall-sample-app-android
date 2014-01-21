@@ -6,6 +6,8 @@
 
 package com.sponsorpay.sdk.android.publisher.interstitial.mediation;
 
+import java.lang.ref.WeakReference;
+
 import android.app.Activity;
 import android.content.Context;
 
@@ -17,48 +19,54 @@ import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialEvent;
 public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapter> {
 
 	protected V mAdapter;
+	protected WeakReference<Activity> mActivityRef;
+
 	private SPInterstitialAd mAd;
 	private boolean mAdAvailable;
-	private Activity mActivity;
-	private boolean mHasClickOccured = false;
+	private boolean mHasBeenClicked = false;
 
 	public SPInterstitialMediationAdapter(V adapter) {
 		mAdapter = adapter;
 	}
 	
-	public abstract boolean show(Activity parentActivity);
+	protected abstract boolean show(Activity parentActivity);
+	
+	protected abstract void checkForAds(Context context);
 
-	public abstract boolean interstitialAvailable(Context context,
-			SPInterstitialAd ad);
+	public boolean isAdAvailable(Context context,
+			SPInterstitialAd ad) {
+		if (!isAdAvailable()) {
+			mAd = ad;
+			checkForAds(context);
+			return false;
+		}
+		return true;
+	}
 
 	public boolean show(Activity parentActivity,
 			SPInterstitialAd ad) {
 		if (isAdAvailable()) {
-			mHasClickOccured = false;
-			mActivity = parentActivity;
+			mHasBeenClicked = false;
 			mAd = ad;
+			mActivityRef = new WeakReference<Activity>(parentActivity);
 			return show(parentActivity);
 		}
-		interstitialAvailable(parentActivity, ad);
+		checkForAds(parentActivity);
 		return false;
 	}
 	
 	// Convenience methods
 	
+	protected String getName() {
+		return mAdapter.getName();
+	}
+	
 	protected void setAdAvailable() {
 		mAdAvailable = true;
 	}
 	
-	protected boolean isAdAvailable() {
+	private boolean isAdAvailable() {
 		return mAdAvailable;
-	}
-	
-	protected void requestAd() {
-		mAd = null;
-		mAdAvailable = false;
-		interstitialAvailable(mActivity, null);
-		mActivity = null;
-//		interstitialAvailable(context, ad)
 	}
 	
 	protected void fireImpressionEvent() {
@@ -66,29 +74,45 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 	}
 	
 	protected void fireClickEvent() {
-		mHasClickOccured = true;
+		mHasBeenClicked = true;
 		fireEvent(SPInterstitialEvent.ShowClick);
 	}
 	
 	protected void fireCloseEvent() {
-		if (!mHasClickOccured) {
+		if (!mHasBeenClicked) {
 			fireEvent(SPInterstitialEvent.ShowClose);
 		}
-		requestAd();
+		resetState();
+		checkForAds(getActivity());
 	}
-	
-	protected void fireErrorEvent() {
-		fireEvent(SPInterstitialEvent.Error);
-		requestAd();
-//		mAd = null;
+
+	protected void fireErrorEvent(String message) {
+		resetState();
+		fireEvent(SPInterstitialEvent.Error, message);
+		checkForAds(getActivity());
 	}
 	
 	private void fireEvent(SPInterstitialEvent event) {
+		fireEvent(event, null);
+	}
+	
+	private void fireEvent(SPInterstitialEvent event, String message) {
 		if (mAd != null) {
-			SPInterstitialClient.INSTANCE.fireEvent(mAd, event);
-		} else {
-			//FIXME log
+			SPInterstitialClient.INSTANCE.fireEvent(mAd, event, message);
 		}
+	}
+	
+	private void resetState() {
+		mHasBeenClicked = false;
+		mAdAvailable = false;
+	}
+	
+	
+	protected Activity getActivity() {
+		if (mActivityRef != null) {
+			return mActivityRef.get();
+		}
+		return null;
 	}
 
 }

@@ -7,7 +7,6 @@ import com.applift.playads.PlayAds;
 import com.applift.playads.api.PlayAdsListener;
 import com.applift.playads.api.PlayAdsPromo;
 import com.applift.playads.api.PlayAdsType;
-import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.mediation.AppLiftMediationAdapter;
 
@@ -19,14 +18,19 @@ public class AppLiftInterstitialMediationAdapter extends
 	}
 	
 	public void start() {
-		PlayAds.cache();
+		checkForAds(null);
 	}
 	
 	@Override
-	public boolean interstitialAvailable(Context context, SPInterstitialAd ad) {
-		return isAdAvailable();
+	protected void checkForAds(Context context) {
+		PlayAds.cache();
 	}
 	
+//	@Override
+//	public boolean interstitialAvailable(Context context, SPInterstitialAd ad) {
+//		return isAdAvailable();
+//	}
+//	
 	@Override
 	public boolean show(Activity parentActivity) {
 		PlayAds.show(parentActivity);
@@ -51,14 +55,15 @@ public class AppLiftInterstitialMediationAdapter extends
 	
 	@Override
 	public void onError(Exception exception) {
-		fireErrorEvent();
-		PlayAds.cache();
+		fireErrorEvent(exception.getMessage());
+//		PlayAds.cache();
 	}
 
 	@Override
 	public void onClosed(PlayAdsType arg0) {
 		fireCloseEvent();
-		PlayAds.cache();
+//		PlayAds.cache();
 	}
+
 
 }

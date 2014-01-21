@@ -16,7 +16,7 @@ public class SPInterstitialAdsProcessorTask extends AsyncTask<SPInterstitialAd, 
 		for(SPInterstitialAd ad : ads)  {
 			SponsorPayLogger.d(TAG, "Processing ad from " + ad.getProviderType());
 			if (SPMediationCoordinator.INSTANCE.isProviderAvailable(ad.getProviderType(), SPMediationAdFormat.Interstitial)) {
-				SponsorPayLogger.d(TAG, ad.getProviderType() + " is available, proceeeding...");
+				SponsorPayLogger.d(TAG, ad.getProviderType() + " is available, proceeding...");
 				SPInterstitialClient.INSTANCE.fireEvent(ad, SPInterstitialEvent.ValidationRequest);
 				if (SPInterstitialClient.INSTANCE.validateAd(ad)) {
 					SponsorPayLogger.d(TAG, "Ad is available from " + ad.getProviderType());

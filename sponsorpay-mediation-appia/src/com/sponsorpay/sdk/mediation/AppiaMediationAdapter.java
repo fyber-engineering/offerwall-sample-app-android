@@ -22,16 +22,16 @@ public class AppiaMediationAdapter extends SPMediationAdapter {
 
 	private static final String TAG = "AppiaAdapter";
 	private static final String ADAPTER_VERSION = "1.0.0";
-	private static final String ADAPTER_NAME = "AppLovin";
+	private static final String ADAPTER_NAME = "Appia";
 	
 	private static final String SITE_ID = "siteId";
-	
 	
 	private AppiaIntersitialMediationAdapter mInterstitialAdapter;
 	
 	@Override
 	public boolean startAdapter(Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting Appia adapter - SDK version ");// + Appia);
+		//No SDK version for Appia
+		SponsorPayLogger.d(TAG, "Starting Appia adapter");
 		Integer siteId = null;
 		try {
 			siteId = Integer.decode(SPMediationConfigurator.getConfiguration(ADAPTER_NAME, SITE_ID, String.class));

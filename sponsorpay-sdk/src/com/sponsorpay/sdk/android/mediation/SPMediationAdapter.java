@@ -94,7 +94,7 @@ public abstract class SPMediationAdapter {
 		// validation is not required here, as SPMediationCoordinator is performing it before, but...
 		SPInterstitialMediationAdapter<? extends SPMediationAdapter> interstitialMediationAdapter = getInterstitialMediationAdapter();
 		if (interstitialMediationAdapter != null) {
-			return interstitialMediationAdapter.interstitialAvailable(context, ad);
+			return interstitialMediationAdapter.isAdAvailable(context, ad);
 		}
 		return false;
 	}

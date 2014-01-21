@@ -4,7 +4,7 @@
  * Copyright 2011 - 2013 SponsorPay. All rights reserved.
  */
 
-package com.sponsorpay.sdk.mediation;
+package com.sponsorpay.sdk.mediation.mbe;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -14,32 +14,30 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import com.sponsorpay.sdk.mediation.helpers.MockSetting;
+public class MockVideoMediationListAdapter extends BaseExpandableListAdapter {
 
-public class MockMediationListAdapter extends BaseExpandableListAdapter {
-
-	private MockSetting[] validation = {MockSetting.SPValidationTimeout,
-			MockSetting.TPNValidationTimeout,
-			MockSetting.NoVideoAvailable,
-			MockSetting.NetowrokError,
-			MockSetting.DiskError,
-			MockSetting.OtherError};
+	private MockVideoSetting[] validation = {MockVideoSetting.SPValidationTimeout,
+			MockVideoSetting.TPNValidationTimeout,
+			MockVideoSetting.NoVideoAvailable,
+			MockVideoSetting.NetowrokError,
+			MockVideoSetting.DiskError,
+			MockVideoSetting.OtherError};
 	
-	private MockSetting[] video = {MockSetting.PlayingTimeout,
-			MockSetting.PlayingStartAndTimeout,
-			MockSetting.PlayingStartedAborted,
-			MockSetting.PlayingStartedFinishedClosed,
-			MockSetting.PlayingNoVideo,
-			MockSetting.PlayingOtherError,
-			MockSetting.PlayingStartedOtherError};
+	private MockVideoSetting[] video = {MockVideoSetting.PlayingTimeout,
+			MockVideoSetting.PlayingStartAndTimeout,
+			MockVideoSetting.PlayingStartedAborted,
+			MockVideoSetting.PlayingStartedFinishedClosed,
+			MockVideoSetting.PlayingNoVideo,
+			MockVideoSetting.PlayingOtherError,
+			MockVideoSetting.PlayingStartedOtherError};
 	
-	private MockSetting[][] groups = {validation, video};
+	private MockVideoSetting[][] groups = {validation, video};
 
 	private LayoutInflater inflater;
 
 	private OnClickListener listener;
 	
-	public MockMediationListAdapter(Activity act, OnClickListener listener) {
+	public MockVideoMediationListAdapter(Activity act, OnClickListener listener) {
 		this.listener = listener;
 	    inflater = act.getLayoutInflater();
 	  }
@@ -57,7 +55,7 @@ public class MockMediationListAdapter extends BaseExpandableListAdapter {
 	@Override
 	public View getChildView(int groupPosition, int childPosition,
 			boolean isLastChild, View convertView, ViewGroup parent) {
-	    final MockSetting child = (MockSetting) getChild(groupPosition, childPosition);
+	    final MockVideoSetting child = (MockVideoSetting) getChild(groupPosition, childPosition);
 	    TextView text = null;
 	    if (convertView == null) {
 	      convertView = inflater.inflate(android.R.layout.simple_expandable_list_item_1, null);

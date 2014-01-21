@@ -47,7 +47,7 @@ public class AppLovinMediationAdapter extends SPMediationAdapter {
 			mInterstitialAdapter = new AppLovinIntersitialMediationAdapter(this, activity);
 			return true;
 		}
-		SponsorPayLogger.i(TAG, "SDK key value is not set in the Manifest file and on the settings file.");
+		SponsorPayLogger.i(TAG, "SDK key value is not set in the AndroidManifest file of your application.");
 		return false;
 	}
 	

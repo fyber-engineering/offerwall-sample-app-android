@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.mediation.interstitial;
 
 import android.app.Activity;
@@ -21,36 +27,23 @@ public class AppLovinIntersitialMediationAdapter extends
 	private AppLovinSdk mAppLovinSdk;
 	private AppLovinAd mAppLovinAd;
 	
-//	private AppLovinAdView adView;
-	
 
 	public AppLovinIntersitialMediationAdapter(AppLovinMediationAdapter adapter, Activity activity) {
 		super(adapter);
-//		AppLovinSdk.initializeSdk(activity);
 		mAppLovinSdk = AppLovinSdk.getInstance(activity);
 		mAppLovinSdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
-		
-//		adView = new AppLovinAdView( mAppLovinSdk, AppLovinAdSize.INTERSTITIAL, activity );
-//		adView.setAdLoadListener(this);
-//		adView.loadNextAd();
-
 	}
 
 	@Override
 	public boolean show(Activity parentActivity) {
 		if (mAppLovinAd != null) {
 			mInterstitialDialog = AppLovinInterstitialAd.create(mAppLovinSdk, parentActivity);
-//			mInterstitialDialog.setAdLoadListener(this);
 			mInterstitialDialog.setAdDisplayListener(this);
 			mInterstitialDialog.setAdClickListener(this);
 			mInterstitialDialog.showAndRender(mAppLovinAd);
 			return true;
 		}
 		return false;
-		
-//		parentActivity.addContentView(adView, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-//		return true;
-		
 	}
 
 
@@ -59,15 +52,6 @@ public class AppLovinIntersitialMediationAdapter extends
 		mAppLovinSdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
 	}
 	
-//	@Override
-//	public boolean interstitialAvailable(Context context, SPInterstitialAd ad) {
-//		if (isAdAvailable()) {
-//			return true;
-//		};
-//		mAppLovinSdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
-//		return false;
-//	}
-
 	// AppLovinAdLoadListener
 	@Override
 	public void adReceived(AppLovinAd ad) {
@@ -79,7 +63,6 @@ public class AppLovinIntersitialMediationAdapter extends
 	public void failedToReceiveAd(int errorCode) {
 		mAppLovinAd = null;
 		fireErrorEvent("Applovin failedToReceiveAd with errorCode " + errorCode);
-//		mAppLovinSdk.getAdService().loadNextAd(AppLovinAdSize.INTERSTITIAL, this);
 	}
 
 	// AppLovinAdDisplayListener

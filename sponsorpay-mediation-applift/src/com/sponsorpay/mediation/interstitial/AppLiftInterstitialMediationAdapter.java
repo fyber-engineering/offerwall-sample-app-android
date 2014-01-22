@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.mediation.interstitial;
 
 import android.app.Activity;
@@ -26,11 +32,6 @@ public class AppLiftInterstitialMediationAdapter extends
 		PlayAds.cache();
 	}
 	
-//	@Override
-//	public boolean interstitialAvailable(Context context, SPInterstitialAd ad) {
-//		return isAdAvailable();
-//	}
-//	
 	@Override
 	public boolean show(Activity parentActivity) {
 		PlayAds.show(parentActivity);
@@ -50,20 +51,16 @@ public class AppLiftInterstitialMediationAdapter extends
 	@Override
 	public void onTapped(PlayAdsPromo promo) {
 		fireClickEvent();		
-//		PlayAds.cache();
 	}
 	
 	@Override
 	public void onError(Exception exception) {
 		fireErrorEvent(exception.getMessage());
-//		PlayAds.cache();
 	}
 
 	@Override
 	public void onClosed(PlayAdsType arg0) {
 		fireCloseEvent();
-//		PlayAds.cache();
 	}
-
 
 }

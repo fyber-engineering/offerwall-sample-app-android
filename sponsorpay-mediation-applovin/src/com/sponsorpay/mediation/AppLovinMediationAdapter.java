@@ -34,12 +34,6 @@ public class AppLovinMediationAdapter extends SPMediationAdapter {
 	@Override
 	public boolean startAdapter(Activity activity) {
 		SponsorPayLogger.d(TAG, "Starting AppLovin adapter - SDK version " + AppLovinSdk.VERSION);
-//		String sdkKey = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, SDK_KEY, String.class);
-//		if (StringUtils.notNullNorEmpty(sdkKey)) {
-//			storeMetadata(activity, sdkKey);
-//		} else {
-//			sdkKey = getValueFromAppMetadata(activity);
-//		}
 		String sdkKey = getValueFromAppMetadata(activity);
 		if (StringUtils.notNullNorEmpty(sdkKey)) {
 			AppLovinSdk.initializeSdk(activity);
@@ -93,15 +87,9 @@ public class AppLovinMediationAdapter extends SPMediationAdapter {
         return ai.metaData;
 	}
 	
-//	private void storeMetadata(Activity activity, String value) {
-//		getMetadata(activity).putString(SDK_KEY, value);
-//	}
-	
 	private String getValueFromAppMetadata(Activity activity) {
         Object retrievedValue;
-
         retrievedValue = getMetadata(activity).get(SDK_KEY);
-
         return retrievedValue == null ? null : retrievedValue.toString();
 	}
 

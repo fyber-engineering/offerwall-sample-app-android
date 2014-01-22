@@ -1,5 +1,10 @@
-package com.sponsorpay.mediation.interstitial;
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ */
 
+package com.sponsorpay.mediation.interstitial;
 
 public enum MockInterstitialSetting {
 

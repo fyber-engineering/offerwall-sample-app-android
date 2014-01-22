@@ -36,7 +36,7 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 	@Override
 	public void onSPInterstitialAdClosed(SPInterstitialAdCloseReason reason) {
 		Intent intent = new Intent();
-		intent.putExtra(SP_AD_STATUS, reason);
+		intent.putExtra(SP_AD_STATUS, reason.toString());
 		setResult(RESULT_OK, intent);
 		finish();
 	}

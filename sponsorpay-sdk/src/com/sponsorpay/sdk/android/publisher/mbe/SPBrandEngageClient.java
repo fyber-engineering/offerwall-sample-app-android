@@ -49,7 +49,7 @@ import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediation
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPVideoMediationValidationEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
 import com.sponsorpay.sdk.android.utils.SPWebClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
@@ -628,7 +628,7 @@ public class SPBrandEngageClient {
 						HashMap<String, String> contextData = new HashMap<String, String>(1);
 						contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
 						SPMediationCoordinator.INSTANCE.validateVideoProvider(mContext, tpnName,
-								contextData, new SPVideoMediationValidationEvent() {
+								contextData, new SPMediationValidationEvent() {
 							@Override
 							public void validationEventResult(String name, SPTPNVideoValidationResult result, Map<String, String> contextData) {
 								String url = String.format("%s('validate', {tpn:'%s', id:%s, result:'%s'})", 

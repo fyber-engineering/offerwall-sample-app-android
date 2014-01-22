@@ -16,6 +16,7 @@ import android.content.Context;
 import com.sponsorpay.sdk.android.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.mediation.SPMediationCoordinator;
+import com.sponsorpay.sdk.android.utils.HostInfo;
 import com.sponsorpay.sdk.android.utils.StringUtils;
 
 
@@ -41,7 +42,7 @@ public class SponsorPay {
 	
 	private HashMap<String, SPCredentials> tokensMap = new HashMap<String, SPCredentials>();
 	
-	private String currentCredentials;
+	private SPCredentials currentCredentials;
 	
 	protected SponsorPay() {
 	}
@@ -67,8 +68,8 @@ public class SponsorPay {
 		} else if (StringUtils.notNullNorEmpty(securityToken)) {
 			credentials.setSecurityToken(securityToken);
 		}
-		currentCredentials = credentials.getCredentialsToken();
-		return currentCredentials;
+		currentCredentials = credentials;
+		return currentCredentials.getCredentialsToken();
 	}
 	
 	/**
@@ -77,11 +78,11 @@ public class SponsorPay {
 	 * @return the current {@link SPCredentials}
 	 */
 	public static SPCredentials getCurrentCredentials() {
-		if (StringUtils.nullOrEmpty(INSTANCE.currentCredentials)) {
+		if (INSTANCE.currentCredentials == null) {
 			throw new RuntimeException("No credentials object was created yet.\n" +
 					"You have to execute SponsorPay.start method first.");
 		}
-		return INSTANCE.getCredentialsFromToken(INSTANCE.currentCredentials);
+		return INSTANCE.currentCredentials;
 	}
 	
 	/**
@@ -124,6 +125,7 @@ public class SponsorPay {
 			String securityToken, Activity activity) {
 		Set<String> credentials = new HashSet<String>(SponsorPay.getAllCredentials());
 		Context context = activity.getApplicationContext();
+		HostInfo.getHostInfo(context);
 		String credentialsToken = INSTANCE.getCredentialsToken(appId, userId, securityToken,
 						context);
 		if (!credentials.contains(credentialsToken)) {

@@ -85,7 +85,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 		// exceptions triggered from the SDK to the integrator's code --due to a missing App ID
 		// value or to an invalid collection of custom parameters-- are triggered on the calling
 		// thread.
-		execute(buildUrl());
+		execute((String[])null);
 	}
 
 	private String buildUrl() {
@@ -139,7 +139,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 		Thread.currentThread().setName(TAG);
 		Boolean returnValue = null;
 
-		String callbackUrl = params[0];
+		String callbackUrl = buildUrl();
 
 		HttpGet httpRequest = new HttpGet(callbackUrl);
 		HttpClient httpClient = SPHttpClient.getHttpClient();

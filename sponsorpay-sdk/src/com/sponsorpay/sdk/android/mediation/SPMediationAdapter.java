@@ -18,7 +18,7 @@ import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.sdk.android.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPVideoMediationValidationEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
 
 /**
  * <p>
@@ -66,7 +66,7 @@ public abstract class SPMediationAdapter {
 	 * ======================================================
 	 */
 
-	public void validateVideoProvider(Context context, SPVideoMediationValidationEvent validationEvent,
+	public void validateVideoProvider(Context context, SPMediationValidationEvent validationEvent,
 			HashMap<String, String> contextData) {
 		// validation is not required here, as SPMediationCoordinator is performing it before, but...
 		SPBrandEngageMediationAdapter<? extends SPMediationAdapter> videoMediationAdapter = getVideoMediationAdapter();

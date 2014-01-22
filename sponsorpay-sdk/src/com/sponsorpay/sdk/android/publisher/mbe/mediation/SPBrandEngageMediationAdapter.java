@@ -49,7 +49,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 	/*
 	 * The mediation validation event listener 
 	 */
-	private SPVideoMediationValidationEvent mValidationEvent;
+	private SPMediationValidationEvent mValidationEvent;
 	/*
 	 * The mediation validation context data for this request 
 	 */
@@ -120,18 +120,18 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 	/**
 	 * Method called from the {@link SPMediationCoordinator} to check for videos
 	 * availability for this provider. The result of the method is returned asynchronously
-	 * to the provided {@link SPVideoMediationValidationEvent}.
+	 * to the provided {@link SPMediationValidationEvent}.
 	 * This method also stores the listener and the context data information to send it back
 	 * when needed and starts the validation timeout.
 	 *   
 	 * @param context
 	 * 			The activity context
 	 * @param event
-	 * 			The {@link SPVideoMediationValidationEvent} to be notified.
+	 * 			The {@link SPMediationValidationEvent} to be notified.
 	 * @param contextData
 	 * 			The context data used in this request
 	 */
-	public void videosAvailable(Context context, SPVideoMediationValidationEvent event,
+	public void videosAvailable(Context context, SPMediationValidationEvent event,
 			Map<String, String> contextData) {
 		mValidationEvent = event;
 		mValidationContextData = contextData;

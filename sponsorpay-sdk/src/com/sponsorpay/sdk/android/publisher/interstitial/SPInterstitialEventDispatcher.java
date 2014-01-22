@@ -11,6 +11,7 @@ import com.sponsorpay.sdk.android.credentials.SPCredentials;
 import com.sponsorpay.sdk.android.utils.SPHttpClient;
 import com.sponsorpay.sdk.android.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
+import com.sponsorpay.sdk.android.utils.StringUtils;
 import com.sponsorpay.sdk.android.utils.UrlBuilder;
 
 
@@ -22,18 +23,22 @@ public class SPInterstitialEventDispatcher extends AsyncTask<String, Void, Boole
 
 	public static void trigger(SPCredentials credentials, String requestId,
 			SPInterstitialAd ad, SPInterstitialEvent event) {
-		if (ad != null) {
-			SponsorPayLogger.d(TAG,	String.format(
-					"Notifiying tracker of event=%s with request_id=%s for ad_id=%s and provider_type=%s ",
-					event, requestId, ad.getAdId(),
-					ad.getProviderType()));
+		if (credentials == null || StringUtils.nullOrEmpty(requestId) || event == null) {
+			SponsorPayLogger.d(TAG, "The event cannot be sent, a required field is missing.");
 		} else {
-			SponsorPayLogger.d(TAG,	String.format(
-					"Notifiying tracker of event=%s with request_id=%s",
-					event, requestId));
+			if (ad != null) {
+				SponsorPayLogger.d(TAG,	String.format(
+						"Notifiying tracker of event=%s with request_id=%s for ad_id=%s and provider_type=%s ",
+						event, requestId, ad.getAdId(),
+						ad.getProviderType()));
+			} else {
+				SponsorPayLogger.d(TAG,	String.format(
+						"Notifiying tracker of event=%s with request_id=%s",
+						event, requestId));
+			}
+			new SPInterstitialEventDispatcher().execute(buildUrl(credentials, requestId, ad,
+					event));
 		}
-		new SPInterstitialEventDispatcher().execute(buildUrl(credentials, requestId, ad,
-				event));
 	}
 	
 	private static String buildUrl(SPCredentials credentials, String requestId,

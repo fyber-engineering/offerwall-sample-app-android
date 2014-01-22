@@ -8,7 +8,7 @@ package com.sponsorpay.sdk.android.publisher.mbe.mediation;
 
 import java.util.Map;
 
-public interface SPVideoMediationValidationEvent {
+public interface SPMediationValidationEvent {
 
 	public void validationEventResult(String adapterName,
 			SPTPNVideoValidationResult result, Map<String, String> contextData);

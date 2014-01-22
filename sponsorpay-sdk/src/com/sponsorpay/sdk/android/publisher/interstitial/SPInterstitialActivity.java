@@ -10,23 +10,26 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 	public final static String SP_AD_STATUS = "AD_STATUS"; 
 
 	public final static String SP_AD_STATUS_ERROR = "AD_STATUS_ERROR"; 
-	public final static String SP_ERROR_MESSAGE = "ERROR_MESSAGE"; 
+	public final static String SP_ERROR_MESSAGE = "ERROR_MESSAGE";
+
+//	private RelativeLayout mLayout; 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 //		setTheme(android.R.style.Theme_Translucent_NoTitleBar);
 		super.onCreate(savedInstanceState);
 //		getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-//		RelativeLayout layout = new RelativeLayout(this);
-//		layout.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-//		layout.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-//		setContentView(layout);
+
+//		mLayout = new RelativeLayout(this);
+//		mLayout.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+//		mLayout.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+//		setContentView(mLayout);
 		
-		if(!SPInterstitialClient.INSTANCE.showInterstitial(this)) {
+		if(!SPInterstitialClient.INSTANCE.showInterstitial(SPInterstitialActivity.this)) {
 			finishActivity(RESULT_CANCELED);
 		} else {
-			SPInterstitialClient.INSTANCE.setAdStateListener(this);
+			SPInterstitialClient.INSTANCE.setAdStateListener(SPInterstitialActivity.this);
 		}
 	}
 	
@@ -35,11 +38,34 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 		//do nothing
 	}
 	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
-
+//	@Override
+//	protected void onPause() {
+////		removeViews();
+//		super.onPause();
+//	}
+//
+//	@Override
+//	protected void onDestroy() {
+////		removeViews();
+//		super.onDestroy();
+//	}
+	
+	
+//	private void removeViews() {
+//		View view = getWindow().
+////				getWindowManager().
+//				getDecorView().getRootView();
+//		if (view instanceof ViewGroup) {
+//			((ViewGroup)view).removeAllViews();
+//		}
+//
+////		View view = findViewById(android.R.id.content);
+////		if (view instanceof ViewGroup) {
+////			((ViewGroup)view).removeAllViews();
+////		}
+//	}
+	
+		
 	@Override
 	public void onSPInterstitialAdClosed(SPInterstitialAdCloseReason reason) {
 		Intent intent = new Intent();

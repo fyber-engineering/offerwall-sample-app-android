@@ -20,7 +20,7 @@ import com.sponsorpay.sdk.android.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPTPNVideoValidationResult;
-import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPVideoMediationValidationEvent;
+import com.sponsorpay.sdk.android.publisher.mbe.mediation.SPMediationValidationEvent;
 import com.sponsorpay.sdk.android.utils.SponsorPayLogger;
 
 public class SPMediationCoordinator {
@@ -107,7 +107,7 @@ public class SPMediationCoordinator {
 	// Rewarded Videos
 	public void validateVideoProvider(Context context, String adapterName,
 			HashMap<String, String> contextData,
-			SPVideoMediationValidationEvent validationEvent) {
+			SPMediationValidationEvent validationEvent) {
 		if (isProviderAvailable(adapterName, SPMediationAdFormat.RewardedVideo)) {
 			mAdapters.get(adapterName).validateVideoProvider(context, validationEvent, contextData);
 		} else {

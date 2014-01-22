@@ -7,7 +7,10 @@
 package com.sponsorpay.sdk.android.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -17,6 +20,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Looper;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
@@ -56,6 +60,16 @@ public class HostInfo {
 	protected static boolean sSimulateNoHardwareSerialNumber = false;
 	protected static boolean sSimulateNoAccessNetworkState = false;
 
+	private static HostInfo hostinInfoInstance;
+
+	public static HostInfo getHostInfo(Context context) {
+		if (hostinInfoInstance == null) {
+			hostinInfoInstance = new HostInfo(context);
+		}
+		return hostinInfoInstance;
+	}
+	
+	
 	public static void setSimulateNoReadPhoneStatePermission(boolean value) {
 		sSimulateNoReadPhoneStatePermission = value;
 	}
@@ -111,6 +125,10 @@ public class HostInfo {
 	 */
 	private String mHardwareSerialNumber;
 
+	private String mAdvertisingId;
+	
+	private boolean mAdvertisingIdLimitedTrackingEnabled = true;
+	
 	/**
 	 * Android application context, used to retrieve the rest of the properties.
 	 */
@@ -216,6 +234,9 @@ public class HostInfo {
 		return mWifiMacAddress;
 	}
 
+	
+	private CountDownLatch mIdLatch = new CountDownLatch(1);
+	
 	/**
 	 * Constructor. Requires an Android application context which will be used to retrieve
 	 * information from the device and the host application's Android Manifest.
@@ -223,8 +244,28 @@ public class HostInfo {
 	 * @param context
 	 *            Android application context
 	 */
-	public HostInfo(Context context) {
+	protected HostInfo(Context context) {
+		if (context == null) {
+			throw new RuntimeException("A context is required to initialize HostInfo");
+		}
 		mContext = context;
+		
+		// check if we're running in the main thread
+		if (Looper.myLooper() == Looper.getMainLooper()) {
+//			Handler handler = new Handler() {
+//				public void handleMessage(Message msg) {
+//					retrieveAdvertisingId();
+//				};
+//			};
+//			handler.obtainMessage().sendToTarget();
+			new Thread("AdvertisingIdRetriever") {
+				public void run() {
+					retrieveAdvertisingId();
+				};
+			}.start();
+		} else {
+			retrieveAdvertisingId();
+		}
 
 		if (!sSimulateNoReadPhoneStatePermission) {
 			// Get access to the Telephony Services
@@ -296,6 +337,57 @@ public class HostInfo {
 		}
 	}
 
+	protected void retrieveAdvertisingId() {
+		try {
+			
+			//need to call this reflexively
+//			import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+//			import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
+			Class<?> advertisingIdClientClass = Class.forName("com.google.android.gms.ads.identifier.AdvertisingIdClient");
+				
+			Method getAdInfoMethod = advertisingIdClientClass.getMethod("getAdvertisingIdInfo", Context.class);
+			Object adInfo = getAdInfoMethod.invoke(null, mContext);
+			
+			Method getIdMethod = adInfo.getClass().getMethod("getId");
+			Method isLimitAdTrackingEnabledMethod = adInfo.getClass().getMethod("isLimitAdTrackingEnabled");
+			
+			mAdvertisingId = getIdMethod.invoke(adInfo).toString();
+			mAdvertisingIdLimitedTrackingEnabled = (Boolean)isLimitAdTrackingEnabledMethod.invoke(adInfo);
+			
+//			Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
+//			mAdvertisingId = adInfo.getId();
+//			mAdvertisingIdLimitedTrackingEnabled = adInfo
+//					.isLimitAdTrackingEnabled();
+			
+		} catch (Exception e) {
+//			// Unrecoverable error connecting to Google Play services (e.g.,
+//			// the old version of the service doesn't support getting
+//			// AdvertisingId).
+//			SponsorPayLogger.e("tttttttt", e.getLocalizedMessage(), e);
+//		} catch (GooglePlayServicesNotAvailableException e) {
+//			// Google Play services is not available entirely.
+//			SponsorPayLogger.e("tttttttt", e.getLocalizedMessage(), e);
+//		} catch (IllegalStateException e) {
+//			SponsorPayLogger.e("tttttttt", e.getLocalizedMessage(), e);
+//		} catch (GooglePlayServicesRepairableException e) {
+			SponsorPayLogger.e("tttttttt", e.getLocalizedMessage(), e);
+		}
+		mIdLatch.countDown();
+	}
+
+	public String getAdvertisingId() {
+		try {
+			mIdLatch.await(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return mAdvertisingId;
+	}
+
+	public Boolean isAdvertisingIdLimitedTrackingEnabled() {
+		return mAdvertisingIdLimitedTrackingEnabled;
+	}
+	
 	public String getScreenDensityCategory() {
 		if (null == mScreenDensityCategory) {
 			int densityCategoryDpi = getDisplayMetrics().densityDpi;
@@ -406,4 +498,5 @@ public class HostInfo {
 	public String getAppBundleName() {
 		return mContext.getPackageName();
 	}
+
 }

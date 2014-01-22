@@ -101,7 +101,9 @@ public class UrlBuilder {
 	public static final String URL_PARAM_VALUE_ON = "on";
 	public static final String URL_PARAM_OFFSET_KEY = "offset";
 	public static final String URL_PARAM_CURRENCY_NAME_KEY = "currency";
-
+	
+	private static final String ADVERTISING_ID_KEY = "google_ad_id";
+	private static final String ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY = "google_ad_id_limited_tracking_enabled";
 
 
 	/**
@@ -225,7 +227,8 @@ public class UrlBuilder {
 			keyValueParams.put(USERID_KEY, mCredentials.getUserId());
 		}
 
-		HostInfo hostInfo = mCredentials.getHostInfo();
+//		HostInfo hostInfo = mCredentials.getHostInfo();
+		HostInfo hostInfo = HostInfo.getHostInfo(null);
 
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(APPID_KEY, mCredentials.getAppId());
@@ -265,6 +268,12 @@ public class UrlBuilder {
 
 		if (mShouldAddTimestamp) {
 			keyValueParams.put(TIMESTAMP_KEY, getCurrentUnixTimestampAsString());
+		}
+		
+		String advertisingId = hostInfo.getAdvertisingId();
+		if (StringUtils.notNullNorEmpty(advertisingId)) {
+			keyValueParams.put(ADVERTISING_ID_KEY, advertisingId);
+			keyValueParams.put(ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY, hostInfo.isAdvertisingIdLimitedTrackingEnabled().toString());
 		}
 		
 		Map<String, String> spExtraParams = SponsorPayParametersProvider.getParameters();

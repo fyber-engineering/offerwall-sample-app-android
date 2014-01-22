@@ -502,16 +502,17 @@ public class SponsorPayPublisher {
 	public static boolean getIntentForInterstitialActivity(String credentialsToken, Activity activity, 
 			SPInterstitialRequestListener listener, Map<String, String> parameters) {
 		SPInterstitialClient interstitialClient = SPInterstitialClient.INSTANCE;
-		boolean canRequestOffers = interstitialClient.canRequestAds();
-		if (canRequestOffers) {
+		boolean canRequestAds = interstitialClient.canRequestAds();
+		if (canRequestAds) {
 			SPCredentials credentials = SponsorPay
 					.getCredentials(credentialsToken);
+			interstitialClient.setRequestListener(listener);
 			interstitialClient.setCustomParameters(parameters);
 
 			interstitialClient.requestOffers(credentials, activity);
 
 		}
-		return canRequestOffers;
+		return canRequestAds;
 	}
 	
 }

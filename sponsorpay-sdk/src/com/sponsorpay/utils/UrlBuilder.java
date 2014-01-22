@@ -227,7 +227,6 @@ public class UrlBuilder {
 			keyValueParams.put(USERID_KEY, mCredentials.getUserId());
 		}
 
-//		HostInfo hostInfo = mCredentials.getHostInfo();
 		HostInfo hostInfo = HostInfo.getHostInfo(null);
 
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
@@ -274,6 +273,9 @@ public class UrlBuilder {
 		if (StringUtils.notNullNorEmpty(advertisingId)) {
 			keyValueParams.put(ADVERTISING_ID_KEY, advertisingId);
 			keyValueParams.put(ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY, hostInfo.isAdvertisingIdLimitedTrackingEnabled().toString());
+		} else {
+			keyValueParams.put(ADVERTISING_ID_KEY, null);
+			keyValueParams.put(ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY, null);
 		}
 		
 		Map<String, String> spExtraParams = SponsorPayParametersProvider.getParameters();
@@ -307,7 +309,7 @@ public class UrlBuilder {
 	}
 	
 	/**
-	 * Gets the current UNIX timestamp (in seconds) for the outbound requests.
+	 * Gets the current UNIX timestamp (in seconds) for the requests.
 	 * 
 	 * @return
 	 */

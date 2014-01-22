@@ -58,7 +58,7 @@ import com.sponsorpay.utils.UrlBuilder;
 
 /**
  * <p>
- * Provides methods to request and show RewardedVideo offers and notifies its
+ * Provides methods to request and show BrandEngage offers and notifies its
  * listener {@link SPBrandEngageClientStatusListener} of changes in the status
  * of the engagement.
  * </p>
@@ -227,7 +227,7 @@ public class SPBrandEngageClient {
 	}
 
 	/**
-	 * Queries the server for RewardedVideo offers availability. 
+	 * Queries the server for BrandEngage offers availability. 
 	 * 
 	 * Offer
 	 * availability cannot be requested while an engagement is running or the

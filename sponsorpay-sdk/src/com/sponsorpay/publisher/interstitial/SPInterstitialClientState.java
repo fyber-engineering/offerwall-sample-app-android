@@ -22,28 +22,28 @@ public enum SPInterstitialClientState {
     // An interstitial is currently being shown
     SHOWING_OFFERS(false, false, false);
     
-    private final boolean canShowOffers;
+    private final boolean canShowAdw;
     private final boolean canChangeParameters;
-	private final boolean canRequestOffers;
+	private final boolean canRequestAds;
     
-	SPInterstitialClientState(boolean canShowOffers,
-			boolean canRequestOffers, boolean canChangeParameters) {
-		this.canShowOffers = canShowOffers;
-		this.canRequestOffers = canRequestOffers;
+	SPInterstitialClientState(boolean canShowAds,
+			boolean canRequestAds, boolean canChangeParameters) {
+		this.canShowAdw = canShowAds;
+		this.canRequestAds = canRequestAds;
 		this.canChangeParameters = canChangeParameters;
 	}
     
 	/**
 	 * 
-	 * @return true if this state allows the start of an engagement
+	 * @return true if this state allows the start of an ad§
 	 */
-    boolean canShowOffers() {
-    	return this.canShowOffers;
+    boolean canShowAds() {
+    	return this.canShowAdw;
     }
     
     /**
      * 
-     * @return true if this state allows to change RewardedVideo parameters
+     * @return true if this state allows to change interstitial client parameters
      */
     boolean canChangeParameters() {
     	return this.canChangeParameters;
@@ -53,7 +53,7 @@ public enum SPInterstitialClientState {
      * 
      * @return true if this state allows to request for offers
      */
-    boolean canRequestOffers() {
-    	return this.canRequestOffers;
+    boolean canRequestAds() {
+    	return this.canRequestAds;
     }
 } 

@@ -7,7 +7,7 @@
 package com.sponsorpay.publisher.mbe;
 
 /**
- * The RewardedVideo client internal status 
+ * The BrandEngage client internal status 
  */
 public enum SPBrandEngageOffersStatus {
 	// No offers are ready to show, must do a request before starting an engagement
@@ -42,7 +42,7 @@ public enum SPBrandEngageOffersStatus {
     
     /**
      * 
-     * @return true if this state allows to change RewardedVideo parameters
+     * @return true if this state allows to change BrandEngage parameters
      */
     boolean canChangeParameters() {
     	return this.canChangeParameters;

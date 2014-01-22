@@ -21,7 +21,7 @@ import com.sponsorpay.utils.SponsorPayLogger;
 
 /**
  * <p>
- * Base class for mobile RewardedVideo Mediation adapter
+ * Base class for mobile BrandEngage Mediation adapter
  * </p>
  * 
  * This class defines the required specific methods to every adapter and provides convenience methods
@@ -38,7 +38,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 	 */
 	private static final short VALIDATION_RESULT = 1;
 	/*
-	 * RewardedVideo event message.what field
+	 * BrandEngage event message.what field
 	 */
 	private static final short VIDEO_EVENT = 2;
 	

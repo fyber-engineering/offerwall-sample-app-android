@@ -45,7 +45,7 @@ public class SPInterstitialClient {
 	}
 	
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
-		if (canRequestOffers()) {
+		if (canRequestAds()) {
 			startQueryingOffers(credentials, activity);
 			return true;
 		} else {
@@ -74,11 +74,11 @@ public class SPInterstitialClient {
 		new SPInterstitialRequestTask().execute(requestUrl);
 	}
 
-	private boolean canRequestOffers() {
-		return mState.canRequestOffers();
+	public boolean canRequestAds() {
+		return mState.canRequestAds();
 	}
 	
-	private boolean canChangeParameters() {
+	public boolean canChangeParameters() {
 		return mState.canChangeParameters();
 	}
 	
@@ -151,7 +151,7 @@ public class SPInterstitialClient {
 	}
 
 	public boolean showInterstitial(Activity parentActivity) {
-		if (mState.canShowOffers()) {
+		if (mState.canShowAds()) {
 			boolean showAd = SPMediationCoordinator.INSTANCE.showInterstitial(parentActivity,
 					mAd);
 			if (showAd) {

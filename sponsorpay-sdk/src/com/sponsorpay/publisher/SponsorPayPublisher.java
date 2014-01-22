@@ -18,6 +18,8 @@ import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.publisher.currency.SPCurrencyServerListener;
 import com.sponsorpay.publisher.currency.VirtualCurrencyConnector;
+import com.sponsorpay.publisher.interstitial.SPInterstitialClient;
+import com.sponsorpay.publisher.interstitial.SPInterstitialRequestListener;
 import com.sponsorpay.publisher.mbe.SPBrandEngageClient;
 import com.sponsorpay.publisher.mbe.SPBrandEngageRequest;
 import com.sponsorpay.publisher.mbe.SPBrandEngageRequestListener;
@@ -334,11 +336,11 @@ public class SponsorPayPublisher {
 	}
 	
 	//================================================================================
-	// Mobile RewardedVideo
+	// Rewarded Videos
 	//================================================================================
 
 	/**
-	 * Requests a Mobile RewardedVideo Offer to the SponsorPay servers and registers a listener which will be
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
 	 * 
 	 * @param activity
@@ -356,7 +358,7 @@ public class SponsorPayPublisher {
 	}
 	
 	/**
-	 * Requests a Mobile RewardedVideo Offer to the SponsorPay servers and registers a listener which will be
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
 	 * 
 	 * @param activity
@@ -377,7 +379,7 @@ public class SponsorPayPublisher {
 	}
 
 	/**
-	 * Requests a Mobile RewardedVideo Offer to the SponsorPay servers and registers a listener which will be
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
 	 * 
 	 * @param credentialsToken
@@ -396,7 +398,7 @@ public class SponsorPayPublisher {
 	}
 	
 	/**
-	 * Requests a Mobile RewardedVideo Offer to the SponsorPay servers and registers a listener which will be
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
 	 * 
 	 * @param credentialsToken
@@ -434,6 +436,80 @@ public class SponsorPayPublisher {
 			SPBrandEngageRequest request = new SPBrandEngageRequest(
 					credentials, activity, brandEngageClient, listener);
 			request.askForOffers();
+		}
+		return canRequestOffers;
+	}
+	
+	
+	//================================================================================
+	// Interstitials
+	//================================================================================
+	
+	/**
+	 * Requests an Interstitial Ad to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPInterstitialRequestListener} which will be notified of the results of the
+	 *            request.
+	 *            
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForInterstitialActivity(Activity activity, 
+			SPInterstitialRequestListener listener) {
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForInterstitialActivity(credentialsToken, activity, listener);
+	}
+	
+	
+	/**
+	 * Requests an Interstitial Ad to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPInterstitialRequestListener} which will be notified of the results of the
+	 *            request.
+	 * 
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForInterstitialActivity(String credentialsToken,
+			Activity activity, SPInterstitialRequestListener listener) {
+		return getIntentForInterstitialActivity(credentialsToken, activity, listener, null);
+	}
+	
+	/**
+	 * Requests an Interstitial Ad to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPInterstitialRequestListener} which will be notified of the results of the
+	 *            request.
+	 * @param parameters
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * 
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForInterstitialActivity(String credentialsToken, Activity activity, 
+			SPInterstitialRequestListener listener, Map<String, String> parameters) {
+		SPInterstitialClient interstitialClient = SPInterstitialClient.INSTANCE;
+		boolean canRequestOffers = interstitialClient.canRequestAds();
+		if (canRequestOffers) {
+			SPCredentials credentials = SponsorPay
+					.getCredentials(credentialsToken);
+			interstitialClient.setCustomParameters(parameters);
+
+			interstitialClient.requestOffers(credentials, activity);
+
 		}
 		return canRequestOffers;
 	}

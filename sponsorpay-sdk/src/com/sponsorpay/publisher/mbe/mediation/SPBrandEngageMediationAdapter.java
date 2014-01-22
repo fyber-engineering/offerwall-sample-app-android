@@ -16,6 +16,7 @@ import android.os.Message;
 
 import com.sponsorpay.mediation.SPMediationAdapter;
 import com.sponsorpay.mediation.SPMediationCoordinator;
+import com.sponsorpay.publisher.mbe.SPBrandEngageClient;
 import com.sponsorpay.utils.SponsorPayLogger;
 
 /**

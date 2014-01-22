@@ -43,6 +43,7 @@ public class SponsorPay {
 	private HashMap<String, SPCredentials> tokensMap = new HashMap<String, SPCredentials>();
 	
 	private SPCredentials currentCredentials;
+	private HostInfo mHostInfo;
 	
 	protected SponsorPay() {
 	}
@@ -125,14 +126,21 @@ public class SponsorPay {
 			String securityToken, Activity activity) {
 		Set<String> credentials = new HashSet<String>(SponsorPay.getAllCredentials());
 		Context context = activity.getApplicationContext();
-		HostInfo.getHostInfo(context);
+		if (credentials.isEmpty()) {
+			HostInfo.getHostInfo(context);
+			SPMediationCoordinator.INSTANCE.startMediationAdapters(activity);
+		}
 		String credentialsToken = INSTANCE.getCredentialsToken(appId, userId, securityToken,
 						context);
+		
 		if (!credentials.contains(credentialsToken)) {
-			SPMediationCoordinator.INSTANCE.startMediationAdapters(activity);
 			SponsorPayAdvertiser.register(context);
 		}
 		return credentialsToken;
+	}
+
+	public static HostInfo getHostInfo() {
+		return INSTANCE.mHostInfo;
 	}
 	
 	/**

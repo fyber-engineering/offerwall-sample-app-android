@@ -33,63 +33,31 @@ import android.view.WindowManager;
  */
 public class HostInfo {
 
+	private static final String TAG = "HostInfo";
+	
 	/**
 	 * Prefix appended to the OS version to identify the Android platform.
 	 */
 	private static final String ANDROID_OS_PREFIX = "Android OS ";
-
 	private static final String SCREEN_DENSITY_CATEGORY_VALUE_LOW = "LOW";
-
 	private static final String SCREEN_DENSITY_CATEGORY_VALUE_MEDIUM = "MEDIUM";
-
 	private static final String SCREEN_DENSITY_CATEGORY_VALUE_HIGH = "HIGH";
-
 	private static final String SCREEN_DENSITY_CATEGORY_VALUE_EXTRA_HIGH = "EXTRA_HIGH";
-
 	private static final String SCREEN_DENSITY_CATEGORY_VALUE_TV = "TV";
-
 	private static final String UNDEFINED_VALUE = "undefined";
-
 	private static final String CONNECTION_TYPE_CELLULAR  = "cellular";
-	
 	private static final String CONNECTION_TYPE_WIFI = "wifi";
-	
-	protected static boolean sSimulateNoReadPhoneStatePermission = false;
-	protected static boolean sSimulateNoAccessWifiStatePermission = false;
-	protected static boolean sSimulateInvalidAndroidId = false;
-	protected static boolean sSimulateNoHardwareSerialNumber = false;
-	protected static boolean sSimulateNoAccessNetworkState = false;
 
-	private static HostInfo hostinInfoInstance;
+	
+	private static HostInfo hostInfoInstance;
 
 	public static HostInfo getHostInfo(Context context) {
-		if (hostinInfoInstance == null) {
-			hostinInfoInstance = new HostInfo(context);
+		if (hostInfoInstance == null) {
+			hostInfoInstance = new HostInfo(context);
 		}
-		return hostinInfoInstance;
+		return hostInfoInstance;
 	}
 	
-	
-	public static void setSimulateNoReadPhoneStatePermission(boolean value) {
-		sSimulateNoReadPhoneStatePermission = value;
-	}
-
-	public static void setSimulateNoAccessWifiStatePermission(boolean value) {
-		sSimulateNoAccessWifiStatePermission = value;
-	}
-
-	public static void setSimulateInvalidAndroidId(boolean value) {
-		sSimulateInvalidAndroidId = value;
-	}
-
-	public static void setSimulateNoHardwareSerialNumber(boolean value) {
-		sSimulateNoHardwareSerialNumber = value;
-	}
-
-	public static void setSimulateNoAccessNetworkState(boolean value) {
-		sSimulateNoAccessNetworkState = value;
-	}
-
 	/**
 	 * The unique device ID.
 	 */
@@ -128,11 +96,6 @@ public class HostInfo {
 	private String mAdvertisingId;
 	
 	private boolean mAdvertisingIdLimitedTrackingEnabled = true;
-	
-	/**
-	 * Android application context, used to retrieve the rest of the properties.
-	 */
-	private Context mContext;
 
 	private DisplayMetrics mDisplayMetrics;
 
@@ -149,14 +112,138 @@ public class HostInfo {
 
 	private String mAppVersion;
 
-	private DisplayMetrics getDisplayMetrics() {
+	/**
+	 * Constructor. Requires an Android application context which will be used to retrieve
+	 * information from the device and the host application's Android Manifest.
+	 * 
+	 * @param context
+	 *            Android application context
+	 */
+	public HostInfo(final Context context) {
+		if (context == null) {
+			throw new RuntimeException("A context is required to initialize HostInfo");
+		}
+		
+		// check if we're running in the main thread
+		if (Looper.myLooper() == Looper.getMainLooper()) {
+			new Thread("AdvertisingIdRetriever") {
+				public void run() {
+					retrieveAdvertisingId(context);
+				};
+			}.start();
+		} else {
+			retrieveAdvertisingId(context);
+		}
+
+		retrieveTelephonyManagerValues(context);
+		retrieveAccessNetworkValues(context);
+		// Android ID
+		retrieveAndroidId(context);
+		retrieveWifiStateValues(context);
+		retrieveDisplayMetrics(context);
+		retrieveAppVersion(context);
+		
+		// Get the default locale
+		mLanguageSetting = Locale.getDefault().toString();
+		
+		// Get the Android version
+		mOsVersion = ANDROID_OS_PREFIX + android.os.Build.VERSION.RELEASE;
+		
+		// Get the phone model
+		mPhoneVersion = android.os.Build.MANUFACTURER + "_" + android.os.Build.MODEL;
+		mBundleName = context.getPackageName();
+	}
+
+
+	private void retrieveWifiStateValues(Context context) {
+		if (!sSimulateNoAccessWifiStatePermission) {
+			try {
+				// MAC address of WiFi adapter
+				WifiManager wifiMan = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+				WifiInfo wifiInf = wifiMan.getConnectionInfo();
+				mWifiMacAddress = wifiInf.getMacAddress();
+			} catch (RuntimeException re) {
+				mWifiMacAddress = StringUtils.EMPTY_STRING;
+			}
+		} else {
+			mWifiMacAddress = StringUtils.EMPTY_STRING;
+		}
+	}
+
+
+	private void retrieveAndroidId(Context context) {
+		if (!sSimulateInvalidAndroidId) {
+			mAndroidId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+
+			if (mAndroidId == null) {
+				mAndroidId = StringUtils.EMPTY_STRING;
+			}
+		} else {
+			mAndroidId = StringUtils.EMPTY_STRING;
+		}
+	}
+
+
+	private void retrieveAccessNetworkValues(Context context) {
+		if (!sSimulateNoAccessNetworkState) {
+			ConnectivityManager mConnectivity = (ConnectivityManager) context
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+			NetworkInfo info = mConnectivity.getActiveNetworkInfo();
+			if (info == null) {
+			    mConnectionType = StringUtils.EMPTY_STRING;
+			} else {
+				int netType = info.getType();
+				mConnectionType = netType == ConnectivityManager.TYPE_WIFI ? CONNECTION_TYPE_WIFI
+						: CONNECTION_TYPE_CELLULAR;
+			}
+
+		} else {
+			mConnectionType = StringUtils.EMPTY_STRING;
+		}
+	}
+
+
+	private void retrieveTelephonyManagerValues(Context context) {
+		if (!sSimulateNoReadPhoneStatePermission) {
+			// Get access to the Telephony Services
+			TelephonyManager tManager = (TelephonyManager) context
+					.getSystemService(Context.TELEPHONY_SERVICE);
+			try {
+				mUDID = tManager.getDeviceId();
+				mCarrierName = tManager.getNetworkOperatorName();
+				mCarrierCountry = tManager.getNetworkCountryIso();
+			} catch (SecurityException e) {
+				mUDID = StringUtils.EMPTY_STRING;
+				mCarrierName = StringUtils.EMPTY_STRING;
+				mCarrierCountry = StringUtils.EMPTY_STRING;
+			}
+		} else {
+			mUDID = StringUtils.EMPTY_STRING;
+			mCarrierName = StringUtils.EMPTY_STRING;
+			mCarrierCountry = StringUtils.EMPTY_STRING;
+		}
+	}
+	
+	private DisplayMetrics retrieveDisplayMetrics(Context context) {
 		if (mDisplayMetrics == null) {
 			mDisplayMetrics = new DisplayMetrics();
-			WindowManager windowManager = (WindowManager) mContext
+			WindowManager windowManager = (WindowManager)context 
 					.getSystemService(Context.WINDOW_SERVICE);
 			windowManager.getDefaultDisplay().getMetrics(mDisplayMetrics);
 		}
 		return mDisplayMetrics;
+	}
+	
+
+	private void retrieveAppVersion(Context context) {
+		try {
+			PackageInfo pInfo = context.getPackageManager()
+					.getPackageInfo(context.getPackageName(), 0);
+			mAppVersion = pInfo.versionName;
+		} catch (NameNotFoundException e) {
+			mAppVersion = StringUtils.EMPTY_STRING;
+		}
 	}
 
 	/**
@@ -236,117 +323,18 @@ public class HostInfo {
 
 	
 	private CountDownLatch mIdLatch = new CountDownLatch(1);
+
+	private String mBundleName;
 	
-	/**
-	 * Constructor. Requires an Android application context which will be used to retrieve
-	 * information from the device and the host application's Android Manifest.
-	 * 
-	 * @param context
-	 *            Android application context
-	 */
-	protected HostInfo(Context context) {
-		if (context == null) {
-			throw new RuntimeException("A context is required to initialize HostInfo");
-		}
-		mContext = context;
-		
-		// check if we're running in the main thread
-		if (Looper.myLooper() == Looper.getMainLooper()) {
-//			Handler handler = new Handler() {
-//				public void handleMessage(Message msg) {
-//					retrieveAdvertisingId();
-//				};
-//			};
-//			handler.obtainMessage().sendToTarget();
-			new Thread("AdvertisingIdRetriever") {
-				public void run() {
-					retrieveAdvertisingId();
-				};
-			}.start();
-		} else {
-			retrieveAdvertisingId();
-		}
 
-		if (!sSimulateNoReadPhoneStatePermission) {
-			// Get access to the Telephony Services
-			TelephonyManager tManager = (TelephonyManager) context
-					.getSystemService(Context.TELEPHONY_SERVICE);
-			try {
-				mUDID = tManager.getDeviceId();
-				mCarrierName = tManager.getNetworkOperatorName();
-				mCarrierCountry = tManager.getNetworkCountryIso();
-			} catch (SecurityException e) {
-				mUDID = StringUtils.EMPTY_STRING;
-				mCarrierName = StringUtils.EMPTY_STRING;
-				mCarrierCountry = StringUtils.EMPTY_STRING;
-			}
-		} else {
-			mUDID = StringUtils.EMPTY_STRING;
-			mCarrierName = StringUtils.EMPTY_STRING;
-			mCarrierCountry = StringUtils.EMPTY_STRING;
-		}
-
-		if (!sSimulateNoAccessNetworkState) {
-			ConnectivityManager mConnectivity = (ConnectivityManager) mContext
-					.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-			NetworkInfo info = mConnectivity.getActiveNetworkInfo();
-			if (info == null) {
-			    mConnectionType = StringUtils.EMPTY_STRING;
-			} else {
-				int netType = info.getType();
-				mConnectionType = netType == ConnectivityManager.TYPE_WIFI ? CONNECTION_TYPE_WIFI
-						: CONNECTION_TYPE_CELLULAR;
-			}
-
-		} else {
-			mConnectionType = StringUtils.EMPTY_STRING;
-		}
-		
-		// Get the default locale
-		mLanguageSetting = Locale.getDefault().toString();
-
-		// Get the Android version
-		mOsVersion = ANDROID_OS_PREFIX + android.os.Build.VERSION.RELEASE;
-
-		// Get the phone model
-		mPhoneVersion = android.os.Build.MANUFACTURER + "_" + android.os.Build.MODEL;
-
-		// Android ID
-		if (!sSimulateInvalidAndroidId) {
-			mAndroidId = Secure.getString(mContext.getContentResolver(), Secure.ANDROID_ID);
-
-			if (mAndroidId == null) {
-				mAndroidId = StringUtils.EMPTY_STRING;
-			}
-		} else {
-			mAndroidId = StringUtils.EMPTY_STRING;
-		}
-
-		if (!sSimulateNoAccessWifiStatePermission) {
-			try {
-				// MAC address of WiFi adapter
-				WifiManager wifiMan = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-				WifiInfo wifiInf = wifiMan.getConnectionInfo();
-				mWifiMacAddress = wifiInf.getMacAddress();
-			} catch (RuntimeException re) {
-				mWifiMacAddress = StringUtils.EMPTY_STRING;
-			}
-		} else {
-			mWifiMacAddress = StringUtils.EMPTY_STRING;
-		}
-	}
-
-	protected void retrieveAdvertisingId() {
+	protected void retrieveAdvertisingId(Context context) {
 		try {
 			
-			//need to call this reflexively
-//			import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-//			import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
+			//calling this reflexively, in case of Play Services not linked with the application
 			Class<?> advertisingIdClientClass = Class.forName("com.google.android.gms.ads.identifier.AdvertisingIdClient");
 				
 			Method getAdInfoMethod = advertisingIdClientClass.getMethod("getAdvertisingIdInfo", Context.class);
-			Object adInfo = getAdInfoMethod.invoke(null, mContext);
+			Object adInfo = getAdInfoMethod.invoke(null, context);
 			
 			Method getIdMethod = adInfo.getClass().getMethod("getId");
 			Method isLimitAdTrackingEnabledMethod = adInfo.getClass().getMethod("isLimitAdTrackingEnabled");
@@ -354,23 +342,8 @@ public class HostInfo {
 			mAdvertisingId = getIdMethod.invoke(adInfo).toString();
 			mAdvertisingIdLimitedTrackingEnabled = (Boolean)isLimitAdTrackingEnabledMethod.invoke(adInfo);
 			
-//			Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
-//			mAdvertisingId = adInfo.getId();
-//			mAdvertisingIdLimitedTrackingEnabled = adInfo
-//					.isLimitAdTrackingEnabled();
-			
 		} catch (Exception e) {
-//			// Unrecoverable error connecting to Google Play services (e.g.,
-//			// the old version of the service doesn't support getting
-//			// AdvertisingId).
-//			SponsorPayLogger.e("tttttttt", e.getLocalizedMessage(), e);
-//		} catch (GooglePlayServicesNotAvailableException e) {
-//			// Google Play services is not available entirely.
-//			SponsorPayLogger.e("tttttttt", e.getLocalizedMessage(), e);
-//		} catch (IllegalStateException e) {
-//			SponsorPayLogger.e("tttttttt", e.getLocalizedMessage(), e);
-//		} catch (GooglePlayServicesRepairableException e) {
-			SponsorPayLogger.e("tttttttt", e.getLocalizedMessage(), e);
+			SponsorPayLogger.e(TAG, e.getLocalizedMessage(), e);
 		}
 		mIdLatch.countDown();
 	}
@@ -390,7 +363,7 @@ public class HostInfo {
 	
 	public String getScreenDensityCategory() {
 		if (null == mScreenDensityCategory) {
-			int densityCategoryDpi = getDisplayMetrics().densityDpi;
+			int densityCategoryDpi = mDisplayMetrics.densityDpi;
 
 			switch (densityCategoryDpi) {
 			case DisplayMetrics.DENSITY_MEDIUM:
@@ -440,28 +413,28 @@ public class HostInfo {
 	
 	public String getScreenWidth() {
 		if (0 == mScreenWidth) {
-			mScreenWidth = getDisplayMetrics().widthPixels;
+			mScreenWidth = mDisplayMetrics.widthPixels;
 		}
 		return Integer.toString(mScreenWidth);
 	}
 	
 	public String getScreenHeight() {
 		if (0 == mScreenHeight) {
-			mScreenHeight = getDisplayMetrics().heightPixels;
+			mScreenHeight = mDisplayMetrics.heightPixels;
 		}
 		return Integer.toString(mScreenHeight);
 	}
 	
 	public String getScreenDensityX() {
 		if (0 == mScreenDensityX) {
-			mScreenDensityX = getDisplayMetrics().xdpi;
+			mScreenDensityX = mDisplayMetrics.xdpi;
 		}
 		return Integer.toString(Math.round(mScreenDensityX));
 	}
 	
 	public String getScreenDensityY() {
 		if (0 == mScreenDensityY) {
-			mScreenDensityY = getDisplayMetrics().ydpi;
+			mScreenDensityY = mDisplayMetrics.ydpi;
 		}
 		return Integer.toString(Math.round(mScreenDensityY));
 	}
@@ -483,20 +456,42 @@ public class HostInfo {
 	}
 
 	public String getAppVersion() {
-		if (mAppVersion == null) {
-			try {
-				PackageInfo pInfo = mContext.getPackageManager()
-						.getPackageInfo(mContext.getPackageName(), 0);
-				mAppVersion = pInfo.versionName;
-			} catch (NameNotFoundException e) {
-				mAppVersion = StringUtils.EMPTY_STRING;
-			}
-		}
 		return mAppVersion;
 	}
 
+	
 	public String getAppBundleName() {
-		return mContext.getPackageName();
+		return mBundleName;
 	}
 
+	// Permission simulation section 
+	
+	protected static boolean sSimulateNoReadPhoneStatePermission = false;
+	protected static boolean sSimulateNoAccessWifiStatePermission = false;
+	protected static boolean sSimulateInvalidAndroidId = false;
+	protected static boolean sSimulateNoHardwareSerialNumber = false;
+	protected static boolean sSimulateNoAccessNetworkState = false;
+
+	
+	public static void setSimulateNoReadPhoneStatePermission(boolean value) {
+		sSimulateNoReadPhoneStatePermission = value;
+	}
+
+	public static void setSimulateNoAccessWifiStatePermission(boolean value) {
+		sSimulateNoAccessWifiStatePermission = value;
+	}
+
+	public static void setSimulateInvalidAndroidId(boolean value) {
+		sSimulateInvalidAndroidId = value;
+	}
+
+	public static void setSimulateNoHardwareSerialNumber(boolean value) {
+		sSimulateNoHardwareSerialNumber = value;
+	}
+
+	public static void setSimulateNoAccessNetworkState(boolean value) {
+		sSimulateNoAccessNetworkState = value;
+	}
+	
+	
 }

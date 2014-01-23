@@ -223,6 +223,11 @@ public class UrlBuilder {
 	public String buildUrl() {
 		HashMap<String, String> keyValueParams = new HashMap<String, String>();
 
+		Map<String, String> spExtraParams = SponsorPayParametersProvider.getParameters();
+		if (!spExtraParams.isEmpty()) {
+			keyValueParams.putAll(spExtraParams);
+		}
+
 		if (mShouldAddUserId) {
 			keyValueParams.put(USERID_KEY, mCredentials.getUserId());
 		}
@@ -276,11 +281,6 @@ public class UrlBuilder {
 		} else {
 			keyValueParams.put(ADVERTISING_ID_KEY, null);
 			keyValueParams.put(ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY, null);
-		}
-		
-		Map<String, String> spExtraParams = SponsorPayParametersProvider.getParameters();
-		if (!spExtraParams.isEmpty()) {
-			keyValueParams.putAll(spExtraParams);
 		}
 		
 		Uri uri = Uri.parse(mResourceUrl);

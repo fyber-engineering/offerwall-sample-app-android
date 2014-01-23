@@ -16,20 +16,20 @@ import android.os.Bundle;
 
 import com.applovin.sdk.AppLovinSdk;
 import com.sponsorpay.mediation.interstitial.AppLovinIntersitialMediationAdapter;
-import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
+import com.sponsorpay.mediation.mbe.AppLovinVideoMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
 
 public class AppLovinMediationAdapter extends SPMediationAdapter {
 
-	private static final String TAG = "AppLovinAdapter";
-	private static final String ADAPTER_VERSION = "1.0.0";
+	public static final String TAG = "AppLovinAdapter";
+	private static final String ADAPTER_VERSION = "1.1.0";
 	private static final String ADAPTER_NAME = "AppLovin";
 	
-	private static final String SDK_KEY = "applovin.sdk.key";
+	private static final String SDK_KEY = "applovin.sdk.keyta pe";
 	private AppLovinIntersitialMediationAdapter mInterstitialAdapter;
-	
+	private AppLovinVideoMediationAdapter mVideoAdapter;
 	
 	@Override
 	public boolean startAdapter(Activity activity) {
@@ -38,6 +38,7 @@ public class AppLovinMediationAdapter extends SPMediationAdapter {
 		if (StringUtils.notNullNorEmpty(sdkKey)) {
 			AppLovinSdk.initializeSdk(activity);
 			mInterstitialAdapter = new AppLovinIntersitialMediationAdapter(this, activity);
+			mVideoAdapter = new AppLovinVideoMediationAdapter(this, activity);
 			return true;
 		}
 		SponsorPayLogger.i(TAG, "SDK key value is not set in the AndroidManifest file of your application.");
@@ -55,8 +56,8 @@ public class AppLovinMediationAdapter extends SPMediationAdapter {
 	}
 	
 	@Override
-	public SPBrandEngageMediationAdapter<SPMediationAdapter> getVideoMediationAdapter() {
-		return null;
+	public AppLovinVideoMediationAdapter getVideoMediationAdapter() {
+		return mVideoAdapter;
 	}
 	
 	@Override

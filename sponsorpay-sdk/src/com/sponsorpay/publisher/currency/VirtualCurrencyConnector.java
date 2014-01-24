@@ -92,13 +92,13 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	 */
 	public VirtualCurrencyConnector(Context context, String credentialsToken,
 			SPCurrencyServerListener userListener) {
-		mContext = context;
-		mCredentials = SponsorPay.getCredentials(credentialsToken);
-		mUserListener = userListener;
-		
 		if (StringUtils.nullOrEmpty(mCredentials.getSecurityToken())) {
 			throw new IllegalArgumentException("Security token has not been set on the credentials");
 		}
+
+		mContext = context;
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
+		mUserListener = userListener;
 	}
 
 	/**
@@ -150,14 +150,10 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 
 		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(VCS_URL_KEY);
 
-		String requestUrl = UrlBuilder.newBuilder(baseUrl, mCredentials)
-				.addExtraKeysValues(extraKeysValues).addScreenMetrics().addTimestamp()
-				.buildUrl();
+		UrlBuilder urlBuilder = UrlBuilder.newBuilder(baseUrl, mCredentials)
+				.addExtraKeysValues(extraKeysValues).addScreenMetrics().addTimestamp();
 
-		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
-				+ requestUrl);
-
-		AsyncRequest requestTask = new AsyncRequest(requestUrl, this);
+		AsyncRequest requestTask = new AsyncRequest(urlBuilder, this);
 		
 		mShouldShowNotification = showToastNotification;
 		

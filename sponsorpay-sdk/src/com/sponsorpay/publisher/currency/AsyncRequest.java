@@ -19,6 +19,7 @@ import com.sponsorpay.utils.HttpResponseParser;
 import com.sponsorpay.utils.SPHttpClient;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
+import com.sponsorpay.utils.UrlBuilder;
 
 /**
  * <p>
@@ -58,10 +59,10 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	private static final String SIGNATURE_HEADER = "X-Sponsorpay-Response-Signature";
 
 	/**
-	 * URL for the request that will be performed in the background.
+	 * UrlBuild used to generate the URl in the background
 	 */
-	private String mRequestUrl;
-
+	private UrlBuilder mUrlBuilder;
+	
 	/**
 	 * Status code of the server's response.
 	 */
@@ -94,16 +95,17 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 */
 	private Throwable mThrownRequestError;
 
+
 	/**
 	 * 
-	 * @param requestUrl
-	 *            URL to send the backgorund request to.
+	 * @param urlBuilder
+	 *            the {@link UrlBuilder} that will be used for this request.
 	 * @param listener
 	 *            {@link AsyncRequestResultListener} to be notified of the request's results when
 	 *            they become available.
 	 */
-	public AsyncRequest(String requestUrl, AsyncRequestResultListener listener) {
-		mRequestUrl = requestUrl;
+	public AsyncRequest(UrlBuilder urlBuilder, AsyncRequestResultListener listener) {
+		mUrlBuilder = urlBuilder;
 		mResultListener = listener;
 	}
 
@@ -116,7 +118,12 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 */
 	@Override
 	protected Void doInBackground(Void... params) {
-		HttpUriRequest request = new HttpGet(mRequestUrl);
+		String requestUrl = mUrlBuilder.buildUrl();
+		
+		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
+				+ requestUrl);
+		
+		HttpUriRequest request = new HttpGet(requestUrl);
 		request.addHeader(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE);
 
 		String acceptLanguageHeaderValue = makeAcceptLanguageHeaderValue();
@@ -146,7 +153,7 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 
 				if (shouldLogVerbosely) {
 					SponsorPayLogger.v(LOG_TAG, String.format("Got following cookies from server (url: %s):",
-							mRequestUrl));
+						requestUrl));
 				}
 
 				mCookieStrings = new String[cookieHeaders.length];
@@ -233,10 +240,6 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 		return mResponseSignature;
 	}
 
-	public String getRequestUrl() {
-		return mRequestUrl;
-	}
-	
 	/**
 	 * Returns the local error thrown when trying to send the request. An exception typically means
 	 * that there was a problem connecting to the network, but checking the type of the returned

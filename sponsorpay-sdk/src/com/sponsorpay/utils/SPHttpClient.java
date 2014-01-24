@@ -59,6 +59,7 @@ public class SPHttpClient {
 				
 				HttpResponse response = client.execute(request);
 				response.getStatusLine();
+				response.getEntity().consumeContent();
 			} catch (ClientProtocolException e) {
 				SponsorPayLogger.e(TAG, "Client protocol error", e);
 			} catch (IOException e1) {

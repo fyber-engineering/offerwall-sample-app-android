@@ -12,7 +12,6 @@ import org.apache.http.client.methods.HttpGet;
 
 import android.os.AsyncTask;
 
-import com.sponsorpay.advertiser.AbstractCallbackSender;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.utils.SPHttpClient;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
@@ -86,7 +85,7 @@ public class SPInterstitialEventDispatcher extends AsyncTask<String, Void, Boole
 			
 			returnValue = responseStatusCode == SUCCESSFUL_HTTP_STATUS_CODE;
 		} catch (Exception e) {
-			SponsorPayLogger.e(AbstractCallbackSender.class.getSimpleName(),
+			SponsorPayLogger.e(TAG,
 					"An exception occurred when trying to send advertiser callback: " + e);
 		}
 		return returnValue;

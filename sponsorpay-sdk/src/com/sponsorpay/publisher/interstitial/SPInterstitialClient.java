@@ -14,9 +14,7 @@ import android.content.Intent;
 
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.mediation.SPMediationCoordinator;
-import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
-import com.sponsorpay.utils.UrlBuilder;
 
 public class SPInterstitialClient {
 
@@ -24,8 +22,7 @@ public class SPInterstitialClient {
 
 	public static final SPInterstitialClient INSTANCE = new SPInterstitialClient();
 	
-	private static final String INTERSTITIAL_URL_KEY = "interstitial";
-	private static final String SP_REQUEST_ID_PARAMETER_KEY = "request_id";
+	public static final String SP_REQUEST_ID_PARAMETER_KEY = "request_id";
 	
 	private Map<String, String> mCustomParameters;
 
@@ -60,11 +57,7 @@ public class SPInterstitialClient {
 		mCredentials = credentials;
 		mActivity = activity;
 		mRequestId = UUID.randomUUID().toString();
-		UrlBuilder urlBuilder = UrlBuilder.newBuilder(getBaseUrl(), credentials)
-				.addExtraKeysValues(mCustomParameters)
-				.addKeyValue(SP_REQUEST_ID_PARAMETER_KEY, mRequestId)
-				.addScreenMetrics();
-		new SPInterstitialRequestTask().execute(urlBuilder);
+		SPInterstitialRequester.requestAds(credentials, mRequestId, mCustomParameters);
 		setState(SPInterstitialClientState.REQUESTING_OFFERS);
 	}
 
@@ -95,10 +88,6 @@ public class SPInterstitialClient {
 			return false;
 		}
 	}
-	
-	private String getBaseUrl() {
-		return SponsorPayBaseUrlProvider.getBaseUrl(INTERSTITIAL_URL_KEY);
-	}
 
 	private void setState(SPInterstitialClientState newState) {
 		mState = newState;
@@ -119,7 +108,7 @@ public class SPInterstitialClient {
 
 	public void processAds(SPInterstitialAd[] ads) {
 		setState(SPInterstitialClientState.VALIDATING_OFFERS);
-		new SPInterstitialAdsProcessorTask().execute(ads);
+		SPInterstitialAdsProcessor.processAds(ads);
 	}
 
 	public void availableAd(SPInterstitialAd ad) {
@@ -199,5 +188,5 @@ public class SPInterstitialClient {
 	public void setAdStateListener(SPInterstitialAdStateListener listener) {
 		mAdStateListener = listener;
 	}
-
+	
 }

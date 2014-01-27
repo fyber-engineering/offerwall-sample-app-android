@@ -8,6 +8,7 @@ package com.sponsorpay.publisher.interstitial;
 
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -20,16 +21,36 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 
+import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.utils.HttpResponseParser;
 import com.sponsorpay.utils.SPHttpClient;
+import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.UrlBuilder;
 
-public class SPInterstitialRequestTask extends AsyncTask<UrlBuilder, Void, SPInterstitialAd[]> {
+public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInterstitialAd[]> {
 
-	private static final String TAG = "SPInterstitialRequestTask";
+	private static final String TAG = "SPInterstitialRequester";
+	private static final String INTERSTITIAL_URL_KEY = "interstitial";
 	
+	public static void requestAds(SPCredentials credentials, String requestId,
+			Map<String, String> customParameters) {
+		UrlBuilder urlBuilder = UrlBuilder.newBuilder(getBaseUrl(), credentials)
+				.addExtraKeysValues(customParameters)
+				.addKeyValue(SPInterstitialClient.SP_REQUEST_ID_PARAMETER_KEY, requestId)
+				.addScreenMetrics()
+				.sendUserId(true);
+		new SPInterstitialRequester().execute(urlBuilder);
+	}
+	
+	private static String getBaseUrl() {
+		return SponsorPayBaseUrlProvider.getBaseUrl(INTERSTITIAL_URL_KEY);
+	}
+	
+	private SPInterstitialRequester() {
+	}
+
 	@Override
 	protected SPInterstitialAd[] doInBackground(UrlBuilder... params) {
 		Thread.currentThread().setName(TAG);
@@ -37,7 +58,7 @@ public class SPInterstitialRequestTask extends AsyncTask<UrlBuilder, Void, SPInt
 		try {
 			HttpClient httpClient = SPHttpClient.getHttpClient();
 			String requestUrl = params[0].buildUrl();
-			SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
+			SponsorPayLogger.d(TAG, "Querying URL: " + requestUrl);
 			HttpUriRequest request = new HttpGet(requestUrl);
 			HttpResponse response = httpClient.execute(request);
 	
@@ -76,5 +97,5 @@ public class SPInterstitialRequestTask extends AsyncTask<UrlBuilder, Void, SPInt
 		super.onPostExecute(result);
 		SPInterstitialClient.INSTANCE.processAds(result);
 	}
-    
+
 }

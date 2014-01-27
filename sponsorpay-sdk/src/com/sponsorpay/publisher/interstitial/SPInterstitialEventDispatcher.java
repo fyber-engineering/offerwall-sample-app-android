@@ -23,9 +23,10 @@ import com.sponsorpay.utils.UrlBuilder;
 public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, Boolean> {
 	
 	private static final String TAG = "SPInterstitialEventDispatcher";
-
+	private static final String TRACKERL_URL_KEY = "tracker";
 	private static final int SUCCESSFUL_HTTP_STATUS_CODE = 200;
 	
+	// those values are harccoded for now
 	private static String[] additionalParamKey = {"platform", "ad_format", "client", "rewarded"};
 	private static String[] additionalParamValues = {"android", "interstitial", "sdk", "0"};
 
@@ -51,9 +52,11 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 	private static UrlBuilder getUrlBuilder(SPCredentials credentials, String requestId,
 			SPInterstitialAd ad, SPInterstitialEvent event) {
 		UrlBuilder builder = UrlBuilder.newBuilder(getBaseUrl(), credentials)
-				.addKeyValue("request_id", requestId)
+				.addKeyValue(SPInterstitialClient.SP_REQUEST_ID_PARAMETER_KEY, requestId)
 				.addKeyValue("event", event.toString())
-				.addExtraKeysValues(UrlBuilder.mapKeysToValues(additionalParamKey, additionalParamValues));
+				.addExtraKeysValues(UrlBuilder.mapKeysToValues(additionalParamKey, additionalParamValues))
+				.addScreenMetrics()
+				.sendUserId(true);
 
 		if (ad != null) {
 			builder.addKeyValue("ad_id", ad.getAdId())
@@ -63,7 +66,10 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 	}
 
 	private static String getBaseUrl() {
-		return SponsorPayBaseUrlProvider.getBaseUrl("tracker");
+		return SponsorPayBaseUrlProvider.getBaseUrl(TRACKERL_URL_KEY);
+	}
+	
+	private SPInterstitialEventDispatcher() {
 	}
 	
 	@Override

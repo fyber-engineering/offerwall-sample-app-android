@@ -12,10 +12,17 @@ import com.sponsorpay.mediation.SPMediationAdFormat;
 import com.sponsorpay.mediation.SPMediationCoordinator;
 import com.sponsorpay.utils.SponsorPayLogger;
 
-public class SPInterstitialAdsProcessorTask extends AsyncTask<SPInterstitialAd, Void, SPInterstitialAd> {
+public class SPInterstitialAdsProcessor extends AsyncTask<SPInterstitialAd, Void, SPInterstitialAd> {
 
-	private static final String TAG = "SPInterstitialAdsProcessorTask";
+	private static final String TAG = "SPInterstitialAdsProcessor";
 
+	public static void processAds(SPInterstitialAd[] ads) {
+		new SPInterstitialAdsProcessor().execute(ads);
+	}
+	
+	private SPInterstitialAdsProcessor() {
+	}
+	
 	@Override
 	protected SPInterstitialAd doInBackground(SPInterstitialAd... ads) {
 		Thread.currentThread().setName(TAG);

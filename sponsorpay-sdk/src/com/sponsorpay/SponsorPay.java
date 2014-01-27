@@ -80,7 +80,7 @@ public class SponsorPay {
 	 */
 	public static SPCredentials getCurrentCredentials() {
 		if (INSTANCE.currentCredentials == null) {
-			throw new RuntimeException("No credentials object was created yet.\n" +
+			throw new RuntimeException("Please start the SDK before accessing any of its resources.\n" +
 					"You have to execute SponsorPay.start method first.");
 		}
 		return INSTANCE.currentCredentials;

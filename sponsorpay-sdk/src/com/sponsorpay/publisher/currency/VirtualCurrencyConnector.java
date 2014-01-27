@@ -11,6 +11,7 @@ import java.util.Map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.widget.Toast;
 
 import com.sponsorpay.SponsorPay;
@@ -92,13 +93,13 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	 */
 	public VirtualCurrencyConnector(Context context, String credentialsToken,
 			SPCurrencyServerListener userListener) {
-		mContext = context;
-		mCredentials = SponsorPay.getCredentials(credentialsToken);
-		mUserListener = userListener;
-		
 		if (StringUtils.nullOrEmpty(mCredentials.getSecurityToken())) {
 			throw new IllegalArgumentException("Security token has not been set on the credentials");
 		}
+
+		mContext = context;
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
+		mUserListener = userListener;
 	}
 
 	/**
@@ -150,18 +151,14 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 
 		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(VCS_URL_KEY);
 
-		String requestUrl = UrlBuilder.newBuilder(baseUrl, mCredentials)
-				.addExtraKeysValues(extraKeysValues).addScreenMetrics().addTimestamp()
-				.buildUrl();
+		UrlBuilder urlBuilder = UrlBuilder.newBuilder(baseUrl, mCredentials)
+				.addExtraKeysValues(extraKeysValues).addScreenMetrics().addTimestamp();
 
-		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
-				+ requestUrl);
-
-		AsyncRequest requestTask = new AsyncRequest(requestUrl, this);
+		AsyncRequest requestTask = new AsyncRequest(this);
 		
 		mShouldShowNotification = showToastNotification;
 		
-		requestTask.execute();
+		requestTask.execute(urlBuilder);
 	}
 
 	/**
@@ -203,9 +200,10 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	private void saveLatestTransactionIdForCurrentUser(String transactionId) {
 		SharedPreferences prefs = mContext.getSharedPreferences(
 				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-		prefs.edit()
-				.putString(
-						generatePreferencesLatestTransactionIdKey(mCredentials.getAppId(), mCredentials.getUserId()), transactionId).commit();
+		Editor editor = prefs.edit();
+		editor.putString(generatePreferencesLatestTransactionIdKey(mCredentials), 
+						transactionId);
+		editor.commit();
 	}
 
 	/**
@@ -233,7 +231,7 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		SharedPreferences prefs = context.getSharedPreferences(
 				SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-		String retval = prefs.getString(generatePreferencesLatestTransactionIdKey(credentials.getAppId(), credentials.getUserId()),
+		String retval = prefs.getString(generatePreferencesLatestTransactionIdKey(credentials),
 				URL_PARAM_VALUE_NO_TRANSACTION);
 		return retval;
 	}
@@ -250,8 +248,7 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 							response.getDeltaOfCoins(),
 							StringUtils.notNullNorEmpty(mCurrency) ? mCurrency : 
 								SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_DEFAULT_CURRENCY));
-			Toast.makeText(mContext, text,
-					Toast.LENGTH_LONG).show();
+			Toast.makeText(mContext, text, Toast.LENGTH_LONG).show();
 		}
 	}
 	
@@ -263,9 +260,9 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 		showToastNotification = showNotification;
 	}
 	
-	private static String generatePreferencesLatestTransactionIdKey(String appId, String userId) {
-		return STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + appId
-				+ STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + userId;
+	private static String generatePreferencesLatestTransactionIdKey(SPCredentials credentials) {
+		return STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + credentials.getAppId()
+				+ STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + credentials.getUserId();
 	}
 	
 }

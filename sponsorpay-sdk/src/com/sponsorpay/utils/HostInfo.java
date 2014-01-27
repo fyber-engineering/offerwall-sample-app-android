@@ -362,7 +362,7 @@ public class HostInfo {
 	}
 	
 	public String getScreenDensityCategory() {
-		if (null == mScreenDensityCategory) {
+		if (mScreenDensityCategory == null) {
 			int densityCategoryDpi = mDisplayMetrics.densityDpi;
 
 			switch (densityCategoryDpi) {
@@ -458,13 +458,12 @@ public class HostInfo {
 	public String getAppVersion() {
 		return mAppVersion;
 	}
-
 	
 	public String getAppBundleName() {
 		return mBundleName;
 	}
 
-	// Permission simulation section 
+	// Permission simulation 
 	
 	protected static boolean sSimulateNoReadPhoneStatePermission = false;
 	protected static boolean sSimulateNoAccessWifiStatePermission = false;

@@ -27,7 +27,7 @@ public class AppLovinMediationAdapter extends SPMediationAdapter {
 	private static final String ADAPTER_VERSION = "1.1.0";
 	private static final String ADAPTER_NAME = "AppLovin";
 	
-	private static final String SDK_KEY = "applovin.sdk.keyta pe";
+	private static final String SDK_KEY = "applovin.sdk.key";
 	private AppLovinIntersitialMediationAdapter mInterstitialAdapter;
 	private AppLovinVideoMediationAdapter mVideoAdapter;
 	

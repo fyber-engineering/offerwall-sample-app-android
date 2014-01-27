@@ -47,7 +47,7 @@ public class AppLovinVideoMediationAdapter extends
 
 	@Override
 	public void failedToReceiveAd(int errorCode) {
-		if (errorCode == 202) {
+		if (errorCode == 202 || errorCode == 204) {
 			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 		} else {
 			SponsorPayLogger.d(AppLovinMediationAdapter.TAG, "failedToReceiveAd with errorCode - " + errorCode);
@@ -83,6 +83,11 @@ public class AppLovinVideoMediationAdapter extends
 	public void validationRequestFailed(AppLovinAd ad, int errorCode) {
 		// We were unable to contact the server. Grant the reward, or don't, as you see fit.
 	}
+	
+	@Override
+	public void userDeclinedToViewAd(AppLovinAd ad) {
+		
+	}
 
 	//AppLovinAdVideoPlaybackListener
 	@Override
@@ -107,7 +112,5 @@ public class AppLovinVideoMediationAdapter extends
 	public void adHidden(AppLovinAd arg0) {
 		notifyCloseEngagement();
 	}
-	
-	
 
 }

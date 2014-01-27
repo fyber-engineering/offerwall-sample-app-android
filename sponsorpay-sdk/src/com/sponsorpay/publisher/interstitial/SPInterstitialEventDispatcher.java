@@ -20,11 +20,14 @@ import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.UrlBuilder;
 
 
-public class SPInterstitialEventDispatcher extends AsyncTask<String, Void, Boolean> {
+public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, Boolean> {
 	
 	private static final String TAG = "SPInterstitialEventDispatcher";
 
 	private static final int SUCCESSFUL_HTTP_STATUS_CODE = 200;
+	
+	private static String[] additionalParamKey = {"platform", "ad_format", "client", "rewarded"};
+	private static String[] additionalParamValues = {"android", "interstitial", "sdk", "0"};
 
 	public static void trigger(SPCredentials credentials, String requestId,
 			SPInterstitialAd ad, SPInterstitialEvent event) {
@@ -41,21 +44,22 @@ public class SPInterstitialEventDispatcher extends AsyncTask<String, Void, Boole
 						"Notifiying tracker of event=%s with request_id=%s",
 						event, requestId));
 			}
-			new SPInterstitialEventDispatcher().execute(buildUrl(credentials, requestId, ad,
-					event));
+			new SPInterstitialEventDispatcher().execute(getUrlBuilder(credentials, requestId, ad, event));
 		}
 	}
 	
-	private static String buildUrl(SPCredentials credentials, String requestId,
+	private static UrlBuilder getUrlBuilder(SPCredentials credentials, String requestId,
 			SPInterstitialAd ad, SPInterstitialEvent event) {
 		UrlBuilder builder = UrlBuilder.newBuilder(getBaseUrl(), credentials)
 				.addKeyValue("request_id", requestId)
-				.addKeyValue("event", event.toString());
+				.addKeyValue("event", event.toString())
+				.addExtraKeysValues(UrlBuilder.mapKeysToValues(additionalParamKey, additionalParamValues));
+
 		if (ad != null) {
 			builder.addKeyValue("ad_id", ad.getAdId())
 			.addKeyValue("provider_type", ad.getProviderType());
 		}
-		return builder.buildUrl();
+		return builder;
 	}
 
 	private static String getBaseUrl() {
@@ -63,11 +67,11 @@ public class SPInterstitialEventDispatcher extends AsyncTask<String, Void, Boole
 	}
 	
 	@Override
-	protected Boolean doInBackground(String... params) {
+	protected Boolean doInBackground(UrlBuilder... params) {
 		Thread.currentThread().setName(TAG);
 		Boolean returnValue = false;
 
-		String url = params[0];
+		String url = params[0].buildUrl();
 		
 		SponsorPayLogger.d(TAG, "Sending event to "+ url);
 

@@ -153,11 +153,11 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 		UrlBuilder urlBuilder = UrlBuilder.newBuilder(baseUrl, mCredentials)
 				.addExtraKeysValues(extraKeysValues).addScreenMetrics().addTimestamp();
 
-		AsyncRequest requestTask = new AsyncRequest(urlBuilder, this);
+		AsyncRequest requestTask = new AsyncRequest(this);
 		
 		mShouldShowNotification = showToastNotification;
 		
-		requestTask.execute();
+		requestTask.execute(urlBuilder);
 	}
 
 	/**

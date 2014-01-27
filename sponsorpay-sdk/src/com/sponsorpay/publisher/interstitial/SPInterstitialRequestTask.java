@@ -24,18 +24,21 @@ import com.sponsorpay.utils.HttpResponseParser;
 import com.sponsorpay.utils.SPHttpClient;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
+import com.sponsorpay.utils.UrlBuilder;
 
-public class SPInterstitialRequestTask extends AsyncTask<String, Void, SPInterstitialAd[]> {
+public class SPInterstitialRequestTask extends AsyncTask<UrlBuilder, Void, SPInterstitialAd[]> {
 
 	private static final String TAG = "SPInterstitialRequestTask";
 	
 	@Override
-	protected SPInterstitialAd[] doInBackground(String... params) {
+	protected SPInterstitialAd[] doInBackground(UrlBuilder... params) {
 		Thread.currentThread().setName(TAG);
 		LinkedList<SPInterstitialAd> interstitialAds = new LinkedList<SPInterstitialAd>();
 		try {
 			HttpClient httpClient = SPHttpClient.getHttpClient();
-			HttpUriRequest request = new HttpGet(params[0]);
+			String requestUrl = params[0].buildUrl();
+			SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
+			HttpUriRequest request = new HttpGet(requestUrl);
 			HttpResponse response = httpClient.execute(request);
 	
 			String bodyContent = HttpResponseParser.extractResponseString(response);

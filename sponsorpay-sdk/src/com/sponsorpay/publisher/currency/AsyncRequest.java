@@ -28,7 +28,7 @@ import com.sponsorpay.utils.UrlBuilder;
  * which triggered the request / loading process. Uses the Android {@link AsyncTask} mechanism.
  * </p>
  */
-public class AsyncRequest extends AsyncTask<Void, Void, Void> {
+public class AsyncRequest extends AsyncTask<UrlBuilder, Void, Void> {
 
 	public interface AsyncRequestResultListener {
 		void onAsyncRequestComplete(AsyncRequest request);
@@ -58,11 +58,6 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 */
 	private static final String SIGNATURE_HEADER = "X-Sponsorpay-Response-Signature";
 
-	/**
-	 * UrlBuild used to generate the URl in the background
-	 */
-	private UrlBuilder mUrlBuilder;
-	
 	/**
 	 * Status code of the server's response.
 	 */
@@ -104,8 +99,7 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 *            {@link AsyncRequestResultListener} to be notified of the request's results when
 	 *            they become available.
 	 */
-	public AsyncRequest(UrlBuilder urlBuilder, AsyncRequestResultListener listener) {
-		mUrlBuilder = urlBuilder;
+	public AsyncRequest(AsyncRequestResultListener listener) {
 		mResultListener = listener;
 	}
 
@@ -117,8 +111,8 @@ public class AsyncRequest extends AsyncTask<Void, Void, Void> {
 	 * @return
 	 */
 	@Override
-	protected Void doInBackground(Void... params) {
-		String requestUrl = mUrlBuilder.buildUrl();
+	protected Void doInBackground(UrlBuilder... params) {
+		String requestUrl = params[0].buildUrl();
 		
 		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
 				+ requestUrl);

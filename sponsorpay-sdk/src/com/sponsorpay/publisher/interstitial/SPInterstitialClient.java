@@ -60,18 +60,12 @@ public class SPInterstitialClient {
 		mCredentials = credentials;
 		mActivity = activity;
 		mRequestId = UUID.randomUUID().toString();
-		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials)
+		UrlBuilder urlBuilder = UrlBuilder.newBuilder(getBaseUrl(), credentials)
 				.addExtraKeysValues(mCustomParameters)
 				.addKeyValue(SP_REQUEST_ID_PARAMETER_KEY, mRequestId)
-				.addScreenMetrics().buildUrl();
-		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
-		loadUrl(requestUrl);
+				.addScreenMetrics();
+		new SPInterstitialRequestTask().execute(urlBuilder);
 		setState(SPInterstitialClientState.REQUESTING_OFFERS);
-	}
-
-
-	private void loadUrl(String requestUrl) {
-		new SPInterstitialRequestTask().execute(requestUrl);
 	}
 
 	public boolean canRequestAds() {

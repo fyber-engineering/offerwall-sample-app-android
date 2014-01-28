@@ -39,8 +39,7 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 		UrlBuilder urlBuilder = UrlBuilder.newBuilder(getBaseUrl(), credentials)
 				.addExtraKeysValues(customParameters)
 				.addKeyValue(SPInterstitialClient.SP_REQUEST_ID_PARAMETER_KEY, requestId)
-				.addScreenMetrics()
-				.sendUserId(true);
+				.addScreenMetrics();
 		new SPInterstitialRequester().execute(urlBuilder);
 	}
 	
@@ -94,7 +93,6 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 	
 	@Override
 	protected void onPostExecute(SPInterstitialAd[] result) {
-		super.onPostExecute(result);
 		SPInterstitialClient.INSTANCE.processAds(result);
 	}
 

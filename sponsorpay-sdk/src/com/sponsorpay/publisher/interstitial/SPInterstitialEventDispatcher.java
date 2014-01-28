@@ -55,8 +55,7 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 				.addKeyValue(SPInterstitialClient.SP_REQUEST_ID_PARAMETER_KEY, requestId)
 				.addKeyValue("event", event.toString())
 				.addExtraKeysValues(UrlBuilder.mapKeysToValues(additionalParamKey, additionalParamValues))
-				.addScreenMetrics()
-				.sendUserId(true);
+				.addScreenMetrics();
 
 		if (ad != null) {
 			builder.addKeyValue("ad_id", ad.getAdId())

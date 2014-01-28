@@ -92,12 +92,12 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	 */
 	public VirtualCurrencyConnector(Context context, String credentialsToken,
 			SPCurrencyServerListener userListener) {
+		mCredentials = SponsorPay.getCredentials(credentialsToken);
 		if (StringUtils.nullOrEmpty(mCredentials.getSecurityToken())) {
 			throw new IllegalArgumentException("Security token has not been set on the credentials");
 		}
 
 		mContext = context;
-		mCredentials = SponsorPay.getCredentials(credentialsToken);
 		mUserListener = userListener;
 	}
 

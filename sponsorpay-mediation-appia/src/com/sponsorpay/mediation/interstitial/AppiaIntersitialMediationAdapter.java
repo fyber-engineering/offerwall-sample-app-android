@@ -170,6 +170,7 @@ public class AppiaIntersitialMediationAdapter extends
 				layout.addView(imgView, imgViewLayoutParams);
 				layout.addView(touchFrame, frameLayoutParams);
 			}
+			fireImpressionEvent();
 			show();
 		}
     }

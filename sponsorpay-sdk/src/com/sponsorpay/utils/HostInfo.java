@@ -329,7 +329,6 @@ public class HostInfo {
 
 	protected void retrieveAdvertisingId(Context context) {
 		try {
-			
 			//calling this reflexively, in case of Play Services not linked with the application
 			Class<?> advertisingIdClientClass = Class.forName("com.google.android.gms.ads.identifier.AdvertisingIdClient");
 				

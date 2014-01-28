@@ -6,7 +6,6 @@
 
 package com.sponsorpay.publisher.currency;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import android.content.Context;
@@ -141,18 +140,14 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 		if (StringUtils.nullOrEmpty(transactionId)) {
 			transactionId = fetchLatestTransactionIdForCurrentAppAndUser();
 		}
-		
-		Map<String, String> extraKeysValues = new HashMap<String, String>();
-		extraKeysValues.put(URL_PARAM_KEY_LAST_TRANSACTION_ID, transactionId);
-		
-		if (mCustomParameters != null) {
-			extraKeysValues.putAll(mCustomParameters);
-		}
 
 		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(VCS_URL_KEY);
 
 		UrlBuilder urlBuilder = UrlBuilder.newBuilder(baseUrl, mCredentials)
-				.addExtraKeysValues(extraKeysValues).addScreenMetrics().addTimestamp();
+				.addKeyValue(URL_PARAM_KEY_LAST_TRANSACTION_ID, transactionId)
+				.addExtraKeysValues(mCustomParameters)
+				.addScreenMetrics()
+				.addSignature();
 
 		AsyncRequest requestTask = new AsyncRequest(this);
 		

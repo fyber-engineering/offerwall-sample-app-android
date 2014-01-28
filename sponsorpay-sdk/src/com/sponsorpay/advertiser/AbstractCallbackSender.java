@@ -22,7 +22,7 @@ import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.UrlBuilder;
 
 /**
- * Runs in the background the Advertiser Callback HTTP request.
+ * Runs the Advertiser Callback HTTP request in the background.
  */
 public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boolean> {
 

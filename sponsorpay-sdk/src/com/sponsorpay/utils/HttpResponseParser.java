@@ -6,13 +6,11 @@
 
 package com.sponsorpay.utils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 
 /**
  * Contains an utility method to extract the body of an HTTP response.
@@ -31,22 +29,9 @@ public class HttpResponseParser {
 
 		try {
 			HttpEntity responseEntity = httpResponse.getEntity();
-			InputStream inStream = responseEntity.getContent();
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
-			StringBuilder sb = new StringBuilder();
-
-			String line = null;
-
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-
-			inStream.close();
-
+			responseString = EntityUtils.toString(responseEntity);
 			responseEntity.consumeContent();
 			
-			responseString = sb.toString();
 		} catch (IOException e) {
 			responseString = null;
 		}

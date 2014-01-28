@@ -21,6 +21,9 @@ import com.sponsorpay.credentials.SPCredentials;
  * </p>
  */
 public class UrlBuilder {
+	
+	private static final String TAG = "UrlBuilder";
+	
 	/**
 	 * The unique device ID (for url-encoding).
 	 */
@@ -105,7 +108,6 @@ public class UrlBuilder {
 	private static final String ADVERTISING_ID_KEY = "google_ad_id";
 	private static final String ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY = "google_ad_id_limited_tracking_enabled";
 
-
 	/**
 	 * Checks that the passed Map of key/value parameters doesn't contain empty or null keys or
 	 * values. If it does, triggers an {@link IllegalArgumentException}.
@@ -170,9 +172,12 @@ public class UrlBuilder {
 	
 	private boolean mShouldAddTimestamp = false;
 
+	private boolean mShouldAddSignature = false;
+	
 	private SPCredentials mCredentials;
 
 	private String mCurrency;
+
 	
 	protected UrlBuilder(String resourceUrl, SPCredentials credentials) {
 		mResourceUrl = resourceUrl;
@@ -213,6 +218,12 @@ public class UrlBuilder {
 		return this;
 	}
 
+	public UrlBuilder addSignature() {
+		mShouldAddSignature = true;
+		// signature always requires timestamp
+		mShouldAddTimestamp = true;
+		return this;
+	}
 	/**
 	 * <p>
 	 * This will build the final URL with all the provided parameters
@@ -290,10 +301,15 @@ public class UrlBuilder {
 			builder.appendQueryParameter(entry.getKey(), entry.getValue());
 		}
 		
-		String secretKey = mCredentials.getSecurityToken();
-		if (StringUtils.notNullNorEmpty(secretKey)) {
-			builder.appendQueryParameter(URL_PARAM_SIGNATURE, SignatureTools
-					.generateSignatureForParameters(keyValueParams, secretKey));
+		if (mShouldAddSignature) {
+			String secretKey = mCredentials.getSecurityToken();
+			if (StringUtils.notNullNorEmpty(secretKey)) {
+				builder.appendQueryParameter(URL_PARAM_SIGNATURE,
+						SignatureTools.generateSignatureForParameters(
+								keyValueParams, secretKey));
+			} else {
+				SponsorPayLogger.d(TAG, "It was impossible to add the siganture, the SecretKey has not been provided");
+			}
 		}
 
 		uri = builder.build();
@@ -334,6 +350,5 @@ public class UrlBuilder {
 	public static UrlBuilder newBuilder(String resourceUrl, SPCredentials credentials) {
 		return new UrlBuilder(resourceUrl, credentials);
 	}
-
 	
 }

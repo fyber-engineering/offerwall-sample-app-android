@@ -58,7 +58,7 @@ public class InMobiIntersitialMediationAdapter extends
 
 	@Override
 	public void onInterstitialFailed(IMInterstitial ad, IMErrorCode errorCode) {
-		fireErrorEvent("Interstitial failed to load with errorCode - " + errorCode.toString());
+		fireValidationErrorEvent("Interstitial failed to load with errorCode - " + errorCode.toString());
 	}
 
 	@Override

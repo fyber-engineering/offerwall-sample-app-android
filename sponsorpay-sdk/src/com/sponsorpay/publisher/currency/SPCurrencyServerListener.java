@@ -22,7 +22,7 @@ public interface SPCurrencyServerListener {
 	 *            {@link CurrencyServerAbstractResponse#getErrorCode()},
 	 *            {@link CurrencyServerAbstractResponse#getErrorMessage()} and methods.
 	 */
-	void onSPCurrencyServerError(CurrencyServerAbstractResponse response);
+	void onSPCurrencyServerError(SPCurrencyServerErrorResponse response);
 
 	/**
 	 * Called when a response containing the currency delta for a given user has been answered by the SponsorPay's
@@ -33,5 +33,5 @@ public interface SPCurrencyServerListener {
 	 *            A response instance that implements the {@link CurrencyServerDeltaOfCoinsResponse#getDeltaOfCoins()}
 	 *            and {@link CurrencyServerDeltaOfCoinsResponse#getLatestTransactionId()} methods.
 	 */
-	void onSPCurrencyDeltaReceived(CurrencyServerDeltaOfCoinsResponse response);
+	void onSPCurrencyDeltaReceived(SPCurrencyServerSuccesfulResponse response);
 }

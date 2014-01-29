@@ -17,28 +17,22 @@ import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
-import com.sponsorpay.publisher.currency.AsyncRequest.AsyncRequestResultListener;
-import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
+import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPCurrencyServerReponse;
+//import com.sponsorpay.publisher.currency.AsyncRequest.AsyncRequestResultListener;
+import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPVCSResultListener;
+import com.sponsorpay.utils.SPHandler;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
-import com.sponsorpay.utils.UrlBuilder;
 
 /**
  * <p>
  * Provides services to access SponsorPay's Virtual Currency Server.
  * </p>
  */
-public class VirtualCurrencyConnector implements AsyncRequestResultListener {
+public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 
-	/*
-	 * VCS API Resource URLs.
-	 */
-	private static final String VCS_URL_KEY = "vcs";
-
-	/*
-	 * Parameter key and default values.
-	 */
-	private static final String URL_PARAM_KEY_LAST_TRANSACTION_ID = "ltid";
+	private static final String TAG = "SPVirtualCurrencyConnector";
+	
 	private static final String URL_PARAM_VALUE_NO_TRANSACTION = "NO_TRANSACTION";
 
 	/**
@@ -48,6 +42,7 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	 */
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_";
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR = "_";
+
 	
 	private static boolean showToastNotification = true;
 	
@@ -77,7 +72,9 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	 */
 	protected Map<String, String> mCustomParameters;
 	
-	protected SPCurrencyServerListener mUserListener;
+	protected SPCurrencyServerListener mCurrencyServerListener;
+	
+	private final int handlerWhat = 5487; 
 	
 	/**
 	 * Initializes a new instance with the provided context and application data.
@@ -86,26 +83,27 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	 *            Android application context.
 	 * @param credentialsToken
 	 *            The token identifying the {@link SPCredentials} to be used.
-	 * @param userListener
+	 * @param currencyServerListener
 	 *            {@link SPCurrencyServerListener} registered by the developer code to be notified
 	 *            of the result of requests to the Virtual Currency Server.
 	 */
-	public VirtualCurrencyConnector(Context context, String credentialsToken,
-			SPCurrencyServerListener userListener) {
+	public SPVirtualCurrencyConnector(Context context, String credentialsToken,
+			SPCurrencyServerListener currencyServerListener) {
 		mCredentials = SponsorPay.getCredentials(credentialsToken);
 		if (StringUtils.nullOrEmpty(mCredentials.getSecurityToken())) {
 			throw new IllegalArgumentException("Security token has not been set on the credentials");
 		}
 
 		mContext = context;
-		mUserListener = userListener;
+		mCurrencyServerListener = currencyServerListener;
 	}
 
 	/**
 	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
 	 */
-	public void setCustomParameters(Map<String, String> customParams) {
+	public SPVirtualCurrencyConnector setCustomParameters(Map<String, String> customParams) {
 		mCustomParameters = customParams;
+		return this;
 	}
 
 	/**
@@ -114,7 +112,7 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	 * 			the custom currency name
 	 * @return
 	 */
-	public VirtualCurrencyConnector setCurrency(String currency) {
+	public SPVirtualCurrencyConnector setCurrency(String currency) {
 		mCurrency = currency;
 		return this;
 	}
@@ -137,52 +135,18 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	 *            The transaction ID used as excluded lower limit to calculate the delta of coins.
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId) {
+		if(SPHandler.hasMessage(handlerWhat)) {
+			SponsorPayLogger.d(TAG, "VCS was queried less than 15s ago. Please try again later.");
+			return;
+		}
+		SPHandler.sendMessageDelayed(handlerWhat, 15000);
 		if (StringUtils.nullOrEmpty(transactionId)) {
 			transactionId = fetchLatestTransactionIdForCurrentAppAndUser();
 		}
-
-		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(VCS_URL_KEY);
-
-		UrlBuilder urlBuilder = UrlBuilder.newBuilder(baseUrl, mCredentials)
-				.addKeyValue(URL_PARAM_KEY_LAST_TRANSACTION_ID, transactionId)
-				.addExtraKeysValues(mCustomParameters)
-				.addScreenMetrics()
-				.addSignature();
-
-		AsyncRequest requestTask = new AsyncRequest(this);
 		
 		mShouldShowNotification = showToastNotification;
-		
-		requestTask.execute(urlBuilder);
-	}
-
-	/**
-	 * Called by {@link AsyncRequest} when a response from the currency server is
-	 * received. Performs the first stage of error handling and initializes the right kind of
-	 * {@link CurrencyServerAbstractResponse}.
-	 * 
-	 * @param requestTask
-	 *            The calling {@link AsyncRequest} with the response data.
-	 */
-	@Override
-	public void onAsyncRequestComplete(AsyncRequest requestTask) {
-		SponsorPayLogger.d(getClass().getSimpleName(), String.format(
-				"Currency Server Response, status code: %d, response body: %s, signature: %s",
-				requestTask.getHttpStatusCode(), requestTask.getResponseBody(), requestTask
-						.getResponseSignature()));
-
-		CurrencyServerAbstractResponse response;
-
-		if (requestTask.didRequestThrowError()) {
-			response = new RequestErrorResponse();
-		} else {
-			response = new CurrencyServerDeltaOfCoinsResponse(this);
-			response.setResponseData(requestTask.getHttpStatusCode(),
-					requestTask.getResponseBody(), requestTask.getResponseSignature());
-		}
-
-		response.setResponseListener(mUserListener);
-		response.parseAndCallListener(mCredentials.getSecurityToken());
+		SPCurrencyServerRequester.requestCurrency(this, mCredentials,
+				transactionId, mCustomParameters);
 	}
 
 	/**
@@ -235,7 +199,7 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	 * Saves the returned latest transaction id and shows the notification
 	 * if required
 	 */
-	public void onDeltaOfCoinsResponse(CurrencyServerDeltaOfCoinsResponse response) {
+	private void onDeltaOfCoinsResponse(SPCurrencyServerSuccesfulResponse response) {
 		saveLatestTransactionIdForCurrentUser(response.getLatestTransactionId());
 		if (response.getDeltaOfCoins() > 0 && mShouldShowNotification) {
 			String text = String
@@ -258,6 +222,17 @@ public class VirtualCurrencyConnector implements AsyncRequestResultListener {
 	private static String generatePreferencesLatestTransactionIdKey(SPCredentials credentials) {
 		return STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + credentials.getAppId()
 				+ STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + credentials.getUserId();
+	}
+
+	@Override
+	public void onSPCurrencyServerResponseReceived(
+			SPCurrencyServerReponse response) {
+		if (response instanceof SPCurrencyServerSuccesfulResponse) {
+			onDeltaOfCoinsResponse((SPCurrencyServerSuccesfulResponse) response);
+			mCurrencyServerListener.onSPCurrencyDeltaReceived((SPCurrencyServerSuccesfulResponse) response);
+		} else {
+			mCurrencyServerListener.onSPCurrencyServerError((SPCurrencyServerErrorResponse) response);
+		}
 	}
 	
 }

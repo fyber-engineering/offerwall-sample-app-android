@@ -19,6 +19,8 @@ import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAd
 public class AppLiftInterstitialMediationAdapter extends
 		SPInterstitialMediationAdapter<AppLiftMediationAdapter> implements PlayAdsListener{
 
+	private boolean mIsShown = false;;
+
 	public AppLiftInterstitialMediationAdapter(AppLiftMediationAdapter adapter) {
 		super(adapter);
 	}
@@ -45,6 +47,7 @@ public class AppLiftInterstitialMediationAdapter extends
 
 	@Override
 	public void onShown(PlayAdsType type) {
+		mIsShown  = true;
 		fireImpressionEvent();
 	}
 
@@ -55,7 +58,11 @@ public class AppLiftInterstitialMediationAdapter extends
 	
 	@Override
 	public void onError(Exception exception) {
-		fireErrorEvent(exception.getMessage());
+		if (mIsShown) {
+			fireShowErrorEvent(exception.getMessage());
+		} else {
+			fireValidationErrorEvent(exception.getMessage());
+		}
 	}
 
 	@Override

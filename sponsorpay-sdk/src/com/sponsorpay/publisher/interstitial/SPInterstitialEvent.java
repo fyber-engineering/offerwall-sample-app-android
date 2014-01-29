@@ -11,10 +11,11 @@ public enum SPInterstitialEvent {
 	ValidationRequest("request"),
 	ValidationFill("fill"),
 	ValidationNoFill("no_fill"),
+	ValidationError("error"),
 	ShowImpression("impression"),
 	ShowClick("click"),
 	ShowClose("close"),
-	Error("error"),
+	ShowError("error"),
 	NotIntegrated("no_sdk");
 	
     private final String text;

@@ -62,7 +62,7 @@ public class AppLovinIntersitialMediationAdapter extends
 	@Override
 	public void failedToReceiveAd(int errorCode) {
 		mAppLovinAd = null;
-		fireErrorEvent("Applovin failedToReceiveAd with errorCode " + errorCode);
+		fireValidationErrorEvent("Applovin failedToReceiveAd with errorCode " + errorCode);
 	}
 
 	// AppLovinAdDisplayListener

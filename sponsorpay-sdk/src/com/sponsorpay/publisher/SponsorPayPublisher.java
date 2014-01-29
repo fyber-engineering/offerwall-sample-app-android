@@ -17,7 +17,7 @@ import android.content.Intent;
 import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.publisher.currency.SPCurrencyServerListener;
-import com.sponsorpay.publisher.currency.VirtualCurrencyConnector;
+import com.sponsorpay.publisher.currency.SPVirtualCurrencyConnector;
 import com.sponsorpay.publisher.interstitial.SPInterstitialClient;
 import com.sponsorpay.publisher.interstitial.SPInterstitialRequestListener;
 import com.sponsorpay.publisher.mbe.SPBrandEngageClient;
@@ -317,7 +317,7 @@ public class SponsorPayPublisher {
 			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams, 
 			String customCurrency) {
 		
-		VirtualCurrencyConnector vcc = new VirtualCurrencyConnector(context, credentialsToken, listener);
+		SPVirtualCurrencyConnector vcc = new SPVirtualCurrencyConnector(context, credentialsToken, listener);
 		vcc.setCustomParameters(customParams);
 		vcc.setCurrency(customCurrency);
 		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
@@ -332,7 +332,7 @@ public class SponsorPayPublisher {
 	 * 			Whether the Toast notification message should be shown or not 
 	 */
 	public static void displayNotificationForSuccessfullCoinRequest(boolean shouldShowNotification) {
-		VirtualCurrencyConnector.shouldShowToastNotification(shouldShowNotification);
+		SPVirtualCurrencyConnector.shouldShowToastNotification(shouldShowNotification);
 	}
 	
 	//================================================================================

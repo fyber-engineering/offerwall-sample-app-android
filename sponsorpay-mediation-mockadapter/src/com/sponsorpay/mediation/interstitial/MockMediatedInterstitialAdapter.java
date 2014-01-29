@@ -40,7 +40,7 @@ public class MockMediatedInterstitialAdapter extends
 	@Override
 	protected boolean show(Activity parentActivity) {
 		if (getConfig() == MockInterstitialSetting.ShowError) {
-			fireErrorEvent("Interstitial show error");
+			fireShowErrorEvent("Interstitial show error");
 			return false;
 		}
 		MockInterstitialDialog dialog = new MockInterstitialDialog(parentActivity);
@@ -62,7 +62,7 @@ public class MockMediatedInterstitialAdapter extends
 			setAdAvailable();
 			break;
 		case ValidationError:
-			fireErrorEvent("Validation error");
+			fireValidationErrorEvent("Validation error");
 			break;
 		case ValidationNoAds:
 		default:

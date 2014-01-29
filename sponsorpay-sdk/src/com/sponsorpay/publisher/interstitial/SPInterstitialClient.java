@@ -170,7 +170,8 @@ public class SPInterstitialClient {
 				mAdStateListener.onSPInterstitialAdClosed(SPInterstitialAdCloseReason.ReasonUserClosedAd);
 			}
 			break;
-		case Error:
+		case ValidationError:
+		case ShowError:
 			setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
 			if (mAdStateListener != null) {
 				mAdStateListener.onSPInterstitialAdError(message);

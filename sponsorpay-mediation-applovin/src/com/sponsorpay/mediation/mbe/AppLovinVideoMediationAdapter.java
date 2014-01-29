@@ -37,6 +37,8 @@ public class AppLovinVideoMediationAdapter extends
 	@Override
 	public void startVideo(Activity parentActivity) {
 		mIncentivizedAd.show(parentActivity, this, this, this);
+		// we need to notify here because of the watch dialog
+		notifyVideoStarted();
 	}
 
 	// AppLovinAdLoadListener
@@ -77,6 +79,7 @@ public class AppLovinVideoMediationAdapter extends
 	public void userRewardVerified(AppLovinAd ad, Map response) {
 		//public void userRewardVerified(AppLovinAd ad, Map<String, String> response) {
 		// AppLovin servers validated the reward. Refresh user balance from your server.
+		setVideoPlayed();
 	}
 	
 	@Override
@@ -86,26 +89,28 @@ public class AppLovinVideoMediationAdapter extends
 	
 	@Override
 	public void userDeclinedToViewAd(AppLovinAd ad) {
-		
+		notifyCloseEngagement();
 	}
 
 	//AppLovinAdVideoPlaybackListener
 	@Override
 	public void videoPlaybackBegan(final AppLovinAd ad) {
-		notifyVideoStarted();
+		//the watch dialog can lead to timeout
+//		notifyVideoStarted();
 	}
 
 	@Override
 	public void videoPlaybackEnded(final AppLovinAd ad,
 			final double percentViewed, final boolean fullyWatched) {
-		if (fullyWatched) {
-			setVideoPlayed();
-		}
+//		if (fullyWatched) {
+//			setVideoPlayed();
+//		}
 	}
 
 	//AppLovinAdDisplayListener
 	@Override
 	public void adDisplayed(AppLovinAd ad) {
+		//the watch dialog can lead to timeout
 	}
 
 	@Override

@@ -20,8 +20,6 @@ import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPCurrencyServerReponse;
 //import com.sponsorpay.publisher.currency.AsyncRequest.AsyncRequestResultListener;
 import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPVCSResultListener;
-import com.sponsorpay.utils.SPHandler;
-import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
 /**
@@ -31,9 +29,11 @@ import com.sponsorpay.utils.StringUtils;
  */
 public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 
-	private static final String TAG = "SPVirtualCurrencyConnector";
+//	private static final String TAG = "SPVirtualCurrencyConnector";
 	
 	private static final String URL_PARAM_VALUE_NO_TRANSACTION = "NO_TRANSACTION";
+
+//	private static Calendar nextRequestTimestamp;
 
 	/**
 	 * Key for the String containing the latest known transaction ID, which is saved as state in the
@@ -73,8 +73,6 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	protected Map<String, String> mCustomParameters;
 	
 	protected SPCurrencyServerListener mCurrencyServerListener;
-	
-	private final int handlerWhat = 5487; 
 	
 	/**
 	 * Initializes a new instance with the provided context and application data.
@@ -135,16 +133,20 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 *            The transaction ID used as excluded lower limit to calculate the delta of coins.
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId) {
-		if(SPHandler.hasMessage(handlerWhat)) {
-			SponsorPayLogger.d(TAG, "VCS was queried less than 15s ago. Please try again later.");
-			return;
-		}
-		SPHandler.sendMessageDelayed(handlerWhat, 15000);
+//		Calendar calendar = Calendar.getInstance();
+//		if(calendar.before(nextRequestTimestamp)) {
+//			SponsorPayLogger.d(TAG, "VCS was queried less than 15s ago. Please try again later.");
+//			mCurrencyServerListener.onSPCurrencyServerError(new SPCurrencyServerErrorResponse(SPCurrencyServerRequestErrorType.ERROR_OTHER, "blas", "blaaa"));
+//			return;
+//		}
+//		calendar.add(Calendar.SECOND, 15);
+//		nextRequestTimestamp = calendar; 
 		if (StringUtils.nullOrEmpty(transactionId)) {
 			transactionId = fetchLatestTransactionIdForCurrentAppAndUser();
 		}
 		
 		mShouldShowNotification = showToastNotification;
+		
 		SPCurrencyServerRequester.requestCurrency(this, mCredentials,
 				transactionId, mCustomParameters);
 	}

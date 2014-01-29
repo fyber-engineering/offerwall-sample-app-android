@@ -68,7 +68,7 @@ public class AppiaIntersitialMediationAdapter extends
 				});
 				return true;
 			} else {
-				fireErrorEvent(mAdResult.getErrorText());
+				fireShowErrorEvent(mAdResult.getErrorText());
 			}
 		}
 		return false;
@@ -85,7 +85,7 @@ public class AppiaIntersitialMediationAdapter extends
 					mAdResult = mAppia.getBannerAd(mActivityRef.get(),
 							mAdParameters, BannerAdSize.SIZE_768x1024);
 					if (mAdResult.hasError()) {
-						fireErrorEvent(mAdResult.getErrorText());
+						fireValidationErrorEvent(mAdResult.getErrorText());
 					} else {
 						setAdAvailable();
 					}

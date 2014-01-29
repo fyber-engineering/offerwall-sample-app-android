@@ -86,9 +86,14 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 		checkForAds(getActivity());
 	}
 
-	protected void fireErrorEvent(String message) {
+	protected void fireValidationErrorEvent(String message) {
 		resetState();
-		fireEvent(SPInterstitialEvent.Error, message);
+		fireEvent(SPInterstitialEvent.ValidationError, message);
+	}
+	
+	protected void fireShowErrorEvent(String message) {
+		resetState();
+		fireEvent(SPInterstitialEvent.ShowError, message);
 		checkForAds(getActivity());
 	}
 	

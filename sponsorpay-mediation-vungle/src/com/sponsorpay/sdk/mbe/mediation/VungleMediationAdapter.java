@@ -24,7 +24,7 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 
 	private static final String TAG = "VungleAdapter";
 
-	private static final String ADAPTER_VERSION = "1.0.0";
+	private static final String ADAPTER_VERSION = "1.0.1";
 
 	private static final String ADAPTER_NAME = "Vungle";
 	
@@ -44,14 +44,14 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 		String appId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID, String.class);
 		if (StringUtils.notNullNorEmpty(appId)) {
 			SponsorPayLogger.i(TAG, "Using App ID = " + appId);
-			VunglePub.setSoundEnabled(SPMediationConfigurator.getConfiguration(
-					ADAPTER_NAME, SOUND_ENABLED, Boolean.TRUE, Boolean.class));
 			VunglePub.setAutoRotation(SPMediationConfigurator.getConfiguration(
 					ADAPTER_NAME, AUTO_ROTATION_ENABLED, Boolean.FALSE,	Boolean.class));
-			VunglePub.setBackButtonEnabled(SPMediationConfigurator.getConfiguration(
-					ADAPTER_NAME, BACK_BUTTON_ENABLED, Boolean.FALSE, Boolean.class));
 			setVideoWatchedAt();
 			VunglePub.init(activity, appId);
+			VunglePub.setSoundEnabled(SPMediationConfigurator.getConfiguration(
+					ADAPTER_NAME, SOUND_ENABLED, Boolean.TRUE, Boolean.class));
+			VunglePub.setBackButtonEnabled(SPMediationConfigurator.getConfiguration(
+					ADAPTER_NAME, BACK_BUTTON_ENABLED, Boolean.FALSE, Boolean.class));
 			VunglePub.setEventListener(this);
 			return true;
 		}

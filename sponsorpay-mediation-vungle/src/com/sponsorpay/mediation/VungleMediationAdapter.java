@@ -44,13 +44,13 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 		String appId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID, String.class);
 		if (StringUtils.notNullNorEmpty(appId)) {
 			SponsorPayLogger.i(TAG, "Using App ID = " + appId);
-			VunglePub.setSoundEnabled(SPMediationConfigurator.getConfiguration(
-					ADAPTER_NAME, SOUND_ENABLED, Boolean.TRUE, Boolean.class));
 			VunglePub.setAutoRotation(SPMediationConfigurator.getConfiguration(
 					ADAPTER_NAME, AUTO_ROTATION_ENABLED, Boolean.FALSE,	Boolean.class));
+			VunglePub.init(activity, appId);
+			VunglePub.setSoundEnabled(SPMediationConfigurator.getConfiguration(
+					ADAPTER_NAME, SOUND_ENABLED, Boolean.TRUE, Boolean.class));
 			VunglePub.setBackButtonEnabled(SPMediationConfigurator.getConfiguration(
 					ADAPTER_NAME, BACK_BUTTON_ENABLED, Boolean.FALSE, Boolean.class));
-			VunglePub.init(activity, appId);
 			VunglePub.setEventListener(this);
 			mVungleListeners.add(mVideoMediationAdapter);
 			return true;

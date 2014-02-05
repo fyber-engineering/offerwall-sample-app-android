@@ -6,6 +6,7 @@
 
 package com.sponsorpay.publisher.currency;
 
+import java.util.Calendar;
 import java.util.Map;
 
 import android.content.Context;
@@ -18,9 +19,7 @@ import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPCurrencyServerReponse;
-//import com.sponsorpay.publisher.currency.AsyncRequest.AsyncRequestResultListener;
 import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPVCSResultListener;
-import com.sponsorpay.utils.SPHandler;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
@@ -31,9 +30,14 @@ import com.sponsorpay.utils.StringUtils;
  */
 public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 
+	private static final int VCS_TIMEOUT = 15;
+
 	private static final String TAG = "SPVirtualCurrencyConnector";
 	
 	private static final String URL_PARAM_VALUE_NO_TRANSACTION = "NO_TRANSACTION";
+
+	private static Calendar nextRequestTimestamp;
+	private static SPCurrencyServerReponse lastResponse;
 
 	/**
 	 * Key for the String containing the latest known transaction ID, which is saved as state in the
@@ -73,8 +77,6 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	protected Map<String, String> mCustomParameters;
 	
 	protected SPCurrencyServerListener mCurrencyServerListener;
-	
-	private final int handlerWhat = 5487; 
 	
 	/**
 	 * Initializes a new instance with the provided context and application data.
@@ -135,16 +137,28 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 *            The transaction ID used as excluded lower limit to calculate the delta of coins.
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId) {
-		if(SPHandler.hasMessage(handlerWhat)) {
-			SponsorPayLogger.d(TAG, "VCS was queried less than 15s ago. Please try again later.");
+		Calendar calendar = Calendar.getInstance();
+		if (calendar.before(nextRequestTimestamp)) {
+			SponsorPayLogger
+					.d(TAG,	"The VCS was queried less than "+ VCS_TIMEOUT +"s ago.Replying with cached response");
+			if (lastResponse != null) {
+				onSPCurrencyServerResponseReceived(lastResponse);
+			} else {
+				mCurrencyServerListener
+				.onSPCurrencyServerError(new SPCurrencyServerErrorResponse(
+						SPCurrencyServerRequestErrorType.ERROR_OTHER,
+						"blas", "blaaa"));
+			}
 			return;
 		}
-		SPHandler.sendMessageDelayed(handlerWhat, 15000);
+		calendar.add(Calendar.SECOND, VCS_TIMEOUT);
+		nextRequestTimestamp = calendar; 
 		if (StringUtils.nullOrEmpty(transactionId)) {
 			transactionId = fetchLatestTransactionIdForCurrentAppAndUser();
 		}
 		
 		mShouldShowNotification = showToastNotification;
+		
 		SPCurrencyServerRequester.requestCurrency(this, mCredentials,
 				transactionId, mCustomParameters);
 	}
@@ -228,9 +242,11 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	public void onSPCurrencyServerResponseReceived(
 			SPCurrencyServerReponse response) {
 		if (response instanceof SPCurrencyServerSuccesfulResponse) {
+			lastResponse = new SPCurrencyServerSuccesfulResponse(0, ((SPCurrencyServerSuccesfulResponse) response).getLatestTransactionId());
 			onDeltaOfCoinsResponse((SPCurrencyServerSuccesfulResponse) response);
 			mCurrencyServerListener.onSPCurrencyDeltaReceived((SPCurrencyServerSuccesfulResponse) response);
 		} else {
+			lastResponse = response;
 			mCurrencyServerListener.onSPCurrencyServerError((SPCurrencyServerErrorResponse) response);
 		}
 	}

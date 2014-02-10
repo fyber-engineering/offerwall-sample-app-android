@@ -19,14 +19,21 @@ import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.UrlBuilder;
 
-
+/**
+ * <p> 
+ * Internal class dispatches the intersitital events. 
+ * </p>
+ * 
+ * This class is not meant to be used directly. 
+ * It is used by {@link SPInterstitialClient}.
+ */
 public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, Boolean> {
 	
 	private static final String TAG = "SPInterstitialEventDispatcher";
 	private static final String TRACKERL_URL_KEY = "tracker";
 	private static final int SUCCESSFUL_HTTP_STATUS_CODE = 200;
 	
-	// those values are harccoded for now
+	// those values are hardcoded for now
 	private static String[] additionalParamKey = {"platform", "ad_format", "client", "rewarded"};
 	private static String[] additionalParamValues = {"android", "interstitial", "sdk", "0"};
 

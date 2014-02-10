@@ -229,8 +229,7 @@ public class SPBrandEngageClient {
 	/**
 	 * Queries the server for BrandEngage offers availability. 
 	 * 
-	 * Offer
-	 * availability cannot be requested while an engagement is running or the
+	 * Offer availability cannot be requested while an engagement is running or the
 	 * server is currently being queried. Call {@link #canRequestOffers()} if you're not
 	 * sure that this instance is in a state in which a request for offers is
 	 * possible.
@@ -627,7 +626,7 @@ public class SPBrandEngageClient {
 						SponsorPayLogger.d(TAG, "MBE client asks to validate a third party network: " + tpnName);
 						HashMap<String, String> contextData = new HashMap<String, String>(1);
 						contextData.put(SP_THIRD_PARTY_ID_PARAMETER, uri.getQueryParameter(SP_THIRD_PARTY_ID_PARAMETER));
-						SPMediationCoordinator.INSTANCE.validateVideoProvider(mContext, tpnName,
+						SPMediationCoordinator.INSTANCE.validateVideoNetwork(mContext, tpnName,
 								contextData, new SPMediationValidationEvent() {
 							@Override
 							public void validationEventResult(String name, SPTPNVideoValidationResult result, Map<String, String> contextData) {
@@ -815,7 +814,7 @@ public class SPBrandEngageClient {
 	}
 
 	
-	//ÊHack section - don't shop around here
+	//Hack section - don't shop around here
 	public void onPause() {
 		Message m = Message.obtain(mWebViewHandler);
 		m.what = ON_PAUSE;

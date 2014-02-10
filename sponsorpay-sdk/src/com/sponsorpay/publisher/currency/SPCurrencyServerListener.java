@@ -14,13 +14,12 @@ package com.sponsorpay.publisher.currency;
  * </p>
  */
 public interface SPCurrencyServerListener {
+
 	/**
 	 * Called when a request to SponsorPay's Virtual Currency Server resulted in an error.
 	 * 
 	 * @param response
-	 *            Instance implementing the {@link CurrencyServerAbstractResponse#getErrorType()},
-	 *            {@link CurrencyServerAbstractResponse#getErrorCode()},
-	 *            {@link CurrencyServerAbstractResponse#getErrorMessage()} and methods.
+	 * 			An instance of {@link SPCurrencyServerErrorResponse} which describes the error.
 	 */
 	void onSPCurrencyServerError(SPCurrencyServerErrorResponse response);
 
@@ -30,8 +29,8 @@ public interface SPCurrencyServerListener {
 	 * and the response contains valid data.
 	 * 
 	 * @param response
-	 *            A response instance that implements the {@link CurrencyServerDeltaOfCoinsResponse#getDeltaOfCoins()}
-	 *            and {@link CurrencyServerDeltaOfCoinsResponse#getLatestTransactionId()} methods.
+	 * 			An instance of {@link SPCurrencyServerSuccesfulResponse} holding the amount of currency earned for
+	 * 			this request and the latest transaction id.
 	 */
 	void onSPCurrencyDeltaReceived(SPCurrencyServerSuccesfulResponse response);
 }

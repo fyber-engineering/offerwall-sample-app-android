@@ -17,7 +17,7 @@ public enum SPInterstitialClientState {
     REQUESTING_OFFERS(false, false, false),
     // Validating offers received from the backend
     VALIDATING_OFFERS(false, false, false),
-    // An offer is preloaded and ready to show
+    // An ad is preloaded and ready to show
     READY_TO_SHOW_OFFERS(true, true, true),
     // An interstitial is currently being shown
     SHOWING_OFFERS(false, false, false);
@@ -34,23 +34,20 @@ public enum SPInterstitialClientState {
 	}
     
 	/**
-	 * 
-	 * @return true if this state allows the start of an ad§
+	 * @return true if this state allows the start of an ad
 	 */
     boolean canShowAds() {
     	return this.canShowAdw;
     }
     
     /**
-     * 
-     * @return true if this state allows to change interstitial client parameters
+     * @return true if this state allows to change parameters
      */
     boolean canChangeParameters() {
     	return this.canChangeParameters;
     }
     
     /**
-     * 
      * @return true if this state allows to request for offers
      */
     boolean canRequestAds() {

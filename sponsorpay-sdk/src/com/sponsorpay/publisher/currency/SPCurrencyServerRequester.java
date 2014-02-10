@@ -30,7 +30,7 @@ import com.sponsorpay.utils.UrlBuilder;
 /**
  * <p>
  * Requests and loads a resource using the HTTP GET method in the background. Will call the
- * {@link SPCurrencyServerRequester.AsyncRequestResultListener} registered in the constructor in the same thread
+ * {@link SPVCSResultListener} registered in the constructor in the same thread
  * which triggered the request / loading process. Uses the Android {@link AsyncTask} mechanism.
  * </p>
  */
@@ -124,10 +124,8 @@ public class SPCurrencyServerRequester extends AsyncTask<UrlBuilder, Void, SPCur
 
 	/**
 	 * Performs the request in the background. Called by the parent {@link AsyncTask} when
-	 * {@link #execute(Void...)} is invoked.
+	 * {@link #requestCurrency(SPVCSResultListener, SPCredentials, String, Map)} is invoked.
 	 * 
-	 * @param
-	 * @return
 	 */
 	@Override
 	protected SPCurrencyServerReponse doInBackground(UrlBuilder... params) {

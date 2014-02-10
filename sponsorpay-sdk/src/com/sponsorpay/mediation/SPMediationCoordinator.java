@@ -59,7 +59,7 @@ public class SPMediationCoordinator {
 		// not using new thread handler because of the required Looper.quit to kill it 
 		new Thread("SPMediationCoordinator") {
 			public void run() {
-				SponsorPayLogger.d(TAG, "Starting mediation providers...");
+				SponsorPayLogger.d(TAG, "Starting mediation networks...");
 				for (Entry<String, List<String>> entry : SPMediationConfigurator.INSTANCE
 						.getMediationAdapters().entrySet()) {
 					String className = entry.getKey();
@@ -94,7 +94,7 @@ public class SPMediationCoordinator {
 		}.start();
 	}
 	
-	public boolean isProviderAvailable(String name, SPMediationAdFormat adFormat) {
+	public boolean isNetworkAvailable(String name, SPMediationAdFormat adFormat) {
 		SPMediationAdapter adapter = mAdapters.get(name);
 		if (adapter != null) {
 			return adapter.supportMediationFormat(adFormat);
@@ -105,11 +105,11 @@ public class SPMediationCoordinator {
 	
 	
 	// Rewarded Videos
-	public void validateVideoProvider(Context context, String adapterName,
+	public void validateVideoNetwork(Context context, String adapterName,
 			HashMap<String, String> contextData,
 			SPMediationValidationEvent validationEvent) {
-		if (isProviderAvailable(adapterName, SPMediationAdFormat.RewardedVideo)) {
-			mAdapters.get(adapterName).validateVideoProvider(context, validationEvent, contextData);
+		if (isNetworkAvailable(adapterName, SPMediationAdFormat.RewardedVideo)) {
+			mAdapters.get(adapterName).validateVideoNetwork(context, validationEvent, contextData);
 		} else {
 			validationEvent.validationEventResult(adapterName, SPTPNVideoValidationResult.SPTPNValidationAdapterNotIntegrated, contextData);
 		}
@@ -118,7 +118,7 @@ public class SPMediationCoordinator {
 	public void startVideoEngagement(Activity parentActivity, String adapterName, 
 			HashMap<String, String> contextData,
 			SPMediationVideoEvent videoEvent) {
-		if (isProviderAvailable(adapterName, SPMediationAdFormat.RewardedVideo)) {
+		if (isNetworkAvailable(adapterName, SPMediationAdFormat.RewardedVideo)) {
 			mAdapters.get(adapterName).startVideoEngagement(parentActivity, videoEvent, contextData);
 		} else {
 			videoEvent.videoEventOccured(adapterName, SPTPNVideoEvent.SPTPNVideoEventAdapterNotIntegrated, contextData);
@@ -126,10 +126,10 @@ public class SPMediationCoordinator {
 	}
 	
 	// Interstitials
-	public boolean validateInterstitialProvider(Context context, SPInterstitialAd ad) {
+	public boolean validateInterstitialNetwork(Context context, SPInterstitialAd ad) {
 		String adapterName = ad.getProviderType();
-		if (isProviderAvailable(adapterName, SPMediationAdFormat.Interstitial)) {
-			return mAdapters.get(adapterName).validateInterstitialProvider(context, ad);
+		if (isNetworkAvailable(adapterName, SPMediationAdFormat.Interstitial)) {
+			return mAdapters.get(adapterName).validateInterstitialNetwork(context, ad);
 		} else {
 			return false;
 		}
@@ -137,7 +137,7 @@ public class SPMediationCoordinator {
 	
 	public boolean showInterstitial(Activity parentActivity, SPInterstitialAd ad) {
 		String adapterName = ad.getProviderType();
-		if (isProviderAvailable(adapterName, SPMediationAdFormat.Interstitial)) {
+		if (isNetworkAvailable(adapterName, SPMediationAdFormat.Interstitial)) {
 			return mAdapters.get(adapterName).showInterstitial(parentActivity, ad);
 		} else {
 			return false;

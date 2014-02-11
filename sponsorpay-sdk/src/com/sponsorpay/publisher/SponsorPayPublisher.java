@@ -509,7 +509,7 @@ public class SponsorPayPublisher {
 			interstitialClient.setRequestListener(listener);
 			interstitialClient.setCustomParameters(parameters);
 
-			interstitialClient.requestOffers(credentials, activity);
+			interstitialClient.requestAds(credentials, activity);
 
 		}
 		return canRequestAds;

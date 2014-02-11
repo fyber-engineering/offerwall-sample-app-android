@@ -20,8 +20,8 @@ public enum SPCurrencyServerRequestErrorType {
 	ERROR_INVALID_RESPONSE_SIGNATURE,
 
 	/**
-	 * The server returned an error. Use {@link #getErrorCode()}
-	 * and {@link #getErrorMessage()} to extract more details
+	 * The server returned an error. Use {@link SPCurrencyServerErrorResponse#getErrorCode()}
+	 * and {@link SPCurrencyServerErrorResponse#getErrorMessage()} to extract more details
 	 * about this error.
 	 */
 	SERVER_RETURNED_ERROR,

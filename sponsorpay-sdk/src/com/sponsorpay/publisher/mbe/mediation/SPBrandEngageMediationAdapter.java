@@ -75,6 +75,9 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 	 */
 	private Handler mHandler;
 
+	/**
+	 * The base {@link SPMediationAdapter} for this network
+	 */
 	protected V mAdapter;
 	
 	public SPBrandEngageMediationAdapter(V adapter) {
@@ -120,7 +123,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 
 	/**
 	 * Method called from the {@link SPMediationCoordinator} to check for videos
-	 * availability for this provider. The result of the method is returned asynchronously
+	 * availability for this network. The result of the method is returned asynchronously
 	 * to the provided {@link SPMediationValidationEvent}.
 	 * This method also stores the listener and the context data information to send it back
 	 * when needed and starts the validation timeout.
@@ -142,7 +145,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 
 	/**
 	 * Method called from the {@link SPMediationCoordinator} to start videos
-	 * engagement for this provider. The video status is returned asynchronously
+	 * engagement for this network. The video status is returned asynchronously
 	 * to the provided {@link SPMediationVideoEvent}.
 	 * This method also stores the listener and the context data information to send it back
 	 * when needed and starts the video validation timeout.
@@ -172,9 +175,9 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
     * Convenience method that sends a validation event if there is a listener 
     * to be notified, remove the timeout message from the queue and clears
     * the validation events related data, preventing more events from this
-    * provider to be sent.
+    * adapter to be sent.
     * 
-    * @param event
+    * @param result
     * 		The {@link SPTPNVideoEvent} to be sent.
     */
    protected void sendValidationEvent(SPTPNVideoValidationResult result) {
@@ -191,7 +194,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
    /**
     * Convenience method that sends a video event if there is a listener 
     * to be notified and remove the timeout message from the queue if it is a 
-    * {@link #SPTPNVideoEvent.SPTPNVideoEventStarted}
+    * {@link SPTPNVideoEvent#SPTPNVideoEventStarted}
     * 
     * @param event
     * 		The {@link SPTPNVideoEvent} to be sent.
@@ -210,7 +213,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
    /**
     * Convenience method that clears all video events related data.
     * This method is called automatically after an engagement close or video 
-    * error event, preventing more events from this provider to be sent.
+    * error event, preventing more events from this adapter to be sent.
     */
    protected void clearVideoEvent() {
 	   mVideoEvent = null;

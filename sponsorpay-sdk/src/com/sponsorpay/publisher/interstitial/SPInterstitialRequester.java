@@ -29,6 +29,14 @@ import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.UrlBuilder;
 
+/**
+ * <p> 
+ * Internal class that will perform a back-end query for interstitial ads. 
+ * </p>
+ * 
+ * This class is not meant to be used directly. 
+ * It is used by {@link SPInterstitialClient}.
+ */
 public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInterstitialAd[]> {
 
 	private static final String TAG = "SPInterstitialRequester";

@@ -125,8 +125,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 	 * </p>
 	 * <p>
 	 * Encodes the host information in the request URL, runs the request, waits for the response,
-	 * parses its status code and lets the UI thread receive the result and notify the registered
-	 * {@link APIResultListener}.
+	 * parses its status code and lets the UI thread receive the result.
 	 * <p/>
 	 * 
 	 * @param params
@@ -172,8 +171,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 	/**
 	 * This method is called by the Android {@link AsyncTask} implementation in the UI thread (or
 	 * the thread which invoked {@link #trigger()}) when
-	 * {@link #doInBackground(String...)} returns. It will invoke the registered
-	 * {@link APIResultListener}
+	 * {@link #doInBackground(String...)} returns.
 	 * 
 	 * @param callbackWasSuccessful
 	 *            true if the response has a successful status code (equal to

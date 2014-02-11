@@ -29,6 +29,7 @@ public abstract class SPMediationAdapter {
 
 	/**
 	 * Initializes the wrapped SDK, usually with the necessary credentials.
+	 * 
 	 * @param activity
 	 * 			The parent activity calling this method
 	 * @return 
@@ -37,7 +38,7 @@ public abstract class SPMediationAdapter {
 	public abstract boolean startAdapter(Activity activity);
 	
 	/**
-	 * @return the name of the wrapped video network.
+	 * @return the name of the wrapped network.
 	 */
 	public abstract String getName();
 	
@@ -66,7 +67,7 @@ public abstract class SPMediationAdapter {
 	 * ======================================================
 	 */
 
-	public void validateVideoProvider(Context context, SPMediationValidationEvent validationEvent,
+	public void validateVideoNetwork(Context context, SPMediationValidationEvent validationEvent,
 			HashMap<String, String> contextData) {
 		// validation is not required here, as SPMediationCoordinator is performing it before, but...
 		SPBrandEngageMediationAdapter<? extends SPMediationAdapter> videoMediationAdapter = getVideoMediationAdapter();
@@ -90,7 +91,7 @@ public abstract class SPMediationAdapter {
 	 * ======================================================
 	 */
 	
-	public boolean validateInterstitialProvider(Context context, SPInterstitialAd ad) {
+	public boolean validateInterstitialNetwork(Context context, SPInterstitialAd ad) {
 		// validation is not required here, as SPMediationCoordinator is performing it before, but...
 		SPInterstitialMediationAdapter<? extends SPMediationAdapter> interstitialMediationAdapter = getInterstitialMediationAdapter();
 		if (interstitialMediationAdapter != null) {
@@ -109,7 +110,11 @@ public abstract class SPMediationAdapter {
 	}
 	
 	
-	//Helper
+	/* ======================================================
+	 *                        Helpers
+	 * ======================================================
+	 */
+	
 	protected abstract Set<? extends Object> getListeners();
 	
 	@SuppressWarnings("rawtypes")

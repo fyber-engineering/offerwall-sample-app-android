@@ -21,6 +21,7 @@ public class InMobiIntersitialMediationAdapter extends
 		SPInterstitialMediationAdapter<InMobiMediationAdapter> implements IMInterstitialListener{
 
 	private IMInterstitial mInterstitial;
+	private boolean mShouldStartAd = false;
 
 	public InMobiIntersitialMediationAdapter(InMobiMediationAdapter adapter, final Activity activity) {
 		super(adapter);
@@ -38,7 +39,10 @@ public class InMobiIntersitialMediationAdapter extends
 	@Override
 	protected boolean show(Activity parentActivity) {
 		if (mInterstitial.getState() == IMInterstitial.State.READY) {
-			mInterstitial.show();
+			mInterstitial = new IMInterstitial(parentActivity, mAdapter.getPropertyId());
+			mInterstitial.setIMInterstitialListener(InMobiIntersitialMediationAdapter.this);
+			mShouldStartAd  = true;
+			checkForAds(null);
 			return true;
 		}
 		return false;
@@ -54,20 +58,27 @@ public class InMobiIntersitialMediationAdapter extends
 	@Override
 	public void onDismissInterstitialScreen(IMInterstitial ad) {
 		fireCloseEvent();
+		mShouldStartAd = false;
 	}
 
 	@Override
 	public void onInterstitialFailed(IMInterstitial ad, IMErrorCode errorCode) {
 		fireValidationErrorEvent("Interstitial failed to load with errorCode - " + errorCode.toString());
+		mShouldStartAd = false;
 	}
 
 	@Override
 	public void onInterstitialInteraction(IMInterstitial ad, Map<String, String> params) {
+		fireClickEvent();
 	}
 
 	@Override
 	public void onInterstitialLoaded(IMInterstitial ad) {
-		setAdAvailable();
+		if (mShouldStartAd) {
+			mInterstitial.show();
+		} else {
+			setAdAvailable();
+		}
 	}
 
 	@Override

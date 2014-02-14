@@ -66,7 +66,6 @@ public class InMobiMediationAdapter extends SPMediationAdapter {
 		return null;
 	}
 	
-	
 	public String getPropertyId() {
 		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, PROPERTY_ID, String.class);
 	}

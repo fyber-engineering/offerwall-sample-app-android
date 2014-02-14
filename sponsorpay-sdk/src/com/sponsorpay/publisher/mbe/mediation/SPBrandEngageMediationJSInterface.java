@@ -12,9 +12,11 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+
+import com.sponsorpay.utils.SponsorPayLogger;
+import com.sponsorpay.utils.StringUtils;
 
 public class SPBrandEngageMediationJSInterface {
 	
@@ -25,12 +27,12 @@ public class SPBrandEngageMediationJSInterface {
 	
 	public boolean playThroughTirdParty(WebView webView) {
 		String jsResult = getJSValue(webView, SP_GET_OFFERS);
-		if (jsResult != null) {
+		if (StringUtils.notNullNorEmpty(jsResult)) {
 			try {
 				JSONObject json = new JSONObject(jsResult);
 				return json.getBoolean(SP_TPN_JSON_KEY);
 			} catch (JSONException e) {
-				e.printStackTrace();
+				SponsorPayLogger.e(TAG, e.getLocalizedMessage(), e);
 			}
 		}
 		return false;
@@ -66,7 +68,7 @@ public class SPBrandEngageMediationJSInterface {
 				latch.await(1, TimeUnit.SECONDS);
 				return returnValue;
 			} catch (InterruptedException e) {
-				Log.e(TAG, "Interrupted", e);
+				SponsorPayLogger.e(TAG, "Interrupted", e);
 			}
 		}
 		return null;

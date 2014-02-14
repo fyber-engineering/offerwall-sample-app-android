@@ -156,6 +156,7 @@ public class HostInfo {
 
 
 	private void retrieveWifiStateValues(Context context) {
+		mWifiMacAddress = StringUtils.EMPTY_STRING;
 		if (!sSimulateNoAccessWifiStatePermission) {
 			try {
 				// MAC address of WiFi adapter
@@ -163,10 +164,7 @@ public class HostInfo {
 				WifiInfo wifiInf = wifiMan.getConnectionInfo();
 				mWifiMacAddress = wifiInf.getMacAddress();
 			} catch (RuntimeException re) {
-				mWifiMacAddress = StringUtils.EMPTY_STRING;
 			}
-		} else {
-			mWifiMacAddress = StringUtils.EMPTY_STRING;
 		}
 	}
 
@@ -174,37 +172,36 @@ public class HostInfo {
 	private void retrieveAndroidId(Context context) {
 		if (!sSimulateInvalidAndroidId) {
 			mAndroidId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
-
-			if (mAndroidId == null) {
-				mAndroidId = StringUtils.EMPTY_STRING;
-			}
-		} else {
+		}
+		if (mAndroidId == null) {
 			mAndroidId = StringUtils.EMPTY_STRING;
 		}
 	}
 
 
 	private void retrieveAccessNetworkValues(Context context) {
+		mConnectionType = StringUtils.EMPTY_STRING;
 		if (!sSimulateNoAccessNetworkState) {
-			ConnectivityManager mConnectivity = (ConnectivityManager) context
-					.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-			NetworkInfo info = mConnectivity.getActiveNetworkInfo();
-			if (info == null) {
-			    mConnectionType = StringUtils.EMPTY_STRING;
-			} else {
-				int netType = info.getType();
-				mConnectionType = netType == ConnectivityManager.TYPE_WIFI ? CONNECTION_TYPE_WIFI
-						: CONNECTION_TYPE_CELLULAR;
+			try {
+				ConnectivityManager mConnectivity = (ConnectivityManager) context
+						.getSystemService(Context.CONNECTIVITY_SERVICE);
+	
+				NetworkInfo info = mConnectivity.getActiveNetworkInfo();
+				if (info != null) {
+					int netType = info.getType();
+					mConnectionType = netType == ConnectivityManager.TYPE_WIFI ? CONNECTION_TYPE_WIFI
+							: CONNECTION_TYPE_CELLULAR;
+				}
+			} catch (RuntimeException e) {
 			}
-
-		} else {
-			mConnectionType = StringUtils.EMPTY_STRING;
 		}
 	}
 
 
 	private void retrieveTelephonyManagerValues(Context context) {
+		mUDID = StringUtils.EMPTY_STRING;
+		mCarrierName = StringUtils.EMPTY_STRING;
+		mCarrierCountry = StringUtils.EMPTY_STRING;
 		if (!sSimulateNoReadPhoneStatePermission) {
 			// Get access to the Telephony Services
 			TelephonyManager tManager = (TelephonyManager) context
@@ -214,14 +211,7 @@ public class HostInfo {
 				mCarrierName = tManager.getNetworkOperatorName();
 				mCarrierCountry = tManager.getNetworkCountryIso();
 			} catch (SecurityException e) {
-				mUDID = StringUtils.EMPTY_STRING;
-				mCarrierName = StringUtils.EMPTY_STRING;
-				mCarrierCountry = StringUtils.EMPTY_STRING;
 			}
-		} else {
-			mUDID = StringUtils.EMPTY_STRING;
-			mCarrierName = StringUtils.EMPTY_STRING;
-			mCarrierCountry = StringUtils.EMPTY_STRING;
 		}
 	}
 	

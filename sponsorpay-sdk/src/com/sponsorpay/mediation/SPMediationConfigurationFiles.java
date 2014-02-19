@@ -74,7 +74,11 @@ public class SPMediationConfigurationFiles {
 		String content = null;
 		InputStream is = getClass().getResourceAsStream(file);
 		if (is == null) {
-			is = URI.create(file).toURL().openStream();
+			try {
+				is = URI.create(file).toURL().openStream();
+			} catch (Exception e) {
+				// do nothing
+			}
 		}
 		if (is != null) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));

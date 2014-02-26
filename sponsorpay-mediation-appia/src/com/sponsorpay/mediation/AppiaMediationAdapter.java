@@ -13,7 +13,7 @@ import android.app.Activity;
 import com.appia.sdk.Appia;
 import com.sponsorpay.mediation.SPMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
-import com.sponsorpay.mediation.interstitial.AppiaIntersitialMediationAdapter;
+import com.sponsorpay.mediation.interstitial.AppiaInterstitialMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 
@@ -26,7 +26,7 @@ public class AppiaMediationAdapter extends SPMediationAdapter {
 	
 	private static final String SITE_ID = "siteId";
 	
-	private AppiaIntersitialMediationAdapter mInterstitialAdapter;
+	private AppiaInterstitialMediationAdapter mInterstitialAdapter;
 	
 	@Override
 	public boolean startAdapter(Activity activity) {
@@ -37,7 +37,7 @@ public class AppiaMediationAdapter extends SPMediationAdapter {
 			siteId = Integer.decode(SPMediationConfigurator.getConfiguration(ADAPTER_NAME, SITE_ID, String.class));
 			Appia appia = Appia.getAppia(activity);
 			appia.setSiteId(siteId);
-			mInterstitialAdapter = new AppiaIntersitialMediationAdapter(this, appia, activity);
+			mInterstitialAdapter = new AppiaInterstitialMediationAdapter(this, appia, activity);
 			return true;
 		} catch (Exception e) {
 			SponsorPayLogger.i(TAG, "Site ID value is not valid.");
@@ -61,7 +61,7 @@ public class AppiaMediationAdapter extends SPMediationAdapter {
 	}
 	
 	@Override
-	public AppiaIntersitialMediationAdapter getInterstitialMediationAdapter() {
+	public AppiaInterstitialMediationAdapter getInterstitialMediationAdapter() {
 		return mInterstitialAdapter;
 	}
 	

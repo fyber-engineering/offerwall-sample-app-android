@@ -34,7 +34,7 @@ import com.sponsorpay.mediation.AppiaMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 
-public class AppiaIntersitialMediationAdapter extends
+public class AppiaInterstitialMediationAdapter extends
 		SPInterstitialMediationAdapter<AppiaMediationAdapter>  {
 
 	private static final String PLACEMENT_ID = "placementId";
@@ -43,7 +43,7 @@ public class AppiaIntersitialMediationAdapter extends
 	private AdParameters mAdParameters;
 	private BannerAdResult mAdResult;
 
-	public AppiaIntersitialMediationAdapter(AppiaMediationAdapter adapter,
+	public AppiaInterstitialMediationAdapter(AppiaMediationAdapter adapter,
 			Appia appia, Activity activity) {
 		super(adapter);
 		this.mAppia = appia;

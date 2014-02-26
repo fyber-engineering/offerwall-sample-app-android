@@ -29,10 +29,6 @@ public class VideoMediationConfigurationActivity extends Activity {
 	      public void onClick(View v) {
 	    	  MockVideoSetting setting = (MockVideoSetting) v.getTag();
 	    	  Map<String, Object> config = SPMediationConfigurator.INSTANCE.getConfigurationForAdapter(MockMediatedAdapter.ADAPTER_NAME);
-//	    	  config.put(MockMediatedVideoAdapter.VIDEO_MOCK_BEHAVIOUR, setting.getBehaviour());
-//	    	  config.put(MockMediatedVideoAdapter.VIDEO_EVENT_RESULT, setting.getVideoEvent());
-//	    	  config.put(MockMediatedVideoAdapter.VIDEO_VALIDATION_RESULT, setting.getValidationResult());
-//	    	  ConfigHolder.INSTANCE.setCurrentVideoConfig(setting);
 	    	  config.put(MockMediatedVideoAdapter.VIDEO_MOCK_SETTING, setting);
 	    	  finish();
 	      }
@@ -49,7 +45,6 @@ public class VideoMediationConfigurationActivity extends Activity {
 		text.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		text.setTextSize(25f);
 		text.setTypeface(Typeface.DEFAULT_BOLD);
-//		text.setText(ConfigHolder.INSTANCE.getCurrentVideoConfig().toString());
 		text.setText(SPMediationConfigurator.getConfiguration(
 				MockMediatedAdapter.ADAPTER_NAME,
 				MockMediatedVideoAdapter.VIDEO_MOCK_SETTING, MockVideoSetting.class)

@@ -45,7 +45,6 @@ public class InterstitialMediationConfigurationActivity extends Activity {
 		text.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 		text.setTextSize(25f);
 		text.setTypeface(Typeface.DEFAULT_BOLD);
-//		text.setText(ConfigHolder.INSTANCE.getCurrentVideoConfig().toString());
 		text.setText(SPMediationConfigurator.getConfiguration(
 				MockMediatedAdapter.ADAPTER_NAME,
 				MockMediatedInterstitialAdapter.INTERSTITIAL_MOCK_SETTING, MockInterstitialSetting.class)

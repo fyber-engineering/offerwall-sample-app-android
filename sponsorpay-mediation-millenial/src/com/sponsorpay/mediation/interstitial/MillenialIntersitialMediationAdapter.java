@@ -87,6 +87,7 @@ public class MillenialIntersitialMediationAdapter extends
 
 	@Override
 	public void requestFailed(MMAd ad, MMException exception) {
+		// ad is already precached, mark it as available
 		if (exception.getCode() == 17) {
 			setAdAvailable();
 		} else {

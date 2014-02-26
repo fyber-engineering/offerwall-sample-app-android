@@ -87,13 +87,13 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 		
 					}
 				} catch (JSONException e) {
-					e.printStackTrace();
+					SponsorPayLogger.e(TAG, e.getMessage(), e);;
 				}
 			}
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			SponsorPayLogger.e(TAG, e.getMessage(), e);;
 		} catch (IOException e) {
-			e.printStackTrace();
+			SponsorPayLogger.e(TAG, e.getMessage(), e);;
 		}
 		
 		return interstitialAds.toArray(new SPInterstitialAd[interstitialAds.size()]);

@@ -83,8 +83,7 @@ public class SignatureTools {
 			byte[] digestBytes = sha1.digest(text.getBytes());
 			digestString = byteArray2Hex(digestBytes);
 		} catch (NoSuchAlgorithmException e) {
-			SponsorPayLogger.e("UrlBuilder", "SHA1 algorithm not available.");
-			e.printStackTrace();
+			SponsorPayLogger.e("UrlBuilder", "SHA1 algorithm not available.", e);
 		}
 		
 		return digestString;

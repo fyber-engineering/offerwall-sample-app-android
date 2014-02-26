@@ -341,7 +341,7 @@ public class HostInfo {
 		try {
 			mIdLatch.await(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			//do nothing
 		}
 		return mAdvertisingId;
 	}

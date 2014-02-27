@@ -586,13 +586,17 @@ public class SPBrandEngageClient {
 			mHandler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					try {
-						SponsorPayPublisher.requestNewCoins(SponsorPay
-								.getCurrentCredentials().getCredentialsToken(),
-								mContext, mVCSListener, null, null, mCurrency);
-					} catch (RuntimeException e) {
-						SponsorPayLogger.e(TAG, "Error in VCS request", e);
-					}
+					if( mVCSListener != null ) {
+						try {
+							SponsorPayPublisher.requestNewCoins(SponsorPay
+									.getCurrentCredentials().getCredentialsToken(),
+									mContext, mVCSListener, null, null, mCurrency);
+						} catch (RuntimeException e) {
+							SponsorPayLogger.e(TAG, "Error in VCS request", e);
+						}
+					} else {
+						SponsorPayLogger.d(TAG, "There's no VCS listener");
+					};
 				}
 			}, VCS_TIMEOUT);
 		}

@@ -190,7 +190,7 @@ public class SPBrandEngageClient {
 				switch (msg.what) {
 				case VALIDATION_RESULT:
 					SponsorPayLogger.d(TAG, "Timeout reached, canceling request...");
-					clearWebViewPage();
+					processQueryOffersResponse(0);
 					break;
 				case VIDEO_EVENT:
 					//something went wrong, show error dialog message
@@ -367,7 +367,7 @@ public class SPBrandEngageClient {
 		if (areOffersAvailable) {
 			setClientStatus(SPBrandEngageOffersStatus.READY_TO_SHOW_OFFERS);
 		} else {
-			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
+			clearWebViewPage();
 		}
 		if (mStatusListener != null) {
 			mStatusListener.didReceiveOffers(areOffersAvailable);

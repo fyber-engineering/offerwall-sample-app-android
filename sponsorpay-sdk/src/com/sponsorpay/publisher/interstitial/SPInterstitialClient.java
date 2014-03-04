@@ -91,6 +91,7 @@ public class SPInterstitialClient {
 	}
 
 	private void startQueryingForAds(SPCredentials credentials, Activity activity) {
+		mAd = null;
 		mCredentials = credentials;
 		mActivity = activity;
 		mRequestId = UUID.randomUUID().toString();
@@ -134,9 +135,7 @@ public class SPInterstitialClient {
 		mState = newState;
 		switch (mState) {
 		case READY_TO_CHECK_OFFERS:
-			mAd = null;
 			mActivity = null;
-			mRequestId = null;
 			break;
 		case READY_TO_SHOW_OFFERS:
 			break;
@@ -255,6 +254,7 @@ public class SPInterstitialClient {
 		case ValidationError:
 		case ShowError:
 			setState(SPInterstitialClientState.READY_TO_CHECK_OFFERS);
+			SponsorPayLogger.d(TAG, "An error occurred. Message: " + message);
 			if (mAdStateListener != null) {
 				mAdStateListener.onSPInterstitialAdError(message);
 			}

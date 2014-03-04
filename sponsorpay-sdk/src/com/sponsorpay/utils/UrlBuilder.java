@@ -290,8 +290,8 @@ public class UrlBuilder {
 			keyValueParams.put(ADVERTISING_ID_KEY, advertisingId);
 			keyValueParams.put(ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY, hostInfo.isAdvertisingIdLimitedTrackingEnabled().toString());
 		} else {
-			keyValueParams.put(ADVERTISING_ID_KEY, null);
-			keyValueParams.put(ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY, null);
+			keyValueParams.put(ADVERTISING_ID_KEY, StringUtils.EMPTY_STRING);
+			keyValueParams.put(ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY, StringUtils.EMPTY_STRING);
 		}
 		
 		Uri uri = Uri.parse(mResourceUrl);

@@ -74,6 +74,9 @@ public class AppLiftInterstitialMediationAdapter extends
 		if (mIsShown) {
 			fireShowErrorEvent(exception.getMessage());
 		} else {
+//			if (exception.getLocalizedMessage().contains("timed out")) {
+//				return;
+//			}
 			fireValidationErrorEvent(exception.getMessage());
 		}
 	}

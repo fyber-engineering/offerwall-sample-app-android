@@ -24,6 +24,7 @@ public class MillenialMediationAdapter extends SPMediationAdapter {
 	private static final String ADAPTER_NAME = "Millenial";
 	
 	private static String APP_ID = "app.id";
+	private static String LOG_LEVEL = "log.level";
 	
 	private MillenialIntersitialMediationAdapter mInterstitialAdapter;
 	
@@ -34,6 +35,10 @@ public class MillenialMediationAdapter extends SPMediationAdapter {
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
+					Integer logLevel = getLogLevel();
+					if (logLevel != null) {
+						MMSDK.setLogLevel(logLevel);
+					}
 					MMSDK.initialize(activity);
 					mInterstitialAdapter = new MillenialIntersitialMediationAdapter(
 							MillenialMediationAdapter.this, activity);
@@ -73,6 +78,17 @@ public class MillenialMediationAdapter extends SPMediationAdapter {
 
 	public String getAppid() {
 		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID , String.class);
+	}
+	
+	private Integer getLogLevel() {
+		String logLevel = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, LOG_LEVEL, String.class);
+		if (StringUtils.notNullNorEmpty(logLevel)) {
+			try {
+				return Integer.decode(logLevel);
+			} catch (Exception e) {
+			}
+		}
+		return null;
 	}
 	
 

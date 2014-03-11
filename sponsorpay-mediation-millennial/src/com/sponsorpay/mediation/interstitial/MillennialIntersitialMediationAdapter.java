@@ -23,22 +23,22 @@ import com.millennialmedia.android.MMException;
 import com.millennialmedia.android.MMInterstitial;
 import com.millennialmedia.android.MMRequest;
 import com.millennialmedia.android.RequestListener;
-import com.sponsorpay.mediation.MillenialMediationAdapter;
+import com.sponsorpay.mediation.MillennialMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 
-public class MillenialIntersitialMediationAdapter extends
-		SPInterstitialMediationAdapter<MillenialMediationAdapter> implements RequestListener  {
+public class MillennialIntersitialMediationAdapter extends
+		SPInterstitialMediationAdapter<MillennialMediationAdapter> implements RequestListener  {
 
 	public static final String RUNTIME_METADATA_KEY = "runtimeMetadata";
 
-	private static final String TAG = "MillenialIntersitialMediationAdapter";
+	private static final String TAG = "MillennialIntersitialMediationAdapter";
 	private static final String METADATA_KEY = "metadata";
 	
 	private MMInterstitial mInterstitial;
 
-	public MillenialIntersitialMediationAdapter(MillenialMediationAdapter adapter, Activity activity) {
+	public MillennialIntersitialMediationAdapter(MillennialMediationAdapter adapter, Activity activity) {
 		super(adapter);
 		this.mActivityRef = new WeakReference<Activity>(activity);
 		mInterstitial = new MMInterstitial(activity);

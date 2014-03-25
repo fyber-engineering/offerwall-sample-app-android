@@ -11,22 +11,22 @@ import java.util.Set;
 import android.app.Activity;
 
 import com.millennialmedia.android.MMSDK;
-import com.sponsorpay.mediation.interstitial.MillenialIntersitialMediationAdapter;
+import com.sponsorpay.mediation.interstitial.MillennialIntersitialMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
 
-public class MillenialMediationAdapter extends SPMediationAdapter {
+public class MillennialMediationAdapter extends SPMediationAdapter {
 
-	private static final String TAG = "MillenialAdapter";
+	private static final String TAG = "MillennialAdapter";
 	private static final String ADAPTER_VERSION = "1.0.0";
-	private static final String ADAPTER_NAME = "Millenial";
+	private static final String ADAPTER_NAME = "Millennial";
 	
 	private static String APP_ID = "app.id";
 	private static String LOG_LEVEL = "log.level";
 	
-	private MillenialIntersitialMediationAdapter mInterstitialAdapter;
+	private MillennialIntersitialMediationAdapter mInterstitialAdapter;
 	
 	@Override
 	public boolean startAdapter(final Activity activity) {
@@ -40,8 +40,8 @@ public class MillenialMediationAdapter extends SPMediationAdapter {
 						MMSDK.setLogLevel(logLevel);
 					}
 					MMSDK.initialize(activity);
-					mInterstitialAdapter = new MillenialIntersitialMediationAdapter(
-							MillenialMediationAdapter.this, activity);
+					mInterstitialAdapter = new MillennialIntersitialMediationAdapter(
+							MillennialMediationAdapter.this, activity);
 				}
 			});
 			return true;
@@ -67,7 +67,7 @@ public class MillenialMediationAdapter extends SPMediationAdapter {
 	}
 	
 	@Override
-	public MillenialIntersitialMediationAdapter getInterstitialMediationAdapter() {
+	public MillennialIntersitialMediationAdapter getInterstitialMediationAdapter() {
 		return mInterstitialAdapter;
 	}
 	

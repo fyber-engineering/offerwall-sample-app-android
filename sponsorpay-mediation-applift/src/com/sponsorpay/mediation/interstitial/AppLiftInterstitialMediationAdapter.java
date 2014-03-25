@@ -6,6 +6,8 @@
 
 package com.sponsorpay.mediation.interstitial;
 
+import java.lang.ref.WeakReference;
+
 import android.app.Activity;
 import android.content.Context;
 
@@ -15,6 +17,7 @@ import com.applift.playads.api.PlayAdsPromo;
 import com.applift.playads.api.PlayAdsType;
 import com.sponsorpay.mediation.AppLiftMediationAdapter;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
+import com.sponsorpay.utils.SponsorPayLogger;
 
 public class AppLiftInterstitialMediationAdapter extends
 		SPInterstitialMediationAdapter<AppLiftMediationAdapter> implements PlayAdsListener{
@@ -25,13 +28,23 @@ public class AppLiftInterstitialMediationAdapter extends
 		super(adapter);
 	}
 	
-	public void start() {
+	public void start(Activity activity) {
+		mActivityRef = new WeakReference<Activity>(activity);
 		checkForAds(null);
 	}
 	
 	@Override
 	protected void checkForAds(Context context) {
-		PlayAds.cache();
+		if (getActivity() != null) {
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					PlayAds.cache();	
+				}
+			});
+		} else {
+			SponsorPayLogger.e(getName(), "Unable to check for ads, needs to be run in the main thread");
+		}
 	}
 	
 	@Override

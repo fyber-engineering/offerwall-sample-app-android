@@ -5,8 +5,6 @@
  */
 package com.sponsorpay.mediation.interstitial;
 
-import java.lang.ref.WeakReference;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +14,9 @@ import android.view.Display;
 import android.view.WindowManager;
 
 import com.sponsorpay.mediation.YuMeMediationAdapter;
+import com.sponsorpay.mediation.helper.YuMeConfigurationsHelper;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
+import com.sponsorpay.utils.SponsorPayLogger;
 import com.yume.android.sdk.YuMeAdBlockType;
 import com.yume.android.sdk.YuMeAdEvent;
 import com.yume.android.sdk.YuMeAppInterface;
@@ -26,139 +26,88 @@ import com.yume.android.sdk.YuMeParentViewInfo;
 public class YuMeInterstitialMediationAdapter extends
 		SPInterstitialMediationAdapter<YuMeMediationAdapter> implements YuMeAppInterface {
 
-	public static YuMeInterstitialMediationAdapter INTERSTITIAL;
-	public static YuMeMediationAdapter ADAPTER;
-	private boolean mAdPlaying = false;
-	private Activity yumeActivity;
+	private static final int YUME_ACTIVITY_REQUEST_CODE = 3241;
+
+	private static final String TAG = "YuMeInterstitialMediationAdapter";
 	
-	public YuMeInterstitialMediationAdapter(YuMeMediationAdapter adapter, Activity activity) {
+	private boolean mAdPlaying = false;
+	private Activity mYuMeActivity;
+	
+	public YuMeInterstitialMediationAdapter(YuMeMediationAdapter adapter) {
 		super(adapter);
-		mActivityRef = new WeakReference<Activity>(activity);
-		INTERSTITIAL = this;
-		ADAPTER = mAdapter;
-		
+		YuMeConfigurationsHelper.setYuMeInterstitialAdapter(this);
 	}
 
 	@Override
 	protected boolean show(Activity parentActivity) {
-//		try {
-//			FrameLayout frameLayout = new FrameLayout(parentActivity);
-////			frameLayout.setOnKeyListener(new OnKeyListener() {
-////				@Override
-////				public boolean onKey(View v, int keyCode, KeyEvent event) {
-////					Log.e("EVENT", "=========\n=========\n=========\n=========\n=========\n=========\n=========\n=========\n=========\n");
-////					if (keyCode == KeyEvent.KEYCODE_BACK) { //Back key pressed
-////				       	try {
-////							mAdapter.getYuMeSDKInterface().YuMeSDK_BackKeyPressed();
-////						} catch (YuMeException e) {
-////							e.printStackTrace();
-////						}
-////				        return true;
-////					} else if (keyCode == KeyEvent.KEYCODE_HOME) {
-////						try {
-////							mAdapter.getYuMeSDKInterface().YuMeSDK_StopAd();
-////						} catch (YuMeException e) {
-////							e.printStackTrace();
-////						}
-////						return true;
-////					}
-////					return false;
-////				}
-////			});
-//			frameLayout.setBackgroundColor(Color.BLACK);
-//			parentActivity.addContentView(frameLayout, new LayoutParams(
-//					LayoutParams.FILL_PARENT,
-//					LayoutParams.FILL_PARENT));
-//			mAdapter.getYuMeSDKInterface().YuMeSDK_SetParentView(frameLayout);
-//			mAdapter.getYuMeSDKInterface().YuMeSDK_ShowAd(YuMeAdBlockType.PREROLL);
-//			return true;
-//		} catch (YuMeException e) {
-//			e.printStackTrace();
-//		}
-//		return false;
-//		YuMeDialog dialog = new YuMeDialog(parentActivity);
-//		dialog.setOnDismissListener(new OnDismissListener() {
-//			@Override
-//			public void onDismiss(DialogInterface dialog) {
-//				fireCloseEvent();
-//			}
-//		});
-//		return dialog.showAd();
-		
-		
-		
-		//SPMediationConfigurator.INSTANCE.
 		mAdPlaying = false;
 		Intent intent = new Intent(parentActivity, YuMeActivity.class);
-		parentActivity.startActivityForResult(intent, 325641);
+		parentActivity.startActivityForResult(intent, YUME_ACTIVITY_REQUEST_CODE);
 		return true;
 	}
 
 	@Override
 	protected void checkForAds(Context context) {
+		//don't do anything here
+	}
+	
+	private Activity getYuMeActivity() {
+		return mYuMeActivity;
+	}
+	
+	public void setYuMeActivity( Activity activity) {
+		mYuMeActivity = activity;
 	}
 
 	//YuMeAppInterface implementation
+	
 	@Override
 	public void YuMeApp_EventListener(YuMeAdBlockType adBlockType, YuMeAdEvent adEvent,
 			String eventInfo) {
 		switch (adEvent) {
 		case AD_READY:
-			if (adBlockType == YuMeAdBlockType.PREROLL) {
-				Log.d("Event", "AD READY (Preroll)");
-			}
+			//do nothing
 			break;
 		case AD_AND_ASSETS_READY:
-			if (adBlockType == YuMeAdBlockType.PREROLL) {
-				Log.d("Event", "AD AND ASSETS_READY (Preroll)");
-			}
+			// set ad availability
 			setAdAvailable();
 			break;
 		case AD_NOT_READY:
-			if (adBlockType == YuMeAdBlockType.PREROLL) {
-				Log.d("Event", "AD NOT READY (Preroll).");
-			}
+			//do nothing
 			break;
 		case AD_PRESENT:
-			Log.d("Event", "AD PRESENT");
+			//do nothing
 			break;
 		case AD_PLAYING:
-			Log.d("Event", "AD PLAYING");
+			//set the ad as playing
 			mAdPlaying = true;
 			break;
 		case AD_ABSENT:
-			Log.d("Event", "AD ABSENT");
+			//do nothing
 			break;
 		case AD_COMPLETED:
 			Log.d("Event", "AD COMPLETED");
 			mAdPlaying = false;
-			// Application can play ad content
-//			notifyClose();
-			close();
-//			setAdAvailable();
+			//close the activity
+			closeYuMeActivity();
 			break;
 		case AD_ERROR:
-			Log.d("Event", "AD ERROR");
-			Log.e("Error", "Error Info: " + eventInfo);
+			// fire show error event
 			fireShowErrorEvent(eventInfo);
 			try {
-				mAdapter.getYuMeSDKInterface().YuMeSDK_InitAd(YuMeAdBlockType.PREROLL);
+				// re init the interface for more ads
+				YuMeConfigurationsHelper.getYuMeSDKInterface().YuMeSDK_InitAd(YuMeAdBlockType.PREROLL);
 			} catch (YuMeException e) {
-				e.printStackTrace();
+				SponsorPayLogger.e(TAG, e.getMessage(), e);
 			}
 			break;
 		case AD_EXPIRED:
-			Log.d("Event", "AD EXPIRED");
-			// Application can call YuMeSDK_InitAd() to prefetch another ad. If
-			// YuMeSDK_InitAd() is not called, the SDK will do an auto-prefetch
-			// after the first YuMeSDK_ShowAd() call following AD_EXPIRED. No
-			// ad will be served for this particular YuMeSDK_ShowAd() call.
-			
-			fireShowErrorEvent(eventInfo);
+			// ads expired even though they are not shown
 			try {
-				mAdapter.getYuMeSDKInterface().YuMeSDK_InitAd(YuMeAdBlockType.PREROLL);
+				// re init the interface for more ads
+				YuMeConfigurationsHelper.getYuMeSDKInterface().YuMeSDK_InitAd(YuMeAdBlockType.PREROLL);
 			} catch (YuMeException e) {
-				e.printStackTrace();
+				SponsorPayLogger.e(TAG, e.getMessage(), e);
 			}
 			break;
 		default:
@@ -168,15 +117,7 @@ public class YuMeInterstitialMediationAdapter extends
 
 	@Override
 	public Context YuMeApp_GetActivityContext() {
-		return getYumEActivity();
-	}
-
-	private Activity getYumEActivity() {
-		return yumeActivity;
-	}
-	
-	public void setYuMeActivity( Activity activity) {
-		yumeActivity = activity;
+		return getYuMeActivity();
 	}
 
 	@Override
@@ -190,9 +131,7 @@ public class YuMeInterstitialMediationAdapter extends
 	@Override
 	public YuMeParentViewInfo YuMeApp_GetParentViewInfo() {
 		Context appContext =  YuMeApp_GetApplicationContext();
-		Log.e("EVENT", "=========\n=========\n=========\n=========\n=========\n=========\n=========\n=========\n=========\n");
 		if (appContext != null) {
-			Log.e("EVENT", "=========\n=========\n=========\n=========\n=========\n=========\n=========\n=========\n=========\n");
 			Display display = ((WindowManager) appContext
 					.getSystemService(Context.WINDOW_SERVICE))
 					.getDefaultDisplay();
@@ -203,209 +142,49 @@ public class YuMeInterstitialMediationAdapter extends
 			parentViewInfo.height = displayMetrics.heightPixels;
 			parentViewInfo.left = 0;
 			parentViewInfo.top = 0;
-			 parentViewInfo.statusBarAndTitleBarHeight = 0;
-			// STATUS_BAR_AND_TITLE_BAR_HEIGHT;
+			parentViewInfo.statusBarAndTitleBarHeight = 0;
 			return parentViewInfo;
 		}
 		return null;
 	}
 
-	public void close() {
-		getActivity().finishActivity(325641);
+	public void closeYuMeActivity() {
+		getActivity().finishActivity(YUME_ACTIVITY_REQUEST_CODE);
 	}
 	
 	public void notifyClose() {
-		if (mAdPlaying) {
-			try {
-				mAdapter.getYuMeSDKInterface().YuMeSDK_StopAd();
-				mAdapter.getYuMeSDKInterface().YuMeSDK_InitAd(YuMeAdBlockType.PREROLL);
-			} catch (YuMeException e) {
-				e.printStackTrace();
-			}
-		}
+		// fire close event 
 		fireCloseEvent();
-		setAdAvailable();
+		if (mAdPlaying) {
+			// if the ad is playing, stop it and re init the interface
+			try {
+				YuMeConfigurationsHelper.getYuMeSDKInterface().YuMeSDK_StopAd();
+				YuMeConfigurationsHelper.getYuMeSDKInterface().YuMeSDK_InitAd(YuMeAdBlockType.PREROLL);
+				// sets ad availability
+				setAdAvailable();
+			} catch (YuMeException e) {
+				SponsorPayLogger.e(TAG, e.getMessage(), e);
+			}
+		} else {
+			// sets ad availability
+			setAdAvailable();
+		}
 	}
 
-	public void impression() {
+	public void fireImpression() {
 		fireImpressionEvent();
 	}
 
-	public void backButton() {
+	public void backButtonPressed() {
 		try {
-			mAdapter.getYuMeSDKInterface().YuMeSDK_BackKeyPressed();
+			// notify interface about the back button press
+			YuMeConfigurationsHelper.getYuMeSDKInterface().YuMeSDK_BackKeyPressed();
 			mAdPlaying = false;
-			mAdapter.getYuMeSDKInterface().YuMeSDK_InitAd(YuMeAdBlockType.PREROLL);
-			//	close();
+			// re init for more ads
+			YuMeConfigurationsHelper.getYuMeSDKInterface().YuMeSDK_InitAd(YuMeAdBlockType.PREROLL);
 		} catch (YuMeException e) {
-			e.printStackTrace();
+			SponsorPayLogger.e(TAG, e.getMessage(), e);
 		}
 	}
-	
-//	@Override
-//	public void backButtonPressed() {
-//		backButton();
-//	}
-//	
-//	@Override
-//	public void activityOnPause() {
-////		super.activityOnPause();
-//		notifyClose();
-//	}
-			
-//	public class YuMeActivity extends Activity {
-//		
-//		@Override
-//		protected void onCreate(Bundle savedInstanceState) {
-//			super.onCreate(savedInstanceState);
-//			requestWindowFeature(Window.FEATURE_NO_TITLE);
-//			FrameLayout frameLayout = new FrameLayout(this);
-//			frameLayout.setBackgroundColor(Color.BLACK);
-//			setContentView(frameLayout, new LayoutParams(
-//					LayoutParams.FILL_PARENT,
-//					LayoutParams.FILL_PARENT));
-//			try {
-//				mAdapter.getYuMeSDKInterface().YuMeSDK_SetParentView(frameLayout);
-//				mAdapter.getYuMeSDKInterface().YuMeSDK_ShowAd(YuMeAdBlockType.PREROLL);
-//			} catch (YuMeException e) {
-//				e.printStackTrace();
-//				finish();
-//			}
-//		}
-//		
-//		@Override
-//		protected void onPostCreate(Bundle savedInstanceState) {
-//			super.onPostCreate(savedInstanceState);
-//			fireImpressionEvent();
-//		}
-//		
-//		@Override
-//		public void onBackPressed() {
-//			try {
-//				mAdapter.getYuMeSDKInterface().YuMeSDK_BackKeyPressed();
-//			} catch (YuMeException e) {
-//				e.printStackTrace();
-//			}
-//			super.onBackPressed();
-//		}
-//
-//		@Override
-//		protected void onPause() {
-//			try {
-//				mAdapter.getYuMeSDKInterface().YuMeSDK_StopAd();
-//			} catch (YuMeException e) {
-//				e.printStackTrace();
-//			}
-//			fireCloseEvent();
-//			super.onPause();
-//		}
-//	}
-	
-	/*private class YuMeDialog extends Dialog {
-
-		public YuMeDialog(Context context) {
-			super(context);
-		}
-		
-		@Override
-		public void onBackPressed() {
-	       	try {
-				mAdapter.getYuMeSDKInterface().YuMeSDK_BackKeyPressed();
-			} catch (YuMeException e) {
-				e.printStackTrace();
-			}
-//	        return true;
-//		} else if (keyCode == KeyEvent.KEYCODE_HOME) {
-//			try {
-//				mAdapter.getYuMeSDKInterface().YuMeSDK_StopAd();
-//			} catch (YuMeException e) {
-//				e.printStackTrace();
-//			}	
-			super.onBackPressed();
-		}
-		public boolean showAd() {
-			FrameLayout layout = new FrameLayout(getContext());
-			layout.setBackgroundColor(getContext().getResources().getColor(android.R.color.black));
-			getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-			layout.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-			requestWindowFeature(Window.FEATURE_NO_TITLE);
-			setContentView(layout);
-			
-			try {
-				mAdapter.getYuMeSDKInterface().YuMeSDK_SetParentView(layout);
-				mAdapter.getYuMeSDKInterface().YuMeSDK_ShowAd(YuMeAdBlockType.PREROLL);
-				fireImpressionEvent();
-				show();
-				return true;
-			} catch (YuMeException e) {
-				e.printStackTrace();
-				return false;
-			}
-			
-//			if (!adResult.hasError()) {
-//				DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
-//				
-//				int dpValue = 15; // margin in dips
-//				float d = displayMetrics.density;
-//				int margin = (int)(dpValue * d); 
-//
-//				View adView = adResult.getView();
-//				adView.setId(3);
-//
-//				LayoutParams adViewLayoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-//				adViewLayoutParams.setMargins(margin, margin, margin, margin);
-//
-//				int dpi = displayMetrics.densityDpi;
-//				
-//				String path = "";
-//				if (dpi > 160 && dpi < 240 ) {
-//					path = "-hdpi";
-//				} else if (dpi < 320) {
-//					path = "-xhdpi";
-//				} else {
-//					path = "-xxhdpi";
-//				}
-//				
-//				ImageView imgView = new ImageView(getContext());
-//				imgView.setId(1);
-//				InputStream is = getClass().getResourceAsStream("/com/appia/res/drawable" + path + "/close_active.png");
-//				imgView.setImageDrawable(Drawable.createFromStream(is, ""));
-//				LayoutParams imgViewLayoutParams = new LayoutParams((int)(2 * dpValue * d),(int)(2 * dpValue * d));
-//				imgViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP | RelativeLayout.ALIGN_PARENT_RIGHT);
-//				
-//				imgView.setOnClickListener(new View.OnClickListener() {
-//					@Override
-//					public void onClick(View v) {
-//						dismiss();
-//					}
-//				});
-//				
-//				FrameLayout touchFrame = new FrameLayout(getContext());
-//				LayoutParams frameLayoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-//				frameLayoutParams.addRule(RelativeLayout.BELOW, 1);
-//				frameLayoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, adView.getId());
-//				frameLayoutParams.addRule(RelativeLayout.ALIGN_RIGHT, adView.getId());
-//				frameLayoutParams.addRule(RelativeLayout.ALIGN_LEFT, adView.getId());
-//				touchFrame.setOnTouchListener(new OnTouchListener() {
-//					@Override
-//					public boolean onTouch(View v, MotionEvent event) {
-//						v.postDelayed(new Runnable() {
-//							@Override
-//							public void run() {
-//								fireClickEvent();
-//								dismiss();
-//							}
-//						}, 200);
-//						return false;
-//					}
-//				});
-//				
-//				layout.addView(adView, adViewLayoutParams);
-//				layout.addView(imgView, imgViewLayoutParams);
-//				layout.addView(touchFrame, frameLayoutParams);
-//			}
-
-		}
-    }*/
 	
 }

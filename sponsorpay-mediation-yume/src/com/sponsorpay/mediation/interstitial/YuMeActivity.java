@@ -5,6 +5,7 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -104,6 +105,22 @@ public class YuMeActivity extends Activity {
 	public void finish() {
 		YuMeConfigurationsHelper.getYuMeInterstitialAdapter().notifyClose();
 		super.finish();
+	}
+	
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		switch (newConfig.orientation) {
+		case Configuration.ORIENTATION_LANDSCAPE:
+		case Configuration.ORIENTATION_PORTRAIT:
+		case Configuration.ORIENTATION_SQUARE:
+		case Configuration.ORIENTATION_UNDEFINED:
+			resizeAdLayout();
+			break;
+		default:
+			break;
+		}
 	}
 
 	/**
@@ -266,7 +283,6 @@ public class YuMeActivity extends Activity {
 			/* resize the ad layout */
 			resizeAdLayout();
 			try {
-				YuMeConfigurationsHelper.getYuMeSDKInterface().YuMeSDK_SetControlBarToggle(true);
 				YuMeConfigurationsHelper.getYuMeSDKInterface().YuMeSDK_SetParentView(fLayout);
 				YuMeConfigurationsHelper.getYuMeSDKInterface().YuMeSDK_ShowAd(YuMeAdBlockType.PREROLL);
 			} catch (YuMeException e) {

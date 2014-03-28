@@ -38,34 +38,37 @@ public class YuMeMediationAdapter extends SPMediationAdapter {
 	public boolean startAdapter(Activity activity) {
 		if (Build.VERSION.SDK_INT >= 8) {
 			SponsorPayLogger.d(TAG, "Starting YuMe adapter");
-			try {
-				yumeSDKInterface = new YuMeSDKInterfaceImpl();
-				SponsorPayLogger.d(TAG, "YuMe SDK version " + yumeSDKInterface.YuMeSDK_GetVersion());
-				final YuMeAdParams adParams = new YuMeAdParams();
-				YuMeConfigurationsHelper.getAdParamsSettings(adParams);
-				interstitialAdapter = new YuMeInterstitialMediationAdapter(this);
-				
-				activity.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						YuMeAdBlockType adBlockType = YuMeAdBlockType.PREROLL;
-						try {
-							
-							yumeSDKInterface.YuMeSDK_Init(adParams, interstitialAdapter);
-							yumeSDKInterface.YuMeSDK_InitAd(adBlockType);
-							
-							YuMeConfigurationsHelper.setYuMeSDKInterface(yumeSDKInterface);
-						} catch (YuMeException e) {
-							SponsorPayLogger.e(TAG,e.getLocalizedMessage(), e);
+			final YuMeAdParams adParams = YuMeConfigurationsHelper.getAdParams();
+			if (adParams != null) {
+				try {
+					yumeSDKInterface = new YuMeSDKInterfaceImpl();
+					SponsorPayLogger.d(TAG, "YuMe SDK version " + yumeSDKInterface.YuMeSDK_GetVersion());
+					interstitialAdapter = new YuMeInterstitialMediationAdapter(this, activity);
+					
+					activity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							YuMeAdBlockType adBlockType = YuMeAdBlockType.PREROLL;
+							try {
+								
+								yumeSDKInterface.YuMeSDK_Init(adParams, interstitialAdapter);
+								yumeSDKInterface.YuMeSDK_InitAd(adBlockType);
+								
+								YuMeConfigurationsHelper.setYuMeSDKInterface(yumeSDKInterface);
+							} catch (YuMeException e) {
+								SponsorPayLogger.e(TAG,e.getLocalizedMessage(), e);
+							}
 						}
-					}
-				});
-				return true;
-			} catch (Exception e) {
-				SponsorPayLogger.e(TAG,e.getLocalizedMessage(), e);
+					});
+					return true;
+				} catch (YuMeException e) {
+					SponsorPayLogger.e(TAG,e.getLocalizedMessage(), e);
+				}
+			} else {
+				SponsorPayLogger.e(TAG, "YuMeAdParams is missing a required field.");
 			}
 		} else {
-			SponsorPayLogger.d(TAG, "The OS version is not supported by the SDK.");
+			SponsorPayLogger.e(TAG, "The OS version is not supported by the SDK.");
 		}
 		return false;
 	}

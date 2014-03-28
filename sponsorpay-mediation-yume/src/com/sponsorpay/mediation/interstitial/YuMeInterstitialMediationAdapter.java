@@ -5,6 +5,8 @@
  */
 package com.sponsorpay.mediation.interstitial;
 
+import java.lang.ref.WeakReference;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -33,9 +35,10 @@ public class YuMeInterstitialMediationAdapter extends
 	private boolean mAdPlaying = false;
 	private Activity mYuMeActivity;
 	
-	public YuMeInterstitialMediationAdapter(YuMeMediationAdapter adapter) {
+	public YuMeInterstitialMediationAdapter(YuMeMediationAdapter adapter, Activity activity) {
 		super(adapter);
 		YuMeConfigurationsHelper.setYuMeInterstitialAdapter(this);
+		mActivityRef = new WeakReference<Activity>(activity);
 	}
 
 	@Override

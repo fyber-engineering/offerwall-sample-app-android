@@ -1,5 +1,6 @@
 package com.sponsorpay.mediation.helper;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -103,13 +104,13 @@ public class YuMeConfigurationsHelper {
 	//
 	
 	private static void getAdParamsNumericValues(YuMeAdParams adParams, Map<String, String> settings) {
-		Integer intValue = Integer.getInteger(settings.get("adTimeout"));
-		if (intValue != null) {
-			adParams.adTimeout = intValue;
+		try {
+			adParams.adTimeout = Integer.parseInt(settings.get("adTimeout"));
+		} catch (Exception e) {
 		}
-		intValue = Integer.getInteger(settings.get("videoTimeout"));
-		if (intValue != null) {
-			adParams.videoTimeout = intValue;
+		try {
+			adParams.videoTimeout = Integer.parseInt(settings.get("videoTimeout"));
+		} catch (Exception e) {
 		}
 		try {
 			adParams.storageSize = Float.parseFloat(settings.get("storageSize"));
@@ -133,16 +134,15 @@ public class YuMeConfigurationsHelper {
 				"bEnableCaching","bEnableAutoPrefetch","bEnableCBToggle","bEnableLocationSupport",
 				"bEnableFileLogging","bEnableConsoleLogging","bRequireVastAds","bOverrideOrientation",
 				"bSupportSurvey"};
-		Boolean[] values = {adParams.bSupportMP4, adParams.bSupport3GPP, adParams.bSupportHighBitRate,
-				adParams.bSupportAutoNetworkDetect, adParams.bEnableCaching, adParams.bEnableAutoPrefetch, 
-				adParams.bEnableCBToggle, adParams.bEnableLocationSupport, adParams.bEnableFileLogging,
-				adParams.bEnableConsoleLogging , adParams.bRequireVastAds, adParams.bOverrideOrientation,
-				adParams.bSupportSurvey};
 		
 		for (int i = 0 ; i < keys.length ; i++) {
 			String stringBoolean = settings.get(keys[i]);
 			if (StringUtils.notNullNorEmpty(stringBoolean)) {
-				values[i] = Boolean.parseBoolean(stringBoolean);
+				try {
+					Field field = YuMeAdParams.class.getDeclaredField(keys[i]);
+					field.set(adParams, Boolean.parseBoolean(stringBoolean));
+				} catch (Exception e) {
+				}
 			}
 		}
 	}

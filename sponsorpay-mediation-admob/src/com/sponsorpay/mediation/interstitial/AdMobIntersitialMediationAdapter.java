@@ -152,15 +152,17 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 		
 		
 		// Set the ids of all testing devices that have been declared in the config file.
-		if (metadata.length() > 0) {
-			for (int i = 0; i < metadata.length(); i++) {
-				String deviceId;
-				try {
-					deviceId = metadata.getJSONObject(i).toString();
-					requestBuilder.addTestDevice(deviceId);
-				} catch (JSONException jsonexc) {
-					SponsorPayLogger.e(TAG, "Error on parsing device id.");
-				}	
+		if (metadata != null) {
+			if (metadata.length() > 0) {
+				for (int i = 0; i < metadata.length(); i++) {
+					String deviceId;
+					try {
+						deviceId = metadata.getJSONObject(i).toString();
+						requestBuilder.addTestDevice(deviceId);
+					} catch (JSONException jsonexc) {
+						SponsorPayLogger.e(TAG, "Error on parsing device id.");
+					}
+				}
 			}
 		}
 		
@@ -192,7 +194,6 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 	}
 	
 	/**
-	 * 
 	 * @return the list of the test devices
 	 */
 	private JSONArray getConfigListOfDevices() {
@@ -205,7 +206,9 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 	 * @return true- if it's COOPA compliant otherwise false.
 	 */
 	private boolean isCOPPAcompliant(){
-		return SPMediationConfigurator.getConfiguration(getName(), COOPA_COPLIANT , Boolean.class);
+		String coppaCompliant = SPMediationConfigurator.getConfiguration(getName(), COOPA_COPLIANT, String.class);
+		
+		return  Boolean.parseBoolean(coppaCompliant);
 	}
 	
 }

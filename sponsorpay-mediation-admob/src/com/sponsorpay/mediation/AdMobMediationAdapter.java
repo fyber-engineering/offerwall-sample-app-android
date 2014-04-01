@@ -29,8 +29,8 @@ public class AdMobMediationAdapter extends SPMediationAdapter {
 	@Override
 	public boolean startAdapter(final Activity activity) {
 		//get admob version
-		SponsorPayLogger.d(TAG, "Starting Admob SDK version ");
-		if (StringUtils.notNullNorEmpty(addUnitId())) {
+		SponsorPayLogger.d(TAG, "Starting Admob SDK");
+		if (StringUtils.notNullNorEmpty(getAdUnitId())) {
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -39,7 +39,7 @@ public class AdMobMediationAdapter extends SPMediationAdapter {
 			});
 			return true;
 		} else {
-			SponsorPayLogger.i(TAG, "App ID value is not valid.");
+			SponsorPayLogger.i(TAG, "Ad Unit ID value is not valid.");
 			return false;
 		}
 	}
@@ -69,7 +69,7 @@ public class AdMobMediationAdapter extends SPMediationAdapter {
 		return null;
 	}
 
-	public String addUnitId() {
+	public String getAdUnitId() {
 		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, ADD_UNIT_ID , String.class);
 	}
 

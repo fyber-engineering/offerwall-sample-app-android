@@ -228,6 +228,15 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 	@Override
 	protected void checkForAds(Context context) {
 
+		if(context instanceof Activity){
+			((Activity) context).runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					loadInterstitial();
+				}
+			});
+		}
+		
 	}
 	
 	/**

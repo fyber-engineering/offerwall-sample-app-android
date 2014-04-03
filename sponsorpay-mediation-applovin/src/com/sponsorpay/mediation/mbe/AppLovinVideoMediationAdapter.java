@@ -22,6 +22,7 @@ public class AppLovinVideoMediationAdapter extends
 		AppLovinAdVideoPlaybackListener, AppLovinAdDisplayListener {
 
 	private AppLovinIncentivizedInterstitial mIncentivizedAd;
+	private boolean mRewardVerified = false;
 
 	public AppLovinVideoMediationAdapter(
 			AppLovinMediationAdapter appLovinMediationAdapter, Activity activity) {
@@ -32,6 +33,7 @@ public class AppLovinVideoMediationAdapter extends
 	@Override
 	public void videosAvailable(Context context) {
 		mIncentivizedAd.preload(this);
+		mRewardVerified = false;
 	}
 
 	@Override
@@ -62,29 +64,30 @@ public class AppLovinVideoMediationAdapter extends
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void userOverQuota(AppLovinAd ad, Map response) {
-		//public void userOverQuota(AppLovinAd ad, Map<String, String> response) {
 		// User watched video but has already earned the maximum number of coins you specified in the UI.
+		mRewardVerified = false;
 	}
 		
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void userRewardRejected(AppLovinAd ad, Map response) {
-		//public void userRewardRejected(AppLovinAd ad, Map<String, String> response) {
 		// The user's reward was marked as fraudulent, they are most likely trying to modify their balance illicitly.	
+		mRewardVerified = false;
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void userRewardVerified(AppLovinAd ad, Map response) {
-		//public void userRewardVerified(AppLovinAd ad, Map<String, String> response) {
 		// AppLovin servers validated the reward. Refresh user balance from your server.
-		setVideoPlayed();
+//		setVideoPlayed();
+		mRewardVerified = true;
 	}
 	
 	@Override
 	public void validationRequestFailed(AppLovinAd ad, int errorCode) {
 		// We were unable to contact the server. Grant the reward, or don't, as you see fit.
+		mRewardVerified = false;
 	}
 	
 	@Override
@@ -95,22 +98,22 @@ public class AppLovinVideoMediationAdapter extends
 	//AppLovinAdVideoPlaybackListener
 	@Override
 	public void videoPlaybackBegan(final AppLovinAd ad) {
-		//the watch dialog can lead to timeout
-//		notifyVideoStarted();
+		//the watch dialog can lead to timeout -> notify video start before
 	}
 
 	@Override
 	public void videoPlaybackEnded(final AppLovinAd ad,
 			final double percentViewed, final boolean fullyWatched) {
-//		if (fullyWatched) {
-//			setVideoPlayed();
-//		}
+		if (fullyWatched && mRewardVerified) {
+			mRewardVerified = false;
+			setVideoPlayed();
+		}
 	}
 
 	//AppLovinAdDisplayListener
 	@Override
 	public void adDisplayed(AppLovinAd ad) {
-		//the watch dialog can lead to timeout
+		//the watch dialog can lead to timeout -> notify video start before
 	}
 
 	@Override

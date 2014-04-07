@@ -96,7 +96,7 @@ public class MillennialIntersitialMediationAdapter extends
 
 	@Override
 	public void onSingleTap(MMAd ad) {
-		fireClickEvent();
+		fireCloseEvent();
 	}
 
 	@Override

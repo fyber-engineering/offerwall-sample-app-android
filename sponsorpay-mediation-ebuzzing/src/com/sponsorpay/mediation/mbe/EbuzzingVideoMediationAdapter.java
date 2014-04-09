@@ -1,31 +1,36 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.mediation.mbe;
 
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import android.app.Activity;
 import android.content.Context;
 
-import com.ebuzzing.sdk.controller.util.EbzVideoListener;
 import com.ebuzzing.sdk.interfaces.EbzError;
 import com.ebuzzing.sdk.interfaces.EbzInterstitial;
 import com.sponsorpay.mediation.EbuzzingMediationAdapter;
+import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
+import com.sponsorpay.utils.SponsorPayLogger;
 
 public class EbuzzingVideoMediationAdapter extends
 		SPBrandEngageMediationAdapter<EbuzzingMediationAdapter> implements
-		EbzVideoListener,  EbzInterstitial.EbzInterstitialListener {
-
-//	private static final float MIN_PLAY_REQUIRED = 0.1f;
-//
-//	private static final String SHOW_CLOSE_BUTTON = "show.close.button";
-//	private static final String VIDEO_WATCHED_AT = "video.considered.watched.at";
-//
-//	private float mVideoWatchedAt;
+		EbzInterstitial.EbzInterstitialListener { //,EbzVideoListener {
+	
+	
+	private static final String TARGETTING_KEYWORDS = "target";
+	private static final String TAG_INTERSTITIAL    = "TAG_ANDROID_SP1_INTERSTITIAL";
+	private static final String TAG                 = "EbuzzingVideoMediationAdapter";
+	
 	
 	private EbzInterstitial mEbzInterstitialRewarded;
 
@@ -35,68 +40,54 @@ public class EbuzzingVideoMediationAdapter extends
 
 	@Override
 	public void videosAvailable(Context context) {
-		mEbzInterstitialRewarded = new EbzInterstitial(context, "TAG_DEMO_ANDROID", false);
+		//instantiate the EbzInterstitial with the provided tag and set the rewarded as true
+		mEbzInterstitialRewarded = new EbzInterstitial(context, TAG_INTERSTITIAL, true);
+		//mEbzInterstitialRewarded.setListener(this);	
+		
+		//set the target keywords if these have been set in the config file
+		setKeywordsFromConfig();
+		
+		SponsorPayLogger.i(TAG, "Loading video");
+		
+		//load the video
 		mEbzInterstitialRewarded.load();
 	}
 
 	@Override
 	public void startVideo(final Activity parentActivity) {
+		
+		SponsorPayLogger.i(TAG, "Showing video");
+		
+		//show the video
 		mEbzInterstitialRewarded.show();
 		notifyVideoStarted();
 	}
 
-//	private void setVideoWatchedAt() {
-//		try {
-//			mVideoWatchedAt = Float.parseFloat(SPMediationConfigurator
-//					.getConfiguration(getName(), VIDEO_WATCHED_AT, "0.9",
-//							String.class));
-//			if (mVideoWatchedAt < MIN_PLAY_REQUIRED) {
-//				mVideoWatchedAt = MIN_PLAY_REQUIRED;
-//			} else if (mVideoWatchedAt > 1) {
-//				mVideoWatchedAt = 1;
-//			}
-//		} catch (NumberFormatException e) {
-//			mVideoWatchedAt = 0.9f;
-//		}
-//	}
-
-//	// Vungle EventListener interface
-//	@Override
-//	public void onVungleAdEnd() {
-//		// this is fired before onVungleView method
-//		// notifyCloseEngagement();
-//	}
-//
-//	@Override
-//	public void onVungleAdStart() {
-//		notifyVideoStarted();
-//	}
-	
 	@Override
 	public boolean onCloseFullscreen() {
+		SponsorPayLogger.i(TAG, "Closing video");
 		notifyCloseEngagement();
 		return false;
 	}
 
 	@Override
 	public boolean onDisplayFullscreen() {
+		SponsorPayLogger.i(TAG, "Set full screen video");
 		return false;
 	}
 
 	@Override
 	public boolean onLoadFail(EbzError errorCode) {
-//		errorCode.EbzAdFailsToLoad;
-//		errorCode.EbzAdServerBadResponse;
-//		errorCode.EbzAdServerError;
-//		errorCode.EbzNetworkError;
-//		EbzError r = errorCode.EbzNoAdsAvailable;
+		
+		SponsorPayLogger.e(TAG, "Error: " + errorCode.getMessage());
+
 		if(errorCode.equals(EbzError.EbzNoAdsAvailable)){
 			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 			
 		}else if(errorCode.equals(EbzError.EbzNetworkError)){
 			
 			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationNetworkError);
-			
+						
 		}else {
 			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationError);
 		}
@@ -106,47 +97,49 @@ public class EbuzzingVideoMediationAdapter extends
 
 	@Override
 	public boolean onLoadSuccess() {
+		SponsorPayLogger.i(TAG, "Video loaded successfully");
 		sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationSuccess);
 		return true;
 	}
 
 	@Override
 	public boolean onRewardUnlocked() {
+		SponsorPayLogger.i(TAG, "Rewarded");
 		setVideoPlayed();
 		return false;
 	}
 
-
-	@Override
-	public void onComplete() {
-		// TODO Auto-generated method stub
+	
+	private String[]  getConfigurationMetadata() throws JSONException, NullPointerException {
 		
+		JSONArray  configurationForAdapter = SPMediationConfigurator.getConfiguration(getName(), TARGETTING_KEYWORDS, JSONArray .class);
+
+		ArrayList<String> listOfTargetWords = new ArrayList<String>();
+		
+		for(int index = 0; index < configurationForAdapter.length(); index++){
+			listOfTargetWords.add(configurationForAdapter.getString(index));
+		}
+		
+
+		return listOfTargetWords.toArray(new String[listOfTargetWords.size()]);
 	}
-
-	@Override
-	public void onError() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onPrepared() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onProgress(int watchedPercent) {
-//		if (watchedPercent >= mVideoWatchedAt) {
-//			// we notify only about the finished event tdue to the lack of event
-//			// separation
-//			// the mediation offer will do the conversion and the close
-//			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
-//		} else {
-//			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventAborted);
-//		}
-//		clearVideoEvent();
-		
+	
+	private void setKeywordsFromConfig(){
+		try {
+			String[] targetting_keywords = getConfigurationMetadata();
+			
+			if (targetting_keywords.length > 0){
+				
+				//set the keywords specified in config file
+				mEbzInterstitialRewarded.setKeywords(targetting_keywords);
+				
+				SponsorPayLogger.i(TAG, "Targetting keywords have been set");
+			}
+		} catch (JSONException jsonEx) {
+			SponsorPayLogger.e(TAG, "Getting target keywords: " + jsonEx.toString());
+		} catch (NullPointerException npe) {
+			SponsorPayLogger.e(TAG, "Getting target keywords: " + npe.toString());
+		}
 	}
 
 }

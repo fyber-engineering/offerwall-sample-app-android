@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.mediation;
@@ -21,12 +21,9 @@ public class EbuzzingMediationAdapter extends SPMediationAdapter {
 
 	private static final String TAG = "EbuzzingMediationAdapter";
 	private static final String ADAPTER_VERSION = "1.0.0";
-	private static final String ADAPTER_NAME = "Ebuzzing";
+	protected static final String ADAPTER_NAME = "Ebuzzing";
 	
 	private static final String APP_ID = "app.id";
-//	private static final String SOUND_ENABLED = "sound.enabled";
-//	private static final String AUTO_ROTATION_ENABLED = "auto.rotation.enabled";
-//	private static final String BACK_BUTTON_ENABLED = "back.button.enabled";
 
 	private EbuzzingVideoMediationAdapter mVideoMediationAdapter;
 		

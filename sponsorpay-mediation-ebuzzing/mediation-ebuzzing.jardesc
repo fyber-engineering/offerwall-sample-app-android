@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="US-ASCII" standalone="no"?>
 <jardesc>
-    <jar path="sponsorpay-mediation-millennial/sp-mediation-millennial.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/sponsorpay-mediation-millennial/mediation-millennial.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="sponsorpay-mediation-ebuzzing/sp-mediation-ebuzzing.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/sponsorpay-mediation-ebuzzing/mediation-ebuzzing.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,6 +11,12 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=sponsorpay-mediation-millennial/src"/>
+        <file path="/sponsorpay-mediation-ebuzzing/.gitignore"/>
+        <file path="/sponsorpay-mediation-ebuzzing/.classpath"/>
+        <file path="/sponsorpay-mediation-ebuzzing/mediation-ebuzzing.jardesc"/>
+        <file path="/sponsorpay-mediation-ebuzzing/project.properties"/>
+        <folder path="/sponsorpay-mediation-ebuzzing/libs"/>
+        <file path="/sponsorpay-mediation-ebuzzing/.project"/>
+        <javaElement handleIdentifier="=sponsorpay-mediation-ebuzzing/src"/>
     </selectedElements>
 </jardesc>

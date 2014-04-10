@@ -19,11 +19,10 @@ import com.sponsorpay.utils.StringUtils;
 
 public class EbuzzingMediationAdapter extends SPMediationAdapter {
 
-	private static final String TAG = "EbuzzingMediationAdapter";
+	private static final String TAG             = "EbuzzingMediationAdapter";
 	private static final String ADAPTER_VERSION = "1.0.0";
-	protected static final String ADAPTER_NAME = "Ebuzzing";
-	
-	private static final String APP_ID = "app.id";
+	private static final String ADAPTER_NAME    = "Ebuzzing";
+	private static final String APP_ID          = "app.id";
 
 	private EbuzzingVideoMediationAdapter mVideoMediationAdapter;
 		
@@ -36,6 +35,7 @@ public class EbuzzingMediationAdapter extends SPMediationAdapter {
 		if (StringUtils.notNullNorEmpty(appId)) {
 			SponsorPayLogger.i(TAG, "Using App ID = " + appId);
 			mVideoMediationAdapter = new EbuzzingVideoMediationAdapter(this);
+			return true;
 		}
 		SponsorPayLogger.d(TAG, "App Id  must have a valid value!");
 		return false;

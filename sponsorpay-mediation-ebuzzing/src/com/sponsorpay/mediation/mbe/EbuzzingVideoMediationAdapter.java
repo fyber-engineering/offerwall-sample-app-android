@@ -19,6 +19,7 @@ import com.ebuzzing.sdk.interfaces.EbzInterstitial;
 import com.sponsorpay.mediation.EbuzzingMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
+import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.sponsorpay.utils.SponsorPayLogger;
 
@@ -38,11 +39,18 @@ public class EbuzzingVideoMediationAdapter extends
 		super(adapter);
 	}
 
+	/**
+     * Instantiate the EbzInterstitial with the provided tag.
+     * Set the target words, if any.
+     * Load the video.
+     */
 	@Override
 	public void videosAvailable(Context context) {
 		//instantiate the EbzInterstitial with the provided tag and set the rewarded as true
 		mEbzInterstitialRewarded = new EbzInterstitial(context, TAG_INTERSTITIAL, true);
-		//mEbzInterstitialRewarded.setListener(this);	
+		
+		//set the listener for the eBuzzing callback methods
+		mEbzInterstitialRewarded.setListener(this);
 		
 		//set the target keywords if these have been set in the config file
 		setKeywordsFromConfig();
@@ -53,15 +61,86 @@ public class EbuzzingVideoMediationAdapter extends
 		mEbzInterstitialRewarded.load();
 	}
 
+	/**
+	 * Start playing the video.
+	 * Notify that the video has started playing.
+	 */
 	@Override
 	public void startVideo(final Activity parentActivity) {
 		
-		SponsorPayLogger.i(TAG, "Showing video");
+		if(mEbzInterstitialRewarded.isLoaded()){
 		
-		//show the video
-		mEbzInterstitialRewarded.show();
-		notifyVideoStarted();
+			SponsorPayLogger.i(TAG, "Showing video");
+			
+			//show the video
+			mEbzInterstitialRewarded.show();
+			notifyVideoStarted();
+			
+		}else{
+			
+			SponsorPayLogger.i(TAG, "Video not loaded");
+			
+			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventError);
+			clearVideoEvent();
+			
+		}
+		
 	}
+
+	
+	/**
+	 * @return An array with all the target words that have been declared in the config file
+	 * 
+	 * @throws JSONException
+	 * @throws NullPointerException - if the target field in the config file doesn't exist 
+	 */
+	private String[]  getConfigurationMetadata() throws JSONException, NullPointerException {
+		
+		//get the jsonArray which contains all the target words
+		JSONArray  configurationForAdapter = SPMediationConfigurator.getConfiguration(getName(), TARGETTING_KEYWORDS, JSONArray .class);
+
+		ArrayList<String> listOfTargetWords = new ArrayList<String>();
+		
+		//assign each one of these into the arraylist
+		for(int index = 0; index < configurationForAdapter.length(); index++){
+			listOfTargetWords.add(configurationForAdapter.getString(index));
+		}
+		
+        //convert the arraylist to an array of Strings
+		return listOfTargetWords.toArray(new String[listOfTargetWords.size()]);
+	}
+	
+	/**
+	 * Assign all the target words of the configuration file 
+	 * to the EbzInterstitial object that has been instantiated
+	 * into the videosAvailable().
+	 */
+	private void setKeywordsFromConfig(){
+		try {
+			String[] targetting_keywords = getConfigurationMetadata();
+			
+			if (targetting_keywords.length > 0){
+				
+				//set the keywords specified in config file
+				mEbzInterstitialRewarded.setKeywords(targetting_keywords);
+				
+				SponsorPayLogger.i(TAG, "Targetting keywords have been set");
+			}
+		} catch (JSONException jsonEx) {
+			SponsorPayLogger.e(TAG, "Getting target keywords: " + jsonEx.toString());
+			
+		} catch (NullPointerException npe) {
+			SponsorPayLogger.e(TAG, "Getting target keywords: " + npe.toString() 
+					+ " , target keywords doesn't exist in config file");
+		}
+	}
+	
+
+	/**
+	 * -----------------------------------------
+	 * Callback methods provided by eBuzzing SDK
+	 * -----------------------------------------
+	 */
 
 	@Override
 	public boolean onCloseFullscreen() {
@@ -107,39 +186,6 @@ public class EbuzzingVideoMediationAdapter extends
 		SponsorPayLogger.i(TAG, "Rewarded");
 		setVideoPlayed();
 		return false;
-	}
-
-	
-	private String[]  getConfigurationMetadata() throws JSONException, NullPointerException {
-		
-		JSONArray  configurationForAdapter = SPMediationConfigurator.getConfiguration(getName(), TARGETTING_KEYWORDS, JSONArray .class);
-
-		ArrayList<String> listOfTargetWords = new ArrayList<String>();
-		
-		for(int index = 0; index < configurationForAdapter.length(); index++){
-			listOfTargetWords.add(configurationForAdapter.getString(index));
-		}
-		
-
-		return listOfTargetWords.toArray(new String[listOfTargetWords.size()]);
-	}
-	
-	private void setKeywordsFromConfig(){
-		try {
-			String[] targetting_keywords = getConfigurationMetadata();
-			
-			if (targetting_keywords.length > 0){
-				
-				//set the keywords specified in config file
-				mEbzInterstitialRewarded.setKeywords(targetting_keywords);
-				
-				SponsorPayLogger.i(TAG, "Targetting keywords have been set");
-			}
-		} catch (JSONException jsonEx) {
-			SponsorPayLogger.e(TAG, "Getting target keywords: " + jsonEx.toString());
-		} catch (NullPointerException npe) {
-			SponsorPayLogger.e(TAG, "Getting target keywords: " + npe.toString());
-		}
 	}
 
 }

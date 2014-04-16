@@ -1,3 +1,4 @@
+
 /**
  * SponsorPay Android SDK
  *
@@ -19,72 +20,74 @@ import com.ebuzzing.sdk.interfaces.EbzInterstitial;
 import com.sponsorpay.mediation.EbuzzingMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
-import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.sponsorpay.utils.SponsorPayLogger;
 
 public class EbuzzingVideoMediationAdapter extends
 		SPBrandEngageMediationAdapter<EbuzzingMediationAdapter> implements
-		EbzInterstitial.EbzInterstitialListener { //,EbzVideoListener {
+		EbzInterstitial.EbzInterstitialListener { 
 	
 	
 	private static final String TARGETTING_KEYWORDS = "target";
-	private static final String TAG_INTERSTITIAL    = "TAG_ANDROID_SP1_INTERSTITIAL";
 	private static final String TAG                 = "EbuzzingVideoMediationAdapter";
 	
 	
 	private EbzInterstitial mEbzInterstitialRewarded;
 
-	public EbuzzingVideoMediationAdapter(EbuzzingMediationAdapter adapter) {
-		super(adapter);
-	}
-
 	/**
      * Instantiate the EbzInterstitial with the provided tag.
      * Set the target words, if any.
+     */
+	public EbuzzingVideoMediationAdapter(EbuzzingMediationAdapter adapter, final String tag, final Activity activity) {
+		super(adapter);
+				
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+
+				//instantiate the EbzInterstitial with the provided tag and set the rewarded as true
+				mEbzInterstitialRewarded = new EbzInterstitial(activity, tag, true);
+				
+				//set the listener for the eBuzzing callback methods
+				mEbzInterstitialRewarded.setListener(EbuzzingVideoMediationAdapter.this);
+				
+				//set the target keywords if these have been set in the config file
+				setKeywordsFromConfig();
+			}
+		});
+	}
+
+	/**
      * Load the video.
      */
 	@Override
 	public void videosAvailable(Context context) {
-		//instantiate the EbzInterstitial with the provided tag and set the rewarded as true
-		mEbzInterstitialRewarded = new EbzInterstitial(context, TAG_INTERSTITIAL, true);
-		
-		//set the listener for the eBuzzing callback methods
-		mEbzInterstitialRewarded.setListener(this);
-		
-		//set the target keywords if these have been set in the config file
-		setKeywordsFromConfig();
-		
+
 		SponsorPayLogger.i(TAG, "Loading video");
 		
 		//load the video
 		mEbzInterstitialRewarded.load();
 	}
 
+	
 	/**
 	 * Start playing the video.
 	 * Notify that the video has started playing.
 	 */
 	@Override
-	public void startVideo(final Activity parentActivity) {
-		
-		if(mEbzInterstitialRewarded.isLoaded()){
-		
-			SponsorPayLogger.i(TAG, "Showing video");
+	public void startVideo(final Activity parentActivity) {	
 			
-			//show the video
-			mEbzInterstitialRewarded.show();
-			notifyVideoStarted();
+		SponsorPayLogger.i(TAG, "Showing video");		
 			
-		}else{
-			
-			SponsorPayLogger.i(TAG, "Video not loaded");
-			
-			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventError);
-			clearVideoEvent();
-			
-		}
-		
+		//show vdeo on main thread		
+		parentActivity.runOnUiThread(new Runnable() {			
+			@Override			
+			public void run() {				
+				mEbzInterstitialRewarded.show();
+			}	
+		});
+				
+		notifyVideoStarted();
 	}
 
 	
@@ -127,11 +130,11 @@ public class EbuzzingVideoMediationAdapter extends
 				SponsorPayLogger.i(TAG, "Targetting keywords have been set");
 			}
 		} catch (JSONException jsonEx) {
-			SponsorPayLogger.e(TAG, "Getting target keywords: " + jsonEx.toString());
+			SponsorPayLogger.e(TAG, "Getting target keywords error: " + jsonEx.toString());
 			
 		} catch (NullPointerException npe) {
-			SponsorPayLogger.e(TAG, "Getting target keywords: " + npe.toString() 
-					+ " , target keywords doesn't exist in config file");
+			SponsorPayLogger.e(TAG, "Getting target keywords error: " + npe.toString() 
+					+ " , target keywords don't exist in config file");
 		}
 	}
 	
@@ -178,7 +181,7 @@ public class EbuzzingVideoMediationAdapter extends
 	public boolean onLoadSuccess() {
 		SponsorPayLogger.i(TAG, "Video loaded successfully");
 		sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationSuccess);
-		return true;
+		return false;
 	}
 
 	@Override

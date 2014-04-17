@@ -22,7 +22,7 @@ public class EbuzzingMediationAdapter extends SPMediationAdapter {
 	private static final String TAG               = "EbuzzingMediationAdapter";
 	private static final String ADAPTER_VERSION   = "1.0.0";
 	private static final String ADAPTER_NAME      = "Ebuzzing";
-	private static final String INSTARSTITAL_TAG  = "interstitial.tag";
+	private static final String INTERSTITIAL_TAG  = "interstitial.tag";
 
 	private EbuzzingVideoMediationAdapter mVideoMediationAdapter;
 		
@@ -31,7 +31,7 @@ public class EbuzzingMediationAdapter extends SPMediationAdapter {
 	public boolean startAdapter(Activity activity) {
 		
 		SponsorPayLogger.d(TAG, "Starting Ebuzzing adapter - SDK version " + EbzConstants.EBUZZING_SDK_VERSION);
-		String intersitialTag = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, INSTARSTITAL_TAG, String.class);
+		String intersitialTag = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, INTERSTITIAL_TAG, String.class);
 		
 		if (StringUtils.notNullNorEmpty(intersitialTag)) {
 			SponsorPayLogger.i(TAG, "Interstitial tag = " + intersitialTag);

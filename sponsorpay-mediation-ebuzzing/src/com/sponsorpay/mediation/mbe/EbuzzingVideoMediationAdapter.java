@@ -28,13 +28,13 @@ public class EbuzzingVideoMediationAdapter extends
 		EbzInterstitial.EbzInterstitialListener { 
 	
 	
-	private static final String TARGETTING_KEYWORDS = "target";
-	private static final String TAG                 = "EbuzzingVideoMediationAdapter";
+	private static final String TARGETING_KEYWORDS = "target";
+	private static final String TAG                = "EbuzzingVideoMediationAdapter";
 	
 	
 	private EbzInterstitial mEbzInterstitialRewarded;
 
-	/**
+    /**
      * Instantiate the EbzInterstitial with the provided tag.
      * Set the target words, if any.
      */
@@ -57,7 +57,7 @@ public class EbuzzingVideoMediationAdapter extends
 		});
 	}
 
-	/**
+    /**
      * Load the video.
      */
 	@Override
@@ -70,7 +70,7 @@ public class EbuzzingVideoMediationAdapter extends
 	}
 
 	
-	/**
+    /**
 	 * Start playing the video.
 	 * Notify that the video has started playing.
 	 */
@@ -79,7 +79,7 @@ public class EbuzzingVideoMediationAdapter extends
 			
 		SponsorPayLogger.i(TAG, "Showing video");		
 			
-		//show vdeo on main thread		
+		//show video on main thread		
 		parentActivity.runOnUiThread(new Runnable() {			
 			@Override			
 			public void run() {				
@@ -91,16 +91,16 @@ public class EbuzzingVideoMediationAdapter extends
 	}
 
 	
-	/**
+    /**
 	 * @return An array with all the target words that have been declared in the config file
 	 * 
 	 * @throws JSONException
 	 * @throws NullPointerException - if the target field in the config file doesn't exist 
 	 */
-	private String[]  getConfigurationMetadata() throws JSONException, NullPointerException {
+	private String[] getConfigurationMetadata() throws JSONException, NullPointerException {
 		
 		//get the jsonArray which contains all the target words
-		JSONArray  configurationForAdapter = SPMediationConfigurator.getConfiguration(getName(), TARGETTING_KEYWORDS, JSONArray .class);
+		JSONArray  configurationForAdapter = SPMediationConfigurator.getConfiguration(getName(), TARGETING_KEYWORDS, JSONArray .class);
 
 		ArrayList<String> listOfTargetWords = new ArrayList<String>();
 		
@@ -113,7 +113,7 @@ public class EbuzzingVideoMediationAdapter extends
 		return listOfTargetWords.toArray(new String[listOfTargetWords.size()]);
 	}
 	
-	/**
+    /**
 	 * Assign all the target words of the configuration file 
 	 * to the EbzInterstitial object that has been instantiated
 	 * into the videosAvailable().
@@ -139,10 +139,13 @@ public class EbuzzingVideoMediationAdapter extends
 	}
 	
 
-	/**
-	 * -----------------------------------------
-	 * Callback methods provided by eBuzzing SDK
-	 * -----------------------------------------
+    /**
+	 * ---------------------------------------------------
+	 * Callback methods provided by eBuzzing SDK.
+	 * There's no documentation about what it should 
+	 * return and the their test app is returning false
+	 * for all of them.
+	 * ---------------------------------------------------
 	 */
 
 	@Override

@@ -6,7 +6,11 @@
 
 package com.sponsorpay.mediation.interstitial;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -180,7 +184,7 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 		/**
 		 * set all the runtime configuration for gender, 
 		 * location and date which will be used for 
-		 * ad targeting
+		 * ad targeting.
 		*/
 		
 		
@@ -193,12 +197,18 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 			requestBuilder.setGender(gender);
 		}
 		
-		Date birthday = SPMediationConfigurator.getConfiguration(getName(), BIRTHDAY_KEY, Date.class);
-		if (birthday != null) {
-			requestBuilder.setBirthday(birthday);
+		//get birthday from config file
+		Date birthdayDate = getBirtdayDate();
+		
+		//set it to request builder
+		if (birthdayDate != null) {
+			requestBuilder.setBirthday(birthdayDate);
 		}
 		
-		Location location = SPMediationConfigurator.getConfiguration(getName(), LOCATION_KEY, Location.class);
+		//get location from config file
+		Location location = getLocation();
+		
+		//set it to request builder
 		if (location != null) {
 			requestBuilder.setLocation(location);
 		}
@@ -209,7 +219,7 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 			requestBuilder.tagForChildDirectedTreatment(true);
 		}
 		
-		// Finally we build the requst
+		// Finally we build the request
 		AdRequest adRequest =  requestBuilder.build();
 		
 		// and load the interstitial ad.
@@ -236,11 +246,10 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 				}
 			});
 		}
-		
 	}
 	
 	/**
-	 * @return the list of the test devices
+	 * @return the list of the test devices.
 	 */
 	private JSONArray getConfigListOfDevices() {
 		JSONArray metadata = SPMediationConfigurator.getConfiguration(getName(), BUILDER_CONFIG_ADD_TEST_DEVICE, JSONArray.class);
@@ -255,6 +264,46 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 		String coppaCompliant = SPMediationConfigurator.getConfiguration(getName(), COOPA_COMPLIANT, String.class);
 		
 		return  Boolean.parseBoolean(coppaCompliant);
+	}
+	
+	/**
+	 * Get the birthday date which has been set in the config file.
+	 * We are using "yyyy-MM-dd" as date format.
+	 * @return birthday - provided date or null if hasn't been set.
+	 */
+	private Date getBirtdayDate() {
+		// Fetch date from config file
+		String birthdayAsString = SPMediationConfigurator.getConfiguration(getName(), BIRTHDAY_KEY, String.class);
+
+		// format it and providing the locale as English
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+		Date birthday = null;
+		try {
+			birthday = (Date) formatter.parse(birthdayAsString);
+
+		} catch (ParseException parseExc) {
+			SponsorPayLogger.e(TAG, "Couldn't convert provided date to Date object.");
+		} catch (NullPointerException npe) {
+			SponsorPayLogger.i(TAG, "birthday field doesn't exist in config file.");
+		}
+		return birthday;
+	}
+	
+	
+	/**
+	 * Get the provided location.
+	 * @return location - which is the provided location or null if isn't set in config file.
+	 */
+	private Location getLocation() {
+		// get the provided location as a String
+		String locationAsString = SPMediationConfigurator.getConfiguration(getName(), LOCATION_KEY, String.class);
+		Location location = null;
+		// create the location object
+		if (locationAsString != null) {
+			location = new Location(SPMediationConfigurator.getConfiguration(getName(), LOCATION_KEY, String.class));
+		}
+		
+		return location;
 	}
 
 }

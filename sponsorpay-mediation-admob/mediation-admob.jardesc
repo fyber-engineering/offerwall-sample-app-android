@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<?xml version="1.0" encoding="US-ASCII" standalone="no"?>
 <jardesc>
     <jar path="sponsorpay-mediation-admob/sp-mediation-admob.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/sponsorpay-mediation-admob/mediation-admob.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>

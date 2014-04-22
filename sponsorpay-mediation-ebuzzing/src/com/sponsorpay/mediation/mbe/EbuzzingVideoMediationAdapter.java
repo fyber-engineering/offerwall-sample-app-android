@@ -97,16 +97,16 @@ public class EbuzzingVideoMediationAdapter extends
 	 * @throws JSONException
 	 * @throws NullPointerException - if the target field in the config file doesn't exist 
 	 */
-	private String[] getConfigurationMetadata() throws JSONException, NullPointerException {
+	private String[] getTargetingKeywordsFromConfig() throws JSONException, NullPointerException {
 		
 		//get the jsonArray which contains all the target words
-		JSONArray  configurationForAdapter = SPMediationConfigurator.getConfiguration(getName(), TARGETING_KEYWORDS, JSONArray .class);
+		JSONArray  keywordsForAdapter = SPMediationConfigurator.getConfiguration(getName(), TARGETING_KEYWORDS, JSONArray .class);
 
 		ArrayList<String> listOfTargetWords = new ArrayList<String>();
 		
 		//assign each one of these into the arraylist
-		for(int index = 0; index < configurationForAdapter.length(); index++){
-			listOfTargetWords.add(configurationForAdapter.getString(index));
+		for(int index = 0; index < keywordsForAdapter.length(); index++){
+			listOfTargetWords.add(keywordsForAdapter.getString(index));
 		}
 		
         //convert the arraylist to an array of Strings
@@ -120,7 +120,7 @@ public class EbuzzingVideoMediationAdapter extends
 	 */
 	private void setKeywordsFromConfig(){
 		try {
-			String[] targetting_keywords = getConfigurationMetadata();
+			String[] targetting_keywords = getTargetingKeywordsFromConfig();
 			
 			if (targetting_keywords.length > 0){
 				

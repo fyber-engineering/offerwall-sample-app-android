@@ -142,8 +142,8 @@ public class EbuzzingVideoMediationAdapter extends
     /**
 	 * ---------------------------------------------------
 	 * Callback methods provided by eBuzzing SDK.
-	 * There's no documentation about what it should 
-	 * return and the their test app is returning false
+	 * There's no documentation about what should 
+	 * return and eBuzzing's test app returns false
 	 * for all of them.
 	 * ---------------------------------------------------
 	 */

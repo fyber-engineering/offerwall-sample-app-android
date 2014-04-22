@@ -40,7 +40,7 @@ public class EbuzzingMediationAdapter extends SPMediationAdapter {
 			return true;
 		}
 			
-		SponsorPayLogger.d(TAG, "Interstitial tag  must have a valid value!");
+		SponsorPayLogger.d(TAG, "Interstitial tag must have a valid value!");
 
 		return false;
 	}

@@ -22,7 +22,7 @@ public class AdMobMediationAdapter extends SPMediationAdapter {
 	private static final String ADAPTER_VERSION = "1.0.0";
 	private static final String ADAPTER_NAME = "AdMob";
 	
-	private static String ADD_UNIT_ID= "add.unit.id";
+	private static String AD_UNIT_ID= "ad.unit.id";
 	
 	private AdMobIntersitialMediationAdapter mInterstitialAdapter;
 	
@@ -70,7 +70,7 @@ public class AdMobMediationAdapter extends SPMediationAdapter {
 	}
 
 	public String getAdUnitId() {
-		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, ADD_UNIT_ID , String.class);
+		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, AD_UNIT_ID , String.class);
 	}
 
 

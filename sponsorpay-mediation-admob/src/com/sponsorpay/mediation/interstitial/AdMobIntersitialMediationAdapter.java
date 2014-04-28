@@ -37,7 +37,7 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 	 * to set manual settings for the request adapter.
 	 */
 	private static final String BUILDER_CONFIG_ADD_TEST_DEVICE = "addTestDevice";
-	private static final String COOPA_COMPLIANT                 = "isCOPPAcompliant";
+	private static final String COPPA_COMPLIANT                 = "isCOPPAcompliant";
 		
 	/**
 	 * The following keys are declared in the config file and are used
@@ -213,7 +213,7 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 			requestBuilder.setLocation(location);
 		}
 		
-		//if the developer explicitly set that is COOPA compliant in the config file 
+		//if the developer explicitly set that is COPPA compliant in the config file 
 		//then we set it as true otherwise we don't set it and it will be false by default;
 		if(isCOPPACompliant()){
 			requestBuilder.tagForChildDirectedTreatment(true);
@@ -258,10 +258,10 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 	}
 	
 	/**
-	 * @return true- if it's COOPA compliant otherwise false.
+	 * @return true- if it's COPPA compliant otherwise false.
 	 */
 	private boolean isCOPPACompliant(){
-		String coppaCompliant = SPMediationConfigurator.getConfiguration(getName(), COOPA_COMPLIANT, String.class);
+		String coppaCompliant = SPMediationConfigurator.getConfiguration(getName(), COPPA_COMPLIANT, String.class);
 		
 		return  Boolean.parseBoolean(coppaCompliant);
 	}

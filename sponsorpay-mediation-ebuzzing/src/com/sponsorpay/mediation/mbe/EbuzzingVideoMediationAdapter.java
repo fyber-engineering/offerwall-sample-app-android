@@ -84,10 +84,10 @@ public class EbuzzingVideoMediationAdapter extends
 			@Override			
 			public void run() {				
 				mEbzInterstitialRewarded.show();
+				notifyVideoStarted();
 			}	
 		});
-				
-		notifyVideoStarted();
+			
 	}
 
 	
@@ -100,7 +100,7 @@ public class EbuzzingVideoMediationAdapter extends
 	private String[] getTargetingKeywordsFromConfig() throws JSONException, NullPointerException {
 		
 		//get the jsonArray which contains all the target words
-		JSONArray  keywordsForAdapter = SPMediationConfigurator.getConfiguration(getName(), TARGETING_KEYWORDS, JSONArray .class);
+		JSONArray  keywordsForAdapter = SPMediationConfigurator.getConfiguration(getName(), TARGETING_KEYWORDS, JSONArray.class);
 
 		ArrayList<String> listOfTargetWords = new ArrayList<String>();
 		

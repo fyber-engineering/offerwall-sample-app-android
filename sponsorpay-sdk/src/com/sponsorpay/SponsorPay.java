@@ -34,7 +34,7 @@ import com.sponsorpay.utils.StringUtils;
 public class SponsorPay {
 	public static final int MAJOR_RELEASE_NUMBER = 6;
 	public static final int MINOR_RELEASE_NUMBER = 1;
-	public static final int BUGFIX_RELEASE_NUMBER = 0;
+	public static final int BUGFIX_RELEASE_NUMBER = 1;
 	public static final String RELEASE_VERSION_STRING = MAJOR_RELEASE_NUMBER + "." + 
 				MINOR_RELEASE_NUMBER + "." + BUGFIX_RELEASE_NUMBER;
 	

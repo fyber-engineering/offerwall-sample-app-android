@@ -11,47 +11,56 @@ import java.util.Set;
 
 import android.app.Activity;
 
-import com.sponsorpay.mediation.SPMediationAdapter;
-import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.mediation.mbe.VungleVideoMediationAdapter;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
-import com.vungle.sdk.VunglePub;
-import com.vungle.sdk.VunglePub.EventListener;
+import com.vungle.publisher.AdConfig;
+import com.vungle.publisher.EventListener;
+import com.vungle.publisher.Orientation;
+import com.vungle.publisher.VunglePub;
 
 public class VungleMediationAdapter extends SPMediationAdapter implements EventListener {
 			
 	private static final String TAG = "VungleAdapter";
 
-	private static final String ADAPTER_VERSION = "2.0.0";
+	private static final String ADAPTER_VERSION = "2.1.0";
 
 	private static final String ADAPTER_NAME = "Vungle";
 	
 	private static final String APP_ID = "app.id";
+
 	private static final String SOUND_ENABLED = "sound.enabled";
 	private static final String AUTO_ROTATION_ENABLED = "auto.rotation.enabled";
 	private static final String BACK_BUTTON_ENABLED = "back.button.enabled";
+	private static final String SHOW_CLOSE_BUTTON = "show.close.button";
+	private static final String INCENTIVIZED_USER_ID = "incentivized.user.id";
+	private static final String INCENTIVIZED_CANCEL_DIALOG_TITLE = "cancel.dialog.title";
+	private static final String INCENTIVIZED_CANCEL_DIALOG_TEXT = "cancel.dialog.text";
+	private static final String INCENTIVIZED_CANCEL_DIALOG_BUTTON = "cancel.dialog.button";
+	private static final String INCENTIVIZED_KEEP_WATCHING = "keep.watching.text";
+
 
 	private VungleVideoMediationAdapter mVideoMediationAdapter = new VungleVideoMediationAdapter(this);
 	
-	private HashSet<EventListener> mVungleListeners = new HashSet<VunglePub.EventListener>();
+	private HashSet<EventListener> mVungleListeners = new HashSet<EventListener>();
+
+	private String INCENTIVIZED_MODE;
 	
 
 	@Override
 	public boolean startAdapter(Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting Vungle adapter - SDK version " + VunglePub.getVersionString());
+		SponsorPayLogger.d(TAG, "Starting Vungle adapter - SDK version " + VunglePub.VERSION);
 		String appId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID, String.class);
 		if (StringUtils.notNullNorEmpty(appId)) {
 			SponsorPayLogger.i(TAG, "Using App ID = " + appId);
-			VunglePub.setAutoRotation(SPMediationConfigurator.getConfiguration(
-					ADAPTER_NAME, AUTO_ROTATION_ENABLED, Boolean.FALSE,	Boolean.class));
-			VunglePub.init(activity, appId);
-			VunglePub.setSoundEnabled(SPMediationConfigurator.getConfiguration(
-					ADAPTER_NAME, SOUND_ENABLED, Boolean.TRUE, Boolean.class));
-			VunglePub.setBackButtonEnabled(SPMediationConfigurator.getConfiguration(
-					ADAPTER_NAME, BACK_BUTTON_ENABLED, Boolean.FALSE, Boolean.class));
-			VunglePub.setEventListener(this);
+			
+			VunglePub vunglePub = VunglePub.getInstance();
+			vunglePub.init(activity, appId);
+			vunglePub.setEventListener(this);
+			
+			setVungleSetting(vunglePub.getGlobalAdConfig());
+			
 			mVungleListeners.add(mVideoMediationAdapter);
 			return true;
 		}
@@ -87,18 +96,118 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 	
 	// Vungle EventListener interface 
 	@Override
-	public void onVungleAdEnd() {
+	public void onAdEnd() {
 		notifyListeners((Object[])null);
 	}
 
 	@Override
-	public void onVungleAdStart() {
+	public void onAdStart() {
 		notifyListeners((Object[])null);
 	}
 
 	@Override
-	public void onVungleView(double watchedSeconds, double totalAdSeconds) {
-		notifyListeners(new Object[]{watchedSeconds, totalAdSeconds}, new Class[]{double.class, double.class});
+	public void onCachedAdAvailable() {
+		notifyListeners((Object[])null);
+	}
+
+	@Override
+	public void onVideoView(boolean isCompletedView, int watchedMillis, int videoDurationMillis) {
+		notifyListeners(new Object[]{isCompletedView, watchedMillis, videoDurationMillis}, 
+				new Class[]{boolean.class, int.class, int.class});
 	}
 	
+	//Helper methods for additional settings
+	private void setVungleSetting(AdConfig adConfig) {
+		setAutoOrientation(adConfig);
+		setSoundEnabled(adConfig);
+		setBackButtonEnabled(adConfig);
+		setShowCloseButton(adConfig);
+		setIncentivizedMode(adConfig);
+		setIncentivizedUserId(adConfig);
+		setIncentivizedCancelDialogTitle(adConfig);
+		setIncentivizedCancelDialogBodyText(adConfig);
+		setIncentivizedCancelDialogCloseButtonText(adConfig);
+		setIncentivizedCancelDialogKeepWatchingButtonText(adConfig);
+	}
+	
+	private void setAutoOrientation(AdConfig adConfig) {
+		Boolean enabled = SPMediationConfigurator.getConfiguration(
+				ADAPTER_NAME, AUTO_ROTATION_ENABLED, Boolean.class);
+		if (enabled != null) {
+			adConfig.setOrientation( enabled ? Orientation.autoRotate : Orientation.matchVideo );
+		}
+	}
+	
+	private void setSoundEnabled(AdConfig adConfig) {
+		Boolean enabled = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
+				SOUND_ENABLED, Boolean.class);
+		if (enabled != null) {
+			adConfig.setSoundEnabled(enabled);
+		}
+	}
+
+	private void setBackButtonEnabled(AdConfig adConfig) {
+		Boolean enabled = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
+				BACK_BUTTON_ENABLED, Boolean.class);
+		if (enabled != null) {
+			adConfig.setBackButtonImmediatelyEnabled(enabled);
+		}
+	}
+	
+	private void setShowCloseButton(AdConfig adConfig) {
+		Boolean isShowClose = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
+				SHOW_CLOSE_BUTTON, Boolean.class);
+		if (isShowClose != null) {
+			adConfig.setShowClose(isShowClose);
+		}
+	}
+	
+	private void setIncentivizedMode(AdConfig adConfig) {
+		Boolean isIncentivized = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
+				INCENTIVIZED_MODE, Boolean.class);
+		if (isIncentivized != null) {
+			adConfig.setIncentivized(isIncentivized);
+		}
+	}
+	
+	private void setIncentivizedUserId(AdConfig adConfig) {
+		String userId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
+				INCENTIVIZED_USER_ID, String.class);
+		if (StringUtils.notNullNorEmpty(userId) ) {
+			adConfig.setIncentivizedUserId(userId);
+		}
+	}
+	
+	private void setIncentivizedCancelDialogTitle(AdConfig adConfig) {
+		String text = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
+				INCENTIVIZED_CANCEL_DIALOG_TITLE, String.class);
+		if (StringUtils.notNullNorEmpty(text) ) {
+			adConfig.setIncentivizedCancelDialogTitle(text);
+		}
+	}
+	
+	private void setIncentivizedCancelDialogBodyText(AdConfig adConfig) {
+		String text = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
+				INCENTIVIZED_CANCEL_DIALOG_TEXT, String.class);
+		if (StringUtils.notNullNorEmpty(text) ) {
+			adConfig.setIncentivizedCancelDialogBodyText(text);
+		}
+	}
+	
+	private void setIncentivizedCancelDialogCloseButtonText(AdConfig adConfig) {
+		String text = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
+				INCENTIVIZED_CANCEL_DIALOG_BUTTON, String.class);
+		if (StringUtils.notNullNorEmpty(text) ) {
+			adConfig.setIncentivizedCancelDialogCloseButtonText(text);
+		}
+	}
+	
+	private void setIncentivizedCancelDialogKeepWatchingButtonText(AdConfig adConfig) {
+		String text = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
+				INCENTIVIZED_KEEP_WATCHING, String.class);
+		if (StringUtils.notNullNorEmpty(text) ) {
+			adConfig.setIncentivizedCancelDialogKeepWatchingButtonText(text);
+		}
+	}
+
 }

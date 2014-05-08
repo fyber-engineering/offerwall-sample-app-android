@@ -14,8 +14,9 @@ import com.sponsorpay.mediation.VungleMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
-import com.vungle.sdk.VunglePub;
-import com.vungle.sdk.VunglePub.EventListener;
+import com.vungle.publisher.EventListener;
+import com.vungle.publisher.VunglePub;
+
 
 public class VungleVideoMediationAdapter extends
 		SPBrandEngageMediationAdapter<VungleMediationAdapter> implements
@@ -23,7 +24,6 @@ public class VungleVideoMediationAdapter extends
 			
 	private static final float MIN_PLAY_REQUIRED = 0.1f;
 
-	private static final String SHOW_CLOSE_BUTTON = "show.close.button";
 	private static final String VIDEO_WATCHED_AT = "video.considered.watched.at";
 
 	private float mVideoWatchedAt;
@@ -35,16 +35,15 @@ public class VungleVideoMediationAdapter extends
 
 	@Override
 	public void videosAvailable(Context context) {
-		sendValidationEvent(VunglePub.isVideoAvailable() ? SPTPNVideoValidationResult.SPTPNValidationSuccess
+		sendValidationEvent(VunglePub.getInstance().isCachedAdAvailable() ? SPTPNVideoValidationResult.SPTPNValidationSuccess
 				: SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 	}
 
 	@Override
 	public void startVideo(final Activity parentActivity) {
-		if (VunglePub.isVideoAvailable()) {
-			Boolean showClose = SPMediationConfigurator.getConfiguration(
-					getName(), SHOW_CLOSE_BUTTON, Boolean.FALSE,	Boolean.class);
-			VunglePub.displayIncentivizedAdvert(showClose);
+		VunglePub vunglePub = VunglePub.getInstance();
+		if (vunglePub.isCachedAdAvailable()) {
+			vunglePub.playAd();
 		} else {
 			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventNoVideo);
 			clearVideoEvent();
@@ -70,21 +69,25 @@ public class VungleVideoMediationAdapter extends
 	
 	// Vungle EventListener interface 
 	@Override
-	public void onVungleAdEnd() {
+	public void onAdEnd() {
 		// this is fired before onVungleView method
 //		notifyCloseEngagement();
 	}
 
 	@Override
-	public void onVungleAdStart() {
+	public void onAdStart() {
 		notifyVideoStarted();
 	}
 
 	@Override
-	public void onVungleView(double watchedSeconds, double totalAdSeconds) {
-        final double watchedPercent = watchedSeconds / totalAdSeconds;
+	public void onCachedAdAvailable() {
+	}
+
+	@Override
+	public void onVideoView(boolean isCompletedView, int watchedMillis, int videoDurationMillis) {
+        final double watchedPercent = watchedMillis / videoDurationMillis;
         if (watchedPercent >= mVideoWatchedAt) {
-        	// we notify only about the finished event tdue to the lack of event separation
+        	// we notify only about the finished event due to the lack of event separation
         	// the mediation offer will do the conversion and the close
         	sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
         } else {

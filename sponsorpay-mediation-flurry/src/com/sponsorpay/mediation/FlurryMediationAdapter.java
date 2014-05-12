@@ -27,7 +27,7 @@ public class FlurryMediationAdapter extends SPMediationAdapter implements Flurry
 			
 	private static final String TAG = "FlurryAdapter";
 
-	private static final String ADAPTER_VERSION = "2.0.0";
+	private static final String ADAPTER_VERSION = "2.1.0";
 	private static final String ADAPTER_NAME = "FlurryAppCircleClips";
 	private static final String API_KEY = "api.key";
 

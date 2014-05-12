@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.mediation;
@@ -15,6 +15,7 @@ import com.flurry.android.FlurryAdListener;
 import com.flurry.android.FlurryAdType;
 import com.flurry.android.FlurryAds;
 import com.flurry.android.FlurryAgent;
+
 import com.sponsorpay.mediation.SPMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.mediation.mbe.FlurryVideoMediationAdapter;
@@ -40,10 +41,19 @@ public class FlurryMediationAdapter extends SPMediationAdapter implements Flurry
 	public boolean startAdapter(Activity activity) {
 		actRef = new WeakReference<Activity>(activity);
 		SponsorPayLogger.d(TAG, "Starting Flurry adapter - SDK version " + FlurryAgent.getReleaseVersion());
-		String apiKey = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, API_KEY, String.class);
+		final String apiKey = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, API_KEY, String.class);
 		if (StringUtils.notNullNorEmpty(apiKey)) {
 			SponsorPayLogger.i(TAG, "Using API key = " + apiKey);
-			FlurryAgent.onStartSession(actRef.get(), apiKey);
+			activity.runOnUiThread(new Runnable(){
+
+				@Override
+				public void run() {
+					//onStartSession must be called from the UI thread.
+					FlurryAgent.onStartSession(actRef.get(), apiKey);
+				}
+				
+			});
+			
 			FlurryAds.setAdListener(this);
 			mFlurryListeners.add(mVideoMediationAdapter);
 			return true;
@@ -132,5 +142,6 @@ public class FlurryMediationAdapter extends SPMediationAdapter implements Flurry
 	public WeakReference<Activity> getActRef() {
 		return actRef;
 	}
+
 
 }

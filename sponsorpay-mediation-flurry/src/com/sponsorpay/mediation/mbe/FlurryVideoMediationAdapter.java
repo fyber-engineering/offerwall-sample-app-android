@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.mediation.mbe;
@@ -16,6 +16,7 @@ import com.flurry.android.FlurryAdListener;
 import com.flurry.android.FlurryAdSize;
 import com.flurry.android.FlurryAdType;
 import com.flurry.android.FlurryAds;
+
 import com.sponsorpay.mediation.FlurryMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
@@ -136,5 +137,6 @@ public class FlurryVideoMediationAdapter extends SPBrandEngageMediationAdapter<F
 		return FlurryAdSize.valueOf(SPMediationConfigurator.getConfiguration(
 				getName(), AD_NAME_TYPE, "FULLSCREEN", String.class));
 	}
+
 	
 }

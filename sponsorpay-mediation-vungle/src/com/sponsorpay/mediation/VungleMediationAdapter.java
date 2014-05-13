@@ -34,19 +34,17 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 	private static final String AUTO_ROTATION_ENABLED = "auto.rotation.enabled";
 	private static final String BACK_BUTTON_ENABLED = "back.button.enabled";
 	private static final String SHOW_CLOSE_BUTTON = "show.close.button";
+	private static final String INCENTIVIZED_MODE = "incentivized.mode";
 	private static final String INCENTIVIZED_USER_ID = "incentivized.user.id";
 	private static final String INCENTIVIZED_CANCEL_DIALOG_TITLE = "cancel.dialog.title";
 	private static final String INCENTIVIZED_CANCEL_DIALOG_TEXT = "cancel.dialog.text";
 	private static final String INCENTIVIZED_CANCEL_DIALOG_BUTTON = "cancel.dialog.button";
 	private static final String INCENTIVIZED_KEEP_WATCHING = "keep.watching.text";
 
-
 	private VungleVideoMediationAdapter mVideoMediationAdapter = new VungleVideoMediationAdapter(this);
 	
 	private HashSet<EventListener> mVungleListeners = new HashSet<EventListener>();
 
-	private String INCENTIVIZED_MODE;
-	
 
 	@Override
 	public boolean startAdapter(Activity activity) {

@@ -9,11 +9,11 @@ package com.sponsorpay.mediation.mbe;
 import android.app.Activity;
 import android.content.Context;
 
-import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.mediation.VungleMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
+import com.sponsorpay.utils.SponsorPayLogger;
 import com.vungle.publisher.EventListener;
 import com.vungle.publisher.VunglePub;
 
@@ -21,16 +21,9 @@ import com.vungle.publisher.VunglePub;
 public class VungleVideoMediationAdapter extends
 		SPBrandEngageMediationAdapter<VungleMediationAdapter> implements
 		EventListener {
-			
-	private static final float MIN_PLAY_REQUIRED = 0.1f;
-
-	private static final String VIDEO_WATCHED_AT = "video.considered.watched.at";
-
-	private float mVideoWatchedAt;
 	
 	public VungleVideoMediationAdapter(VungleMediationAdapter adapter) {
 		super(adapter);
-		setVideoWatchedAt();
 	}
 
 	@Override
@@ -49,23 +42,6 @@ public class VungleVideoMediationAdapter extends
 			clearVideoEvent();
 		}
 	}
-
-	private void setVideoWatchedAt() {
-		try {
-			mVideoWatchedAt = Float.parseFloat(SPMediationConfigurator
-					.getConfiguration(getName(), VIDEO_WATCHED_AT,
-							"0.9", String.class));
-			if (mVideoWatchedAt < MIN_PLAY_REQUIRED) {
-				mVideoWatchedAt = MIN_PLAY_REQUIRED;
-			} else if (mVideoWatchedAt > 1) {
-				mVideoWatchedAt = 1;
-			}
-		} catch (NumberFormatException e) {
-			mVideoWatchedAt = 0.9f;
-		}
-	}
-
-	
 	
 	// Vungle EventListener interface 
 	@Override
@@ -81,18 +57,19 @@ public class VungleVideoMediationAdapter extends
 
 	@Override
 	public void onCachedAdAvailable() {
+		SponsorPayLogger.d(getName(), "onCachedAdAvailable");
 	}
 
 	@Override
 	public void onVideoView(boolean isCompletedView, int watchedMillis, int videoDurationMillis) {
-        final double watchedPercent = watchedMillis / videoDurationMillis;
-        if (watchedPercent >= mVideoWatchedAt) {
+        if (isCompletedView) {
         	// we notify only about the finished event due to the lack of event separation
         	// the mediation offer will do the conversion and the close
         	sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
         } else {
         	sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventAborted);
         }
+        // we have to clear the video event manually
         clearVideoEvent();
 	}
 	

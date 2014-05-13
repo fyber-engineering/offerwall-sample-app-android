@@ -10,6 +10,7 @@ import java.util.Set;
 
 import android.app.Activity;
 
+import com.millennialmedia.android.MMLog;
 import com.millennialmedia.android.MMSDK;
 import com.sponsorpay.mediation.interstitial.MillennialIntersitialMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
@@ -37,7 +38,7 @@ public class MillennialMediationAdapter extends SPMediationAdapter {
 				public void run() {
 					Integer logLevel = getLogLevel();
 					if (logLevel != null) {
-						MMSDK.setLogLevel(logLevel);
+						MMLog.setLogLevel(logLevel);
 					}
 					MMSDK.initialize(activity);
 					mInterstitialAdapter = new MillennialIntersitialMediationAdapter(

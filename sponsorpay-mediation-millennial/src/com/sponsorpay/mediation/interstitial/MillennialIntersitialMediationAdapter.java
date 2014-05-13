@@ -37,10 +37,13 @@ public class MillennialIntersitialMediationAdapter extends
 	private static final String METADATA_KEY = "metadata";
 	
 	private MMInterstitial mInterstitial;
+	
+	private boolean onSingleTapFired;
 
 	public MillennialIntersitialMediationAdapter(MillennialMediationAdapter adapter, Activity activity) {
 		super(adapter);
 		this.mActivityRef = new WeakReference<Activity>(activity);
+		onSingleTapFired = false;
 		mInterstitial = new MMInterstitial(activity);
 		String appId = mAdapter.getAppid();
 		mInterstitial.setApid(appId);
@@ -51,11 +54,12 @@ public class MillennialIntersitialMediationAdapter extends
 		requestMetadata.putAll(getConfigMetadata());
 		requestMetadata.putAll(getRuntimeMetadata());
 		request.setMetaValues(requestMetadata);
-		
+				
 		//Add the MMRequest object to your MMInterstitial.
 		mInterstitial.setMMRequest(request);
 		mInterstitial.setListener(this);
 		checkForAds(activity);
+		
 	}
 
 	@Override
@@ -81,7 +85,9 @@ public class MillennialIntersitialMediationAdapter extends
 	//RequestListener
 	@Override
 	public void MMAdOverlayClosed(MMAd ad) {
-		fireCloseEvent();
+		if(!onSingleTapFired){
+			fireCloseEvent();
+		}
 	}
 
 	@Override
@@ -96,7 +102,8 @@ public class MillennialIntersitialMediationAdapter extends
 
 	@Override
 	public void onSingleTap(MMAd ad) {
-		fireClickEvent();
+		onSingleTapFired = true;
+		fireCloseEvent();
 	}
 
 	@Override

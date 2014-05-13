@@ -26,11 +26,10 @@ public class AdColonyMediationAdapter extends SPMediationAdapter {
 
 	private static final String ADAPTER_VERSION = "1.0.0";
 
-	private static final String ADAPTER_NAME = "Ebuzzing";
+	private static final String ADAPTER_NAME = "AdColony";
 	
 	private static final String APP_ID = "app.id";
 	private static final String ZONE_IDS = "zone.ids";
-//	private static final String BACK_BUTTON_ENABLED = "v4vc.secret.key";
 
 	private AdColonyVideoMediationAdapter mVideoMediationAdapter;
 

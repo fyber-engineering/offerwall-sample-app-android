@@ -78,9 +78,13 @@ public class AdColonyVideoMediationAdapter extends
 	public void onAdColonyAdAttemptFinished(AdColonyAd ad) {
 		if (ad.notShown() || ad.noFill()) {
 			notifyVideoError();
+//		} else if (ad.shown()) {
+//			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventClosed);
 		} else {
-			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventAborted);
+//			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventClosed);
+			notifyCloseEngagement();
 		}
+		mV4VCAd = null;
 		/*
 		// error
 		notShown() : boolean

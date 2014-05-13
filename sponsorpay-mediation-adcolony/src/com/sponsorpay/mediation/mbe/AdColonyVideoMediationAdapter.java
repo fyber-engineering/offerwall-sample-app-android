@@ -17,21 +17,17 @@ import com.jirbo.adcolony.AdColonyV4VCListener;
 import com.jirbo.adcolony.AdColonyV4VCReward;
 import com.sponsorpay.mediation.AdColonyMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
-import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
 
 public class AdColonyVideoMediationAdapter extends
 		SPBrandEngageMediationAdapter<AdColonyMediationAdapter> implements
-		AdColonyV4VCListener, 
-//		AdColonyAdAvailabilityListener,
-		AdColonyAdListener {
+		AdColonyV4VCListener, AdColonyAdListener {
 
 	private AdColonyV4VCAd mV4VCAd;
 
 	public AdColonyVideoMediationAdapter(AdColonyMediationAdapter adapter) {
 		super(adapter);
 		AdColony.addV4VCListener(this);
-//		AdColony.addAdAvailabilityListener(this);
 	}
 
 	@Override
@@ -63,38 +59,15 @@ public class AdColonyVideoMediationAdapter extends
 		}
 	}
 
-//	//AdColonyAdAvailabilityListener
-//	@Override
-//	public void onAdColonyAdAvailabilityChange(boolean available, String zoneId) {
-//		if (available) {
-//			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationSuccess);
-//		} else {
-//			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
-//		}
-//	}
-
 	//AdColonyAdListener
 	@Override
 	public void onAdColonyAdAttemptFinished(AdColonyAd ad) {
 		if (ad.notShown() || ad.noFill()) {
 			notifyVideoError();
-//		} else if (ad.shown()) {
-//			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventClosed);
 		} else {
-//			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventClosed);
 			notifyCloseEngagement();
 		}
 		mV4VCAd = null;
-		/*
-		// error
-		notShown() : boolean
-		noFill() : boolean
-		// played
-		shown() : boolean
-		// aborted
-		canceled() : boolean
-		skipped() : boolean
-		*/
 	}
 
 	@Override

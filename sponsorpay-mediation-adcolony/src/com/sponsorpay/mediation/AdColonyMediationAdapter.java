@@ -30,6 +30,7 @@ public class AdColonyMediationAdapter extends SPMediationAdapter {
 	
 	private static final String APP_ID = "app.id";
 	private static final String ZONE_IDS = "zone.ids";
+	private static final String CLIENT_OPTIONS = "client.options";
 
 	private AdColonyVideoMediationAdapter mVideoMediationAdapter;
 
@@ -39,11 +40,11 @@ public class AdColonyMediationAdapter extends SPMediationAdapter {
 			SponsorPayLogger.d(TAG, "Starting AdColony adapter" );
 			final String appId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID, String.class);
 			final String[] zoneIds = getZoneIds();
+			final String clientOptions = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, CLIENT_OPTIONS, String.class);
 			if (StringUtils.notNullNorEmpty(appId) && zoneIds != null) {
 				activity.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						String clientOptions = "version:1.1,store:google";
 						AdColony.configure(activity, clientOptions, appId, zoneIds);
 						mVideoMediationAdapter = new AdColonyVideoMediationAdapter(AdColonyMediationAdapter.this);
 					}

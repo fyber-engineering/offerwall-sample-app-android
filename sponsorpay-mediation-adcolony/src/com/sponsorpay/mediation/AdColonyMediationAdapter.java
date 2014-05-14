@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.mediation;
@@ -31,6 +31,9 @@ public class AdColonyMediationAdapter extends SPMediationAdapter {
 	private static final String APP_ID = "app.id";
 	private static final String ZONE_IDS = "zone.ids";
 	private static final String CLIENT_OPTIONS = "client.options";
+	
+	private static final String DEVICE_ID = "device.id";
+	private static final String CUSTOM_ID = "custom.id";
 
 	private AdColonyVideoMediationAdapter mVideoMediationAdapter;
 
@@ -45,6 +48,8 @@ public class AdColonyMediationAdapter extends SPMediationAdapter {
 				activity.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
+						setCustomId();
+						setDeviceId();
 						AdColony.configure(activity, clientOptions, appId, zoneIds);
 						mVideoMediationAdapter = new AdColonyVideoMediationAdapter(AdColonyMediationAdapter.this);
 					}
@@ -90,7 +95,7 @@ public class AdColonyMediationAdapter extends SPMediationAdapter {
 			String[] zoneIds = new String[jsonZoneIds.length()];
 			for (int i = 0; i < jsonZoneIds.length(); i++) {
 				try {
-					zoneIds[i] = jsonZoneIds.getJSONObject(i).getString("id");
+					zoneIds[i] = jsonZoneIds.getString(i);
 				} catch (JSONException exception) {
 					SponsorPayLogger.e(TAG, "Error on parsing Zone Id.");
 					return null;
@@ -100,5 +105,20 @@ public class AdColonyMediationAdapter extends SPMediationAdapter {
 		}
 		return null;
 	}
+	
+	private void setDeviceId() {
+		String deviceId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, DEVICE_ID, String.class);
+		if (StringUtils.notNullNorEmpty(deviceId)) {
+			AdColony.setDeviceID(deviceId);
+		}
+	}
+	
+	private void setCustomId() {
+		String cutsomId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, CUSTOM_ID, String.class);
+		if (StringUtils.notNullNorEmpty(cutsomId)) {
+			AdColony.setDeviceID(cutsomId);
+		}
+	}
+	
 	
 }

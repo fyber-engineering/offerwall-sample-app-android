@@ -13,7 +13,6 @@ import com.sponsorpay.mediation.VungleMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
-import com.sponsorpay.utils.SponsorPayLogger;
 import com.vungle.publisher.EventListener;
 import com.vungle.publisher.VunglePub;
 
@@ -57,9 +56,14 @@ public class VungleVideoMediationAdapter extends
 
 	@Override
 	public void onCachedAdAvailable() {
-		SponsorPayLogger.d(getName(), "onCachedAdAvailable");
+//		SponsorPayLogger.d(getName(), "onCachedAdAvailable");
 	}
 
+	@Override
+	public void onAdUnavailable(String arg0) {
+//		SponsorPayLogger.d(getName(), "onAdUnavailable");
+	}
+	
 	@Override
 	public void onVideoView(boolean isCompletedView, int watchedMillis, int videoDurationMillis) {
         if (isCompletedView) {

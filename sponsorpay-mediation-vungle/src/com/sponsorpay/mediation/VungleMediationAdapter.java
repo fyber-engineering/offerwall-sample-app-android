@@ -113,6 +113,11 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 		notifyListeners(new Object[]{isCompletedView, watchedMillis, videoDurationMillis}, 
 				new Class[]{boolean.class, int.class, int.class});
 	}
+
+	@Override
+	public void onAdUnavailable(String arg0) {
+		notifyListeners(new Object[]{arg0}, new Class[]{String.class});
+	}
 	
 	//Helper methods for additional settings
 	private void setVungleSetting(AdConfig adConfig) {

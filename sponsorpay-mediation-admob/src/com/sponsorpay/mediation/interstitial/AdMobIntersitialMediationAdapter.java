@@ -6,11 +6,7 @@
 
 package com.sponsorpay.mediation.interstitial;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,7 +33,7 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 	 * to set manual settings for the request adapter.
 	 */
 	private static final String BUILDER_CONFIG_ADD_TEST_DEVICE = "addTestDevice";
-	private static final String COPPA_COMPLIANT                 = "isCOPPAcompliant";
+	private static final String COPPA_COMPLIANT                = "isCOPPAcompliant";
 		
 	/**
 	 * The following keys are declared in the config file and are used
@@ -215,8 +211,9 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 		
 		//if the developer explicitly set that is COPPA compliant in the config file 
 		//then we set it as true otherwise we don't set it and it will be false by default;
-		if(isCOPPACompliant()){
-			requestBuilder.tagForChildDirectedTreatment(true);
+		Boolean isCoppaCompliant = isCOPPACompliant();
+		if(isCoppaCompliant != null){
+			requestBuilder.tagForChildDirectedTreatment(isCoppaCompliant);
 		}
 		
 		// Finally we build the request
@@ -260,50 +257,27 @@ public class AdMobIntersitialMediationAdapter extends SPInterstitialMediationAda
 	/**
 	 * @return true- if it's COPPA compliant otherwise false.
 	 */
-	private boolean isCOPPACompliant(){
-		String coppaCompliant = SPMediationConfigurator.getConfiguration(getName(), COPPA_COMPLIANT, String.class);
-		
-		return  Boolean.parseBoolean(coppaCompliant);
+	private Boolean isCOPPACompliant(){
+		return SPMediationConfigurator.getConfiguration(getName(), COPPA_COMPLIANT, Boolean.class);	
 	}
 	
 	/**
-	 * Get the birthday date which has been set in the config file.
-	 * We are using "yyyy-MM-dd" as date format.
+	 * Get the birthday date which has been set runtime.
 	 * @return birthday - provided date or null if hasn't been set.
 	 */
 	private Date getBirtdayDate() {
-		// Fetch date from config file
-		String birthdayAsString = SPMediationConfigurator.getConfiguration(getName(), BIRTHDAY_KEY, String.class);
-
-		// format it and providing the locale as English
-		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-		Date birthday = null;
-		try {
-			birthday = (Date) formatter.parse(birthdayAsString);
-
-		} catch (ParseException parseExc) {
-			SponsorPayLogger.e(TAG, "Couldn't convert provided date to Date object.");
-		} catch (NullPointerException npe) {
-			SponsorPayLogger.i(TAG, "birthday field doesn't exist in config file.");
-		}
-		return birthday;
+		// Fetch date from runtime config
+		return SPMediationConfigurator.getConfiguration(getName(), BIRTHDAY_KEY, Date.class);
 	}
 	
 	
 	/**
 	 * Get the provided location.
-	 * @return location - which is the provided location or null if isn't set in config file.
+	 * @return location - which is the runtime provided location or null if it's not set.
 	 */
 	private Location getLocation() {
 		// get the provided location as a String
-		String locationAsString = SPMediationConfigurator.getConfiguration(getName(), LOCATION_KEY, String.class);
-		Location location = null;
-		// create the location object
-		if (locationAsString != null) {
-			location = new Location(SPMediationConfigurator.getConfiguration(getName(), LOCATION_KEY, String.class));
-		}
-		
-		return location;
+		return SPMediationConfigurator.getConfiguration(getName(), LOCATION_KEY, Location.class);		
 	}
 
 }

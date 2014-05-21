@@ -25,17 +25,14 @@ public class AdColonyVideoMediationAdapter extends
 		AdColonyV4VCListener, AdColonyAdListener {
 	
 	private static final String CONFIRMATION_DIALOG = "with.confirmation.dialog";
-	private static final String RESULTS_DIALOG = "with.results.dialog";
 
 	private AdColonyV4VCAd mV4VCAd;
 	private Boolean mShouldShowConfirmationDialog;
-	private Boolean mShouldShowResultsDialog;
 
 	public AdColonyVideoMediationAdapter(AdColonyMediationAdapter adapter) {
 		super(adapter);
 		AdColony.addV4VCListener(this);
 		mShouldShowConfirmationDialog = shouldShowConfirmationDialog();
-		mShouldShowResultsDialog = shouldShowResultsDialog();
 	}
 
 	@Override
@@ -44,7 +41,6 @@ public class AdColonyVideoMediationAdapter extends
 		if (mV4VCAd.isReady()) {
 			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationSuccess);
 			mV4VCAd.withConfirmationDialog(mShouldShowConfirmationDialog);
-			mV4VCAd.withResultsDialog(mShouldShowResultsDialog);
 		} else {
 			mV4VCAd = null;
 			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
@@ -96,12 +92,6 @@ public class AdColonyVideoMediationAdapter extends
 		Boolean showConfirmationDialog = SPMediationConfigurator.getConfiguration(getName(), 
 				CONFIRMATION_DIALOG, Boolean.FALSE, Boolean.class);
 		return showConfirmationDialog;
-	}
-	
-	private Boolean shouldShowResultsDialog() {
-		Boolean showResultsDialog = SPMediationConfigurator.getConfiguration(getName(), 
-				RESULTS_DIALOG, Boolean.FALSE, Boolean.class);
-		return showResultsDialog;
 	}
 
 }

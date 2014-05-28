@@ -24,7 +24,7 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 			
 	private static final String TAG = "VungleAdapter";
 
-	private static final String ADAPTER_VERSION = "2.1.0";
+	private static final String ADAPTER_VERSION = "2.2.0";
 
 	private static final String ADAPTER_NAME = "Vungle";
 	
@@ -33,7 +33,6 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 	private static final String SOUND_ENABLED = "sound.enabled";
 	private static final String AUTO_ROTATION_ENABLED = "auto.rotation.enabled";
 	private static final String BACK_BUTTON_ENABLED = "back.button.enabled";
-	private static final String SHOW_CLOSE_BUTTON = "show.close.button";
 	private static final String INCENTIVIZED_MODE = "incentivized.mode";
 	private static final String INCENTIVIZED_USER_ID = "incentivized.user.id";
 	private static final String INCENTIVIZED_CANCEL_DIALOG_TITLE = "cancel.dialog.title";
@@ -124,7 +123,6 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 		setAutoOrientation(adConfig);
 		setSoundEnabled(adConfig);
 		setBackButtonEnabled(adConfig);
-		setShowCloseButton(adConfig);
 		setIncentivizedMode(adConfig);
 		setIncentivizedUserId(adConfig);
 		setIncentivizedCancelDialogTitle(adConfig);
@@ -154,14 +152,6 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 				BACK_BUTTON_ENABLED, Boolean.class);
 		if (enabled != null) {
 			adConfig.setBackButtonImmediatelyEnabled(enabled);
-		}
-	}
-	
-	private void setShowCloseButton(AdConfig adConfig) {
-		Boolean isShowClose = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, 
-				SHOW_CLOSE_BUTTON, Boolean.class);
-		if (isShowClose != null) {
-			adConfig.setShowClose(isShowClose);
 		}
 	}
 	

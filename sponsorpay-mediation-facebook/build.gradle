@@ -1,0 +1,4 @@
+ext {
+	interstitialsAdapter = true
+	rewardedVideosAdapter = false
+}

@@ -50,6 +50,7 @@ public class FlurryMediationAdapter extends SPMediationAdapter implements Flurry
 				public void run() {
 					//onStartSession must be called from the UI thread.
 					FlurryAgent.onStartSession(actRef.get(), apiKey);
+					FlurryAgent.addOrigin("SponsorPayAndroid", "SPONSORPAY_SDK_VERSION");
 				}
 				
 			});

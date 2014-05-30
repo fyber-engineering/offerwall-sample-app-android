@@ -1,0 +1,7 @@
+ext {
+	interstitialsAdapter = true
+}
+
+dependencies {
+    compile fileTree(dir: playAdsDir, include: 'libs/*.jar')
+}

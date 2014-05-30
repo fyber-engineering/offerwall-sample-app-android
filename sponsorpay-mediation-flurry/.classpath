@@ -4,5 +4,8 @@
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="lib" path="/sponsorpay-android-sdk/sponsorpay-android-sdk.jar" sourcepath="/sponsorpay-android-sdk"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="lib" path="libs/flurryAds_3.4.0.jar"/>
+	<classpathentry kind="lib" path="libs/flurryAnalytics_3.4.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,0 +1,159 @@
+buildscript {
+    repositories {
+        mavenCentral()
+
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.5.+'
+    }
+}
+
+configure(allprojects.findAll { it.name =~ /sp/	}) {
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+	sourceCompatibility = 1.6
+	targetCompatibility = 1.6
+
+	group = 'com.sponsorpay'
+    
+    dependencies {
+	    compile 'com.google.android:android:2.1.2'
+	}
+    repositories {
+        mavenCentral()
+	    maven {
+	        url localMavenRepo
+	    }
+    }
+
+	uploadArchives {
+	    repositories {
+	        mavenDeployer {
+	            repository(url: localMavenRepo)
+	        }
+	    }
+	}
+	
+	artifacts {
+	    archives jar
+	}
+
+}
+
+configure(subprojects.findAll {it.name =~ /sp-mediation/}) {
+
+	ext {
+		interstitialsAdapter = false
+		rewardedVideosAdapter = false
+	}
+
+	configurations { 
+		interstitials
+		videos
+	}
+
+	sourceSets {
+	    main.java.srcDirs = ['src']
+	    main.resources.srcDirs = ['src']
+	}
+
+	dependencies {
+	    compile fileTree(dir: 'libs', include: '*.jar')
+	    compile project(':sponsorpay-android-sdk')
+	}
+
+	afterEvaluate {
+    	jar.dependsOn getVersion
+ 	}
+
+ 	task interstitials (dependsOn: 'jar') {
+ 		onlyIf {
+ 			interstitialsAdapter
+ 		}
+ 		doLast {
+	 		project.artifacts { 
+	 			interstitials jar 
+	 		}		
+ 		}
+ 	}
+ 	
+ 	task videos (dependsOn: 'jar') {
+ 		onlyIf {
+ 			rewardedVideosAdapter
+ 		}
+ 		doLast {
+	 		project.artifacts { 
+	 			videos jar 
+	 		}		
+ 		}
+ 	}
+	
+	task getVersion {
+
+	    def p = /((\d+|\.){5})/
+	    
+	    def tree = fileTree(dir: getProjectDir(), include: 'src/com/sponsorpay/mediation/*MediationAdapter.java')
+    	def mediationFile = tree.getSingleFile()
+
+	    mediationFile.eachLine {
+	        def m = it =~  p
+	        if (m.count>0) {
+	            project.version = m[0][0]
+	            return true
+	        }
+	    }
+	}
+}
+
+configure(project(':sponsorpay-android-sdk')) {
+	configurations {
+		release
+	}
+}
+
+configure(project(':android-sdk')) {
+
+	apply plugin: 'java'
+
+	ext.adaptersDir = project.distsDir.path + '/adapters'
+
+	task getVersion (dependsOn: ':sponsorpay-android-sdk:getVersion') {
+		doLast {
+			project.version = project(':sponsorpay-android-sdk').version
+			ext.adaptersDir = project.distsDir.path + '/adapters-' + project.getVersion()
+		}
+	}
+
+	def projects = rootProject.allprojects
+
+	task releaseInterstitialAdapters(type: Zip, dependsOn: 'getVersion') {
+		dependsOn projects.findAll {it.name =~ /sp-mediation/}.interstitials
+	    baseName = 'SponsorPay_Android_Interstitial_Adapters'
+	    into 'interstitials'
+		from projects.findAll {it.name =~ /sp-mediation/}.configurations.interstitials.artifacts.files
+	}
+
+	task releaseVideoAdapters(type: Zip, dependsOn: 'getVersion') {
+		dependsOn projects.findAll {it.name =~ /sp-mediation/}.videos
+	    baseName = 'SponsorPay_Android_Rewarded_Videos_Adapters'
+	    into 'rewardedVideos'
+		from projects.findAll {it.name =~ /sp-mediation/}.configurations.videos.artifacts.files
+	}
+
+	task releaseAdapters(type: Copy, dependsOn: ['releaseVideoAdapters', 'releaseInterstitialAdapters']) {
+		into adaptersDir
+		from projects.findAll {it.name =~ /sp-mediation/}.configurations.archives.artifacts.files
+	}
+
+	task releaseSdk(type: Copy, dependsOn: ':sponsorpay-android-sdk:release') {
+		into project.distsDir.path
+		from project(':sponsorpay-android-sdk').configurations.release.artifacts.files
+	}
+
+	task release {
+		dependsOn {
+			tasks.findAll { it.name =~ /release.+/ }
+		}
+	}
+}

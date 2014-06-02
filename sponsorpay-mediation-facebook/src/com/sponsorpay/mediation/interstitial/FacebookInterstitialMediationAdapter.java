@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
@@ -16,18 +17,34 @@ import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAd
 public class FacebookInterstitialMediationAdapter extends
 		SPInterstitialMediationAdapter<FacebookMediationAdapter> implements InterstitialAdListener {
 
+	private static final String TAG = FacebookInterstitialMediationAdapter.class.getSimpleName();
+
 	private InterstitialAd mInterstitialAd;
 
 	public FacebookInterstitialMediationAdapter(FacebookMediationAdapter adapter, Activity pActivity) {
 		super(adapter);
+		Log.d(TAG, "my device hash: " + mAdapter.getTestDeviceId());
 		AdSettings.addTestDevice(mAdapter.getTestDeviceId());
+		// AdSettings.addTestDevice("93e88e38272aee6251e20be438ed249f"); //hubert samsung s3
+
 		this.mActivityRef = new WeakReference<Activity>(pActivity);
+		// only for testing purposes placed here getting an ad
+		mActivityRef.get().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				mInterstitialAd = new InterstitialAd(mActivityRef.get(), mAdapter.getPlacementId());
+				mInterstitialAd.setAdListener(FacebookInterstitialMediationAdapter.this);
+				mInterstitialAd.loadAd();
+				setAdAvailable(); //only for testing purposes
+			}
+		});
 		// TODO Auto-generated constructor stub
 	}
 
 	/** from SPInterstitialMediationAdapter */
 	@Override
 	protected boolean show(Activity parentActivity) {
+		Log.d(TAG, "show() facebook ad interstitial");
 		if (mInterstitialAd != null) {
 			mInterstitialAd.setAdListener(this);
 			mInterstitialAd.show();
@@ -39,14 +56,7 @@ public class FacebookInterstitialMediationAdapter extends
 	/** from SPInterstitialMediationAdapter */
 	@Override
 	protected void checkForAds(final Context context) {
-		mActivityRef.get().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mInterstitialAd = new InterstitialAd(context, mAdapter.getPlacementId());
-				mInterstitialAd.setAdListener(FacebookInterstitialMediationAdapter.this);
-				mInterstitialAd.loadAd();
-			}
-		});
+		Log.d(TAG, "checkForAds");
 	}
 
 	/** from Facebook SDK */
@@ -67,7 +77,9 @@ public class FacebookInterstitialMediationAdapter extends
 	@Override
 	public void onError(Ad ad, AdError pError) {
 		// TODO Auto-generated method stub
-		fireShowErrorEvent("Facebook ad error (" + pError.getErrorCode() + "): " + pError.getErrorMessage());
+		Log.e(TAG, "Ad error (" + pError.getErrorCode() + "): " + pError.getErrorMessage());
+		Log.getStackTraceString(new Exception());
+		//fireShowErrorEvent("Facebook ad error (" + pError.getErrorCode() + "): " + pError.getErrorMessage());
 	}
 
 	/** from Facebook SDK */

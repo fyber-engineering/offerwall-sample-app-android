@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.utils;
@@ -17,11 +17,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Looper;
-import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
@@ -57,11 +54,6 @@ public class HostInfo {
 		}
 		return hostInfoInstance;
 	}
-	
-	/**
-	 * The unique device ID.
-	 */
-	private String mUDID;
 
 	/**
 	 * The running Android OS version (e.g. "2.1" for Android 2.1).
@@ -77,21 +69,6 @@ public class HostInfo {
 	 * Language settings (the default locale).
 	 */
 	private String mLanguageSetting;
-
-	/**
-	 * Android ID as reported by Settings.Secure
-	 */
-	private String mAndroidId;
-
-	/**
-	 * MAC Address of the WiFi Adapter
-	 */
-	private String mWifiMacAddress;
-
-	/**
-	 * Device's hardware serial number, reported by versions of Android >=2.3
-	 */
-	private String mHardwareSerialNumber;
 
 	private String mAdvertisingId;
 	
@@ -138,8 +115,6 @@ public class HostInfo {
 		retrieveTelephonyManagerValues(context);
 		retrieveAccessNetworkValues(context);
 		// Android ID
-		retrieveAndroidId(context);
-		retrieveWifiStateValues(context);
 		retrieveDisplayMetrics(context);
 		retrieveAppVersion(context);
 		
@@ -152,30 +127,6 @@ public class HostInfo {
 		// Get the phone model
 		mPhoneVersion = android.os.Build.MANUFACTURER + "_" + android.os.Build.MODEL;
 		mBundleName = context.getPackageName();
-	}
-
-
-	private void retrieveWifiStateValues(Context context) {
-		mWifiMacAddress = StringUtils.EMPTY_STRING;
-		if (!sSimulateNoAccessWifiStatePermission) {
-			try {
-				// MAC address of WiFi adapter
-				WifiManager wifiMan = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-				WifiInfo wifiInf = wifiMan.getConnectionInfo();
-				mWifiMacAddress = wifiInf.getMacAddress();
-			} catch (RuntimeException re) {
-			}
-		}
-	}
-
-
-	private void retrieveAndroidId(Context context) {
-		if (!sSimulateInvalidAndroidId) {
-			mAndroidId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
-		}
-		if (mAndroidId == null) {
-			mAndroidId = StringUtils.EMPTY_STRING;
-		}
 	}
 
 
@@ -199,7 +150,6 @@ public class HostInfo {
 
 
 	private void retrieveTelephonyManagerValues(Context context) {
-		mUDID = StringUtils.EMPTY_STRING;
 		mCarrierName = StringUtils.EMPTY_STRING;
 		mCarrierCountry = StringUtils.EMPTY_STRING;
 		if (!sSimulateNoReadPhoneStatePermission) {
@@ -207,7 +157,6 @@ public class HostInfo {
 			TelephonyManager tManager = (TelephonyManager) context
 					.getSystemService(Context.TELEPHONY_SERVICE);
 			try {
-				mUDID = tManager.getDeviceId();
 				mCarrierName = tManager.getNetworkOperatorName();
 				mCarrierCountry = tManager.getNetworkCountryIso();
 			} catch (SecurityException e) {
@@ -237,15 +186,6 @@ public class HostInfo {
 	}
 
 	/**
-	 * Get the unique device ID
-	 * 
-	 * @return the unique device id
-	 */
-	public String getUDID() {
-		return mUDID;
-	}
-
-	/**
 	 * Get the running OS version
 	 * 
 	 * @return the OS version
@@ -264,51 +204,12 @@ public class HostInfo {
 	}
 
 	/**
-	 * Fetches the device's hardware serial number, reported by versions of Android >=2.3
-	 */
-	public String getHardwareSerialNumber() {
-		if (mHardwareSerialNumber == null) {
-			if (!sSimulateNoHardwareSerialNumber) {
-				Field serialField = null;
-				try {
-					serialField = android.os.Build.class.getField("SERIAL");
-					Object serialValue = serialField.get(null);
-					if (serialValue != null && serialValue.getClass().equals(String.class)) {
-						mHardwareSerialNumber = (String) serialValue;
-					}
-				} catch (Exception e) {
-					// Probably running on an older version of Android which doesn't include this
-					// field
-					mHardwareSerialNumber = StringUtils.EMPTY_STRING;
-				}
-			} else {
-				mHardwareSerialNumber = StringUtils.EMPTY_STRING;
-			}
-		}
-		return mHardwareSerialNumber;
-	}
-
-	/**
 	 * Get the default locale set by the user
 	 * 
 	 * @return the default language setting
 	 */
 	public String getLanguageSetting() {
 		return mLanguageSetting;
-	}
-
-	/**
-	 * Returns the device's Android ID.
-	 */
-	public String getAndroidId() {
-		return mAndroidId;
-	}
-
-	/**
-	 * Returns the MAC address of the device's WiFi adapter.
-	 */
-	public String getWifiMacAddress() {
-		return mWifiMacAddress;
 	}
 
 	

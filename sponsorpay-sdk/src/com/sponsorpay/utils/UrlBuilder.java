@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.utils;
@@ -23,11 +23,6 @@ import com.sponsorpay.credentials.SPCredentials;
 public class UrlBuilder {
 	
 	private static final String TAG = "UrlBuilder";
-	
-	/**
-	 * The unique device ID (for url-encoding).
-	 */
-	private static final String UDID_KEY = "device_id";
 
 	/**
 	 * The user id key for encoding the corresponding URL parameter.
@@ -58,16 +53,6 @@ public class UrlBuilder {
 	 * The SDK release version key for encoding the corresponding URL parameter.
 	 */
 	private static final String SDK_RELEASE_VERSION_KEY = "sdk_version";
-
-	/**
-	 * The Android ID key for encoding the corresponding URL parameter.
-	 */
-	private static final String ANDROID_ID_KEY = "android_id";
-
-	/**
-	 * The WiFi MAC Address ID key for encoding the corresponding URL parameter.
-	 */
-	private static final String WIFI_MAC_ADDRESS_KEY = "mac_address";
 
 	private static final String SCREEN_WIDTH_KEY = "screen_width";
 
@@ -247,13 +232,10 @@ public class UrlBuilder {
 
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(APPID_KEY, mCredentials.getAppId());
-		keyValueParams.put(UDID_KEY, hostInfo.getUDID());
 
 		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());
 		keyValueParams.put(PHONE_VERSION_KEY, hostInfo.getPhoneVersion());
 		keyValueParams.put(LANGUAGE_KEY, hostInfo.getLanguageSetting());
-		keyValueParams.put(ANDROID_ID_KEY, hostInfo.getAndroidId());
-		keyValueParams.put(WIFI_MAC_ADDRESS_KEY, hostInfo.getWifiMacAddress());
 		
 		keyValueParams.put(CARRIER_NAME_KEY, hostInfo.getCarrierName());
 		keyValueParams.put(CARRIER_COUNTRY_KEY, hostInfo.getCarrierCountry());

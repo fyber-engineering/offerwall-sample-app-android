@@ -3,12 +3,12 @@ package com.sponsorpay.mediation;
 import java.util.Set;
 
 import android.app.Activity;
-import android.util.Log;
 
 import com.hyprmx.android.sdk.HyprMXHelper;
 import com.sponsorpay.mediation.mbe.HyprMXVideoMediationAdapter;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
+import com.sponsorpay.utils.SponsorPayLogger;
 
 public class HyprMXMediationAdapter extends SPMediationAdapter {
 
@@ -18,13 +18,13 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 
 	public static final String TAG = HyprMXMediationAdapter.class.getSimpleName(); // just
 																					// TAG
-	private static final String ADAPTER_VERSION = "2.0.0"; // to verify what
-//	private static final String ADAPTER_VERSION = "1.0.0"; // to verify what
+	public static final String ADAPTER_VERSION = "2.0.0"; // to verify what
+//	public static final String ADAPTER_VERSION = "1.0.0"; // to verify what
 															// version of
 															// adapter is
 															// supported
-	private static final String ADAPTER_NAME = "Applifier"; // user for getting
-//	private static final String ADAPTER_NAME = "HyprMX"; // user for getting
+	public static final String ADAPTER_NAME = "Applifier"; // user for getting
+//	public static final String ADAPTER_NAME = "HyprMX"; // user for getting
 															// info from
 															// adapters.config
 
@@ -37,9 +37,9 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 	public boolean startAdapter(final Activity activity) {
 		// TODO Auto-generated method stub
 		// create video adapter instance
-		Log.d(TAG, "starting Applifier - HyprMX adapter");
+		SponsorPayLogger.d(TAG, "starting Applifier - HyprMX adapter");
 		mVideoAdapter = new HyprMXVideoMediationAdapter(this);
-		Log.d(TAG, "adapter details - distributorID: " + getDistributorId() + ", propertyID: " + getPropertyId() + ", userID: " + getUserId());
+		SponsorPayLogger.d(TAG, "adapter details - distributorID: " + getDistributorId() + ", propertyID: " + getPropertyId() + ", userID: " + getUserId());
 		activity.runOnUiThread(new Runnable() {
 			
 			@Override
@@ -52,32 +52,32 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 
 	@Override
 	public String getName() {
-		Log.d(TAG, "get name");
+		SponsorPayLogger.d(TAG, "get name");
 		return ADAPTER_NAME;
 	}
 
 	@Override
 	public String getVersion() {
-		Log.d(TAG, "get version");
+		SponsorPayLogger.d(TAG, "get version");
 		return ADAPTER_VERSION;
 	}
 
 	@Override
 	public SPBrandEngageMediationAdapter<? extends SPMediationAdapter> getVideoMediationAdapter() {
-		Log.d(TAG, "get video adapter");
+		SponsorPayLogger.d(TAG, "get video adapter");
 		return mVideoAdapter;
 	}
 
 	@Override
 	public SPInterstitialMediationAdapter<? extends SPMediationAdapter> getInterstitialMediationAdapter() {
 		// no interstitial adapter - return null
-		Log.d(TAG, "get interstitial adapter");
+		SponsorPayLogger.d(TAG, "get interstitial adapter");
 		return null;
 	}
 
 	@Override
 	protected Set<? extends Object> getListeners() {
-		Log.d(TAG, "get listeners");
+		SponsorPayLogger.d(TAG, "get listeners");
 		// TODO to add, what needs to be added - need help?
 		return null;
 	}
@@ -104,8 +104,7 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 	// } catch (NameNotFoundException e) {
 	// return null;
 	// }
-	//
-	// if (ai.metaData == null) {
+	//ewfwe.metaData == null) {
 	// ai.metaData = new Bundle();
 	// }
 	//

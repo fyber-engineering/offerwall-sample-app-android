@@ -110,7 +110,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 		}
 
 		String callbackUrl = UrlBuilder.newBuilder(getBaseUrl(), mCredentials).addExtraKeysValues(
-				params).sendUserId(false).addScreenMetrics().buildUrl();
+				params).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(TAG,
 				"Callback will be sent to: " + callbackUrl);

@@ -77,6 +77,7 @@ public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<H
 		SponsorPayLogger.d(TAG, "onOfferCompleted method");
 		mPresentation = null;
 		setVideoPlayed();
+		sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
 	}
 
 	@Override
@@ -100,7 +101,8 @@ public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<H
 	public void onNoOffersAvailable(OffersAvailableResponse arg0) {
 		SponsorPayLogger.d(TAG, "onNoOffersAvailable method");
 		// TODO Auto-generated method stub
-
+		sendValidationEvent(arg0.getOffersAvailable().size() > 0 ? SPTPNVideoValidationResult.SPTPNValidationSuccess
+				: SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 	}
 
 	@Override

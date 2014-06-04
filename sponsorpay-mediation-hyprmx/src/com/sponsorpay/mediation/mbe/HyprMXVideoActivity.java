@@ -3,6 +3,7 @@ package com.sponsorpay.mediation.mbe;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 
 import com.hyprmx.android.sdk.HyprMXHelper;
 import com.hyprmx.android.sdk.HyprMXPresentation;
@@ -38,18 +39,37 @@ public class HyprMXVideoActivity extends Activity {
 	}
 
 	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		SponsorPayLogger.d(TAG, "onactivityresult");
 		super.onActivityResult(requestCode, resultCode, data);
 		HyprMXHelper.processActivityResult(this, requestCode, resultCode, data,
 				HyprMXVideoAdapterHelper.getHyprMXVideoMediationAdapter());
-		finish();
+		// finish();
 	}
 
 	private void runPresentation() {
-//		HyprMXMediationAdapter adapter = (HyprMXMediationAdapter) HyprMXVideoAdapterHelper.getHyprMXMediationAdapter();
+		// HyprMXMediationAdapter adapter = (HyprMXMediationAdapter)
+		// HyprMXVideoAdapterHelper.getHyprMXMediationAdapter();
 		HyprMXVideoMediationAdapter videoAdapter = HyprMXVideoAdapterHelper.getHyprMXVideoMediationAdapter();
 		HyprMXPresentation presentation = videoAdapter.getPresentation();
-		presentation.show(this);
+		if (presentation != null) {
+			presentation.show(this);
+		}
 	}
 }

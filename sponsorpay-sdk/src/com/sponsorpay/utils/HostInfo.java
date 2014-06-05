@@ -356,26 +356,11 @@ public class HostInfo {
 	// Permission simulation 
 	
 	protected static boolean sSimulateNoReadPhoneStatePermission = false;
-	protected static boolean sSimulateNoAccessWifiStatePermission = false;
-	protected static boolean sSimulateInvalidAndroidId = false;
-	protected static boolean sSimulateNoHardwareSerialNumber = false;
 	protected static boolean sSimulateNoAccessNetworkState = false;
 
 	
 	public static void setSimulateNoReadPhoneStatePermission(boolean value) {
 		sSimulateNoReadPhoneStatePermission = value;
-	}
-
-	public static void setSimulateNoAccessWifiStatePermission(boolean value) {
-		sSimulateNoAccessWifiStatePermission = value;
-	}
-
-	public static void setSimulateInvalidAndroidId(boolean value) {
-		sSimulateInvalidAndroidId = value;
-	}
-
-	public static void setSimulateNoHardwareSerialNumber(boolean value) {
-		sSimulateNoHardwareSerialNumber = value;
 	}
 
 	public static void setSimulateNoAccessNetworkState(boolean value) {

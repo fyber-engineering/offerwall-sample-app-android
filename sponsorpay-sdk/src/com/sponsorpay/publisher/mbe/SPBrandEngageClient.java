@@ -268,6 +268,16 @@ public class SPBrandEngageClient {
 	}
 	
 	private void startQueryingOffers(SPCredentials credentials) {
+		
+		if(mCustomParameters == null){
+			mCustomParameters = new HashMap<String, String>();
+		}
+		
+		mCustomParameters.put(KEY_FOR_CLIENT_CUSTOM_PARAMETER, "sdk");
+		mCustomParameters.put(KEY_FOR_PLATFORM_CUSTOM_PARAMETER, "android");
+		mCustomParameters.put(KEY_FOR_REWARDED_CUSTOM_PARAMETER, "1");
+		mCustomParameters.put(KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER, "video");
+		
 		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials)
 				.setCurrency(mCurrency).addExtraKeysValues(mCustomParameters)
 				.addScreenMetrics().buildUrl();
@@ -449,19 +459,7 @@ public class SPBrandEngageClient {
 	 */
 	public boolean setCustomParameters(Map<String, String> parameters) {
 		if (canChangeParameters()) {
-			
-			
-			if(parameters == null){
-				mCustomParameters = new HashMap<String, String>();
-			}else{
-			
-				mCustomParameters = parameters;
-			}
-			
-			mCustomParameters.put(KEY_FOR_CLIENT_CUSTOM_PARAMETER, "sdk");
-			mCustomParameters.put(KEY_FOR_PLATFORM_CUSTOM_PARAMETER, "android");
-			mCustomParameters.put(KEY_FOR_REWARDED_CUSTOM_PARAMETER, "1");
-			mCustomParameters.put(KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER, "video");
+			mCustomParameters = parameters;
 			
 			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 			return true;

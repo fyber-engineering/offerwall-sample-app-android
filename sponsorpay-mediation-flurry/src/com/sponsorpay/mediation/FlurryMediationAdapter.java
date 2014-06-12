@@ -15,7 +15,7 @@ import com.flurry.android.FlurryAdListener;
 import com.flurry.android.FlurryAdType;
 import com.flurry.android.FlurryAds;
 import com.flurry.android.FlurryAgent;
-
+import com.sponsorpay.SponsorPay;
 import com.sponsorpay.mediation.SPMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.mediation.mbe.FlurryVideoMediationAdapter;
@@ -50,7 +50,7 @@ public class FlurryMediationAdapter extends SPMediationAdapter implements Flurry
 				public void run() {
 					//onStartSession must be called from the UI thread.
 					FlurryAgent.onStartSession(actRef.get(), apiKey);
-					FlurryAgent.addOrigin("SponsorPayAndroid", "SPONSORPAY_SDK_VERSION");
+					FlurryAgent.addOrigin("SponsorPayAndroid", SponsorPay.RELEASE_VERSION_STRING);
 				}
 				
 			});

@@ -1,13 +1,20 @@
 package com.sponsorpay.publisher;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+
+import com.sponsorpay.utils.SponsorPayLogger;
 
 import android.location.Location;
 
 public final class SPUser extends HashMap<String, Object>  {
 	
 	private static final long serialVersionUID = -5963403748409731798L;
+	
+	private static final String CLASS_NAME = "SPUser";
+	
+	private ArrayList<String> lockedKeys = new ArrayList<String>();
 	
 	public static final String AGE = "age";
 	public static final String BIRTHDAY = "birthdate";
@@ -36,15 +43,14 @@ public final class SPUser extends HashMap<String, Object>  {
 	
 
 
-	private static final class SingletonHolder {
-		static final SPUser singleton = new SPUser();
-	}
+	private static final SPUser singleton = new SPUser();
 
 	private SPUser() {
+		setLockedlockedKeys();
 	}
 
 	public static SPUser getInstance() {
-		return SingletonHolder.singleton;
+		return singleton;
 	}
      
 	public enum SPUserGender{
@@ -100,7 +106,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static Integer getAge() {
-		return  (Integer) SingletonHolder.singleton.get(AGE);
+		return  (Integer) singleton.get(AGE);
 	}
 
 
@@ -110,7 +116,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public Date getBirthdate() {
-		return (Date) SingletonHolder.singleton.get(BIRTHDAY);
+		return (Date) singleton.get(BIRTHDAY);
 	}
 
 
@@ -120,7 +126,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static SPUserGender getGender() {
-		return (SPUserGender) SingletonHolder.singleton.get(GENDER);
+		return (SPUserGender) singleton.get(GENDER);
 	}
 
 
@@ -130,7 +136,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static SPUserSexualOrientation getSexualOrientation() {
-		return (SPUserSexualOrientation) SingletonHolder.singleton.get(SEXUAL_ORIENTATION);
+		return (SPUserSexualOrientation) singleton.get(SEXUAL_ORIENTATION);
 	}
 
 
@@ -140,7 +146,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static SPUserEthnicity getEthnicity() {
-		return (SPUserEthnicity) SingletonHolder.singleton.get(ETHNICITY);
+		return (SPUserEthnicity) singleton.get(ETHNICITY);
 	}
 
 
@@ -150,7 +156,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static Location getLocation() {
-		return (Location) SingletonHolder.singleton.get(LOCATION);
+		return (Location) singleton.get(LOCATION);
 	}
 
 
@@ -160,7 +166,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static Float getLat() {
-		return (Float) SingletonHolder.singleton.get(LAT);
+		return (Float) singleton.get(LAT);
 	}
 
 
@@ -170,7 +176,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static Float getLongt() {
-		return (Float) SingletonHolder.singleton.get(LONGT);
+		return (Float) singleton.get(LONGT);
 	}
 
 
@@ -180,7 +186,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static SPUserMaritalStatus getMaritalStatus() {
-		return (SPUserMaritalStatus) SingletonHolder.singleton.get(MARITAL_STATUS);
+		return (SPUserMaritalStatus) singleton.get(MARITAL_STATUS);
 	}
 
 
@@ -189,7 +195,7 @@ public final class SPUser extends HashMap<String, Object>  {
 	}
 	
 	public static Boolean hasChildren() {
-		return (Boolean) SingletonHolder.singleton.get(HAS_CHILDREN);
+		return (Boolean) singleton.get(HAS_CHILDREN);
 	}
 
 
@@ -198,7 +204,7 @@ public final class SPUser extends HashMap<String, Object>  {
 	}
 	
 	public static Integer getNumberOfChildrens(){
-		return (Integer) SingletonHolder.singleton.get(NUMBER_OF_CHILDRENS);
+		return (Integer) singleton.get(NUMBER_OF_CHILDRENS);
 	}
 
 	public void setNumberOfChildrens(Integer numberOfChildrens) {
@@ -206,7 +212,7 @@ public final class SPUser extends HashMap<String, Object>  {
 	}
 
 	public static Integer getAnnualHouseholdIncome() {
-		return (Integer) SingletonHolder.singleton.get(ANNUAL_HOUSEHOLD_INCOME);
+		return (Integer) singleton.get(ANNUAL_HOUSEHOLD_INCOME);
 	}
 
 
@@ -216,7 +222,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static SPUserEducation getEducation() {
-		return (SPUserEducation) SingletonHolder.singleton.get(EDUCATION);
+		return (SPUserEducation) singleton.get(EDUCATION);
 	}
 
 
@@ -226,7 +232,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static String getZipcode() {
-		return (String) SingletonHolder.singleton.get(ZIPCODE);
+		return (String) singleton.get(ZIPCODE);
 	}
 
 
@@ -236,7 +242,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static String getPoliticalAffiliation() {
-		return (String) SingletonHolder.singleton.get(POLITICAL_AFFILIATION);
+		return (String) singleton.get(POLITICAL_AFFILIATION);
 	}
 
 
@@ -246,7 +252,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static String[] getInterests() {
-		return (String[]) SingletonHolder.singleton.get(INTERESTS);
+		return (String[]) singleton.get(INTERESTS);
 	}
 
 
@@ -256,7 +262,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static Boolean getIap() {
-		return (Boolean) SingletonHolder.singleton.get(IAP);
+		return (Boolean) singleton.get(IAP);
 	}
 
 
@@ -266,7 +272,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static Float getIapAmount() {
-		return (Float) SingletonHolder.singleton.get(IAP_AMOUNT);
+		return (Float) singleton.get(IAP_AMOUNT);
 	}
 
 
@@ -276,7 +282,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static Integer getNumberOfSessions() {
-		return (Integer) SingletonHolder.singleton.get(NUMBER_OF_SESSIONS);
+		return (Integer) singleton.get(NUMBER_OF_SESSIONS);
 	}
 
 
@@ -286,7 +292,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static Long getPsTime() {
-		return (Long) SingletonHolder.singleton.get(PS_TIME);
+		return (Long) singleton.get(PS_TIME);
 	}
 
 
@@ -296,7 +302,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static Long getLastSession() {
-		return (Long) SingletonHolder.singleton.get(LAST_SESSION);
+		return (Long) singleton.get(LAST_SESSION);
 	}
 
 
@@ -306,7 +312,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static SPUserConnection getConnection() {
-		return (SPUserConnection) SingletonHolder.singleton.get(CONNECTION);
+		return (SPUserConnection) singleton.get(CONNECTION);
 	}
 
 	public void setConnection(SPUserConnection connection) {
@@ -315,7 +321,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static String getDevice() {
-		return (String) SingletonHolder.singleton.get(DEVICE);
+		return (String) singleton.get(DEVICE);
 	}
 
 
@@ -325,7 +331,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static String getAppVersion() {
-		return (String) SingletonHolder.singleton.get(APP_VERSION);
+		return (String) singleton.get(APP_VERSION);
 	}
 
 
@@ -337,21 +343,45 @@ public final class SPUser extends HashMap<String, Object>  {
 	/**
 	 * You can set custom values in the collection
 	 * as long as the key doesn't match with an 
-	 * existing one.
+	 * existing one and isn't the same with the
+	 * existed locked keywords.
 	 */
-	public void addCustomValue(String key, Object value){
-		boolean doesKeyAlreadyExistInCollection = false;
-		
-		for (String existedkey : keySet()) {
-		    if(existedkey.equalsIgnoreCase(key)){
-		    	doesKeyAlreadyExistInCollection = true;
-		    	break;
-		    }
-		} 
-		
-		if(!doesKeyAlreadyExistInCollection){
+	public void addCustomValue(String key, Object value) {
+		if (!lockedKeys.contains(key)) {
 			put(key, value);
+		}else{
+			SponsorPayLogger.v(CLASS_NAME, key + " is a locked key for this HashMap, please select another name.");
 		}
 	}
+	
+	private ArrayList<String> setLockedlockedKeys(){
+		lockedKeys.add(AGE);
+		lockedKeys.add(BIRTHDAY);
+		lockedKeys.add(GENDER);
+		lockedKeys.add(SEXUAL_ORIENTATION);
+		lockedKeys.add(ETHNICITY);
+		lockedKeys.add(LOCATION);
+		lockedKeys.add(LAT);
+		lockedKeys.add(LONGT);
+		lockedKeys.add(MARITAL_STATUS);
+		lockedKeys.add(HAS_CHILDREN);
+		lockedKeys.add(NUMBER_OF_CHILDRENS);
+		lockedKeys.add(ANNUAL_HOUSEHOLD_INCOME);
+		lockedKeys.add(EDUCATION);
+		lockedKeys.add(ZIPCODE);
+		lockedKeys.add(POLITICAL_AFFILIATION);
+		lockedKeys.add(INTERESTS);
+		lockedKeys.add(IAP);
+		lockedKeys.add(IAP_AMOUNT);
+		lockedKeys.add(NUMBER_OF_SESSIONS);
+		lockedKeys.add(PS_TIME);
+		lockedKeys.add(LAST_SESSION);
+		lockedKeys.add(CONNECTION);
+		lockedKeys.add(DEVICE);
+		lockedKeys.add(APP_VERSION);
+		
+		return lockedKeys;
+	}
+	
 
 }

@@ -3,3 +3,6 @@ bin/
 .idea/
 .gradle
 build/
+
+android-sdk/
+.directory

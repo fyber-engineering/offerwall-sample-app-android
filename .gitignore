@@ -6,3 +6,5 @@ build/
 
 android-sdk/
 .directory
+sponsorpay-mediation-facebook/
+libs/

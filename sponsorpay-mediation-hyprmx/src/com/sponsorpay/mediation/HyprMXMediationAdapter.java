@@ -16,15 +16,14 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 	private static final String PROPERTY_ID = "propertyId";
 	private static final String USER_ID = "userId";
 
-	public static final String TAG = HyprMXMediationAdapter.class.getSimpleName(); // just
-																					// TAG
-	public static final String ADAPTER_VERSION = "2.0.0"; // to verify what
-//	public static final String ADAPTER_VERSION = "1.0.0"; // to verify what
+	public static final String TAG = HyprMXMediationAdapter.class.getSimpleName(); // just TAG
+//	public static final String ADAPTER_VERSION = "2.0.0"; // to verify what
+	public static final String ADAPTER_VERSION = "1.0.0"; // to verify what
 															// version of
 															// adapter is
 															// supported
-	public static final String ADAPTER_NAME = "Applifier"; // user for getting
-//	public static final String ADAPTER_NAME = "HyprMX"; // user for getting
+//	public static final String ADAPTER_NAME = "Applifier"; // user for getting
+	public static final String ADAPTER_NAME = "HyprMX"; // user for getting
 															// info from
 															// adapters.config
 

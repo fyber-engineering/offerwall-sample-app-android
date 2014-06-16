@@ -135,7 +135,8 @@ public class SPBrandEngageClient {
 	 */
 	public static final String SP_REQUEST_STATUS_PARAMETER_ERROR = "ERROR";
 	
-	private static final int TIMEOUT = 10000 ;
+	public static final int TIMEOUT = 10000 ;
+	
 	private static final int VCS_TIMEOUT = 3000 ;
 
 	private static final int VIDEO_EVENT = 1;
@@ -289,28 +290,36 @@ public class SPBrandEngageClient {
 	 * @return true if the engagement can be started
 	 */
 	public boolean startEngagement(Activity activity) {
-		if (canStartEngagement()) {
-			
-			loadUrl(SP_START_ENGAGEMENT);
-			
-			mActivity = activity;
-			if (!playThroughMediation()) {
-				mActivity.addContentView(mWebView, new LayoutParams(
-						LayoutParams.FILL_PARENT,
-						LayoutParams.FILL_PARENT));
-				mContext.registerReceiver(mNetworkStateReceiver, mIntentFilter);
-			}
-		
-			checkEngagementStarted();
-			return true;
-		} else {
-			SponsorPayLogger.d(TAG,	"SPBrandEngageClient is not ready to show offers. " +
-					"Call requestOffers() and wait until your listener is called with the" +
-					" confirmation that offers have been received.");
-			return false;
-		}
+		return startEngagement(activity, playThroughMediation());
 	}
 	
+	public boolean startEngagement(Activity activity,
+			boolean playThroughMediation) {
+		if (activity != null) {
+			if (canStartEngagement()) {
+				
+				loadUrl(SP_START_ENGAGEMENT);
+				
+				mActivity = activity;
+				if (!playThroughMediation) {
+					mActivity.addContentView(mWebView, new LayoutParams(
+							LayoutParams.FILL_PARENT,
+							LayoutParams.FILL_PARENT));
+					mContext.registerReceiver(mNetworkStateReceiver, mIntentFilter);
+				}
+			
+				checkEngagementStarted();
+				return true;
+			} else {
+				SponsorPayLogger.d(TAG,	"SPBrandEngageClient is not ready to show offers. " +
+						"Call requestOffers() and wait until your listener is called with the" +
+						" confirmation that offers have been received.");
+			}
+		} else {
+			SponsorPayLogger.d(TAG,	"The provided activity is null, SPBrandEngageClient cannot start the engagement.");
+		}
+		return false;
+	}	
 	/**
 	 * Closes the current engagement
 	 */
@@ -575,8 +584,10 @@ public class SPBrandEngageClient {
 	}
 	
 	private void setClientStatus(SPBrandEngageOffersStatus newStatus) {
-		mStatus = newStatus;
-		SponsorPayLogger.d(TAG, "SPBrandEngageClient mStatus -> " + newStatus.name());
+		if (mStatus != newStatus) {
+			mStatus = newStatus;
+			SponsorPayLogger.d(TAG, "SPBrandEngageClient mStatus -> " + newStatus.name());
+		}
 	}
 	
 	private void showRewardsNotification() {
@@ -844,5 +855,4 @@ public class SPBrandEngageClient {
 			}
 		}
 	}
-
 }

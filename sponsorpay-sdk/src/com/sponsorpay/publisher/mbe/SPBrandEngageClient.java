@@ -109,6 +109,11 @@ public class SPBrandEngageClient {
 	private static final String SP_THIRD_PARTY_ID_PARAMETER = "id";
 	private static final String SP_REQUEST_PLAY = "play";
 	
+	private static final String KEY_FOR_CLIENT_CUSTOM_PARAMETER    = "client";
+	private static final String KEY_FOR_PLATFORM_CUSTOM_PARAMETER  = "platform";
+	private static final String KEY_FOR_REWARDED_CUSTOM_PARAMETER  = "rewarded";
+	private static final String KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER = "ad_format";
+	
 	
 	/**
 	 * Engagement status key used in {@link SPBrandEngageActivity}
@@ -263,9 +268,11 @@ public class SPBrandEngageClient {
 	}
 	
 	private void startQueryingOffers(SPCredentials credentials) {
+		
 		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials)
-				.setCurrency(mCurrency).addExtraKeysValues(mCustomParameters)
-				.addScreenMetrics().buildUrl();
+				.setCurrency(mCurrency).addExtraKeysValues(mCustomParameters).addKeyValue(KEY_FOR_CLIENT_CUSTOM_PARAMETER, "sdk")
+				.addKeyValue(KEY_FOR_PLATFORM_CUSTOM_PARAMETER, "android").addKeyValue(KEY_FOR_REWARDED_CUSTOM_PARAMETER, "1")
+				.addKeyValue(KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER, "video").addScreenMetrics().buildUrl();
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
 		loadUrl(requestUrl);
 		setClientStatus(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
@@ -445,6 +452,7 @@ public class SPBrandEngageClient {
 	public boolean setCustomParameters(Map<String, String> parameters) {
 		if (canChangeParameters()) {
 			mCustomParameters = parameters;
+			
 			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 			return true;
 		} else {

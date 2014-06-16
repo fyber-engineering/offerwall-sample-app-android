@@ -38,55 +38,60 @@ public class SponsorPayLogger {
 	}
 
 	public static void e(String tag, String message) {
-		if (logging) {
+		if (shouldLog()) {
 			Log.e(tag, message);
 			INSTANCE.log(Level.ERROR, tag, message, null);
 		}
 	}
 
 	public static void e(String tag, String message, Exception exception) {
-		if (logging) {
+		if (shouldLog()) {
 			Log.w(tag, message, exception);
 			INSTANCE.log(Level.ERROR, tag, message, exception);
 		}
 	}
 
 	public static void d(String tag, String message) {
-		if (logging) {
+		if (shouldLog()) {
 			Log.d(tag, message);
 			INSTANCE.log(Level.DEBUG, tag, message, null);
 		}
 	}
 
 	public static void i(String tag, String message) {
-		if (logging) {
+		if (shouldLog()) {
 			Log.i(tag, message);
 			INSTANCE.log(Level.INFO, tag, message, null);
 		}
 	}
 
 	public static void v(String tag, String message) {
-		if (logging) {
+		if (shouldLog()) {
 			Log.v(tag, message);
 			INSTANCE.log(Level.VERBOSE, tag, message, null);
 		}
 	}
 
 	public static void w(String tag, String message) {
-		if (logging) {
+		if (shouldLog()) {
 			Log.w(tag, message);
 			INSTANCE.log(Level.WARNING, tag, message, null);
 		}
 	}
 
 	public static void w(String tag, String message, Exception exception) {
-		if (logging) {
+		if (shouldLog()) {
 			Log.w(tag, message, exception);
 			INSTANCE.log(Level.WARNING, tag, message, exception);
 		}
 	}
 	
-	// 
+	//
+	
+	private static boolean shouldLog() {
+		return logging || Log.isLoggable("SponsorPay", Log.VERBOSE);
+	}
+	
 	private static SponsorPayLogger INSTANCE = new SponsorPayLogger();
 	
 	private Set<SPLoggerListener> listeners = new HashSet<SPLoggerListener>();

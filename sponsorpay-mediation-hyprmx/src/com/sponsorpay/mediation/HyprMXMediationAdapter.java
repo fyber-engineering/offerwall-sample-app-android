@@ -16,25 +16,20 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 	private static final String PROPERTY_ID = "propertyId";
 	private static final String USER_ID = "userId";
 
-	public static final String TAG = HyprMXMediationAdapter.class.getSimpleName(); // just TAG
-//	public static final String ADAPTER_VERSION = "2.0.0"; // to verify what
+	public static final String TAG = HyprMXMediationAdapter.class.getSimpleName();
 	public static final String ADAPTER_VERSION = "1.0.0"; // to verify what
 															// version of
 															// adapter is
 															// supported
-//	public static final String ADAPTER_NAME = "Applifier"; // user for getting
 	public static final String ADAPTER_NAME = "HyprMX"; // user for getting
 															// info from
 															// adapters.config
 
-	// private static final String SDK_KEY = "applovin.sdk.key"; //used for
-	// getting info from adapters.info
 	private HyprMXVideoMediationAdapter mVideoAdapter; // reference to video
 														// adapter
 
 	@Override
 	public boolean startAdapter(final Activity activity) {
-		// TODO Auto-generated method stub
 		// create video adapter instance
 		SponsorPayLogger.d(TAG, "starting Applifier - HyprMX adapter");
 		mVideoAdapter = new HyprMXVideoMediationAdapter(this);
@@ -43,7 +38,7 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 			
 			@Override
 			public void run() {
-				HyprMXHelper.getInstance(activity, getDistributorId(), getPropertyId(), getUserId()); // This only needs to happen once, but won't hurt.
+				HyprMXHelper.getInstance(activity, getDistributorId(), getPropertyId(), getUserId());
 			}
 		});
 		return true; // indicates that adapter has been run successfully
@@ -77,7 +72,6 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 	@Override
 	protected Set<? extends Object> getListeners() {
 		SponsorPayLogger.d(TAG, "get listeners");
-		// TODO to add, what needs to be added - need help?
 		return null;
 	}
 
@@ -92,28 +86,5 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 	public String getPropertyId() {
 		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, PROPERTY_ID, String.class);
 	}
-
-	// private Bundle getMetadata(Activity activity) {
-	// ApplicationInfo ai = null;
-	//
-	// // Extract the meta data from the package manager
-	// try {
-	// ai = activity.getPackageManager().getApplicationInfo(
-	// activity.getPackageName(), PackageManager.GET_META_DATA);
-	// } catch (NameNotFoundException e) {
-	// return null;
-	// }
-	//ewfwe.metaData == null) {
-	// ai.metaData = new Bundle();
-	// }
-	//
-	// return ai.metaData;
-	// }
-
-	// private String getValueFromAppMetadata(Activity activity) {
-	// Object retrievedValue;
-	// retrievedValue = getMetadata(activity).get(SDK_KEY);
-	// return retrievedValue == null ? null : retrievedValue.toString();
-	// }
 
 }

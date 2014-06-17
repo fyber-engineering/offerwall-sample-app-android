@@ -31,12 +31,10 @@ public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<H
 		super(adapter);
 		HyprMXVideoAdapterHelper.setHyprMXVideoMediationAdapter(this);
 		SponsorPayLogger.d(TAG, "creating hypr video adapter");
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void videosAvailable(Context context) {
-		// TODO Auto-generated method stub
 		SponsorPayLogger.d(TAG, "videos available method");
 		mPresentation = new HyprMXPresentation();
 		mPresentation.prepare(this);
@@ -45,9 +43,7 @@ public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<H
 	@Override
 	public void startVideo(final Activity parentActivity) {
 		SponsorPayLogger.d(TAG, "start video method");
-		// TODO Auto-generated method stub
 		SponsorPayLogger.d(TAG, parentActivity.getClass().getCanonicalName());
-		// parentActivity.add
 		Intent intent = new Intent(parentActivity, HyprMXVideoActivity.class);
 		parentActivity.startActivity(intent);
 		notifyVideoStarted();
@@ -60,7 +56,6 @@ public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<H
 	@Override
 	public void onNoContentAvailable() {
 		SponsorPayLogger.d(TAG, "onNoContentAvailable method");
-		// TODO Auto-generated method stub
 		sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventNoVideo);
 	}
 
@@ -73,7 +68,6 @@ public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<H
 
 	@Override
 	public void onOfferCompleted(Offer arg0) {
-		// TODO Auto-generated method stub
 		SponsorPayLogger.d(TAG, "onOfferCompleted method");
 		mPresentation = null;
 		setVideoPlayed();
@@ -92,7 +86,6 @@ public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<H
 	 */
 	@Override
 	public void onError(int arg0) {
-		// TODO Auto-generated method stub
 		SponsorPayLogger.d(TAG, "onError method");
 		notifyVideoError();
 	}
@@ -100,7 +93,6 @@ public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<H
 	@Override
 	public void onNoOffersAvailable(OffersAvailableResponse arg0) {
 		SponsorPayLogger.d(TAG, "onNoOffersAvailable method");
-		// TODO Auto-generated method stub
 		sendValidationEvent(arg0.getOffersAvailable().size() > 0 ? SPTPNVideoValidationResult.SPTPNValidationSuccess
 				: SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 	}
@@ -108,8 +100,6 @@ public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<H
 	@Override
 	public void onOffersAvailable(OffersAvailableResponse arg0) {
 		SponsorPayLogger.d(TAG, "onOffersAvailable method");
-		// TODO Auto-generated method stub
-		// _presentation.show(arg0);
 		sendValidationEvent(arg0.getOffersAvailable().size() > 0 ? SPTPNVideoValidationResult.SPTPNValidationSuccess
 				: SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 	}

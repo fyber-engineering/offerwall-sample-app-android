@@ -24,9 +24,4 @@ public class HyprMXVideoAdapterHelper {
 		configs.put(HYPRMX_VIDEO_ADAPTER, videoAdapter);
 	}
 	
-//	public static YuMeInterstitialMediationAdapter getYuMeInterstitialAdapter() {
-//		return SPMediationConfigurator.getConfiguration(getName(),
-//				YUME_INTERSTITIAL_ADAPTER, YuMeInterstitialMediationAdapter.class);
-//	}
-	
 }

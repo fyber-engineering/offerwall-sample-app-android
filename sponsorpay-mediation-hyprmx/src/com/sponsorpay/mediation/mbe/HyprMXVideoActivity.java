@@ -19,30 +19,10 @@ public class HyprMXVideoActivity extends Activity {
 
 	private static final String TAG = "HyprMXVideoActivity";
 
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
-
-	protected void onStart() {
-		super.onStart();
-	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();
 		runPresentation();
-	}
-
-	protected void onPause() {
-		super.onPause();
-	}
-
-	protected void onStop() {
-		super.onStop();
-	}
-
-	protected void onDestroy() {
-		super.onDestroy();
 	}
 
 	@Override

@@ -12,33 +12,34 @@ import com.sponsorpay.utils.SponsorPayLogger;
 
 public class HyprMXMediationAdapter extends SPMediationAdapter {
 
+	private static final String TAG = "HyprMXMediationAdapter";
+	
 	private static final String DISTRIBUTOR_ID = "distributorId";
-	private static final String PROPERTY_ID = "propertyId";
-	private static final String USER_ID = "userId";
+	private static final String PROPERTY_ID    = "propertyId";
+	private static final String USER_ID        = "userId";
+	
+	public static final String ADAPTER_VERSION = "1.0.0"; 
+	public static final String ADAPTER_NAME    = "HyprMX"; 
 
-	public static final String TAG = HyprMXMediationAdapter.class.getSimpleName();
-	public static final String ADAPTER_VERSION = "1.0.0"; // to verify what
-															// version of
-															// adapter is
-															// supported
-	public static final String ADAPTER_NAME = "HyprMX"; // user for getting
-															// info from
-															// adapters.config
-
-	private HyprMXVideoMediationAdapter mVideoAdapter; // reference to video
-														// adapter
+	//reference to video adapter
+	private HyprMXVideoMediationAdapter mVideoAdapter; 
 
 	@Override
 	public boolean startAdapter(final Activity activity) {
 		// create video adapter instance
-		SponsorPayLogger.d(TAG, "starting Applifier - HyprMX adapter");
+		SponsorPayLogger.d(TAG, "starting HyprMX adapter");
 		mVideoAdapter = new HyprMXVideoMediationAdapter(this);
-		SponsorPayLogger.d(TAG, "adapter details - distributorID: " + getDistributorId() + ", propertyID: " + getPropertyId() + ", userID: " + getUserId());
+		
+		final String distributorId = getDistributorId();
+		final String propertyId    = getPropertyId();
+		final String userId        = getUserId();
+		
+		SponsorPayLogger.d(TAG, "adapter details - distributorID: " + distributorId + ", propertyID: " + propertyId + ", userID: " + userId);
 		activity.runOnUiThread(new Runnable() {
 			
 			@Override
 			public void run() {
-				HyprMXHelper.getInstance(activity, getDistributorId(), getPropertyId(), getUserId());
+				HyprMXHelper.getInstance(activity, distributorId, propertyId, userId);
 			}
 		});
 		return true; // indicates that adapter has been run successfully

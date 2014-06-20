@@ -10,23 +10,19 @@ import com.sponsorpay.mediation.helper.HyprMXVideoAdapterHelper;
 import com.sponsorpay.utils.SponsorPayLogger;
 
 /**
- * Purpose of this activity is to host displaying the video and provide proper
- * handling mechanism for received ad result.
- * 
- * @author hubert
- * 
+ * The purpose of this activity is to host the displaying 
+ * video and provide a proper handling mechanism for the
+ * received ad result.
  */
 
 public class HyprMXVideoActivity extends Activity {
 
-	private static final String TAG = HyprMXVideoActivity.class.getSimpleName();
+	private static final String TAG = "HyprMXVideoActivity";
 
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
 
-	@Override
 	protected void onStart() {
 		super.onStart();
 	}
@@ -37,27 +33,27 @@ public class HyprMXVideoActivity extends Activity {
 		runPresentation();
 	}
 
-	@Override
 	protected void onPause() {
 		super.onPause();
 	}
 
-	@Override
 	protected void onStop() {
 		super.onStop();
 	}
 
-	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		SponsorPayLogger.d(TAG, "onactivityresult");
+		SponsorPayLogger.d(TAG, "onActivityResult");
 		super.onActivityResult(requestCode, resultCode, data);
 		HyprMXHelper.processActivityResult(this, requestCode, resultCode, data,
 				HyprMXVideoAdapterHelper.getHyprMXVideoMediationAdapter());
+		
+		//CLose the activity
+		finish();
 	}
 
 	private void runPresentation() {

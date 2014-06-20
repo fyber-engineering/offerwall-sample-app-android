@@ -19,7 +19,7 @@ import com.sponsorpay.utils.SponsorPayLogger;
 public class HyprMXVideoMediationAdapter extends SPBrandEngageMediationAdapter<HyprMXMediationAdapter>
 		implements HyprMXHelper.HyprMXListener, OnOffersAvailableResponseReceivedListener {
 
-	private static final String TAG = HyprMXVideoMediationAdapter.class.getSimpleName();
+	private static final String TAG = "HyprMXVideoMediationAdapter";
 
 	private HyprMXPresentation mPresentation = null;
 

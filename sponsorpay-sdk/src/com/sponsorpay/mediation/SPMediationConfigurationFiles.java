@@ -54,17 +54,17 @@ public class SPMediationConfigurationFiles {
 			try {
 				return new GetRemoteFileContentTask().execute(urlString).get();
 			} catch (InterruptedException e) {
-				SponsorPayLogger.e(TAG, "Error occured", e);
+				SponsorPayLogger.e(TAG, "Error occurred", e);
 			} catch (ExecutionException e) {
-				SponsorPayLogger.e(TAG, "Error occured", e);
+				SponsorPayLogger.e(TAG, "Error occurred", e);
 			}
 		} else {
 			try {
 				return readFile(urlString);
 			} catch (IOException e) {
-				SponsorPayLogger.e(TAG, "Error occured", e);
+				SponsorPayLogger.e(TAG, "Error occurred", e);
 			} catch (URISyntaxException e) {
-				SponsorPayLogger.e(TAG, "Error occured", e);
+				SponsorPayLogger.e(TAG, "Error occurred", e);
 			}
 		}
 		return StringUtils.EMPTY_STRING;

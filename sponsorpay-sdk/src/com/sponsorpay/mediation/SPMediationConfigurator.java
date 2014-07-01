@@ -34,7 +34,9 @@ public class SPMediationConfigurator {
 		mConfigurations = new HashMap<String, Map<String, Object>>();
 
 		SponsorPayLogger.d(TAG, "Reading config file");
+
 		String jsonString = SPMediationConfigurationFiles.getAdaptersConfig();
+
 		if (StringUtils.notNullNorEmpty(jsonString)) {
 			try {
 				SponsorPayLogger.d(TAG, "Parsing configurations");
@@ -60,13 +62,13 @@ public class SPMediationConfigurator {
 						mConfigurations.put(adapterName, map);
 					}
 				}
-				SponsorPayLogger.d(TAG, "adapters.config file successfully loaded");
+				SponsorPayLogger.d(TAG, "configuration loaded successfully");
 			} catch (JSONException e) {
-				SponsorPayLogger.e(TAG, "A JSON error occurred while parsing the adapters.config file,"
+				SponsorPayLogger.e(TAG, "A JSON error occurred while parsing the configuration file,"
 						+ " there will be no mediation configurations.", e);
 			}
 		} else {
-			SponsorPayLogger.e(TAG, "The adapters.config file was not found, there will be no mediation configurations.");
+			SponsorPayLogger.d(TAG, "Configuration was not found, there will be no mediation configurations.");
 		} 
 		
 	}

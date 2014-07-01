@@ -24,6 +24,7 @@ public class SponsorPayBaseUrlProvider {
 		put("ofw", "https://iframe.sponsorpay.com/mobile");
 		put("interstitial", "https://engine.sponsorpay.com/interstitial");
 		put("tracker", "https://engine.sponsorpay.com/tracker");
+		put("config", "https://engine.sponsorpay.com/sdk-config");
 	}};
 	
 	private SponsorPayBaseUrlProvider() {

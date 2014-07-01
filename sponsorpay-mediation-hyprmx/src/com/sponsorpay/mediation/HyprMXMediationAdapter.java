@@ -9,37 +9,52 @@ import com.sponsorpay.mediation.mbe.HyprMXVideoMediationAdapter;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
+import com.sponsorpay.utils.StringUtils;
 
 public class HyprMXMediationAdapter extends SPMediationAdapter {
 
 	private static final String TAG = "HyprMXMediationAdapter";
-	
-	private static final String DISTRIBUTOR_ID = "distributorId";
-	private static final String PROPERTY_ID    = "propertyId";
-	private static final String USER_ID        = "userId";
-	
-	public static final String ADAPTER_VERSION = "1.0.0"; 
-	public static final String ADAPTER_NAME    = "HyprMX"; 
 
-	//reference to video adapter
-	private HyprMXVideoMediationAdapter mVideoAdapter; 
+	private static final String DISTRIBUTOR_ID = "distributorId";
+	private static final String PROPERTY_ID = "propertyId";
+	private static final String USER_ID = "userId";
+
+	public static final String ADAPTER_VERSION = "1.0.0";
+	public static final String ADAPTER_NAME = "HyprMX";
+
+	// reference to video adapter
+	private HyprMXVideoMediationAdapter mVideoAdapter;
 
 	@Override
 	public boolean startAdapter(final Activity activity) {
 		// create video adapter instance
 		SponsorPayLogger.d(TAG, "starting HyprMX adapter");
 		mVideoAdapter = new HyprMXVideoMediationAdapter(this);
-		
+
 		final String distributorId = getDistributorId();
-		final String propertyId    = getPropertyId();
-		final String userId        = getUserId();
-		
-		SponsorPayLogger.d(TAG, "adapter details - distributorID: " + distributorId + ", propertyID: " + propertyId + ", userID: " + userId);
+		final String propertyId = getPropertyId();
+		final String userId = getUserId();
+
+		// parameters assertions
+		if (StringUtils.nullOrEmpty(distributorId)) {
+			SponsorPayLogger.w(TAG, "distributorId is empty");
+			return false;
+		}
+		if (StringUtils.nullOrEmpty(propertyId)) {
+			SponsorPayLogger.w(TAG, "propertyId is empty");
+			return false;
+		}
+		if (StringUtils.nullOrEmpty(userId)) {
+			SponsorPayLogger.w(TAG, "userId is empty");
+			return false;
+		}
+
 		activity.runOnUiThread(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				HyprMXHelper.getInstance(activity, distributorId, propertyId, userId);
+				HyprMXHelper.getInstance(activity, distributorId, propertyId,
+						userId);
 			}
 		});
 		return true; // indicates that adapter has been run successfully
@@ -77,15 +92,18 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 	}
 
 	public String getDistributorId() {
-		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, DISTRIBUTOR_ID, String.class);
+		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME,
+				DISTRIBUTOR_ID, String.class);
 	}
 
 	public String getUserId() {
-		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, USER_ID, String.class);
+		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, USER_ID,
+				String.class);
 	}
 
 	public String getPropertyId() {
-		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, PROPERTY_ID, String.class);
+		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME,
+				PROPERTY_ID, String.class);
 	}
 
 }

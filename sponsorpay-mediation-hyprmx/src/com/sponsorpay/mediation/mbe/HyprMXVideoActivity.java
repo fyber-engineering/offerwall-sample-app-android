@@ -2,7 +2,6 @@ package com.sponsorpay.mediation.mbe;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 
 import com.hyprmx.android.sdk.HyprMXHelper;
 import com.hyprmx.android.sdk.HyprMXPresentation;

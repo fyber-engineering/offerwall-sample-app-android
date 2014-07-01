@@ -16,7 +16,6 @@ import com.flurry.android.FlurryAdListener;
 import com.flurry.android.FlurryAdSize;
 import com.flurry.android.FlurryAdType;
 import com.flurry.android.FlurryAds;
-
 import com.sponsorpay.mediation.FlurryMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;

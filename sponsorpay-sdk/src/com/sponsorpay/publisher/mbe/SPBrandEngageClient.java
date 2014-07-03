@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.publisher.mbe;
@@ -109,6 +109,11 @@ public class SPBrandEngageClient {
 	private static final String SP_THIRD_PARTY_ID_PARAMETER = "id";
 	private static final String SP_REQUEST_PLAY = "play";
 	
+	private static final String KEY_FOR_CLIENT_CUSTOM_PARAMETER    = "client";
+	private static final String KEY_FOR_PLATFORM_CUSTOM_PARAMETER  = "platform";
+	private static final String KEY_FOR_REWARDED_CUSTOM_PARAMETER  = "rewarded";
+	private static final String KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER = "ad_format";
+	
 	
 	/**
 	 * Engagement status key used in {@link SPBrandEngageActivity}
@@ -130,7 +135,8 @@ public class SPBrandEngageClient {
 	 */
 	public static final String SP_REQUEST_STATUS_PARAMETER_ERROR = "ERROR";
 	
-	private static final int TIMEOUT = 10000 ;
+	public static final int TIMEOUT = 10000 ;
+	
 	private static final int VCS_TIMEOUT = 3000 ;
 
 	private static final int VIDEO_EVENT = 1;
@@ -263,9 +269,11 @@ public class SPBrandEngageClient {
 	}
 	
 	private void startQueryingOffers(SPCredentials credentials) {
+		
 		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials)
-				.setCurrency(mCurrency).addExtraKeysValues(mCustomParameters)
-				.addScreenMetrics().buildUrl();
+				.setCurrency(mCurrency).addExtraKeysValues(mCustomParameters).addKeyValue(KEY_FOR_CLIENT_CUSTOM_PARAMETER, "sdk")
+				.addKeyValue(KEY_FOR_PLATFORM_CUSTOM_PARAMETER, "android").addKeyValue(KEY_FOR_REWARDED_CUSTOM_PARAMETER, "1")
+				.addKeyValue(KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER, "video").addScreenMetrics().buildUrl();
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
 		loadUrl(requestUrl);
 		setClientStatus(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
@@ -282,28 +290,36 @@ public class SPBrandEngageClient {
 	 * @return true if the engagement can be started
 	 */
 	public boolean startEngagement(Activity activity) {
-		if (canStartEngagement()) {
-			
-			loadUrl(SP_START_ENGAGEMENT);
-			
-			mActivity = activity;
-			if (!playThroughMediation()) {
-				mActivity.addContentView(mWebView, new LayoutParams(
-						LayoutParams.FILL_PARENT,
-						LayoutParams.FILL_PARENT));
-				mContext.registerReceiver(mNetworkStateReceiver, mIntentFilter);
-			}
-		
-			checkEngagementStarted();
-			return true;
-		} else {
-			SponsorPayLogger.d(TAG,	"SPBrandEngageClient is not ready to show offers. " +
-					"Call requestOffers() and wait until your listener is called with the" +
-					" confirmation that offers have been received.");
-			return false;
-		}
+		return startEngagement(activity, playThroughMediation());
 	}
 	
+	public boolean startEngagement(Activity activity,
+			boolean playThroughMediation) {
+		if (activity != null) {
+			if (canStartEngagement()) {
+				
+				loadUrl(SP_START_ENGAGEMENT);
+				
+				mActivity = activity;
+				if (!playThroughMediation) {
+					mActivity.addContentView(mWebView, new LayoutParams(
+							LayoutParams.FILL_PARENT,
+							LayoutParams.FILL_PARENT));
+					mContext.registerReceiver(mNetworkStateReceiver, mIntentFilter);
+				}
+			
+				checkEngagementStarted();
+				return true;
+			} else {
+				SponsorPayLogger.d(TAG,	"SPBrandEngageClient is not ready to show offers. " +
+						"Call requestOffers() and wait until your listener is called with the" +
+						" confirmation that offers have been received.");
+			}
+		} else {
+			SponsorPayLogger.d(TAG,	"The provided activity is null, SPBrandEngageClient cannot start the engagement.");
+		}
+		return false;
+	}	
 	/**
 	 * Closes the current engagement
 	 */
@@ -445,6 +461,7 @@ public class SPBrandEngageClient {
 	public boolean setCustomParameters(Map<String, String> parameters) {
 		if (canChangeParameters()) {
 			mCustomParameters = parameters;
+			
 			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 			return true;
 		} else {
@@ -567,8 +584,10 @@ public class SPBrandEngageClient {
 	}
 	
 	private void setClientStatus(SPBrandEngageOffersStatus newStatus) {
-		mStatus = newStatus;
-		SponsorPayLogger.d(TAG, "SPBrandEngageClient mStatus -> " + newStatus.name());
+		if (mStatus != newStatus) {
+			mStatus = newStatus;
+			SponsorPayLogger.d(TAG, "SPBrandEngageClient mStatus -> " + newStatus.name());
+		}
 	}
 	
 	private void showRewardsNotification() {
@@ -836,5 +855,4 @@ public class SPBrandEngageClient {
 			}
 		}
 	}
-
 }

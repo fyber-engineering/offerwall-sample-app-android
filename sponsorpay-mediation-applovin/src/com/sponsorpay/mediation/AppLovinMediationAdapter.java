@@ -36,7 +36,7 @@ public class AppLovinMediationAdapter extends SPMediationAdapter {
 		SponsorPayLogger.d(TAG, "Starting AppLovin adapter - SDK version " + AppLovinSdk.VERSION);
 		String sdkKey = getValueFromAppMetadata(activity);
 		if (StringUtils.notNullNorEmpty(sdkKey)) {
-//			AppLovinSdk.initializeSdk(activity);
+			AppLovinSdk.initializeSdk(activity);
 			mInterstitialAdapter = new AppLovinIntersitialMediationAdapter(this, activity);
 			mVideoAdapter = new AppLovinVideoMediationAdapter(this, activity);
 			return true;

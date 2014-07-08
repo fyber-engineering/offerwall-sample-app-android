@@ -4,6 +4,4 @@ bin/
 .gradle
 build/
 
-android-sdk/
 .directory
-libs/

@@ -44,10 +44,6 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 			SponsorPayLogger.w(TAG, "propertyId is empty");
 			return false;
 		}
-		if (StringUtils.nullOrEmpty(userId)) {
-			SponsorPayLogger.w(TAG, "userId is empty");
-			return false;
-		}
 
 		activity.runOnUiThread(new Runnable() {
 
@@ -97,8 +93,12 @@ public class HyprMXMediationAdapter extends SPMediationAdapter {
 	}
 
 	public String getUserId() {
-		return SPMediationConfigurator.getConfiguration(ADAPTER_NAME, USER_ID,
+		String userId = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, USER_ID,
 				String.class);
+		if (StringUtils.nullOrEmpty(userId)) {
+			return null;
+		}
+		return userId;
 	}
 
 	public String getPropertyId() {

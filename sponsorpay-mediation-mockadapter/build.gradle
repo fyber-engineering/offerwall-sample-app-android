@@ -1,6 +1,0 @@
-// we will not inlcude this one in the release process
-/*
-ext {
-	interstitialsAdapter = true
-	rewardedVideosAdapter = true
-}*/

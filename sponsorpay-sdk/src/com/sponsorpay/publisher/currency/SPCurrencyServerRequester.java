@@ -14,7 +14,7 @@ import android.os.AsyncTask;
 
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.utils.AsyncTaskRequester;
-import com.sponsorpay.utils.CurrencyAndMediationServerResponse;
+import com.sponsorpay.utils.SignedServerResponse;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.UrlBuilder;
@@ -106,9 +106,9 @@ public class SPCurrencyServerRequester extends AsyncTaskRequester {
 	 *            Security token used to verify the authenticity of the response.
 	 */
 	private SPCurrencyServerReponse parseResponse(int statusCode, String responseBody, String responseSignature) {
-		if (AsyncTaskRequester.hasErrorStatusCode(statusCode)) {
+		if (hasErrorStatusCode(statusCode)) {
 			return parseErrorResponse(responseBody);
-		} else if (!AsyncTaskRequester.verifySignature(responseBody, responseSignature, mSecurityToken)) {
+		} else if (!verifySignature(responseBody, responseSignature, mSecurityToken)) {
 			return new SPCurrencyServerErrorResponse(
 				SPCurrencyServerRequestErrorType.ERROR_INVALID_RESPONSE_SIGNATURE,
 				null,
@@ -163,7 +163,7 @@ public class SPCurrencyServerRequester extends AsyncTaskRequester {
 	 * @param result
 	 */
 	@Override
-	protected void onPostExecute(CurrencyAndMediationServerResponse result) {
+	protected void onPostExecute(SignedServerResponse result) {
 		
 		SPCurrencyServerReponse response = null; 
 		
@@ -185,6 +185,11 @@ public class SPCurrencyServerRequester extends AsyncTaskRequester {
 		}
 		
 		mResultListener.onSPCurrencyServerResponseReceived(response);
+	}
+
+	@Override
+	protected String getTag() {
+		return TAG;
 	}
 
 }

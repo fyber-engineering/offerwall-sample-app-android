@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,44 +34,9 @@ public class SPMediationConfigurator {
 	private SPMediationConfigurator() {
 		mConfigurations = new HashMap<String, Map<String, Object>>();
 
-		SponsorPayLogger.d(TAG, "Reading config file");
-
 		String jsonString = SPMediationConfigurationFiles.getAdaptersConfig();
-
-		if (StringUtils.notNullNorEmpty(jsonString)) {
-			try {
-				SponsorPayLogger.d(TAG, "Parsing configurations");
-				JSONObject json = new JSONObject(jsonString);
-				JSONArray configs = json.getJSONArray("adapters");
-				for (int i = 0; i < configs.length(); i++) {
-					JSONObject config = configs.getJSONObject(i);
-					String adapterName = config.getString("name").toLowerCase();
-					if (config.has("settings")) {
-						JSONObject settings = config.getJSONObject("settings");
-						Map<String, Object> map = new HashMap<String, Object>(
-								settings.length());
-						@SuppressWarnings("unchecked")
-						Iterator<String> itr = settings.keys();
-						while (itr.hasNext()) {
-							String key = itr.next();
-							Object value = settings.get(key);
-							map.put(key, value);
-						}
-						mConfigurations.put(adapterName, map);
-					} else {
-						Map<String, Object> map = Collections.emptyMap();
-						mConfigurations.put(adapterName, map);
-					}
-				}
-				SponsorPayLogger.d(TAG, "configuration loaded successfully");
-			} catch (JSONException e) {
-				SponsorPayLogger.e(TAG, "A JSON error occurred while parsing the configuration file,"
-						+ " there will be no mediation configurations.", e);
-			}
-		} else {
-			SponsorPayLogger.d(TAG, "Configuration was not found, there will be no mediation configurations.");
-		} 
 		
+		mConfigurations = parseConfiguration(jsonString);
 	}
 	
 	public Map<String, List<String>> getMediationAdapters() {
@@ -133,4 +99,48 @@ public class SPMediationConfigurator {
 		return config == null ? defaultValue : config;
 	}
 	
+	public static Map<String, Map<String, Object>> parseConfiguration(String jsonString){
+		SponsorPayLogger.d(TAG, "Reading config file");
+		
+		Map<String, Map<String, Object>> mConfigurations = new HashMap<String, Map<String, Object>>();
+
+		if (StringUtils.notNullNorEmpty(jsonString)) {
+			try {
+				SponsorPayLogger.d(TAG, "Parsing configurations");
+				JSONObject json = new JSONObject(jsonString);
+				JSONArray configs = json.getJSONArray("adapters");
+				for (int i = 0; i < configs.length(); i++) {
+					JSONObject config = configs.getJSONObject(i);
+					String adapterName = config.getString("name").toLowerCase();
+					if (config.has("settings")) {
+						JSONObject settings = config.getJSONObject("settings");
+						Map<String, Object> map = new HashMap<String, Object>(
+								settings.length());
+						@SuppressWarnings("unchecked")
+						Iterator<String> itr = settings.keys();
+						while (itr.hasNext()) {
+							String key = itr.next();
+							Object value = settings.get(key);
+							map.put(key, value);
+						}
+						mConfigurations.put(adapterName, map);
+					} else {
+						Map<String, Object> map = Collections.emptyMap();
+						mConfigurations.put(adapterName, map);
+					}
+				}
+				SponsorPayLogger.d(TAG, "configuration loaded successfully");
+			} catch (JSONException e) {
+				SponsorPayLogger.e(TAG, "A JSON error occurred while parsing the configuration file,"
+						+ " there will be no mediation configurations.", e);
+			}
+		} else {
+			SponsorPayLogger.d(TAG, "Configuration was not found, there will be no mediation configurations.");
+		}
+		return mConfigurations; 
+	}
+	
+	public Set<String> allConfigurationKeys(){
+		return mConfigurations.keySet();
+	}
 }

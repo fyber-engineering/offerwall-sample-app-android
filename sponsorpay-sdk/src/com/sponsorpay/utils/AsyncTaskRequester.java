@@ -20,10 +20,10 @@ import android.os.AsyncTask;
  * verifying the signature, to check the if there is an
  * error status code and to accept the language header value. 
  */
-public class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, CurrencyAndMediationServerResponse>{
+public abstract class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, SignedServerResponse>{
 	
 	public static String TAG = "AsyncTaskRequester";
-
+	
 	/**
 	 * Key of the User-Agent header sent on background requests.
 	 */
@@ -46,15 +46,15 @@ public class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, CurrencyAndM
 	
 
 	@Override
-	protected CurrencyAndMediationServerResponse doInBackground(UrlBuilder... params) {
+	protected SignedServerResponse doInBackground(UrlBuilder... params) {
 
-		CurrencyAndMediationServerResponse currencyAndMediationServerResponse = null;
+		SignedServerResponse signedServerResponse = null;
 		
-		Thread.currentThread().setName(TAG);
+		Thread.currentThread().setName(getTag());
 		
 		String requestUrl = params[0].buildUrl();
 		
-		SponsorPayLogger.d(getClass().getSimpleName(), "Request will be sent to URL + params: "
+		SponsorPayLogger.d(TAG, "Request will be sent to URL + params: "
 				+ requestUrl);
 		
 		HttpUriRequest request = new HttpGet(requestUrl);
@@ -64,6 +64,7 @@ public class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, CurrencyAndM
 		
 		request.addHeader(ACCEPT_LANGUAGE_HEADER_NAME, acceptLanguageHeaderValue);
 
+		
 		HttpClient client = SPHttpClient.getHttpClient();
 		
 		try {
@@ -78,14 +79,14 @@ public class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, CurrencyAndM
 					"Server Response, status code: %d, response body: %s, signature: %s",
 					statusCode, responseBody, responseSignature));
 			
-			currencyAndMediationServerResponse = new CurrencyAndMediationServerResponse(statusCode, responseBody, responseSignature); 
+			signedServerResponse = new SignedServerResponse(statusCode, responseBody, responseSignature); 
 			
-			return currencyAndMediationServerResponse;
+			return signedServerResponse;
 			
 		} catch (Throwable t) {
 			SponsorPayLogger.e(TAG, "Exception triggered when executing request: " + t);
 			
-			return currencyAndMediationServerResponse;
+			return signedServerResponse;
 		}
 
 	}
@@ -101,7 +102,7 @@ public class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, CurrencyAndM
 	 * @return true if the calculated signature matches the server-provided signature. false
 	 *         otherwise.
 	 */
-	public static boolean verifySignature(String responseBody, String responseSignature, String mSecurityToken) {
+	protected boolean verifySignature(String responseBody, String responseSignature, String mSecurityToken) {
 		String generatedSignature = SignatureTools.generateSignatureForString(responseBody, mSecurityToken);
 		return generatedSignature.equals(responseSignature);
 	}
@@ -112,7 +113,7 @@ public class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, CurrencyAndM
 	 * 
 	 * @return false if HTTP status code is between 200 and 299. True otherwise.
 	 */
-	public static boolean hasErrorStatusCode(int responseStatusCode) {
+	protected boolean hasErrorStatusCode(int responseStatusCode) {
 		return responseStatusCode < 200 || responseStatusCode > 299;
 	}
 	
@@ -120,7 +121,7 @@ public class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, CurrencyAndM
 	 * Returns a value for the HTTP Accept-Language header based on the current locale set up for
 	 * the device.
 	 */
-	public static String makeAcceptLanguageHeaderValue() {
+	protected String makeAcceptLanguageHeaderValue() {
 		String preferredLanguage = Locale.getDefault().getLanguage();
 
 		String acceptLanguageLocaleValue = preferredLanguage;
@@ -134,4 +135,10 @@ public class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, CurrencyAndM
 		return acceptLanguageLocaleValue;
 	}
 
+
+	/**
+	 * 
+	 * @return The tag of the class that is implementing it
+	 */
+	protected abstract String getTag();
 }

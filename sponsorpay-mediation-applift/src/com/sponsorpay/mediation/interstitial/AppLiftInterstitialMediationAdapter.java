@@ -22,7 +22,9 @@ import com.sponsorpay.utils.SponsorPayLogger;
 public class AppLiftInterstitialMediationAdapter extends
 		SPInterstitialMediationAdapter<AppLiftMediationAdapter> implements PlayAdsListener{
 
-	private boolean mIsShown = false;;
+	private boolean mIsShown = false;
+	
+	private final boolean CACHING_STATUS = false;
 
 	public AppLiftInterstitialMediationAdapter(AppLiftMediationAdapter adapter) {
 		super(adapter);
@@ -49,7 +51,7 @@ public class AppLiftInterstitialMediationAdapter extends
 	
 	@Override
 	public boolean show(Activity parentActivity) {
-		PlayAds.show(parentActivity);
+		PlayAds.show(parentActivity, CACHING_STATUS);
 		return true;
 	}
 

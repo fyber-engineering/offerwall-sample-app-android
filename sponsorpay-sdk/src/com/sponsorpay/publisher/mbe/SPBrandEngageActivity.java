@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.publisher.mbe;
@@ -31,6 +31,8 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	// variable used to prevent double STATUS notification 
 	private boolean mEngagementAlreadyClosed = false;
 
+	private boolean mPlayThroughMediation = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,14 +45,15 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
 		// Screen orientation locked to landscape on Gingerbread
-		if ( !SPBrandEngageClient.INSTANCE.playThroughMediation() &&
+		mPlayThroughMediation = SPBrandEngageClient.INSTANCE.playThroughMediation();
+		if ( !mPlayThroughMediation &&
 				(Build.VERSION.SDK_INT == 9 || Build.VERSION.SDK_INT == 10)) {
 			setRequestedOrientation(
 					   ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
 		
 		SPBrandEngageClient.INSTANCE.setStatusListener(this);
-		SPBrandEngageClient.INSTANCE.startEngagement(SPBrandEngageActivity.this);
+		SPBrandEngageClient.INSTANCE.startEngagement(SPBrandEngageActivity.this, mPlayThroughMediation);
 	}
 	
 	@Override
@@ -64,7 +67,7 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (!mPendingClose && !SPBrandEngageClient.INSTANCE.playThroughMediation() 
+		if (!mPendingClose && !mPlayThroughMediation
 				&& !mEngagementAlreadyClosed) {
 			SPBrandEngageClient.INSTANCE.onPause();
 			SPBrandEngageClient.INSTANCE.closeEngagement();

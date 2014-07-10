@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.publisher.mbe.mediation;
@@ -45,7 +45,9 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 	/*
 	 * Timeout delay, in nanoseconds
 	 */
-	private static final int TIMEOUT_DELAY = 4500;
+	public static final int START_TIMEOUT_DELAY = 4500;
+	
+	public static final int VALIDATION_TIMEOUT_DELAY = 4500;
 	
 	/*
 	 * The mediation validation event listener 
@@ -139,7 +141,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 			Map<String, String> contextData) {
 		mValidationEvent = event;
 		mValidationContextData = contextData;
-		mHandler.sendEmptyMessageDelayed(VALIDATION_RESULT, TIMEOUT_DELAY);
+		mHandler.sendEmptyMessageDelayed(VALIDATION_RESULT, VALIDATION_TIMEOUT_DELAY);
 		videosAvailable(context);
 	}
 
@@ -162,7 +164,7 @@ public abstract class SPBrandEngageMediationAdapter<V extends SPMediationAdapter
 		mVideoPlayed = false;
 		mVideoEvent = event;
 		mVideoContextData = contextData;
-		mHandler.sendEmptyMessageDelayed(VIDEO_EVENT, TIMEOUT_DELAY);
+		mHandler.sendEmptyMessageDelayed(VIDEO_EVENT, START_TIMEOUT_DELAY);
 		startVideo(parentActivity);
 	}
 	

@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.utils;
@@ -26,7 +26,7 @@ public class UserId {
 
 		if (userIdValue == null) {
 
-			userIdValue = generateUserId(HostInfo.getHostInfo(context));
+			userIdValue = generateUserId();
 
 			Editor stateEditor = state.edit();
 			stateEditor.putString(STATE_GENERATED_USERID_KEY, userIdValue);
@@ -36,53 +36,10 @@ public class UserId {
 		return userIdValue;
 	}
 
-	private static boolean isValidAndroidId(String androidId) {
-		// Check for general ID validness
-		if (!isValidId(androidId) || androidId.equals("9774d56d682e549c")) {
-			return false;
-		}
-
-		return true;
-	}
-
-	private static boolean isValidId(String id) {
-		// Check for null string
-		// Check for empty or whitespace only string
-		if (StringUtils.nullOrEmpty(id)) {
-			return false;
-		}
-
-		// Check for the integer number 0
-		Integer androidIdAsInteger = null;
-		try {
-			androidIdAsInteger = Integer.parseInt(id);
-		} catch (NumberFormatException e) {
-			// The string didn't have a valid integer format. Test for zero doesn't apply.
-		}
-		
-		return ! (androidIdAsInteger != null && androidIdAsInteger.intValue() == 0);
-	}
-
-	private static String generateUserId(HostInfo hostInfo) {
+	private static String generateUserId() {
 		StringBuilder builder = new StringBuilder();
-
-		String telephonyDeviceId = hostInfo.getUDID();
-		String androidId = hostInfo.getAndroidId();
-		String hardwareSerialNumber = hostInfo.getHardwareSerialNumber();
 		
-		if (isValidId(telephonyDeviceId)) {
-			builder.append(telephonyDeviceId);
-		}
-		if (isValidAndroidId(androidId)) {
-			builder.append(androidId);
-		}
-		if (isValidId(hardwareSerialNumber)) {
-			builder.append(hardwareSerialNumber);
-		}
-		
-		if (builder.length() == 0) {
-			builder.append(UUID.randomUUID());
-		}
+		builder.append(UUID.randomUUID());
 
 		String baseText = builder.toString();
 		String generatedId = SignatureTools.generateSHA1ForString(baseText);

@@ -1,7 +1,7 @@
 /**
  * SponsorPay Android SDK
  *
- * Copyright 2011 - 2013 SponsorPay. All rights reserved.
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
 
 package com.sponsorpay.advertiser;
@@ -110,7 +110,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 		}
 
 		String callbackUrl = UrlBuilder.newBuilder(getBaseUrl(), mCredentials).addExtraKeysValues(
-				params).sendUserId(false).addScreenMetrics().buildUrl();
+				params).addScreenMetrics().buildUrl();
 
 		SponsorPayLogger.d(TAG,
 				"Callback will be sent to: " + callbackUrl);

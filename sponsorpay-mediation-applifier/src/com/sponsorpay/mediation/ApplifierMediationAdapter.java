@@ -10,13 +10,13 @@ import java.util.Set;
 
 import android.app.Activity;
 
-import com.applifier.impact.android.ApplifierImpact;
 import com.sponsorpay.mediation.SPMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.mediation.mbe.ApplifierVideoMediationAdapter;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
+import com.unity3d.ads.android.UnityAds;
 
 public class ApplifierMediationAdapter extends SPMediationAdapter {
 
@@ -30,10 +30,10 @@ public class ApplifierMediationAdapter extends SPMediationAdapter {
 
 	@Override
 	public boolean startAdapter(Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting Applifier adapter - SDK version " + ApplifierImpact.getSDKVersion());
+		SponsorPayLogger.d(TAG, "Starting Applifier adapter - SDK version " + UnityAds.getSDKVersion());
 		String gameKey = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, GAME_ID_KEY, String.class);
 		if (StringUtils.notNullNorEmpty(gameKey)) {
-			new ApplifierImpact(activity, gameKey, mVideoMediationAdapter);
+			UnityAds.init(activity, gameKey, mVideoMediationAdapter);
 			return true;
 		}
 		SponsorPayLogger.i(TAG, "Game key value is not valid");

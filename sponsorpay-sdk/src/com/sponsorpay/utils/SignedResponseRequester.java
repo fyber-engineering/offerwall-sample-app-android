@@ -20,7 +20,7 @@ import android.os.AsyncTask;
  * verifying the signature, to check the if there is an
  * error status code and to accept the language header value. 
  */
-public abstract class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, SignedServerResponse>{
+public abstract class SignedResponseRequester<V> extends AsyncTask<UrlBuilder, Void, V>{
 	
 	public static String TAG = "AsyncTaskRequester";
 	
@@ -46,7 +46,7 @@ public abstract class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, Sig
 	
 
 	@Override
-	protected SignedServerResponse doInBackground(UrlBuilder... params) {
+	protected V doInBackground(UrlBuilder... params) {
 
 		SignedServerResponse signedServerResponse = null;
 		
@@ -75,22 +75,23 @@ public abstract class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, Sig
 			String responseSignature = responseSignatureHeaders.length > 0 ? responseSignatureHeaders[0]
 					.getValue() : StringUtils.EMPTY_STRING;
 					
-			SponsorPayLogger.d(getClass().getSimpleName(), String.format(
+			SponsorPayLogger.d(TAG, String.format(
 					"Server Response, status code: %d, response body: %s, signature: %s",
 					statusCode, responseBody, responseSignature));
 			
 			signedServerResponse = new SignedServerResponse(statusCode, responseBody, responseSignature); 
 			
-			return signedServerResponse;
 			
 		} catch (Throwable t) {
 			SponsorPayLogger.e(TAG, "Exception triggered when executing request: " + t);
 			
-			return signedServerResponse;
 		}
-
+		return parsedSignedResponse(signedServerResponse);
 	}
 	
+	abstract protected V parsedSignedResponse(
+			SignedServerResponse signedServerResponse);
+
 	/**
 	 * Verify calculate the signature of the response with the provided security token and compare
 	 * it against the server-provided response signature.
@@ -102,9 +103,9 @@ public abstract class AsyncTaskRequester extends AsyncTask<UrlBuilder, Void, Sig
 	 * @return true if the calculated signature matches the server-provided signature. false
 	 *         otherwise.
 	 */
-	protected boolean verifySignature(String responseBody, String responseSignature, String mSecurityToken) {
-		String generatedSignature = SignatureTools.generateSignatureForString(responseBody, mSecurityToken);
-		return generatedSignature.equals(responseSignature);
+	protected boolean verifySignature(SignedServerResponse signedServerResponse, String mSecurityToken) {
+		String generatedSignature = SignatureTools.generateSignatureForString(signedServerResponse.getResponseBody(), mSecurityToken);
+		return generatedSignature.equals(signedServerResponse.getResponseSignature());
 	}
 	
 	/**

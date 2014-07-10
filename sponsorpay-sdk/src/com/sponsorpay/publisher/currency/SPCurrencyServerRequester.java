@@ -13,7 +13,8 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 
 import com.sponsorpay.credentials.SPCredentials;
-import com.sponsorpay.utils.AsyncTaskRequester;
+import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPCurrencyServerReponse;
+import com.sponsorpay.utils.SignedResponseRequester;
 import com.sponsorpay.utils.SignedServerResponse;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
@@ -27,7 +28,7 @@ import com.sponsorpay.utils.UrlBuilder;
  * constructor in the same thread which triggered the request / loading process.
  * </p>
  */
-public class SPCurrencyServerRequester extends AsyncTaskRequester {
+public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrencyServerReponse> {
 
 	/*
 	 * VCS API Resource URLs.
@@ -106,9 +107,11 @@ public class SPCurrencyServerRequester extends AsyncTaskRequester {
 	 *            Security token used to verify the authenticity of the response.
 	 */
 	private SPCurrencyServerReponse parseResponse(int statusCode, String responseBody, String responseSignature) {
+		SignedServerResponse signedServerResponse = new SignedServerResponse(statusCode, responseBody, responseSignature);
+		
 		if (hasErrorStatusCode(statusCode)) {
 			return parseErrorResponse(responseBody);
-		} else if (!verifySignature(responseBody, responseSignature, mSecurityToken)) {
+		} else if (!verifySignature(signedServerResponse, mSecurityToken)) {
 			return new SPCurrencyServerErrorResponse(
 				SPCurrencyServerRequestErrorType.ERROR_INVALID_RESPONSE_SIGNATURE,
 				null,
@@ -163,16 +166,27 @@ public class SPCurrencyServerRequester extends AsyncTaskRequester {
 	 * @param result
 	 */
 	@Override
-	protected void onPostExecute(SignedServerResponse result) {
+	protected void onPostExecute(SPCurrencyServerReponse result) {
 		
+		mResultListener.onSPCurrencyServerResponseReceived(result);
+	}
+
+	@Override
+	protected String getTag() {
+		return TAG;
+	}
+
+	@Override
+	protected SPCurrencyServerReponse parsedSignedResponse(
+			SignedServerResponse signedServerResponse) {
 		SPCurrencyServerReponse response = null; 
 		
 		try {
 
-			if (result != null) {
+			if (signedServerResponse != null) {
 
-				response = parseResponse(result.getStatusCode(),
-						result.getResponseBody(), result.getResponseSignature());
+				response = parseResponse(signedServerResponse.getStatusCode(),
+						signedServerResponse.getResponseBody(), signedServerResponse.getResponseSignature());
 			}
 
 		} catch (Throwable t) {
@@ -183,13 +197,7 @@ public class SPCurrencyServerRequester extends AsyncTaskRequester {
 					null, t.getMessage());
 			
 		}
-		
-		mResultListener.onSPCurrencyServerResponseReceived(response);
-	}
-
-	@Override
-	protected String getTag() {
-		return TAG;
+		return response;
 	}
 
 }

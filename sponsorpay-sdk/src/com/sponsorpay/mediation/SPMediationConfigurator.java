@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -139,8 +138,5 @@ public class SPMediationConfigurator {
 		}
 		return mConfigurations; 
 	}
-	
-	public Set<String> allConfigurationKeys(){
-		return mConfigurations.keySet();
-	}
+
 }

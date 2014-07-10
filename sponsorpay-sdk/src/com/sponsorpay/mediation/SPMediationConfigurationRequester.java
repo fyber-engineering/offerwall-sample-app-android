@@ -2,7 +2,6 @@ package com.sponsorpay.mediation;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,7 +9,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 
 import com.sponsorpay.credentials.SPCredentials;
-import com.sponsorpay.utils.AsyncTaskRequester;
+import com.sponsorpay.utils.SignedResponseRequester;
 import com.sponsorpay.utils.SignedServerResponse;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
@@ -25,7 +24,7 @@ import com.sponsorpay.utils.UrlBuilder;
  * the SPMediationConfigurator's Map<String, Map<String, Object>> mConfigurations.
  * </p>
  */
-public class SPMediationConfigurationRequester extends AsyncTaskRequester{
+public class SPMediationConfigurationRequester extends SignedResponseRequester<SignedServerResponse>{
 	
 	public  static final String TAG = "ConfigurationRequester";
 	private static final String SERVER_SIDE_CONFIG_URL_KEY = "config";
@@ -57,9 +56,7 @@ public class SPMediationConfigurationRequester extends AsyncTaskRequester{
 	 */
 	@Override
 	protected void onPostExecute(SignedServerResponse result) {
-		if(result != null){
-			saveResponseOnSharedPreferences(result);
-		}
+		//do nothing
 	}
 	
 
@@ -75,62 +72,71 @@ public class SPMediationConfigurationRequester extends AsyncTaskRequester{
 	 * if the shared preference commit was successful or not. This
 	 * process is taking place on a background thread.
 	 * 
-	 * @param result - the body from the HTTP request.
+	 * @param signedServerResponse - the body from the HTTP request.
 	 */
-	private void saveResponseOnSharedPreferences(final SignedServerResponse result) {
-		
-		class ExecuteOnBackground implements Runnable {
-		
-			@Override
-			public void run() {
+	@SuppressWarnings("unchecked")
+	@Override
+	protected SignedServerResponse parsedSignedResponse(
+			SignedServerResponse signedServerResponse) {
+			if (verifySignature(signedServerResponse, mSecurityToken) && !hasErrorStatusCode(signedServerResponse.getStatusCode())) {
+	
+				String responseBody = signedServerResponse.getResponseBody();
+	
+				SharedPreferences sharedpreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
+				Editor editor = sharedpreferences.edit();
+	
+			if (StringUtils.notNullNorEmpty(responseBody)) {
 
-				if (verifySignature(
-						result.getResponseBody(),result.getResponseSignature(), mSecurityToken)
-						&& !hasErrorStatusCode(result.getStatusCode())) {
+				editor.putString(TAG, responseBody);
 
-					String responseBody = result.getResponseBody();
+				boolean isSuccessfulCommit = editor.commit();
 
-					SharedPreferences sharedpreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
-					Editor editor = sharedpreferences.edit();
+				if (isSuccessfulCommit) {
+						
+					Map<String, Map<String, Object>> settingsMapFromResponseBody = SPMediationConfigurator.parseConfiguration(responseBody);
 
-					if (StringUtils.notNullNorEmpty(responseBody)) {
+					// iterate on all server side configurations
+					for (Entry<String, Map<String, Object>> entry : settingsMapFromResponseBody.entrySet()) {
 
-						editor.putString(TAG, responseBody);
+						Map<String, Object> existedConfigAdapter = SPMediationConfigurator.INSTANCE.getConfigurationForAdapter(entry.getKey());
 
-						boolean isSuccessfulCommit = editor.commit();
+						// if the existed configuration adapter doesn't contain
+						// the key, then save everything
+						if (existedConfigAdapter == null) {
+							SPMediationConfigurator.INSTANCE.setConfigurationForAdapter(entry.getKey(),entry.getValue());
 
-						if (isSuccessfulCommit) {
-							
-							Map<String, Map<String, Object>> settingsMap = SPMediationConfigurator.parseConfiguration(responseBody);
-							
-							SponsorPayLogger.d(getClass().getSimpleName(), "Server Side Configuration has been saved successfully.");
-							
-							//get the list of all keys from the existing configuration
-							Set<String> allKeys = SPMediationConfigurator.INSTANCE.allConfigurationKeys();
-							
-							//iterate on all server side configurations
-							for (Entry<String, Map<String, Object>> entry : settingsMap.entrySet()) {			
-								
-								//if the existing config doesn't contain the key from the
-								//server side config, then add it into.
-								if(!allKeys.contains(entry.getKey())){
-									SPMediationConfigurator.INSTANCE.setConfigurationForAdapter(entry.getKey(), entry.getValue());
-								}
-								
-							}
-
+							// else check if a value that exists in the server
+							// side configuration
+							// and doesn't exist on local one. Then we are
+							// writing the value
+							// to the existed and we save the whole map.
 						} else {
-							SponsorPayLogger.d(getClass().getSimpleName(),"Failed to save Server Side Configuration.");
 
+							Map<String, Object> existedSettings = (Map<String, Object>) existedConfigAdapter.get("settings");
+							Map<String, Object> serverSettings = (Map<String, Object>) entry.getValue().get("settings");
+
+							for (Entry<String, Object> serverSettingsEntry : serverSettings.entrySet()) {
+
+								if (!existedSettings.containsKey(serverSettingsEntry.getKey())) {
+									existedSettings.put(serverSettingsEntry.getKey(), serverSettingsEntry.getValue());
+								}
+							}
+							SPMediationConfigurator.INSTANCE.setConfigurationForAdapter(entry.getKey(), existedSettings);
 						}
 					}
-					context = null;
+
+					SponsorPayLogger.d(TAG,"Server Side Configuration has been saved successfully.");
+
+				} else {
+
+					SponsorPayLogger.d(TAG, "Failed to save Server Side Configuration.");
+
 				}
 			}
+			context = null;
 		}
-		
-		Thread thread = new Thread(new ExecuteOnBackground());
-		thread.start(); 
+			
+		return signedServerResponse;
 	}
 
 }

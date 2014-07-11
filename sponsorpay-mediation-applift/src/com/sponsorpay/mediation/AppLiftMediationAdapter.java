@@ -27,6 +27,7 @@ public class AppLiftMediationAdapter extends SPMediationAdapter{
 	
 	public static final String APP_ID = "app.id";
 	public static final String APP_SECRET = "app.secret";
+	public static final String APP_CACHE_INTERSTITIALS = "aap.cacheInterstitials";
 	
 	private AppLiftInterstitialMediationAdapter mInterstitialAdapter;
 	

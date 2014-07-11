@@ -16,19 +16,19 @@ import com.applift.playads.api.PlayAdsListener;
 import com.applift.playads.api.PlayAdsPromo;
 import com.applift.playads.api.PlayAdsType;
 import com.sponsorpay.mediation.AppLiftMediationAdapter;
-import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 
 public class AppLiftInterstitialMediationAdapter extends
 		SPInterstitialMediationAdapter<AppLiftMediationAdapter> implements PlayAdsListener {
 
-	private static final String TAG = "AppLiftInterstitialMediationAdapter";
-
 	private boolean mIsShown = false;
 
+	private Boolean mIsCachingNeeded;
+	
 	public AppLiftInterstitialMediationAdapter(AppLiftMediationAdapter adapter) {
 		super(adapter);
+		mIsCachingNeeded = adapter.isCachingNeeded();
 	}
 
 	public void start(Activity activity) {
@@ -52,14 +52,7 @@ public class AppLiftInterstitialMediationAdapter extends
 
 	@Override
 	public boolean show(Activity parentActivity) {
-		Boolean cacheIfNeeded = SPMediationConfigurator.getConfiguration(getName(),
-				AppLiftMediationAdapter.APP_CACHE_INTERSTITIALS, Boolean.class);
-		if (null == cacheIfNeeded) {
-			SponsorPayLogger.e(TAG, "Error on parsing forcing caching parameter \""
-					+ AppLiftMediationAdapter.APP_CACHE_INTERSTITIALS + "\".");
-			return false;
-		}
-		PlayAds.show(parentActivity, cacheIfNeeded);
+		PlayAds.show(parentActivity, mIsCachingNeeded);
 		return true;
 	}
 

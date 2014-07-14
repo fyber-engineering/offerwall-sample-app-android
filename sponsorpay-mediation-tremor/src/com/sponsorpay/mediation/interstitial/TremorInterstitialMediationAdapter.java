@@ -12,24 +12,28 @@ public class TremorInterstitialMediationAdapter extends
 		SPInterstitialMediationAdapter<TremorMediationAdapter> {
 
 	private static final String TAG = "TremorInterstitialMediationAdapter";
-	
+
 	public TremorInterstitialMediationAdapter(TremorMediationAdapter adapter) {
 		super(adapter);
 	}
 
 	@Override
 	protected boolean show(Activity parentActivity) {
-		try {
-			return TremorVideo.showAd(parentActivity, 0);
-		} catch (Exception ex) {
-			SponsorPayLogger.e(TAG, "An exception has been thrown while ", ex);
+		if (TremorVideo.isAdReady()) {
+			try {
+				return TremorVideo.showAd(parentActivity, 0);
+			} catch (Exception ex) {
+				SponsorPayLogger.e(TAG, "An exception has been thrown while displaying the ad.", ex);
+				return false;
+			}
+		} else {
 			return false;
 		}
 	}
-
+	
 	@Override
 	protected void checkForAds(Context context) {
-		TremorVideo.start(); // sends an ad request and starts video download 
+		TremorVideo.start(); // sends an ad request and starts video download
 	}
 
 }

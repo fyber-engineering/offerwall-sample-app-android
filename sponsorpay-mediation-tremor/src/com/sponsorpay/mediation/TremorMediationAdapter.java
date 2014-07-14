@@ -79,7 +79,6 @@ public class TremorMediationAdapter extends SPMediationAdapter {
 	}
 
 	private JSONArray getConfigListOfAppIds(){
-		SponsorPayLogger.d(TAG, "log: " + APP_IDS);
 		JSONArray metadata = SPMediationConfigurator.getConfiguration(getName(), APP_IDS, JSONArray.class);
 		return metadata;
 	}

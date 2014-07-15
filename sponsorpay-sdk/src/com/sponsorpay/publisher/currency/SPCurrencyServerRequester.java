@@ -138,7 +138,7 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 			errorMessage = jsonResponse.getString(ERROR_MESSAGE_KEY);
 			errorType = SPCurrencyServerRequestErrorType.SERVER_RETURNED_ERROR;
 		} catch (Exception e) {
-			SponsorPayLogger.w(getClass().getSimpleName(),
+			SponsorPayLogger.w(TAG,
 					"An exception was triggered while parsing error response", e);
 			errorType = SPCurrencyServerRequestErrorType.ERROR_OTHER;
 			errorMessage = e.getMessage();
@@ -167,7 +167,6 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 	 */
 	@Override
 	protected void onPostExecute(SPCurrencyServerReponse result) {
-		
 		mResultListener.onSPCurrencyServerResponseReceived(result);
 	}
 

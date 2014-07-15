@@ -11,7 +11,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import android.os.AsyncTask;
 
 /**
- * The AsyncTaskRequester extends the AsyncTask android class 
+ * The SignedResponseRequester extends the AsyncTask android class 
  * and we are performing HTTP requests. We are creating with 
  * the response an CurrencyAndMediationServerResponse object
  * by passing into the later constructor the HTTP's 

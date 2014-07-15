@@ -21,7 +21,7 @@ import com.unity3d.ads.android.UnityAds;
 public class ApplifierMediationAdapter extends SPMediationAdapter {
 
 	private static final String TAG = "ApplifierAdapter";
-	private static final String ADAPTER_VERSION = "2.0.0";
+	private static final String ADAPTER_VERSION = "2.1.0";
 	private static final String ADAPTER_NAME = "Applifier";
 
 	public static final String GAME_ID_KEY = "game.id.key";

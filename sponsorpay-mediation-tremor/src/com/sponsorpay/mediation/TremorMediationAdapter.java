@@ -21,7 +21,7 @@ public class TremorMediationAdapter extends SPMediationAdapter {
 
 	private static final String ADAPTER_VERSION = "1.0.0";
 
-	private static final String ADAPTER_NAME = "Tremor";
+	public static final String ADAPTER_NAME = "Tremor";
 	
 	private static final String APP_IDS = "appIds";
 

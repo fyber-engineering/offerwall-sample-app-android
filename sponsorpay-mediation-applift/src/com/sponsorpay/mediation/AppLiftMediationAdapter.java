@@ -22,7 +22,7 @@ public class AppLiftMediationAdapter extends SPMediationAdapter {
 
 	private static final String TAG = "AppLiftAdapter";
 
-	private static final String ADAPTER_VERSION = "1.0.1";
+	private static final String ADAPTER_VERSION = "1.1.0";
 	private static final String ADAPTER_NAME = "AppLift";
 
 	public static final String APP_ID = "app.id";

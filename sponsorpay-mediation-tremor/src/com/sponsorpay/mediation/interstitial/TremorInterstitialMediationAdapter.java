@@ -21,6 +21,11 @@ public class TremorInterstitialMediationAdapter extends
 
 	public TremorInterstitialMediationAdapter(TremorMediationAdapter adapter) {
 		super(adapter);
+		
+		// Start the TremorVideo background process, also mark the begining of a user session
+		TremorVideo.start(); 
+		
+		// Put the adapter in the config, as it could be reached from the helper activity within
 		TremorInterstitialAdapterHelper.setTremorInterstitialMediationAdapter(this);
 	}
 
@@ -41,7 +46,6 @@ public class TremorInterstitialMediationAdapter extends
 	@Override
 	protected void checkForAds(Context context) {
 		SponsorPayLogger.w(TAG, "checkForAds");
-		TremorVideo.start(); // sends an ad request and starts video download
 		if (TremorVideo.isAdReady()) {
 			setAdAvailable();
 		}

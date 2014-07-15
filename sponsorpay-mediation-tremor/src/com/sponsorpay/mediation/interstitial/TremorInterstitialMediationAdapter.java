@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.sponsorpay.mediation.TremorMediationAdapter;
+import com.sponsorpay.mediation.helper.TremorInterstitialAdapterHelper;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.tremorvideo.sdk.android.adapter.TremorAdapterCallbackListener;
@@ -20,11 +21,12 @@ public class TremorInterstitialMediationAdapter extends
 
 	public TremorInterstitialMediationAdapter(TremorMediationAdapter adapter) {
 		super(adapter);
-		TremorVideo.start(); // sends an ad request and starts video download
+		TremorInterstitialAdapterHelper.setTremorInterstitialMediationAdapter(this);
 	}
 
 	@Override
 	protected boolean show(Activity parentActivity) {
+		SponsorPayLogger.w(TAG, "show");
 		if (TremorVideo.isAdReady()) {
 			Intent tIntent = new Intent(parentActivity, TremorInterstitialActivity.class);
 			parentActivity.startActivity(tIntent);
@@ -38,7 +40,8 @@ public class TremorInterstitialMediationAdapter extends
 
 	@Override
 	protected void checkForAds(Context context) {
-		SponsorPayLogger.d(TAG, "check for ads!");
+		SponsorPayLogger.w(TAG, "checkForAds");
+		TremorVideo.start(); // sends an ad request and starts video download
 		if (TremorVideo.isAdReady()) {
 			setAdAvailable();
 		}
@@ -46,15 +49,19 @@ public class TremorInterstitialMediationAdapter extends
 
 	@Override
 	public void processActivityResult(int pResultCode) {
+		SponsorPayLogger.w(TAG, "processActivityResult");
 		if (pResultCode == RESULT_CODE_SUCCESS) {
+			SponsorPayLogger.d(TAG, "firing impression event");
 			fireImpressionEvent();
 		} else {
+			SponsorPayLogger.d(TAG, "firing show error event");
 			fireShowErrorEvent("Ad wasn't shown successfully");
 		}
 	}
 
 	@Override
 	public void requestAdValidationError(Throwable thr) {
+		SponsorPayLogger.w(TAG, "requestAdValidationError");
 		fireValidationErrorEvent("An exception has been caught while trying to display the interstitial: "
 				+ thr.getMessage() + ". The cause: " + thr.getCause());
 	}

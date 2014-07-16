@@ -51,7 +51,5 @@ public class TremorInterstitialActivity extends Activity {
 	protected void onDestroy() {
 		SponsorPayLogger.w(TAG, "onDestroy");
 		super.onDestroy();
-		TremorVideo.destroy();
-		SponsorPayLogger.w(TAG, "TremorVideo.destroy() has been passed");
 	}
 }

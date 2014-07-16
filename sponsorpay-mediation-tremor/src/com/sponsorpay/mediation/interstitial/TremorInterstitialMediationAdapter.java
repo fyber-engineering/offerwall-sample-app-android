@@ -21,11 +21,9 @@ public class TremorInterstitialMediationAdapter extends
 
 	public TremorInterstitialMediationAdapter(TremorMediationAdapter adapter) {
 		super(adapter);
-		
-		// Start the TremorVideo background process, also mark the begining of a user session
-		TremorVideo.start(); 
-		
-		// Put the adapter in the config, as it could be reached from the helper activity within
+
+		// Put the adapter in the config, as it could be reached from the helper
+		// activity within
 		TremorInterstitialAdapterHelper.setTremorInterstitialMediationAdapter(this);
 	}
 
@@ -33,9 +31,10 @@ public class TremorInterstitialMediationAdapter extends
 	protected boolean show(Activity parentActivity) {
 		SponsorPayLogger.w(TAG, "show");
 		if (TremorVideo.isAdReady()) {
+			SponsorPayLogger.d(TAG, "Ad is ready to show!");
 			Intent tIntent = new Intent(parentActivity, TremorInterstitialActivity.class);
 			parentActivity.startActivity(tIntent);
-			SponsorPayLogger.d(TAG, "Ad is ready to show!");
+			fireImpressionEvent();
 			return true;
 		} else {
 			SponsorPayLogger.d(TAG, "Ad is not ready to show yet!");
@@ -46,7 +45,12 @@ public class TremorInterstitialMediationAdapter extends
 	@Override
 	protected void checkForAds(Context context) {
 		SponsorPayLogger.w(TAG, "checkForAds");
+		// Start the TremorVideo background process, also mark the begining of a
+		// user session
+		TremorVideo.start();
+		SponsorPayLogger.d(TAG, "TremorVideo.start() has been invoked");
 		if (TremorVideo.isAdReady()) {
+			SponsorPayLogger.i(TAG, "ad is ready!");
 			setAdAvailable();
 		}
 	}
@@ -56,11 +60,12 @@ public class TremorInterstitialMediationAdapter extends
 		SponsorPayLogger.w(TAG, "processActivityResult");
 		if (pResultCode == RESULT_CODE_SUCCESS) {
 			SponsorPayLogger.d(TAG, "firing impression event");
-			fireImpressionEvent();
+			fireCloseEvent();
 		} else {
 			SponsorPayLogger.d(TAG, "firing show error event");
 			fireShowErrorEvent("Ad wasn't shown successfully");
 		}
+		TremorVideo.start();
 	}
 
 	@Override

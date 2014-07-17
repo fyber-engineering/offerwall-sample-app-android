@@ -101,7 +101,7 @@ public class SPMediationConfigurator {
 	public static Map<String, Map<String, Object>> parseConfiguration(String jsonString){
 		SponsorPayLogger.d(TAG, "Reading config file");
 		
-		Map<String, Map<String, Object>> mConfigurations = new HashMap<String, Map<String, Object>>();
+		Map<String, Map<String, Object>> configurations = new HashMap<String, Map<String, Object>>();
 
 		if (StringUtils.notNullNorEmpty(jsonString)) {
 			try {
@@ -122,10 +122,10 @@ public class SPMediationConfigurator {
 							Object value = settings.get(key);
 							map.put(key, value);
 						}
-						mConfigurations.put(adapterName, map);
+						configurations.put(adapterName, map);
 					} else {
 						Map<String, Object> map = Collections.emptyMap();
-						mConfigurations.put(adapterName, map);
+						configurations.put(adapterName, map);
 					}
 				}
 				SponsorPayLogger.d(TAG, "configuration loaded successfully");
@@ -136,7 +136,7 @@ public class SPMediationConfigurator {
 		} else {
 			SponsorPayLogger.d(TAG, "Configuration was not found, there will be no mediation configurations.");
 		}
-		return mConfigurations; 
+		return configurations; 
 	}
 
 }

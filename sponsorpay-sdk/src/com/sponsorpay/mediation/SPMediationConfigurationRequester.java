@@ -3,6 +3,7 @@ package com.sponsorpay.mediation;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -29,23 +30,23 @@ public class SPMediationConfigurationRequester extends SignedResponseRequester<S
 	public  static final String TAG = "ConfigurationRequester";
 	private static final String SERVER_SIDE_CONFIG_URL_KEY = "config";
 	
-	private Context mContext;
+	private Activity mActivity;
 	private String mSecurityToken;
 
 	
-	public static void requestConfig(SPCredentials credentials, Context appcontext) {
+	public static void requestConfig(SPCredentials credentials, Activity activity) {
 		
 		UrlBuilder urlBuilder = UrlBuilder.newBuilder(getBaseUrl(), credentials).addSignature();
 		
-		new SPMediationConfigurationRequester(appcontext, credentials.getSecurityToken()).execute(urlBuilder);
+		new SPMediationConfigurationRequester(activity, credentials.getSecurityToken()).execute(urlBuilder);
 	}
 	
 	private static String getBaseUrl() {
 		return SponsorPayBaseUrlProvider.getBaseUrl(SERVER_SIDE_CONFIG_URL_KEY);
 	}
 	
-	private SPMediationConfigurationRequester(Context context, String securityToken) {		
-		mContext = context;
+	private SPMediationConfigurationRequester(Activity activity, String securityToken) {		
+		mActivity = activity;
 		mSecurityToken = securityToken;
 	}
 	
@@ -55,7 +56,8 @@ public class SPMediationConfigurationRequester extends SignedResponseRequester<S
 	 */
 	@Override
 	protected void onPostExecute(SignedServerResponse result) {
-		//do nothing
+		// even though this is runned inside UI thread, the method below will spawn a new background thread
+		SPMediationCoordinator.INSTANCE.startMediationAdapters(mActivity);
 	}
 	
 
@@ -76,7 +78,9 @@ public class SPMediationConfigurationRequester extends SignedResponseRequester<S
 	@Override
 	protected SignedServerResponse parsedSignedResponse(
 			SignedServerResponse signedServerResponse) {
-		
+		String json = StringUtils.EMPTY_STRING;
+		SharedPreferences sharedpreferences = mActivity
+				.getSharedPreferences(TAG, Context.MODE_PRIVATE);
 		if (signedServerResponse != null && verifySignature(signedServerResponse, mSecurityToken)
 				&& !hasErrorStatusCode(signedServerResponse.getStatusCode())) {
 
@@ -84,8 +88,6 @@ public class SPMediationConfigurationRequester extends SignedResponseRequester<S
 
 			if (StringUtils.notNullNorEmpty(responseBody)) {
 
-				SharedPreferences sharedpreferences = mContext
-						.getSharedPreferences(TAG, Context.MODE_PRIVATE);
 				Editor editor = sharedpreferences.edit();
 				editor.putString(TAG, responseBody);
 
@@ -94,39 +96,44 @@ public class SPMediationConfigurationRequester extends SignedResponseRequester<S
 				} else {
 					SponsorPayLogger.d(TAG, "Failed to save Server Side Configuration.");
 				}
-
-				Map<String, Map<String, Object>> settingsMapFromResponseBody = SPMediationConfigurator
-						.parseConfiguration(responseBody);
-
-				// iterate on all server side configurations
-				for (Entry<String, Map<String, Object>> entry : settingsMapFromResponseBody
-						.entrySet()) {
-
-					String network = entry.getKey();
-					Map<String, Object> serverConfigs = entry.getValue();
-					Map<String, Object> localConfigs = SPMediationConfigurator.INSTANCE
-							.getConfigurationForAdapter(network);
-
-					// if the existing configurations adapter doesn't contain
-					// the key, then save everything
-					if (localConfigs == null || localConfigs.size() == 0) {
-						SPMediationConfigurator.INSTANCE.setConfigurationForAdapter(network,
-										serverConfigs);
-
-						// else check if a value that exists in the server side configuration
-						// and doesn't exist on local one. Then we are writing the value to the local
-					} else {
-						for (Entry<String, Object> serverSettingsEntry : serverConfigs.entrySet()) {
-							if (!localConfigs.containsKey(serverSettingsEntry.getKey())) {
-								localConfigs.put(serverSettingsEntry.getKey(), serverSettingsEntry.getValue());
-							}
-						}
-					}
-				}
+				
+				json = responseBody;
+				
 			}
-			mContext = null;
 		}
+		if (StringUtils.nullOrEmpty(json)) {
+			// retrieve info from the store preferencs, if any
+			SponsorPayLogger.d(TAG, "Using previously stored json file");
+			json = sharedpreferences.getString(TAG, StringUtils.EMPTY_STRING);
+		}
+		overrideConfig(json);
+		
 		return signedServerResponse;
+	}
+	
+	private void overrideConfig(String json) {
+		if (StringUtils.notNullNorEmpty(json)) {
+			Map<String, Map<String, Object>> settingsMapFromResponseBody = SPMediationConfigurator
+					.parseConfiguration(json);
+	
+			// iterate on all server side configurations
+			for (Entry<String, Map<String, Object>> entry : settingsMapFromResponseBody
+					.entrySet()) {
+	
+				String network = entry.getKey();
+				Map<String, Object> serverConfigs = entry.getValue();
+				Map<String, Object> localConfigs = SPMediationConfigurator.INSTANCE
+						.getConfigurationForAdapter(network);
+	
+				if(localConfigs != null) {
+					serverConfigs.putAll(localConfigs);
+				}
+				SPMediationConfigurator.INSTANCE.setConfigurationForAdapter(network,
+								serverConfigs);
+			}
+		} else {
+			SponsorPayLogger.d(TAG, "There were no server side credentials to override");
+		}
 	}
 
 }

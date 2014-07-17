@@ -58,6 +58,7 @@ public abstract class SignedResponseRequester<V> extends AsyncTask<UrlBuilder, V
 				+ requestUrl);
 		
 		HttpUriRequest request = new HttpGet(requestUrl);
+		
 		request.addHeader(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE);
 
 		String acceptLanguageHeaderValue = makeAcceptLanguageHeaderValue();

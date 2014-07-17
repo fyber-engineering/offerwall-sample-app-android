@@ -15,6 +15,7 @@ import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
 import android.location.Location;
+import android.text.TextUtils;
 
 public final class SPUser extends HashMap<String, Object>  {
 	
@@ -192,7 +193,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static void setZipcode(String zipcode) {
-		singleton.put("ZIPCODE", zipcode);
+		singleton.put(ZIPCODE, zipcode);
 	}
 
 
@@ -368,6 +369,8 @@ public final class SPUser extends HashMap<String, Object>  {
 	private String getStringValue(Object value) {
 		if (value instanceof Date) {
 			return String.format("%tY/%tm/%td", value, value, value);
+		} else if (value instanceof String[]) {
+			return TextUtils.join(",", (String[])value);
 		}
 		return value.toString();
 	}

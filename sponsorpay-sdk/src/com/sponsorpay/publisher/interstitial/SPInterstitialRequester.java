@@ -43,7 +43,7 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 				.addKeyValue(SPInterstitialClient.SP_REQUEST_ID_PARAMETER_KEY, requestId)
 				.addScreenMetrics()
 				.addScreenOrientation();
-		
+
 		new SPInterstitialRequester().execute(urlBuilder);
 	}
 	

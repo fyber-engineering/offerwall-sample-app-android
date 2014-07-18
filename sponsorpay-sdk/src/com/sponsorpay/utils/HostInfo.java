@@ -401,7 +401,7 @@ public class HostInfo {
 		}
 	}
 	
-	// Permission simulation 
+	// Permission simulation
 	protected static boolean sSimulateNoReadPhoneStatePermission = false;
 	protected static boolean sSimulateNoAccessNetworkState = false;
 	

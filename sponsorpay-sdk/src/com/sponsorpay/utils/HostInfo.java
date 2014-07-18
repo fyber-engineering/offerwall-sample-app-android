@@ -79,6 +79,7 @@ public class HostInfo {
 	private boolean mAdvertisingIdLimitedTrackingEnabled = true;
 
 	private DisplayMetrics mDisplayMetrics;
+	private WindowManager mWindowManager;
 
 	private String mScreenDensityCategory;
 	private int mScreenWidth;
@@ -120,7 +121,6 @@ public class HostInfo {
 
 		retrieveTelephonyManagerValues(context);
 		retrieveAccessNetworkValues(context);
-		// Android ID
 		retrieveDisplayMetrics(context);
 		retrieveAppVersion(context);
 		
@@ -174,9 +174,9 @@ public class HostInfo {
 	private DisplayMetrics retrieveDisplayMetrics(Context context) {
 		if (mDisplayMetrics == null) {
 			mDisplayMetrics = new DisplayMetrics();
-			WindowManager windowManager = (WindowManager)context 
+			mWindowManager = (WindowManager)context 
 					.getSystemService(Context.WINDOW_SERVICE);
-			windowManager.getDefaultDisplay().getMetrics(mDisplayMetrics);
+			mWindowManager.getDefaultDisplay().getMetrics(mDisplayMetrics);
 		}
 		return mDisplayMetrics;
 	}
@@ -258,6 +258,12 @@ public class HostInfo {
 
 	public Boolean isAdvertisingIdLimitedTrackingEnabled() {
 		return mAdvertisingIdLimitedTrackingEnabled;
+	}
+
+	public String getScreenOrientation() {
+		String[] values = {"portrait", "landscape", "portrait", "landscape"};
+		int orientation = mWindowManager.getDefaultDisplay().getOrientation();
+		return values[orientation];
 	}
 	
 	public String getScreenDensityCategory() {
@@ -396,7 +402,6 @@ public class HostInfo {
 	}
 	
 	// Permission simulation 
-	
 	protected static boolean sSimulateNoReadPhoneStatePermission = false;
 	protected static boolean sSimulateNoAccessNetworkState = false;
 	
@@ -407,6 +412,5 @@ public class HostInfo {
 	public static void setSimulateNoAccessNetworkState(boolean value) {
 		sSimulateNoAccessNetworkState = value;
 	}
-	
 	
 }

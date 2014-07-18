@@ -18,6 +18,7 @@ import com.sponsorpay.utils.SignedResponseRequester;
 import com.sponsorpay.utils.SignedServerResponse;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
+import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.UrlBuilder;
 
 /**
@@ -196,6 +197,12 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 					null, t.getMessage());
 			
 		}
+		if (response == null) {
+			new SPCurrencyServerErrorResponse(
+					SPCurrencyServerRequestErrorType.ERROR_OTHER,
+					StringUtils.EMPTY_STRING, "Unknow error");
+		}
+
 		return response;
 	}
 

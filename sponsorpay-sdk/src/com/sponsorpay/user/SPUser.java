@@ -1,12 +1,13 @@
 package com.sponsorpay.user;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.sponsorpay.utils.SponsorPayLogger;
-import com.sponsorpay.utils.StringUtils;
 
 import android.location.Location;
 
@@ -21,30 +22,30 @@ public final class SPUser extends HashMap<String, Object>  {
 	
 	private ArrayList<String> reservedKeys = new ArrayList<String>();
 	
-	public static final String AGE = "age";
+	public static final String AGE      = "age";
 	public static final String BIRTHDAY = "birthdate";
-	public static final String GENDER = "gender";
+	public static final String GENDER   = "gender";
 	public static final String SEXUAL_ORIENTATION = "sexualOrientation";
 	public static final String ETHNICITY = "ethnicity";
-	public static final String LOCATION = "location";
-	public static final String LAT = "lat";
-	public static final String LONGT = "longt";
+	public static final String LOCATION  = "location";
+	public static final String LAT       = "lat";
+	public static final String LONGT     = "longt";
 	public static final String MARITAL_STATUS = "maritalStatus";
-	public static final String HAS_CHILDREN = "hasChildren";
-	public static final String NUMBER_OF_CHILDRENS = "numberOfChildrens";
+	public static final String HAS_CHILDREN   = "hasChildren";
+	public static final String NUMBER_OF_CHILDRENS     = "numberOfChildrens";
 	public static final String ANNUAL_HOUSEHOLD_INCOME = "annualHouseholdIncome";
 	public static final String EDUCATION = "education";
-	public static final String ZIPCODE = "zipcode";
+	public static final String ZIPCODE   = "zipcode";
 	public static final String POLITICAL_AFFILIATION = "politicalAffiliation";
-	public static final String INTERESTS = "interests";
-	public static final String IAP = "iap";
+	public static final String INTERESTS  = "interests";
+	public static final String IAP        = "iap";
 	public static final String IAP_AMOUNT = "iap_amount";
 	public static final String NUMBER_OF_SESSIONS = "numberOfSessions";
-	public static final String PS_TIME = "ps_time";
+	public static final String PS_TIME      = "ps_time";
 	public static final String LAST_SESSION = "last_session";
-	public static final String CONNECTION = "connection";
-	public static final String DEVICE = "device";
-	public static final String APP_VERSION = "app_version";
+	public static final String CONNECTION   = "connection";
+	public static final String DEVICE       = "device";
+	public static final String APP_VERSION  = "app_version";
 	
 
 
@@ -332,23 +333,30 @@ public final class SPUser extends HashMap<String, Object>  {
 		return reservedKeys;
 	}
 	
-	public static String mapToString(){
-		
+	public static String mapToString() {
+
 		if (singleton.isProvidedMapDirty) {
-			
-			singleton.providedDataAsString = "";
+
+			StringBuilder buffer = new StringBuilder();
 
 			for (Map.Entry<String, Object> entry : singleton.entrySet()) {
-				String key = entry.getKey();
-				Object value = entry.getValue();
 
-				String keyValue = key + "=" + value.toString();
-				if (StringUtils.notNullNorEmpty(singleton.providedDataAsString)) {
-					singleton.providedDataAsString += "&" + keyValue;
-				} else {
-					singleton.providedDataAsString += keyValue;
+				try {
+
+					buffer.append(URLEncoder.encode(entry.getKey(), "UTF-8"))
+						  .append("=")
+						  .append(URLEncoder.encode(entry.getValue().toString(), "UTF-8"))
+					      .append("&");
+
+				} catch (UnsupportedEncodingException e) {
+					SponsorPayLogger.e("SPUser", "Error while encoding the user segmentation data.");
 				}
 			}
+
+			String providedData = buffer.toString();
+			
+			//remove the last ampersand
+			singleton.providedDataAsString = providedData.substring(0,providedData.length()-1);
 
 			SponsorPayLogger.v("SPUser submitted data", singleton.providedDataAsString);
 

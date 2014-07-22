@@ -12,19 +12,19 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 
-import com.sponsorpay.mediation.ApplifierMediationAdapter;
+import com.sponsorpay.mediation.UnityAdsMediationAdapter;
 import com.sponsorpay.mediation.SPMediationConfigurator;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.unity3d.ads.android.IUnityAdsListener;
 import com.unity3d.ads.android.UnityAds;
 
-public class ApplifierVideoMediationAdapter extends SPBrandEngageMediationAdapter<ApplifierMediationAdapter>
+public class UnityAdsVideoMediationAdapter extends SPBrandEngageMediationAdapter<UnityAdsMediationAdapter>
 		implements IUnityAdsListener {
 
 	private boolean campaignAvailable;
 
-	public ApplifierVideoMediationAdapter(ApplifierMediationAdapter adapter) {
+	public UnityAdsVideoMediationAdapter(UnityAdsMediationAdapter adapter) {
 		super(adapter);
 	}
 

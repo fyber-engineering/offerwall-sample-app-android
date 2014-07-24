@@ -21,6 +21,7 @@ public class AppLovinVideoMediationAdapter extends
 
 	private AppLovinIncentivizedInterstitial mIncentivizedAd;
 	private boolean mRewardVerified = false;
+	private boolean mFullyWatched   = false;
 
 	public AppLovinVideoMediationAdapter(
 			AppLovinMediationAdapter appLovinMediationAdapter, Activity activity) {
@@ -36,6 +37,7 @@ public class AppLovinVideoMediationAdapter extends
 				: SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
 
 		mRewardVerified = false;
+		mFullyWatched   = false;
 	}
 
 	@Override
@@ -67,7 +69,6 @@ public class AppLovinVideoMediationAdapter extends
 	@Override
 	public void userRewardVerified(AppLovinAd ad, Map response) {
 		// AppLovin servers validated the reward. Refresh user balance from your server.
-//		setVideoPlayed();
 		mRewardVerified = true;
 	}
 	
@@ -91,10 +92,8 @@ public class AppLovinVideoMediationAdapter extends
 	@Override
 	public void videoPlaybackEnded(final AppLovinAd ad,
 			final double percentViewed, final boolean fullyWatched) {
-		if (fullyWatched && mRewardVerified) {
-			mRewardVerified = false;
-			setVideoPlayed();
-		}
+		
+		mFullyWatched = fullyWatched;
 	}
 
 	//AppLovinAdDisplayListener
@@ -105,6 +104,15 @@ public class AppLovinVideoMediationAdapter extends
 
 	@Override
 	public void adHidden(AppLovinAd arg0) {
+		
+		if (mRewardVerified && mFullyWatched) {
+			// handle granting reward and video completion
+			setVideoPlayed();
+		} 
+	
+		mRewardVerified = false;
+		mFullyWatched   = false;
+		
 		mIncentivizedAd.preload(null);
 		notifyCloseEngagement();
 	}

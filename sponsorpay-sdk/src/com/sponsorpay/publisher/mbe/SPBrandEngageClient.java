@@ -135,7 +135,8 @@ public class SPBrandEngageClient {
 	 */
 	public static final String SP_REQUEST_STATUS_PARAMETER_ERROR = "ERROR";
 	
-	private static final int TIMEOUT = 10000 ;
+	public static final int TIMEOUT = 10000 ;
+	
 	private static final int VCS_TIMEOUT = 3000 ;
 
 	private static final int VIDEO_EVENT = 1;

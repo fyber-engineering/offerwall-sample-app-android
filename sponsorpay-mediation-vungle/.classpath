@@ -5,6 +5,6 @@
 	<classpathentry kind="lib" path="/sponsorpay-android-sdk/sponsorpay-android-sdk.jar" sourcepath="/sponsorpay-android-sdk"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
-	<classpathentry exported="true" kind="lib" path="libs/vungle-publisher-3.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/vungle-publisher-3.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

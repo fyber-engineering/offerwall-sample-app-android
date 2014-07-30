@@ -24,7 +24,7 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 			
 	private static final String TAG = "VungleAdapter";
 
-	private static final String ADAPTER_VERSION = "2.2.0";
+	private static final String ADAPTER_VERSION = "2.1.0";
 
 	private static final String ADAPTER_NAME = "Vungle";
 	

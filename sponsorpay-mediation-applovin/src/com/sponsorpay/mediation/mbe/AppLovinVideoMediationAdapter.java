@@ -8,58 +8,47 @@ import android.content.Context;
 import com.applovin.adview.AppLovinIncentivizedInterstitial;
 import com.applovin.sdk.AppLovinAd;
 import com.applovin.sdk.AppLovinAdDisplayListener;
-import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinAdRewardListener;
 import com.applovin.sdk.AppLovinAdVideoPlaybackListener;
 import com.sponsorpay.mediation.AppLovinMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
-import com.sponsorpay.utils.SponsorPayLogger;
 
 public class AppLovinVideoMediationAdapter extends
 		SPBrandEngageMediationAdapter<AppLovinMediationAdapter> implements
-		AppLovinAdLoadListener, AppLovinAdRewardListener,
+		AppLovinAdRewardListener,
 		AppLovinAdVideoPlaybackListener, AppLovinAdDisplayListener {
 
 	private AppLovinIncentivizedInterstitial mIncentivizedAd;
 	private boolean mRewardVerified = false;
+	private boolean mFullyWatched   = false;
 
 	public AppLovinVideoMediationAdapter(
 			AppLovinMediationAdapter appLovinMediationAdapter, Activity activity) {
 		super(appLovinMediationAdapter);
 		mIncentivizedAd = AppLovinIncentivizedInterstitial.create( activity );
+		mIncentivizedAd.preload(null);
 	}
 
 	@Override
 	public void videosAvailable(Context context) {
-		mIncentivizedAd.preload(this);
+				
+		sendValidationEvent(mIncentivizedAd.isAdReadyToDisplay() ? SPTPNVideoValidationResult.SPTPNValidationSuccess
+				: SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
+
 		mRewardVerified = false;
+		mFullyWatched   = false;
 	}
 
 	@Override
 	public void startVideo(Activity parentActivity) {
-		mIncentivizedAd.show(parentActivity, this, this, this);
-		// we need to notify here because of the watch dialog
-		notifyVideoStarted();
-	}
-
-	// AppLovinAdLoadListener
-	@Override
-	public void adReceived(AppLovinAd ad) {
-		sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationSuccess);
-	}
-
-	@Override
-	public void failedToReceiveAd(int errorCode) {
-		if (errorCode == 202 || errorCode == 204) {
-			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationNoVideoAvailable);
-		} else {
-			SponsorPayLogger.d(AppLovinMediationAdapter.TAG, "failedToReceiveAd with errorCode - " + errorCode);
-			sendValidationEvent(SPTPNVideoValidationResult.SPTPNValidationError);
+		if(mIncentivizedAd.isAdReadyToDisplay()){
+			mIncentivizedAd.show(parentActivity, this, this, this);
+			// we need to notify here because of the watch dialog
+			notifyVideoStarted();
 		}
 	}
 
-	
 	//AppLovinAdRewardListener
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -80,7 +69,6 @@ public class AppLovinVideoMediationAdapter extends
 	@Override
 	public void userRewardVerified(AppLovinAd ad, Map response) {
 		// AppLovin servers validated the reward. Refresh user balance from your server.
-//		setVideoPlayed();
 		mRewardVerified = true;
 	}
 	
@@ -104,10 +92,8 @@ public class AppLovinVideoMediationAdapter extends
 	@Override
 	public void videoPlaybackEnded(final AppLovinAd ad,
 			final double percentViewed, final boolean fullyWatched) {
-		if (fullyWatched && mRewardVerified) {
-			mRewardVerified = false;
-			setVideoPlayed();
-		}
+		
+		mFullyWatched = fullyWatched;
 	}
 
 	//AppLovinAdDisplayListener
@@ -118,6 +104,16 @@ public class AppLovinVideoMediationAdapter extends
 
 	@Override
 	public void adHidden(AppLovinAd arg0) {
+		
+		if (mRewardVerified && mFullyWatched) {
+			// handle granting reward and video completion
+			setVideoPlayed();
+		} 
+	
+		mRewardVerified = false;
+		mFullyWatched   = false;
+		
+		mIncentivizedAd.preload(null);
 		notifyCloseEngagement();
 	}
 

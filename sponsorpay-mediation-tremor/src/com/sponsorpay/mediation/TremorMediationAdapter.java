@@ -28,7 +28,7 @@ public class TremorMediationAdapter extends SPMediationAdapter {
 	private TremorInterstitialMediationAdapter mInterstitialMediationAdapter;
 	
 	@Override
-	public boolean startAdapter(Activity activity) {
+	public boolean startAdapter(final Activity activity) {
 		JSONArray appIds = getConfigListOfAppIds();
 		
 		if(null == appIds){
@@ -36,18 +36,24 @@ public class TremorMediationAdapter extends SPMediationAdapter {
 			return false;
 		}
 		
-		List<String> list = new ArrayList<String>();
+		final List<String> tList = new ArrayList<String>();
 		for(int i = 0; i < appIds.length(); i++){
 		    try {
-				list.add(appIds.getString(i));
+				tList.add(appIds.getString(i));
 			} catch (JSONException e) {
 				e.printStackTrace();
 				SponsorPayLogger.e(TAG, "The appIds list hasn't been provided properly in adapters.config file. Error while processing JSONArray.");
 				return false;
 			}
 		}
+		activity.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				TremorVideo.initialize(activity, tList.toArray(new String[tList.size()]));
+			}
+		});
 		
-		TremorVideo.initialize(activity, list.toArray(new String[list.size()]));
 		mInterstitialMediationAdapter = new TremorInterstitialMediationAdapter(TremorMediationAdapter.this);
 		return true;
 	}

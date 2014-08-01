@@ -27,7 +27,7 @@ public class AppLiftMediationAdapter extends SPMediationAdapter {
 
 	public static final String APP_ID = "app.id";
 	public static final String APP_SECRET = "app.secret";
-	public static final String APP_CACHE_INTERSTITIALS = "aap.cacheInterstitials";
+	public static final String CACHE_INTERSTITIALS = "cache.interstitials";
 
 	private AppLiftInterstitialMediationAdapter mInterstitialAdapter;
 	private Boolean mCachingNeeded;
@@ -44,11 +44,11 @@ public class AppLiftMediationAdapter extends SPMediationAdapter {
 					String.class);
 
 			mCachingNeeded = SPMediationConfigurator.getConfiguration(getName(),
-					AppLiftMediationAdapter.APP_CACHE_INTERSTITIALS, Boolean.class);
+					AppLiftMediationAdapter.CACHE_INTERSTITIALS, Boolean.class);
 
-			if (null == mCachingNeeded) {
-				SponsorPayLogger.e(TAG, "Error on parsing forcing caching parameter \""
-						+ AppLiftMediationAdapter.APP_CACHE_INTERSTITIALS + "\".");
+			if (mCachingNeeded == null) {
+				SponsorPayLogger.e(TAG, "Error on parsing the cache parameter \""
+						+ AppLiftMediationAdapter.CACHE_INTERSTITIALS + "\".");
 				return false;
 			}
 

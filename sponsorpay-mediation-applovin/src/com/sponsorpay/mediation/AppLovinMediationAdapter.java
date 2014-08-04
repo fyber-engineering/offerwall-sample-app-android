@@ -24,7 +24,7 @@ import com.sponsorpay.utils.StringUtils;
 public class AppLovinMediationAdapter extends SPMediationAdapter {
 
 	public static final String TAG = "AppLovinAdapter";
-	private static final String ADAPTER_VERSION = "1.2.0";
+	private static final String ADAPTER_VERSION = "1.3.0";
 	private static final String ADAPTER_NAME = "AppLovin";
 	
 	private static final String SDK_KEY = "applovin.sdk.key";
@@ -36,7 +36,7 @@ public class AppLovinMediationAdapter extends SPMediationAdapter {
 		SponsorPayLogger.d(TAG, "Starting AppLovin adapter - SDK version " + AppLovinSdk.VERSION);
 		String sdkKey = getValueFromAppMetadata(activity);
 		if (StringUtils.notNullNorEmpty(sdkKey)) {
-//			AppLovinSdk.initializeSdk(activity);
+			AppLovinSdk.initializeSdk(activity);
 			mInterstitialAdapter = new AppLovinIntersitialMediationAdapter(this, activity);
 			mVideoAdapter = new AppLovinVideoMediationAdapter(this, activity);
 			return true;

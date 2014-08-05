@@ -151,7 +151,7 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 	}
 	
 	/**
-	 * @return true is an ad is avaialble to be shown
+	 * @return true is an ad is available to be shown
 	 */
 	private boolean isAdAvailable() {
 		return mAdAvailable;

@@ -27,9 +27,13 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
+import com.sponsorpay.user.SPUser;
+
 public class SPHttpClient {
 
 	private static final String TAG = "SPHttpClient";
+	private static final String USER_SEGMENTATION_HEADER_NAME = "X-User-Data";
+	
 	private static SPHttpClient INSTANCE = new SPHttpClient();
 	
 	public static HttpClient getHttpClient() {
@@ -41,6 +45,13 @@ public class SPHttpClient {
 	private HttpClient getClient() {
 		if (client == null) {
 			HttpUriRequest request = new HttpGet("https://service.sponsorpay.com");
+			
+			//If the developer has passed data for user segmentation,
+			//then add them in the headers
+			String userSegmentationData = SPUser.mapToString();
+			if(StringUtils.notNullNorEmpty(userSegmentationData)){
+				request.addHeader(USER_SEGMENTATION_HEADER_NAME, SPUser.mapToString());
+			}
 			
 			HttpParams params = new BasicHttpParams();
 			HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);

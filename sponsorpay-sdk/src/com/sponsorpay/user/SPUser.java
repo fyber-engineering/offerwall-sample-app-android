@@ -12,9 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sponsorpay.utils.SponsorPayLogger;
-import com.sponsorpay.utils.StringUtils;
 
 import android.location.Location;
+import android.net.Uri;
 import android.text.TextUtils;
 
 public final class SPUser extends HashMap<String, Object>  {
@@ -342,27 +342,18 @@ public final class SPUser extends HashMap<String, Object>  {
 	public static String mapToString() {
 
 		if (singleton.isProvidedMapDirty) {
-
-			StringBuilder buffer = new StringBuilder();
+			
+			Uri.Builder builder = new Uri.Builder();
 
 			for (Map.Entry<String, Object> entry : singleton.entrySet()) {
 
-				String key = entry.getKey();
-				Object value = entry.getValue();
-				if (value != null) {
-					String keyAndValue = key + "=" + singleton.getStringValue(value);
-					if (StringUtils.notNullNorEmpty(singleton.providedDataAsString)) {
-						singleton.providedDataAsString += "&" + keyAndValue;
-					} else {
-						singleton.providedDataAsString += keyAndValue;
-					}
-				}
+				builder.appendQueryParameter(entry.getKey(), singleton.getStringValue(entry.getValue()));
 			}
-
-			String providedData = buffer.toString();
 			
-			//remove the last ampersand
-			singleton.providedDataAsString = providedData.substring(0,providedData.length()-1);
+            String providedData = builder.build().toString();
+			
+			//remove the first question mark
+			singleton.providedDataAsString = providedData.substring(1,providedData.length());
 
 			SponsorPayLogger.v("SPUser submitted data", singleton.providedDataAsString);
 

@@ -20,36 +20,39 @@ import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAd
 import com.sponsorpay.utils.SponsorPayLogger;
 
 public class AppLiftInterstitialMediationAdapter extends
-		SPInterstitialMediationAdapter<AppLiftMediationAdapter> implements PlayAdsListener{
+		SPInterstitialMediationAdapter<AppLiftMediationAdapter> implements PlayAdsListener {
 
-	private boolean mIsShown = false;;
+	private boolean mIsShown = false;
 
+	private Boolean mIsCachingNeeded;
+	
 	public AppLiftInterstitialMediationAdapter(AppLiftMediationAdapter adapter) {
 		super(adapter);
+		mIsCachingNeeded = adapter.isCachingNeeded();
 	}
-	
+
 	public void start(Activity activity) {
 		mActivityRef = new WeakReference<Activity>(activity);
 		checkForAds(null);
 	}
-	
+
 	@Override
 	protected void checkForAds(Context context) {
 		if (getActivity() != null) {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					PlayAds.cache();	
+					PlayAds.cache();
 				}
 			});
 		} else {
 			SponsorPayLogger.e(getName(), "Unable to check for ads, needs to be run in the main thread");
 		}
 	}
-	
+
 	@Override
 	public boolean show(Activity parentActivity) {
-		PlayAds.show(parentActivity);
+		PlayAds.show(parentActivity, mIsCachingNeeded);
 		return true;
 	}
 
@@ -60,15 +63,15 @@ public class AppLiftInterstitialMediationAdapter extends
 
 	@Override
 	public void onShown(PlayAdsType type) {
-		mIsShown  = true;
+		mIsShown = true;
 		fireImpressionEvent();
 	}
 
 	@Override
 	public void onTapped(PlayAdsPromo promo) {
-		fireClickEvent();		
+		fireClickEvent();
 	}
-	
+
 	@Override
 	public void onError(Exception exception) {
 		if (mIsShown) {

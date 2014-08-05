@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="US-ASCII" standalone="no"?>
 <jardesc>
-    <jar path="sponsorpay-mediation-applifier/sp-mediation-applifier.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/sponsorpay-mediation-applifier/mediation-applifier.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="sponsorpay-mediation-adcolony/sp-mediation-adcolony.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/sponsorpay-mediation-adcolony/mediation-adcolony.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,6 +11,6 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=sponsorpay-mediation-applifier/src"/>
+        <javaElement handleIdentifier="=sponsorpay-mediation-adcolony/src"/>
     </selectedElements>
 </jardesc>

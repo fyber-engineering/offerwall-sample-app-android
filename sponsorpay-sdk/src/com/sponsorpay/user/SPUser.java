@@ -1,15 +1,21 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.user;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.sponsorpay.utils.SponsorPayLogger;
+import com.sponsorpay.utils.StringUtils;
 
 import android.location.Location;
+import android.text.TextUtils;
 
 public final class SPUser extends HashMap<String, Object>  {
 	
@@ -187,7 +193,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 
 	public static void setZipcode(String zipcode) {
-		singleton.put("ZIPCODE", zipcode);
+		singleton.put(ZIPCODE, zipcode);
 	}
 
 
@@ -341,15 +347,15 @@ public final class SPUser extends HashMap<String, Object>  {
 
 			for (Map.Entry<String, Object> entry : singleton.entrySet()) {
 
-				try {
-
-					buffer.append(URLEncoder.encode(entry.getKey(), "UTF-8"))
-						  .append("=")
-						  .append(URLEncoder.encode(entry.getValue().toString(), "UTF-8"))
-					      .append("&");
-
-				} catch (UnsupportedEncodingException e) {
-					SponsorPayLogger.e("SPUser", "Error while encoding the user segmentation data.");
+				String key = entry.getKey();
+				Object value = entry.getValue();
+				if (value != null) {
+					String keyAndValue = key + "=" + singleton.getStringValue(value);
+					if (StringUtils.notNullNorEmpty(singleton.providedDataAsString)) {
+						singleton.providedDataAsString += "&" + keyAndValue;
+					} else {
+						singleton.providedDataAsString += keyAndValue;
+					}
 				}
 			}
 
@@ -366,14 +372,24 @@ public final class SPUser extends HashMap<String, Object>  {
 		return singleton.providedDataAsString;
 	}
 
+	private String getStringValue(Object value) {
+		if (value instanceof Date) {
+			return String.format("%tY/%tm/%td", value, value, value);
+		} else if (value instanceof String[]) {
+			return TextUtils.join(",", (String[])value);
+		}
+		return value.toString();
+	}
+	
+	
 	@Override
 	public Object put(String key, Object value) {		
 		
-		//The isProvidedMapDirty is used to check
-		//when changes are happening on the map
-		//in order to avoid to continuous creation
-		//of the String from the Map key/values
-		//on the method above (mapToString())
+		// The isProvidedMapDirty is used to check
+		// when changes are happening on the map
+		// in order to avoid to continuous creation
+		// of the String from the Map key/values
+		// on the method above (mapToString())
 		isProvidedMapDirty = true;
 		
 		return super.put(key, value);

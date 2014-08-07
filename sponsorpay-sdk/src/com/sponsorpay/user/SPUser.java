@@ -22,7 +22,7 @@ public final class SPUser extends HashMap<String, Object>  {
 	private static final long serialVersionUID = -5963403748409731798L;
 	
 	private static final String CLASS_NAME = "SPUser";
-	
+		
 	private String providedDataAsString;
 	private boolean isProvidedMapDirty = false;
 	
@@ -37,8 +37,7 @@ public final class SPUser extends HashMap<String, Object>  {
 	public static final String LAT       = "lat";
 	public static final String LONGT     = "longt";
 	public static final String MARITAL_STATUS = "maritalStatus";
-	public static final String HAS_CHILDREN   = "hasChildren";
-	public static final String NUMBER_OF_CHILDRENS     = "numberOfChildrens";
+	public static final String NUMBER_OF_CHILDRENS     = "children";
 	public static final String ANNUAL_HOUSEHOLD_INCOME = "annualHouseholdIncome";
 	public static final String EDUCATION = "education";
 	public static final String ZIPCODE   = "zipcode";
@@ -148,16 +147,7 @@ public final class SPUser extends HashMap<String, Object>  {
 
 	public static void setMaritalStatus(SPUserMaritalStatus maritalStatus) {
 		singleton.put(MARITAL_STATUS, maritalStatus);
-	}
-	
-	public static Boolean hasChildren() {
-		return (Boolean) singleton.get(HAS_CHILDREN);
-	}
-
-
-	public static void setHasChildren(Boolean hasChildren) {
-		singleton.put(HAS_CHILDREN, hasChildren);
-	}
+	}	
 	
 	public static Integer getNumberOfChildrens(){
 		return (Integer) singleton.get(NUMBER_OF_CHILDRENS);
@@ -320,7 +310,6 @@ public final class SPUser extends HashMap<String, Object>  {
 		reservedKeys.add(LAT);
 		reservedKeys.add(LONGT);
 		reservedKeys.add(MARITAL_STATUS);
-		reservedKeys.add(HAS_CHILDREN);
 		reservedKeys.add(NUMBER_OF_CHILDRENS);
 		reservedKeys.add(ANNUAL_HOUSEHOLD_INCOME);
 		reservedKeys.add(EDUCATION);

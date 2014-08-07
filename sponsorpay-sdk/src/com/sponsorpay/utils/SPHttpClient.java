@@ -8,6 +8,8 @@ package com.sponsorpay.utils;
 
 import java.io.IOException;
 import java.security.KeyStore;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -32,7 +34,7 @@ import com.sponsorpay.user.SPUser;
 public class SPHttpClient {
 
 	private static final String TAG = "SPHttpClient";
-	private static final String USER_SEGMENTATION_HEADER_NAME = "X-User-Data";
+	public  static final String USER_SEGMENTATION_HEADER_NAME = "X-User-Data";
 	
 	private static SPHttpClient INSTANCE = new SPHttpClient();
 	
@@ -46,16 +48,14 @@ public class SPHttpClient {
 		if (client == null) {
 			HttpUriRequest request = new HttpGet("https://service.sponsorpay.com");
 			
-			//If the developer has passed data for user segmentation,
-			//then add them in the headers
+			HttpParams params = new BasicHttpParams();
+			HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+			HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
+			
 			String userSegmentationData = SPUser.mapToString();
 			if(StringUtils.notNullNorEmpty(userSegmentationData)){
 				request.addHeader(USER_SEGMENTATION_HEADER_NAME, SPUser.mapToString());
 			}
-			
-			HttpParams params = new BasicHttpParams();
-			HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-			HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
 			
 			SchemeRegistry registry = new SchemeRegistry();
 			registry.register(new Scheme("http", PlainSocketFactory
@@ -74,7 +74,7 @@ public class SPHttpClient {
 			} catch (ClientProtocolException e) {
 				SponsorPayLogger.e(TAG, "Client protocol error", e);
 			} catch (IOException e1) {
-				// SSLPeerUnverifiedException - most likely, create custom http client
+				// SSLPeerUnverifiedException - most likely, create custom HTTP client
 				try {
 
 					KeyStore trustStore = KeyStore.getInstance(KeyStore
@@ -97,6 +97,33 @@ public class SPHttpClient {
 			}
 		}
 		return client;
+	}
+	
+	
+	/**
+	 * Method which is creating a HttpGet object for the provided URL,
+	 * sets the SPUser parameters as headers in the HttpGet object 
+	 * and returns it.
+	 * @param url
+	 * @return
+	 */
+	public static HttpGet createHttpGetWithUserSegmentationHeaders(String url) {
+		
+		HttpGet httpRequest = new HttpGet(url);
+		
+		//If the developer has passed data for user segmentation,
+		//then add them in the headers
+		String userSegmentationData = SPUser.mapToString();
+		if(StringUtils.notNullNorEmpty(userSegmentationData)){
+			httpRequest.addHeader(USER_SEGMENTATION_HEADER_NAME, SPUser.mapToString());
+		}
+		return httpRequest;
+	}
+	
+	public static Map<String, String> createUserSegmentationMapForHeaders(){
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put(USER_SEGMENTATION_HEADER_NAME, SPUser.mapToString());
+		return headers;
 	}
 	
 }

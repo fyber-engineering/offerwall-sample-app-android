@@ -11,7 +11,6 @@ import java.util.Map;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.json.JSONObject;
 
@@ -136,7 +135,7 @@ public class SPCurrencyServerRequester extends AsyncTask<UrlBuilder, Void, SPCur
 		SponsorPayLogger.d(getClass().getSimpleName(), "Delta of coins request will be sent to URL + params: "
 				+ requestUrl);
 		
-		HttpUriRequest request = new HttpGet(requestUrl);
+		HttpUriRequest request = SPHttpClient.createHttpGetWithUserSegmentationHeaders(requestUrl);
 		request.addHeader(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE);
 
 		String acceptLanguageHeaderValue = makeAcceptLanguageHeaderValue();

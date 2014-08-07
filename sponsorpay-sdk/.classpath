@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sponsorpay-android-support"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/google-play-services_lib"/>
-	<classpathentry exported="true" kind="lib" path="/home/hubert/development/android-sdk-linux/platforms/android-17/android.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Alexios/android-sdks/platforms/android-17/android.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

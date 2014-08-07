@@ -13,7 +13,6 @@ import java.util.Map;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,7 +65,7 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 			HttpClient httpClient = SPHttpClient.getHttpClient();
 			String requestUrl = params[0].buildUrl();
 			SponsorPayLogger.d(TAG, "Querying URL: " + requestUrl);
-			HttpUriRequest request = new HttpGet(requestUrl);
+			HttpUriRequest request = SPHttpClient.createHttpGetWithUserSegmentationHeaders(requestUrl);
 			HttpResponse response = httpClient.execute(request);
 	
 			String bodyContent = HttpResponseParser.extractResponseString(response);

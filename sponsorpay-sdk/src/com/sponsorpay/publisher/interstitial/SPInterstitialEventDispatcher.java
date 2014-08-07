@@ -21,7 +21,7 @@ import com.sponsorpay.utils.UrlBuilder;
 
 /**
  * <p> 
- * Internal class dispatches the intersitital events. 
+ * Internal class dispatches the interstitial events. 
  * </p>
  * 
  * This class is not meant to be used directly. 
@@ -87,7 +87,7 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 		
 		SponsorPayLogger.d(TAG, "Sending event to "+ url);
 
-		HttpGet httpRequest = new HttpGet(url);
+		HttpGet httpRequest = SPHttpClient.createHttpGetWithUserSegmentationHeaders(url);
 		HttpClient httpClient = SPHttpClient.getHttpClient();
 
 		try {

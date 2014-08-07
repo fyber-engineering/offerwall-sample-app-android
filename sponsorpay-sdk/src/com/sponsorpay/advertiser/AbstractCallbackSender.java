@@ -140,7 +140,7 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 
 		String callbackUrl = buildUrl();
 
-		HttpGet httpRequest = new HttpGet(callbackUrl);
+		HttpGet httpRequest = SPHttpClient.createHttpGetWithUserSegmentationHeaders(callbackUrl);
 		HttpClient httpClient = SPHttpClient.getHttpClient();
 
 		try {

@@ -9,19 +9,15 @@ package com.sponsorpay.publisher.interstitial.marketplace;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -29,16 +25,18 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.sponsorpay.mediation.marketplace.MarketPlaceAdapter;
 import com.sponsorpay.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SPWebClient;
+import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
 public class MarketPlaceInterstitial extends
 		SPInterstitialMediationAdapter<MarketPlaceAdapter> {
+	
+	private static final String TAG = "MarketPlaceInterstitial";
 
 	protected static final int CREATE_WEBVIEW = 0;
 	protected static final int LOAD_HTML = 1;
@@ -103,6 +101,7 @@ public class MarketPlaceInterstitial extends
 	@Override
 	protected boolean show(Activity parentActivity) {
 		mActivity = parentActivity;
+		mActivity.onRetainNonConfigurationInstance();
 //		FrameLayout frameLayout = new FrameLayout(parentActivity);
 //		frameLayout.setBackgroundColor(Color.MAGENTA);
 //		parentActivity.setContentView(frameLayout, new LayoutParams(
@@ -142,6 +141,16 @@ public class MarketPlaceInterstitial extends
 					return mActivity;
 				}
 				
+				@Override
+				public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
+					SponsorPayLogger.d(TAG, "User clicked on thead, Loading:" + url);
+					
+					//send the click event as we would have only one URL
+					fireClickEvent();
+					return super.shouldOverrideUrlLoading(view, url);
+				}
+				
 			};
 		
 		}
@@ -162,7 +171,6 @@ public class MarketPlaceInterstitial extends
 
 		mainLayout = new FrameLayout(context);
 		
-		//RelativeLayout childLayout = new RelativeLayout(context);
 		RelativeLayout childLayout = new RelativeLayout(context);
 
 		//Image with drawable
@@ -170,32 +178,27 @@ public class MarketPlaceInterstitial extends
 		imageView = new ImageView(context);
 		// create a drawable
 		ShapeDrawable circle = new ShapeDrawable(new OvalShape());
-		circle.setIntrinsicHeight(80);
-		circle.setIntrinsicWidth(80);
-		circle.setBounds(new Rect(0, 0, 40, 40));
-		circle.getPaint().setColor(Color.DKGRAY);
+		circle.setIntrinsicHeight(50);
+	    circle.setIntrinsicWidth(50);
+		circle.getPaint().setColor(Color.parseColor("#7F7F7F"));
 		// set the drawable into the imageviw
 		imageView.setImageDrawable(circle);
 		imageView.setAdjustViewBounds(true);
-		imageView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+		imageView.setScaleType(ScaleType.CENTER);
 		imageView.setPadding(5, 5, 5, 5);
-		imageView.setScaleType(ScaleType.FIT_XY);
 		
 		
 
-		// X close text
-		TextView text = new TextView(context);
-		text.setText("X");
-		text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-		text.setTextColor(Color.WHITE);
-		RelativeLayout.LayoutParams params=new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		DrawCloseViewInterstitial drawView = new DrawCloseViewInterstitial(context);
+		drawView.setBackgroundColor(Color.WHITE);
+		RelativeLayout.LayoutParams params=new RelativeLayout.LayoutParams(20, 20);
 		params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-		text.setLayoutParams(params);
+		drawView.setLayoutParams(params);
 		
 		
-		childLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP|Gravity.RIGHT));
+		childLayout.setLayoutParams(new FrameLayout.LayoutParams(60, 60, Gravity.TOP|Gravity.RIGHT));
 		childLayout.addView(imageView);
-		childLayout.addView(text);
+		childLayout.addView(drawView);
 		
 		
 		//the webview
@@ -204,8 +207,6 @@ public class MarketPlaceInterstitial extends
 
 		mainLayout.addView(mWebView);
 		mainLayout.addView(childLayout);
-		//mainLayout.addView(text);
-
 	     
 	     
 	     /**
@@ -227,21 +228,21 @@ public class MarketPlaceInterstitial extends
 		});
 	     
 	     
-		mWebView.setOnTouchListener(new OnTouchListener() {
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-                fireClickEvent();
-				
-				if (mainLayout != null) {
-		            ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
-		            if (parentViewGroup != null) {
-		                parentViewGroup.removeAllViews();
-		            }
-		        }
-				return true;
-			}
-		});
+//		mWebView.setOnTouchListener(new OnTouchListener() {
+//			
+//			@Override
+//			public boolean onTouch(View v, MotionEvent event) {
+//                fireClickEvent();
+//				
+//				if (mainLayout != null) {
+//		            ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
+//		            if (parentViewGroup != null) {
+//		                parentViewGroup.removeAllViews();
+//		            }
+//		        }
+//				return true;
+//			}
+//		});
 		
 		 
 	}

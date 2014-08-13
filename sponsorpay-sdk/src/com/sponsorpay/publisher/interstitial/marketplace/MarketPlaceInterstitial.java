@@ -15,6 +15,8 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,6 +29,8 @@ import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 
 import com.sponsorpay.mediation.marketplace.MarketPlaceAdapter;
+import com.sponsorpay.publisher.SponsorPayPublisher;
+import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SPWebClient;
@@ -37,15 +41,15 @@ public class MarketPlaceInterstitial extends
 		SPInterstitialMediationAdapter<MarketPlaceAdapter> {
 	
 	private static final String TAG = "MarketPlaceInterstitial";
-
+    private static final int closeButtonGreyColor = Color.parseColor("#7F7F7F");
+	
 	protected static final int CREATE_WEBVIEW = 0;
 	protected static final int LOAD_HTML = 1;
 	private Handler mMainHandler;
 	private WebView mWebView;
 	private WebViewClient mWebClient;
 	private FrameLayout mainLayout;
-
-	private Activity mActivity;
+	private DisplayMetrics metrics;
 
 	public MarketPlaceInterstitial(MarketPlaceAdapter adapter) {
 		super(adapter);
@@ -55,10 +59,15 @@ public class MarketPlaceInterstitial extends
 				switch (msg.what) {
 				case CREATE_WEBVIEW:
 					MessageInfoHolder holder = (MessageInfoHolder) msg.obj;
+					
 					mWebView = new WebView(holder.mContext);
+					
+					metrics = holder.mContext.getResources().getDisplayMetrics();
 					createCloseButton(holder.mContext);
+					
 					mWebView.getSettings().setJavaScriptEnabled(true);
 					mWebView.setWebViewClient(getWebClient());	
+					
 //					loadHtml(holder.mHtml);
 					msg.obj = holder.mHtml;
 //					break;
@@ -100,15 +109,11 @@ public class MarketPlaceInterstitial extends
 	
 	@Override
 	protected boolean show(Activity parentActivity) {
-		mActivity = parentActivity;
-		mActivity.onRetainNonConfigurationInstance();
-//		FrameLayout frameLayout = new FrameLayout(parentActivity);
-//		frameLayout.setBackgroundColor(Color.MAGENTA);
-//		parentActivity.setContentView(frameLayout, new LayoutParams(
-//				LayoutParams.FILL_PARENT,
-//				LayoutParams.FILL_PARENT));
-		FrameLayout.LayoutParams layoutparams= new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);            
-		parentActivity.addContentView(mainLayout, layoutparams);
+		//mActivity = parentActivity;
+
+		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);            
+		parentActivity.setContentView(mainLayout, layoutparams);
+		
 		return true;
 	}
 
@@ -124,36 +129,53 @@ public class MarketPlaceInterstitial extends
 			mWebClient = new SPWebClient(null) {
 
 				@Override
-				protected void processSponsorPayScheme(String host, Uri uri) {
+				protected void onSponsorPayExitScheme(int resultCode, String targetUrl) {
+					Activity hostActivity = getHostActivity();
+
+					if (null == hostActivity) {
+						return;
+					}
+
+					hostActivity.setResult(resultCode);
+					launchActivityWithUrl(targetUrl);
 				}
 
 				@Override
-				protected void onSponsorPayExitScheme(int resultCode,
-						String targetUrl) {
+				protected void processSponsorPayScheme(String host, Uri uri) {
+					// nothing more to do, everything is done by super class
 				}
 
 				@Override
 				protected void onTargetActivityStart(String targetUrl) {
+					// nothing to do 
 				}
 				
 				@Override
-				protected Activity getHostActivity() {
-					return mActivity;
-				}
-				
-				@Override
-				public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				public void onReceivedError(WebView view, int errorCode, String description,
+						String failingUrl) {
+					SponsorPayLogger.e(TAG, String.format(
+							"Interstitials WebView triggered an error. "
+									+ "Error code: %d, error description: %s. Failing URL: %s",
+							errorCode, description, failingUrl));
 
-					SponsorPayLogger.d(TAG, "User clicked on thead, Loading:" + url);
-					
-					//send the click event as we would have only one URL
-					fireClickEvent();
-					return super.shouldOverrideUrlLoading(view, url);
+					UIStringIdentifier error;
+
+					switch (errorCode) {
+					case ERROR_HOST_LOOKUP:
+					case ERROR_IO:
+						error = UIStringIdentifier.ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION;
+						break;
+					default:
+						error = UIStringIdentifier.ERROR_LOADING_OFFERWALL;
+						break;
+					}
+					showDialog(SponsorPayPublisher.getUIString(error));
 				}
 				
 			};
 		
 		}
+		
 		return mWebClient;
 	}
 
@@ -172,38 +194,44 @@ public class MarketPlaceInterstitial extends
 		mainLayout = new FrameLayout(context);
 		
 		RelativeLayout childLayout = new RelativeLayout(context);
+		
+		int fifteenDip = getPixelsFromDip(15);
+		int thirtyDip  = getPixelsFromDip(30);
+		int sixtyDip   = getPixelsFromDip(60);
 
 		//Image with drawable
 		final ImageView imageView;
 		imageView = new ImageView(context);
-		// create a drawable
+		
+		// create a circle with diameter 40X40 dip and set background color
 		ShapeDrawable circle = new ShapeDrawable(new OvalShape());
-		circle.setIntrinsicHeight(50);
-	    circle.setIntrinsicWidth(50);
-		circle.getPaint().setColor(Color.parseColor("#7F7F7F"));
-		// set the drawable into the imageviw
+		circle.setIntrinsicHeight(thirtyDip);
+	    circle.setIntrinsicWidth(thirtyDip);
+		circle.getPaint().setColor(closeButtonGreyColor);
+		
+		// set the drawable into the center of the imageview
+		//and set 5 dip padding on each side.
 		imageView.setImageDrawable(circle);
 		imageView.setAdjustViewBounds(true);
 		imageView.setScaleType(ScaleType.CENTER);
-		imageView.setPadding(5, 5, 5, 5);
+		imageView.setPadding(fifteenDip, fifteenDip, fifteenDip, fifteenDip);
 		
 		
 
-		DrawCloseViewInterstitial drawView = new DrawCloseViewInterstitial(context);
-		drawView.setBackgroundColor(Color.WHITE);
-		RelativeLayout.LayoutParams params=new RelativeLayout.LayoutParams(20, 20);
+		DrawCloseXView drawView = new DrawCloseXView(context);
+		drawView.setBackgroundColor(closeButtonGreyColor);
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(fifteenDip, fifteenDip);
 		params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 		drawView.setLayoutParams(params);
 		
 		
-		childLayout.setLayoutParams(new FrameLayout.LayoutParams(60, 60, Gravity.TOP|Gravity.RIGHT));
+		childLayout.setLayoutParams(new FrameLayout.LayoutParams(sixtyDip, sixtyDip, Gravity.TOP|Gravity.RIGHT));
 		childLayout.addView(imageView);
 		childLayout.addView(drawView);
 		
 		
 		//the webview
 		mWebView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
-
 
 		mainLayout.addView(mWebView);
 		mainLayout.addView(childLayout);
@@ -226,24 +254,10 @@ public class MarketPlaceInterstitial extends
 		        }
 			}
 		});
-	     
-	     
-//		mWebView.setOnTouchListener(new OnTouchListener() {
-//			
-//			@Override
-//			public boolean onTouch(View v, MotionEvent event) {
-//                fireClickEvent();
-//				
-//				if (mainLayout != null) {
-//		            ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
-//		            if (parentViewGroup != null) {
-//		                parentViewGroup.removeAllViews();
-//		            }
-//		        }
-//				return true;
-//			}
-//		});
-		
-		 
+	 
+	}
+	
+	public int getPixelsFromDip(int dip) {
+		return  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, metrics);
 	}
 }

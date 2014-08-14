@@ -29,8 +29,6 @@ import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 
 import com.sponsorpay.mediation.marketplace.MarketPlaceAdapter;
-import com.sponsorpay.publisher.SponsorPayPublisher;
-import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SPWebClient;
@@ -85,6 +83,7 @@ public class MarketPlaceInterstitial extends
 
 	@Override
 	public boolean isAdAvailable(Context context, SPInterstitialAd ad) {
+		removeAttachedLayout();
 		String htmlContent = ad.getContextData().get("html");
 		boolean hasHtml = StringUtils.notNullNorEmpty(htmlContent);
 		if (hasHtml) {
@@ -97,6 +96,7 @@ public class MarketPlaceInterstitial extends
 				loadHtml(htmlContent);
 			}
 			setAdAvailable();
+			fireImpressionEvent();
 		}
 		return hasHtml;
 	}
@@ -138,6 +138,7 @@ public class MarketPlaceInterstitial extends
 					}
 
 					hostActivity.setResult(resultCode);
+					fireClickEvent();
 					launchActivityWithUrl(targetUrl);
 				}
 
@@ -160,23 +161,15 @@ public class MarketPlaceInterstitial extends
 				@Override
 				public void onReceivedError(WebView view, int errorCode, String description,
 						String failingUrl) {
-					SponsorPayLogger.e(TAG, String.format(
+					
+					String errorMessage = String.format(
 							"Interstitials WebView triggered an error. "
 									+ "Error code: %d, error description: %s. Failing URL: %s",
-							errorCode, description, failingUrl));
+							errorCode, description, failingUrl);
+					
+					SponsorPayLogger.e(TAG, errorMessage);
 
-					UIStringIdentifier error;
-
-					switch (errorCode) {
-					case ERROR_HOST_LOOKUP:
-					case ERROR_IO:
-						error = UIStringIdentifier.ERROR_LOADING_OFFERWALL_NO_INTERNET_CONNECTION;
-						break;
-					default:
-						error = UIStringIdentifier.ERROR_LOADING_OFFERWALL;
-						break;
-					}
-					showDialog(SponsorPayPublisher.getUIString(error));
+					fireShowErrorEvent(errorMessage);
 				}
 				
 			};
@@ -252,16 +245,19 @@ public class MarketPlaceInterstitial extends
 			@Override
 			public void onClick(View view) {
 				fireCloseEvent();
-				
-				if (mainLayout != null) {
-		            ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
-		            if (parentViewGroup != null) {
-		                parentViewGroup.removeAllViews();
-		            }
-		        }
+				removeAttachedLayout();
 			}
 		});
 	 
+	}
+	
+	private void removeAttachedLayout(){
+		if (mainLayout != null) {
+            ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
+            if (parentViewGroup != null) {
+                parentViewGroup.removeAllViews();
+            }
+        }
 	}
 	
 	public int getPixelsFromDip(int dip) {

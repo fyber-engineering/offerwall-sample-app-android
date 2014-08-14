@@ -357,6 +357,9 @@ public final class SPUser extends HashMap<String, Object>  {
 			return String.format("%tY/%tm/%td", value, value, value);
 		} else if (value instanceof String[]) {
 			return TextUtils.join(",", (String[])value);
+		} else if (value instanceof Location){
+			return "latitude:"+ Location.convert(((Location) value).getLatitude(), Location.FORMAT_DEGREES) + ",longtitude:"+ Location.convert(((Location) value).getLongitude(), Location.FORMAT_DEGREES)
+					+ ",accuracy:"+((Location) value).getAccuracy();
 		}
 		return value.toString();
 	}

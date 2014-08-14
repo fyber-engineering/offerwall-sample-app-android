@@ -358,12 +358,12 @@ public final class SPUser extends HashMap<String, Object>  {
 		} else if (value instanceof String[]) {
 			return TextUtils.join(",", (String[])value);
 		} else if (value instanceof Location){
-			return "latitude:"+ Location.convert(((Location) value).getLatitude(), Location.FORMAT_DEGREES) + ",longtitude:"+ Location.convert(((Location) value).getLongitude(), Location.FORMAT_DEGREES)
-					+ ",accuracy:"+((Location) value).getAccuracy();
+			Location location = (Location) value;
+			return "latitude:"+ formatInDegrees(location.getLatitude())+ ",longitude:"+ formatInDegrees(location.getLongitude())
+					+ ",accuracy:"+location.getAccuracy();
 		}
 		return value.toString();
 	}
-	
 	
 	@Override
 	public Object put(String key, Object value) {		
@@ -376,6 +376,10 @@ public final class SPUser extends HashMap<String, Object>  {
 		isProvidedMapDirty = true;
 		
 		return super.put(key, value);
+	}
+	
+	private String formatInDegrees(double value){
+		return Location.convert(value, Location.FORMAT_DEGREES);
 	}
 
 }

@@ -50,6 +50,7 @@ public class MarketPlaceInterstitial extends
 	private WebViewClient mWebClient;
 	private FrameLayout mainLayout;
 	private DisplayMetrics metrics;
+	private Activity mActivity;
 
 	public MarketPlaceInterstitial(MarketPlaceAdapter adapter) {
 		super(adapter);
@@ -59,7 +60,7 @@ public class MarketPlaceInterstitial extends
 				switch (msg.what) {
 				case CREATE_WEBVIEW:
 					MessageInfoHolder holder = (MessageInfoHolder) msg.obj;
-					
+										
 					mWebView = new WebView(holder.mContext);
 					
 					metrics = holder.mContext.getResources().getDisplayMetrics();
@@ -109,8 +110,8 @@ public class MarketPlaceInterstitial extends
 	
 	@Override
 	protected boolean show(Activity parentActivity) {
-		//mActivity = parentActivity;
-
+		mActivity = parentActivity;
+		
 		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);            
 		parentActivity.setContentView(mainLayout, layoutparams);
 		
@@ -126,7 +127,7 @@ public class MarketPlaceInterstitial extends
 	private WebViewClient getWebClient() {
 		if (mWebClient == null) {
 				
-			mWebClient = new SPWebClient(null) {
+			mWebClient = new SPWebClient(mActivity) {
 
 				@Override
 				protected void onSponsorPayExitScheme(int resultCode, String targetUrl) {
@@ -141,6 +142,11 @@ public class MarketPlaceInterstitial extends
 				}
 
 				@Override
+				protected Activity getHostActivity() {
+					return mActivity;
+				}
+				
+				@Override
 				protected void processSponsorPayScheme(String host, Uri uri) {
 					// nothing more to do, everything is done by super class
 				}
@@ -149,6 +155,7 @@ public class MarketPlaceInterstitial extends
 				protected void onTargetActivityStart(String targetUrl) {
 					// nothing to do 
 				}
+				
 				
 				@Override
 				public void onReceivedError(WebView view, int errorCode, String description,
@@ -195,18 +202,18 @@ public class MarketPlaceInterstitial extends
 		
 		RelativeLayout childLayout = new RelativeLayout(context);
 		
-		int fifteenDip = getPixelsFromDip(15);
-		int thirtyDip  = getPixelsFromDip(30);
-		int sixtyDip   = getPixelsFromDip(60);
+		int fifteenDipInPixels = getPixelsFromDip(15);
+		int thirtyDipInPixels  = getPixelsFromDip(30);
+		int sixtyDipInPixels   = getPixelsFromDip(60);
 
 		//Image with drawable
 		final ImageView imageView;
 		imageView = new ImageView(context);
 		
-		// create a circle with diameter 40X40 dip and set background color
+		// create a circle with diameter 40X40 dip and set the background color
 		ShapeDrawable circle = new ShapeDrawable(new OvalShape());
-		circle.setIntrinsicHeight(thirtyDip);
-	    circle.setIntrinsicWidth(thirtyDip);
+		circle.setIntrinsicHeight(thirtyDipInPixels);
+	    circle.setIntrinsicWidth(thirtyDipInPixels);
 		circle.getPaint().setColor(closeButtonGreyColor);
 		
 		// set the drawable into the center of the imageview
@@ -214,18 +221,18 @@ public class MarketPlaceInterstitial extends
 		imageView.setImageDrawable(circle);
 		imageView.setAdjustViewBounds(true);
 		imageView.setScaleType(ScaleType.CENTER);
-		imageView.setPadding(fifteenDip, fifteenDip, fifteenDip, fifteenDip);
+		imageView.setPadding(fifteenDipInPixels, fifteenDipInPixels, fifteenDipInPixels, fifteenDipInPixels);
 		
 		
 
 		DrawCloseXView drawView = new DrawCloseXView(context);
 		drawView.setBackgroundColor(closeButtonGreyColor);
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(fifteenDip, fifteenDip);
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(fifteenDipInPixels, fifteenDipInPixels);
 		params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 		drawView.setLayoutParams(params);
 		
 		
-		childLayout.setLayoutParams(new FrameLayout.LayoutParams(sixtyDip, sixtyDip, Gravity.TOP|Gravity.RIGHT));
+		childLayout.setLayoutParams(new FrameLayout.LayoutParams(sixtyDipInPixels, sixtyDipInPixels, Gravity.TOP|Gravity.RIGHT));
 		childLayout.addView(imageView);
 		childLayout.addView(drawView);
 		

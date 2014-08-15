@@ -13,11 +13,18 @@ import java.util.Map;
 
 import com.sponsorpay.utils.SponsorPayLogger;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
+import android.os.Bundle;
 import android.text.TextUtils;
 
-public final class SPUser extends HashMap<String, Object>  {
+public final class SPUser extends HashMap<String, Object>  implements  LocationListener{
 	
 	private static final long serialVersionUID = -5963403748409731798L;
 	
@@ -25,6 +32,10 @@ public final class SPUser extends HashMap<String, Object>  {
 		
 	private String providedDataAsString;
 	private boolean isProvidedMapDirty = false;
+	
+    private Context applicationContext;
+	
+	private LocationManager locationManager;
 	
 	private ArrayList<String> reservedKeys = new ArrayList<String>();
 	
@@ -59,6 +70,24 @@ public final class SPUser extends HashMap<String, Object>  {
 	private SPUser() {
 		setReservedKeys();
 	}
+	
+	// Make sure you only call this once - from the class that is providing the SPUser values.
+    public void init(final Context context) {
+    	
+    	applicationContext = context.getApplicationContext();
+    	
+    	if (applicationContext == null) {
+            
+    		throw new IllegalStateException("The parameter context in the init(context), must not be null.");
+            
+        }else{
+        	
+        	// Acquire a reference to the system Location Manager
+        	locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        	
+        	requestUpdatesFromAvailableProvider();     
+        }
+    }
 
 	public static Integer getAge() {
 		return  (Integer) singleton.get(AGE);
@@ -381,5 +410,101 @@ public final class SPUser extends HashMap<String, Object>  {
 	private String formatInDegrees(double value){
 		return Location.convert(value, Location.FORMAT_DEGREES);
 	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		setLocationDetails(location);
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// Remove the listener you previously added
+		locationManager.removeUpdates(this);
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		LocationManager locManager = (LocationManager) applicationContext.getSystemService(Context.LOCATION_SERVICE);         
+
+		SponsorPayLogger.d(CLASS_NAME, "onProviderEnabled() User has enabled the provider.");
+		
+		Location location = null;
+		
+		if(doesUserHaveCoarseLocationPermission()){
+			location = locManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			
+		}else if(doesUserHaveFineLocationPermission()){
+			
+			location = locManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			
+		}
+		    
+		setLocationDetails(location);	
+	}
+	
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+	
+		switch (status) {
+		case LocationProvider.OUT_OF_SERVICE:
+			// Remove the listener you previously added
+			locationManager.removeUpdates(this);
+			break;
+
+		case LocationProvider.TEMPORARILY_UNAVAILABLE:
+			// Do nothing
+			break;
+
+		case LocationProvider.AVAILABLE:
+			//Re-instantiate the available provider
+			requestUpdatesFromAvailableProvider();
+			break;
+		}
+
+	}
+	
+    
+    private boolean doesUserHaveFineLocationPermission(){
+		//set a static boolean to avoid the continuous check
+		int result = applicationContext.checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+	    return result == PackageManager.PERMISSION_GRANTED;
+		
+	}
+	
+    private boolean doesUserHaveCoarseLocationPermission(){
+		 
+		 int result = applicationContext.checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
+		 return result == PackageManager.PERMISSION_GRANTED;
+
+	}
+    
+    private void requestUpdatesFromAvailableProvider(){
+    	
+    	if(doesUserHaveFineLocationPermission()){
+    		
+    		// Register the listener with the Location Manager to receive location updates
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
+		}else if(doesUserHaveCoarseLocationPermission()){
+			
+			// Register the listener with the Location Manager to receive location updates
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+		}
+    }
+    
+
+    private void setLocationDetails(Location location){
+    	
+    	if (location != null) {
+
+			setLocation(location);
+			
+			setLat((float) location.getLatitude());
+			
+			setLongt((float) location.getLongitude());
+			
+		}
+    }
 
 }

@@ -37,7 +37,7 @@ import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
 public class MarketPlaceInterstitial extends
-		SPInterstitialMediationAdapter<MarketPlaceAdapter> implements MarketPlaceInterstitialEvent{
+		SPInterstitialMediationAdapter<MarketPlaceAdapter> implements MarketPlaceInterstitialActivityListener{
 	
 	private static final String TAG = "MarketPlaceInterstitial";
     private static final int closeButtonGreyColor = Color.parseColor("#7F7F7F");
@@ -58,8 +58,6 @@ public class MarketPlaceInterstitial extends
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case CREATE_WEBVIEW:
-					
-					SPInterstitialActivity.setMarketPlaceInterstitialListener(MarketPlaceInterstitial.this);
 					
 					MessageInfoHolder holder = (MessageInfoHolder) msg.obj;
 										
@@ -116,6 +114,11 @@ public class MarketPlaceInterstitial extends
 	protected boolean show(Activity parentActivity) {
 		mActivity = parentActivity;
 		
+		if(mActivity instanceof SPInterstitialActivity) {
+			mActivity = parentActivity;
+			((SPInterstitialActivity) mActivity).setMarketPlaceInterstitialListener(MarketPlaceInterstitial.this);
+		}
+		
 		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);            
 		parentActivity.setContentView(mainLayout, layoutparams);
 		
@@ -131,7 +134,7 @@ public class MarketPlaceInterstitial extends
 	private WebViewClient getWebClient() {
 		if (mWebClient == null) {
 				
-			mWebClient = new SPWebClient(mActivity) {
+			mWebClient = new SPWebClient(null) {
 
 				@Override
 				protected void onSponsorPayExitScheme(int resultCode, String targetUrl) {
@@ -269,8 +272,15 @@ public class MarketPlaceInterstitial extends
 		return  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, metrics);
 	}
 
+
 	@Override
-	public void notifyOnBackAndHomePressed() {
+	public void notifyOnBackPressed() {
+		fireCloseEvent();
+		removeAttachedLayout();
+	}
+
+	@Override
+	public void notifyOnHomePressed() {
 		fireCloseEvent();
 		removeAttachedLayout();
 	}

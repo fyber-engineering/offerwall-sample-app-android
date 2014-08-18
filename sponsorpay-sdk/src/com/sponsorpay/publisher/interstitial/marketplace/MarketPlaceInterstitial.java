@@ -41,9 +41,8 @@ import com.sponsorpay.utils.SPWebClient;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
-public class MarketPlaceInterstitial extends
-		SPInterstitialMediationAdapter<MarketPlaceAdapter> implements MarketPlaceInterstitialActivityListener, OnClickListener{
-	
+public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<MarketPlaceAdapter> implements MarketPlaceInterstitialActivityListener{
+
 	private static final String TAG = "MarketPlaceInterstitial";
 	
 	protected static final int CREATE_WEBVIEW = 0;
@@ -118,15 +117,15 @@ public class MarketPlaceInterstitial extends
 	@Override
 	protected boolean show(Activity parentActivity) {
 		mActivity = parentActivity;
-
-//		FrameLayout frameLayout = new FrameLayout(parentActivity);
-//		frameLayout.setBackgroundColor(Color.MAGENTA);
-//		parentActivity.setContentView(frameLayout, new LayoutParams(
-//				LayoutParams.FILL_PARENT,
-//				LayoutParams.FILL_PARENT));
-		FrameLayout.LayoutParams layoutparams= new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);            
-		parentActivity.addContentView(mainLayout, layoutparams);
-
+		
+		if(mActivity instanceof SPInterstitialActivity) {
+			mActivity = parentActivity;
+			((SPInterstitialActivity) mActivity).setMarketPlaceInterstitialListener(MarketPlaceInterstitial.this);
+		}
+		
+		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);            
+		parentActivity.setContentView(mainLayout, layoutparams);
+		
 		return true;
 	}
 
@@ -285,6 +284,19 @@ public class MarketPlaceInterstitial extends
 		});
 		
 		 
+	}
+
+
+	@Override
+	public void notifyOnBackPressed() {
+		fireCloseEvent();
+		removeAttachedLayout();
+	}
+
+	@Override
+	public void notifyOnHomePressed() {
+		fireCloseEvent();
+		removeAttachedLayout();
 	}
 
 }

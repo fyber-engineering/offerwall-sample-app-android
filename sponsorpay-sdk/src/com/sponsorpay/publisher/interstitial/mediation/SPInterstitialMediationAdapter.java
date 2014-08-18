@@ -84,7 +84,7 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 	protected abstract void checkForAds(Context context);
 
 	/**
-	 * Method called from the {@link SPMediationCoordinator} to check intersitial ads
+	 * Method called from the {@link SPMediationCoordinator} to check interstitial ads
 	 * availability for this network.
 	 *   
 	 * @param context
@@ -105,11 +105,11 @@ public abstract class SPInterstitialMediationAdapter<V extends SPMediationAdapte
 	}
 	
 	/**
-	 * Method called from the {@link SPMediationCoordinator} to start an intersitial
+	 * Method called from the {@link SPMediationCoordinator} to start an interstitial
 	 * for this network. This method returns a boolean indicating if the ad was shown to
 	 * the user.
 	 * 
-	 * It will stores th {@link SPInterstitialAd}, the {@link Activity} and reset the 
+	 * It will stores the {@link SPInterstitialAd}, the {@link Activity} and reset the 
 	 * clicked status.
 	 * 
 	 * @param parentActivity

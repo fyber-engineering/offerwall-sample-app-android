@@ -29,6 +29,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 
 import com.sponsorpay.mediation.marketplace.MarketPlaceAdapter;
+import com.sponsorpay.publisher.interstitial.SPInterstitialActivity;
 import com.sponsorpay.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SPWebClient;
@@ -36,7 +37,7 @@ import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
 public class MarketPlaceInterstitial extends
-		SPInterstitialMediationAdapter<MarketPlaceAdapter> {
+		SPInterstitialMediationAdapter<MarketPlaceAdapter> implements MarketPlaceInterstitialEvent{
 	
 	private static final String TAG = "MarketPlaceInterstitial";
     private static final int closeButtonGreyColor = Color.parseColor("#7F7F7F");
@@ -57,6 +58,9 @@ public class MarketPlaceInterstitial extends
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case CREATE_WEBVIEW:
+					
+					SPInterstitialActivity.setMarketPlaceInterstitialListener(MarketPlaceInterstitial.this);
+					
 					MessageInfoHolder holder = (MessageInfoHolder) msg.obj;
 										
 					mWebView = new WebView(holder.mContext);
@@ -260,7 +264,14 @@ public class MarketPlaceInterstitial extends
         }
 	}
 	
+	
 	public int getPixelsFromDip(int dip) {
 		return  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, metrics);
+	}
+
+	@Override
+	public void notifyOnBackAndHomePressed() {
+		fireCloseEvent();
+		removeAttachedLayout();
 	}
 }

@@ -8,51 +8,44 @@ package com.sponsorpay.publisher.interstitial.marketplace;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.RelativeLayout;
 
 import com.sponsorpay.mediation.marketplace.MarketPlaceAdapter;
 import com.sponsorpay.publisher.interstitial.SPInterstitialActivity;
 import com.sponsorpay.publisher.interstitial.SPInterstitialAd;
+import com.sponsorpay.publisher.interstitial.marketplace.closebutton.InterstitialCloseButtonRelativeLayout;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SPWebClient;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
 public class MarketPlaceInterstitial extends
-		SPInterstitialMediationAdapter<MarketPlaceAdapter> implements MarketPlaceInterstitialActivityListener{
+		SPInterstitialMediationAdapter<MarketPlaceAdapter> implements MarketPlaceInterstitialActivityListener, OnClickListener{
 	
 	private static final String TAG = "MarketPlaceInterstitial";
-    private static final int closeButtonGreyColor = Color.parseColor("#7F7F7F");
 	
 	protected static final int CREATE_WEBVIEW = 0;
 	protected static final int LOAD_HTML = 1;
-	private Handler mMainHandler;
-	private WebView mWebView;
+	
+	private Handler       mMainHandler;
+	private WebView       mWebView;
 	private WebViewClient mWebClient;
-	private FrameLayout mainLayout;
-	private DisplayMetrics metrics;
-	private Activity mActivity;
+	private FrameLayout   mainLayout;
+	private Activity      mActivity;
+	private InterstitialCloseButtonRelativeLayout closeButtonLayout;
 
 	public MarketPlaceInterstitial(MarketPlaceAdapter adapter) {
 		super(adapter);
+		
 		mMainHandler = new Handler(Looper.getMainLooper()) {
 			@Override
 			public void handleMessage(Message msg) {
@@ -63,19 +56,18 @@ public class MarketPlaceInterstitial extends
 										
 					mWebView = new WebView(holder.mContext);
 					
-					metrics = holder.mContext.getResources().getDisplayMetrics();
 					createCloseButton(holder.mContext);
 					
 					mWebView.getSettings().setJavaScriptEnabled(true);
 					mWebView.setWebViewClient(getWebClient());	
 					
-//					loadHtml(holder.mHtml);
 					msg.obj = holder.mHtml;
-//					break;
+					
 				case LOAD_HTML:
-//					mWebView.loadData(msg.obj.toString(), "text/html", "UTF-8");
+					
 					mWebView.loadDataWithBaseURL("http://engine.sponsorpay.com", msg.obj.toString(), null, "UTF-8", null);
 					break;
+					
 				default:
 					break;
 				}
@@ -198,66 +190,30 @@ public class MarketPlaceInterstitial extends
 	
 	private void createCloseButton(Context context){
 
-		mainLayout = new FrameLayout(context);
+		//main FrameLayout which will host the webview and the close button
+		mainLayout  = new FrameLayout(context);
 		
-		RelativeLayout childLayout = new RelativeLayout(context);
-		
-		int fifteenDipInPixels = getPixelsFromDip(15);
-		int thirtyDipInPixels  = getPixelsFromDip(30);
-		int sixtyDipInPixels   = getPixelsFromDip(60);
-
-		//Image with drawable
-		final ImageView imageView;
-		imageView = new ImageView(context);
-		
-		// create a circle with diameter 40X40 dip and set the background color
-		ShapeDrawable circle = new ShapeDrawable(new OvalShape());
-		circle.setIntrinsicHeight(thirtyDipInPixels);
-	    circle.setIntrinsicWidth(thirtyDipInPixels);
-		circle.getPaint().setColor(closeButtonGreyColor);
-		
-		// set the drawable into the center of the imageview
-		//and set 5 dip padding on each side.
-		imageView.setImageDrawable(circle);
-		imageView.setAdjustViewBounds(true);
-		imageView.setScaleType(ScaleType.CENTER);
-		imageView.setPadding(fifteenDipInPixels, fifteenDipInPixels, fifteenDipInPixels, fifteenDipInPixels);
-		
-		
-
-		DrawCloseXView drawView = new DrawCloseXView(context);
-		drawView.setBackgroundColor(closeButtonGreyColor);
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(fifteenDipInPixels, fifteenDipInPixels);
-		params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-		drawView.setLayoutParams(params);
-		
-		
-		childLayout.setLayoutParams(new FrameLayout.LayoutParams(sixtyDipInPixels, sixtyDipInPixels, Gravity.TOP|Gravity.RIGHT));
-		childLayout.addView(imageView);
-		childLayout.addView(drawView);
+		//Instance of the close button relative layout, which will be generated dynamically
+		closeButtonLayout = new InterstitialCloseButtonRelativeLayout(context);
 		
 		
 		//the webview
 		mWebView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 
+		//attach on the main layout the webview and the close button.
 		mainLayout.addView(mWebView);
-		mainLayout.addView(childLayout);
+		mainLayout.addView(closeButtonLayout);
+  
 	     
-	     
-	     /**
-	      * Listeners for calling the close and click events.
-	      * 
-	      */
-		imageView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				fireCloseEvent();
-				removeAttachedLayout();
-			}
-		});
+	    // Set a listener for the close button
+		closeButtonLayout.setOnClickListener(this);
 	 
 	}
 	
+	/**
+	 * Is removing all the views from the dynamically generated marketplace
+	 * interstitials.
+	 */
 	private void removeAttachedLayout(){
 		if (mainLayout != null) {
             ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
@@ -266,13 +222,11 @@ public class MarketPlaceInterstitial extends
             }
         }
 	}
-	
-	
-	public int getPixelsFromDip(int dip) {
-		return  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, metrics);
-	}
 
-
+	/**
+	 * Callback methods overriding the functionality of the back and
+	 * home buttons.
+	 */
 	@Override
 	public void notifyOnBackPressed() {
 		fireCloseEvent();
@@ -281,6 +235,16 @@ public class MarketPlaceInterstitial extends
 
 	@Override
 	public void notifyOnHomePressed() {
+		fireCloseEvent();
+		removeAttachedLayout();
+	}
+
+	/**
+	 * Listener which will be called when the close button will be clicked.
+	 * It will fire the close event and remove the interstitial layout.
+	 */
+	@Override
+	public void onClick(View v) {
 		fireCloseEvent();
 		removeAttachedLayout();
 	}

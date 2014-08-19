@@ -1,4 +1,4 @@
-package com.sponsorpay.publisher.interstitial.marketplace;
+package com.sponsorpay.publisher.interstitial.marketplace.closebutton;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.WindowManager;
 
 public class DrawCloseXView extends View {
     private Paint paint;
@@ -14,7 +13,7 @@ public class DrawCloseXView extends View {
     
     private static final int fixed_radius = 15;
 
-    public DrawCloseXView(Context context) {
+    public DrawCloseXView(Context context, DisplayMetrics mDisplayMetrics) {
         super(context);
         
         paint = new Paint();
@@ -23,10 +22,6 @@ public class DrawCloseXView extends View {
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeJoin(Paint.Join.ROUND);
-
-		DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-		WindowManager mWindowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
-		mWindowManager.getDefaultDisplay().getMetrics(mDisplayMetrics);
 		
 		densityDependantRadius = (int) (fixed_radius * mDisplayMetrics.density);
     }

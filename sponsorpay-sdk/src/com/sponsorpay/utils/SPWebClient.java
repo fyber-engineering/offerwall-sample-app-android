@@ -36,6 +36,7 @@ public abstract class SPWebClient extends WebViewClient {
 	private static final String SPONSORPAY_SCHEMA = "sponsorpay://";
 	private static final String SPONSORPAY_EXIT_SCHEMA = "exit";
 	private static final String EXIT_URL_TARGET_URL_PARAM_KEY = "url";
+	private static final String EXIT_URL_TRACKING_URL_PARAM_KEY = "tracking_url";
 	private static final String EXIT_URL_RESULT_CODE_PARAM_KEY = "status";
 	
 	/**
@@ -64,6 +65,19 @@ public abstract class SPWebClient extends WebViewClient {
 		Uri uri = Uri.parse(url);
 
 		return uri.getQueryParameter(EXIT_URL_TARGET_URL_PARAM_KEY);
+	}
+	
+	/**
+	 * Extracts the optional tracking provided URL from the exit scheme
+	 * 
+	 * @param url
+	 *            the exit scheme url to parse
+	 * @return the extracted, provided & decoded URL
+	 */
+	protected String parseSponsorPayExitUrlForTrackingUrl(String url) {
+		Uri uri = Uri.parse(url);
+
+		return uri.getQueryParameter(EXIT_URL_TRACKING_URL_PARAM_KEY);
 	}
 
 	/**
@@ -99,6 +113,13 @@ public abstract class SPWebClient extends WebViewClient {
 				String targetUrl = parseSponsorPayExitUrlForTargetUrl(url);
 	
 				SponsorPayLogger.i(LOG_TAG, "Overriding. Target Url: " + targetUrl);
+				
+				String trackingUrl = parseSponsorPayExitUrlForTrackingUrl(url);
+				if(StringUtils.notNullNorEmpty(trackingUrl)){
+					SponsorPayLogger.i(LOG_TAG, "Overriding. Tracking Url: " + trackingUrl);
+					//async task to hit the url
+					new GetRemoteFileContentTask().execute(trackingUrl);
+				}
 				
 				onSponsorPayExitScheme(resultCode, targetUrl);
 			} else {

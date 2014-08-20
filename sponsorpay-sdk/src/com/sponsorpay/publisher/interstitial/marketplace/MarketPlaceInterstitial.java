@@ -8,21 +8,15 @@ package com.sponsorpay.publisher.interstitial.marketplace;
 
 import android.app.Activity;
 import android.content.Context;
-<<<<<<< HEAD
-import android.graphics.Color;
-import android.graphics.Rect;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
-=======
 import android.content.pm.ActivityInfo;
->>>>>>> [76702048] Render server side interstitials set orientation.
+import android.content.res.Configuration;
+
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
@@ -45,12 +39,16 @@ import com.sponsorpay.utils.SPWebClient;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
-public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<MarketPlaceAdapter> implements MarketPlaceInterstitialActivityListener{
-
+public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<MarketPlaceAdapter> implements
+		MarketPlaceInterstitialActivityListener, OnClickListener {
+	
 	private static final String TAG = "MarketPlaceInterstitial";
 	
 	protected static final int CREATE_WEBVIEW = 0;
 	protected static final int LOAD_HTML = 1;
+	
+	private int SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+	private int SCREEN_ORIENTATION_REVERSE_PORTRAIT;
 	
 	private Handler       mMainHandler;
 	private WebView       mWebView;
@@ -58,8 +56,9 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 	private FrameLayout   mainLayout;
 	private Activity      mActivity;
-	private InterstitialCloseButtonRelativeLayout closeButtonLayout;
 	private String        orientation;
+	private InterstitialCloseButtonRelativeLayout closeButtonLayout;
+
 
 	public MarketPlaceInterstitial(MarketPlaceAdapter adapter) {
 		super(adapter);
@@ -125,7 +124,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	protected boolean show(Activity parentActivity) {
 		mActivity = parentActivity;
 		
-		setOrientation();
+		setOrientationAndLock();
 		
 		if(mActivity instanceof SPInterstitialActivity) {
 			mActivity = parentActivity;
@@ -319,10 +318,12 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	}
 	
 	/**
-	 * Method setting the orientation according to the one
-	 * that has been provided via the server's JSON response
+	 * Method which is setting the orientation according to the one that has 
+	 * been provided via the server's JSON response. If the JSON doesn't have
+	 * that response, then get the existing orientation. In both occasions we 
+	 * lock the screen orientation, so no orientation changes can take place.
 	 */
-	private void setOrientation() {
+	private void setOrientationAndLock() {
 		if (StringUtils.notNullNorEmpty(orientation)) {
 
 			if (orientation.equalsIgnoreCase("portrait")) {
@@ -332,7 +333,46 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
 			}
+			
+		} else {
+
+			final int orientation = mActivity.getResources().getConfiguration().orientation;
+		    final int rotation    = mActivity.getWindowManager().getDefaultDisplay().getOrientation();
+
+		    if (Build.VERSION.SDK_INT > 9) {
+		    	// Values 8 and 9 for the reverse orientation are available from Ginberbread and above 
+		    	SCREEN_ORIENTATION_REVERSE_LANDSCAPE = 8;
+			    SCREEN_ORIENTATION_REVERSE_PORTRAIT  = 9;
+			    
+			} else {
+		    	
+		    	SCREEN_ORIENTATION_REVERSE_LANDSCAPE = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+		        SCREEN_ORIENTATION_REVERSE_PORTRAIT  = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+		    }
+		    
+
+		    if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_90){
+		    	
+		        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+		        	mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		        }
+		        else if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+		        	mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		        }
+		    }
+		    //if the rotation is equal to 180 or 270 degrees, then we have one of the reverse orientations
+		    else if (rotation == Surface.ROTATION_180 || rotation == Surface.ROTATION_270) {
+		    	
+		        if (orientation == Configuration.ORIENTATION_PORTRAIT){
+		        	mActivity.setRequestedOrientation(SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+		        }
+		        else if (orientation == Configuration.ORIENTATION_LANDSCAPE){
+		        	mActivity.setRequestedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+		        }
+		    }
+		   
 		}
+		
 	}
 
 }

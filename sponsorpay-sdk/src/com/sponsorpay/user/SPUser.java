@@ -34,8 +34,6 @@ public final class SPUser extends HashMap<String, Object> {
 	
 	private Location mLocation;
 	private Location mLastLocation;
-	private LocationManager mLocationManager;
-	private List<String> mLocationProviders;
 	private Calendar mNextUpdate;
 	
 	private static final String AGE      = "age";
@@ -86,8 +84,6 @@ public final class SPUser extends HashMap<String, Object> {
 		mReservedKeys.add(CONNECTION);
 		mReservedKeys.add(DEVICE);
 		mReservedKeys.add(APP_VERSION);
-		mLocationManager = HostInfo.getHostInfo(null).getLocationManager();
-		mLocationProviders =  HostInfo.getHostInfo(null).getLocationProviders();
 	}
 
 	public static Integer getAge() {
@@ -304,14 +300,16 @@ public final class SPUser extends HashMap<String, Object> {
 
 	private void checkAutoLocation() {
 		// check if there's an provided location
-		if (mLocation == null && mLocationManager != null) {
+		LocationManager locationManager = HostInfo.getHostInfo(null).getLocationManager();
+		if (mLocation == null && locationManager != null) {
 			Calendar now = Calendar.getInstance();
 			if (mNextUpdate == null || now.after(mNextUpdate)) {
 				// get the latest updated location
 				mNextUpdate = now;
 				mNextUpdate.add(Calendar.MINUTE, 10);
-				for (String provider : mLocationProviders) {
-					Location lastKnownLocation = mLocationManager.getLastKnownLocation(provider);
+				List<String> locationProviders =  HostInfo.getHostInfo(null).getLocationProviders();
+				for (String provider : locationProviders) {
+					Location lastKnownLocation = locationManager.getLastKnownLocation(provider);
 					if (mLastLocation == null) {
 						mLastLocation = lastKnownLocation;
 					}

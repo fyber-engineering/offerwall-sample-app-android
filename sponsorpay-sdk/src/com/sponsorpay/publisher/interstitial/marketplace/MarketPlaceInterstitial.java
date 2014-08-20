@@ -8,10 +8,14 @@ package com.sponsorpay.publisher.interstitial.marketplace;
 
 import android.app.Activity;
 import android.content.Context;
+<<<<<<< HEAD
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
+=======
+import android.content.pm.ActivityInfo;
+>>>>>>> [76702048] Render server side interstitials set orientation.
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -51,9 +55,11 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	private Handler       mMainHandler;
 	private WebView       mWebView;
 	private WebViewClient mWebClient;
-	private FrameLayout mainLayout;
 
-	private Activity mActivity;
+	private FrameLayout   mainLayout;
+	private Activity      mActivity;
+	private InterstitialCloseButtonRelativeLayout closeButtonLayout;
+	private String        orientation;
 
 	public MarketPlaceInterstitial(MarketPlaceAdapter adapter) {
 		super(adapter);
@@ -91,6 +97,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	public boolean isAdAvailable(Context context, SPInterstitialAd ad) {
 		removeAttachedLayout();
 		String htmlContent = ad.getContextData().get("html");
+		orientation        = ad.getContextData().get("orientation");
 		boolean hasHtml = StringUtils.notNullNorEmpty(htmlContent);
 		if (hasHtml) {
 			if (mWebView == null) {
@@ -117,6 +124,8 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	@Override
 	protected boolean show(Activity parentActivity) {
 		mActivity = parentActivity;
+		
+		setOrientation();
 		
 		if(mActivity instanceof SPInterstitialActivity) {
 			mActivity = parentActivity;
@@ -297,6 +306,33 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	public void notifyOnHomePressed() {
 		fireCloseEvent();
 		removeAttachedLayout();
+	}
+
+	/**
+	 * Listener which will be called when the close button will be clicked.
+	 * It will fire the close event and remove the interstitial layout.
+	 */
+	@Override
+	public void onClick(View v) {
+		fireCloseEvent();
+		removeAttachedLayout();
+	}
+	
+	/**
+	 * Method setting the orientation according to the one
+	 * that has been provided via the server's JSON response
+	 */
+	private void setOrientation() {
+		if (StringUtils.notNullNorEmpty(orientation)) {
+
+			if (orientation.equalsIgnoreCase("portrait")) {
+				mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+			} else if (orientation.equalsIgnoreCase("landscape")) {
+				mActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+			}
+		}
 	}
 
 }

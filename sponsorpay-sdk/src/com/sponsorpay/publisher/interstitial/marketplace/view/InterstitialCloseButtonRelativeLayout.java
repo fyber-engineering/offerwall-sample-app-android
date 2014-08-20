@@ -1,4 +1,4 @@
-package com.sponsorpay.publisher.interstitial.marketplace.closebutton;
+package com.sponsorpay.publisher.interstitial.marketplace.view;
 
 import android.content.Context;
 import android.graphics.Color;

@@ -22,7 +22,7 @@ import android.widget.FrameLayout;
 import com.sponsorpay.mediation.marketplace.MarketPlaceAdapter;
 import com.sponsorpay.publisher.interstitial.SPInterstitialActivity;
 import com.sponsorpay.publisher.interstitial.SPInterstitialAd;
-import com.sponsorpay.publisher.interstitial.marketplace.closebutton.InterstitialCloseButtonRelativeLayout;
+import com.sponsorpay.publisher.interstitial.marketplace.view.InterstitialCloseButtonRelativeLayout;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
 import com.sponsorpay.utils.SPWebClient;
 import com.sponsorpay.utils.SponsorPayLogger;

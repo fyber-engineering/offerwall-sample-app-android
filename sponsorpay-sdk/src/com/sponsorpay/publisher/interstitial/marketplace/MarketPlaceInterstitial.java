@@ -330,27 +330,21 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 		if (orientation.equalsIgnoreCase("portrait")) {
 			lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
 		} else if (orientation.equalsIgnoreCase("landscape")) {
 			
 			int rotationAsInt = Integer.parseInt(rotation);
 
 		    if (Build.VERSION.SDK_INT > 9) {
-		    	// Value 8 for the reverse orientation are available from Ginberbread and above 
-		    	SCREEN_ORIENTATION_REVERSE_LANDSCAPE = 8;
-			    
+		    	// Value 8 for the reverse orientation are available from Gingerbread and above 
+		    	SCREEN_ORIENTATION_REVERSE_LANDSCAPE = 8;			    
 			} else {
-		    	
 		    	SCREEN_ORIENTATION_REVERSE_LANDSCAPE = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
 		    }
-
 		   
 		    //if the rotation is equal to 180 or 270 degrees, then we have one of the reverse orientations
-		    if (rotationAsInt == Surface.ROTATION_270) {
-		    		
+		    if (rotationAsInt == Surface.ROTATION_270) {		    		
 		    	lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);       
-			} else {
-				
+			} else {				
 		    	lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		    }
 

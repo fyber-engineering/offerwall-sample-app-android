@@ -17,7 +17,9 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 
 import com.sponsorpay.credentials.SPCredentials;
-import com.sponsorpay.utils.SPHttpConnection;
+import com.sponsorpay.utils.HostInfo;
+import com.sponsorpay.utils.HttpResponseParser;
+import com.sponsorpay.utils.SPHttpClient;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
@@ -66,6 +68,7 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 			
 			//parsing offers
 			if (StringUtils.notNullNorEmpty(bodyContent)) {
+				String screenOrientation = HostInfo.getHostInfo(null).getScreenOrientation();
 				SponsorPayLogger.d(TAG, "Parsing ads reponse\n" + bodyContent);
 				try {
 					JSONObject json = new JSONObject(bodyContent);
@@ -83,7 +86,16 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 								ad.setContextData(key, jsonAd.getString(key));
 							}
 						}
+						
+						if (!ad.getContextData().containsKey("orientation")){
+							ad.getContextData().put("orientation", screenOrientation);
+						}
+						
+						int rotation = HostInfo.getHostInfo(null).getOrientation();
+						ad.getContextData().put("rotation", Integer.toString(rotation));
+						
 						interstitialAds.add(ad);
+						
 					}
 				} catch (JSONException e) {
 					SponsorPayLogger.e(TAG, e.getMessage(), e);;

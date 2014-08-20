@@ -266,6 +266,10 @@ public class HostInfo {
 		return values[orientation];
 	}
 	
+	public int getOrientation(){
+		return mWindowManager.getDefaultDisplay().getOrientation();
+	}
+	
 	public String getScreenDensityCategory() {
 		if (mScreenDensityCategory == null) {
 			int densityCategoryDpi = mDisplayMetrics.densityDpi;

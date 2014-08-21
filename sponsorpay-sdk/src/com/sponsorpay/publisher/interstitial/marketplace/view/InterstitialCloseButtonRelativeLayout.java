@@ -1,3 +1,8 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
+ */
 package com.sponsorpay.publisher.interstitial.marketplace.view;
 
 import android.content.Context;
@@ -14,13 +19,13 @@ import android.widget.ImageView.ScaleType;
 
 public class InterstitialCloseButtonRelativeLayout extends RelativeLayout{
 	
-    private static final int closeButtonGreyColor = Color.parseColor("#7F7F7F");
-    private DisplayMetrics metrics;
+    private static final int mCloseButtonGreyColor = Color.parseColor("#7F7F7F");
+    private DisplayMetrics   mMetrics;
 
 	public InterstitialCloseButtonRelativeLayout(Context context) {
 		super(context);
 		//get the current display metrics 
-		metrics = context.getResources().getDisplayMetrics();
+		mMetrics = context.getResources().getDisplayMetrics();
 		
 		createCloseButtonRelativeLayout(context);
 	}
@@ -40,7 +45,7 @@ public class InterstitialCloseButtonRelativeLayout extends RelativeLayout{
 		ShapeDrawable circle = new ShapeDrawable(new OvalShape());
 		circle.setIntrinsicHeight(thirtyDipInPixels);
 	    circle.setIntrinsicWidth(thirtyDipInPixels);
-		circle.getPaint().setColor(closeButtonGreyColor);
+		circle.getPaint().setColor(mCloseButtonGreyColor);
 		
 		// set the Drawable into the center of the ImageView
 		//and set 5 dip padding on each side.
@@ -51,8 +56,8 @@ public class InterstitialCloseButtonRelativeLayout extends RelativeLayout{
 		
 		
 
-		DrawCloseXView drawView = new DrawCloseXView(context, metrics);
-		drawView.setBackgroundColor(closeButtonGreyColor);
+		DrawCloseXView drawView = new DrawCloseXView(context, mMetrics);
+		drawView.setBackgroundColor(mCloseButtonGreyColor);
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(fifteenDipInPixels, fifteenDipInPixels);
 		params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 		drawView.setLayoutParams(params);
@@ -64,7 +69,7 @@ public class InterstitialCloseButtonRelativeLayout extends RelativeLayout{
 	}
 	
 	public int getPixelsFromDip(int dip) {
-		return  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, metrics);
+		return  (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, mMetrics);
 	}
 
 

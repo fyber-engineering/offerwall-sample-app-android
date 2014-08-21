@@ -27,7 +27,7 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 
 	public final static String SP_ERROR_MESSAGE = "ERROR_MESSAGE";
 	
-	private MarketPlaceInterstitialActivityListener setOnHomeAndBackPressedEvent;
+	private MarketPlaceInterstitialActivityListener mActivityListener;
 
 	
 	@Override
@@ -63,15 +63,15 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 	}
 	
 	public void setMarketPlaceInterstitialListener(MarketPlaceInterstitialActivityListener listener) {
-		if(setOnHomeAndBackPressedEvent == null){
-			setOnHomeAndBackPressedEvent = listener;
+		if(mActivityListener == null){
+			mActivityListener = listener;
 		}
     }
 
 	@Override
 	protected void onUserLeaveHint() {
-		if (setOnHomeAndBackPressedEvent != null) {
-			setOnHomeAndBackPressedEvent.notifyOnHomePressed();
+		if (mActivityListener != null) {
+			mActivityListener.notifyOnHomePressed();
 		}
 		super.onUserLeaveHint();
 	}
@@ -79,8 +79,8 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 	
 	@Override
 	public void onBackPressed() {
-		if (setOnHomeAndBackPressedEvent != null) {
-			setOnHomeAndBackPressedEvent.notifyOnBackPressed();
+		if (mActivityListener != null) {
+			mActivityListener.notifyOnBackPressed();
 		}
 		super.onBackPressed();
 	}

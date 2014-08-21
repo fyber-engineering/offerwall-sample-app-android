@@ -1,3 +1,8 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
+ */
 package com.sponsorpay.publisher.interstitial.marketplace.view;
 
 import android.content.Context;
@@ -8,28 +13,28 @@ import android.util.DisplayMetrics;
 import android.view.View;
 
 public class DrawCloseXView extends View {
-    private Paint paint;
-    private int densityDependantRadius;
+	private static final int mFixed_radius = 15;
+	private Paint mPaint;
+    private int   mDensityDependantRadius;
     
-    private static final int fixed_radius = 15;
 
     public DrawCloseXView(Context context, DisplayMetrics mDisplayMetrics) {
         super(context);
         
-        paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setStrokeWidth(1.5f);
-        paint.setColor(Color.WHITE);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeJoin(Paint.Join.ROUND);
+        mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setStrokeWidth(1.5f);
+        mPaint.setColor(Color.WHITE);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
 		
-		densityDependantRadius = (int) (fixed_radius * mDisplayMetrics.density);
+		mDensityDependantRadius = (int) (mFixed_radius * mDisplayMetrics.density);
     }
     
 	@Override
     public void onDraw(Canvas canvas) {
-    	canvas.drawLine(0, 0, densityDependantRadius, densityDependantRadius, paint);
-		canvas.drawLine(densityDependantRadius, 0, 0, densityDependantRadius, paint);
+    	canvas.drawLine(0, 0, mDensityDependantRadius, mDensityDependantRadius, mPaint);
+		canvas.drawLine(mDensityDependantRadius, 0, 0, mDensityDependantRadius, mPaint);
 	}
     
 }

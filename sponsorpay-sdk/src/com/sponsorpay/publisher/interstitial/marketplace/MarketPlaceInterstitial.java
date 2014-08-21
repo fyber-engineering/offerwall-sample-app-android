@@ -55,10 +55,9 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 	private FrameLayout   mainLayout;
 	private Activity      mActivity;
-	private String        orientation;
-	private InterstitialCloseButtonRelativeLayout closeButtonLayout;
-
-	private String rotation;
+	private String        mOrientation;
+	private String        mRotation;
+	private InterstitialCloseButtonRelativeLayout mCloseButtonLayout;
 
 
 	public MarketPlaceInterstitial(MarketPlaceAdapter adapter) {
@@ -100,8 +99,8 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		String htmlContent = ad.getContextData().get("html");
 		boolean hasHtml = StringUtils.notNullNorEmpty(htmlContent);
 		
-		orientation = ad.getContextData().get("orientation");
-		rotation    = ad.getContextData().get("rotation");      
+		mOrientation = ad.getContextData().get("orientation");
+		mRotation    = ad.getContextData().get("rotation");      
 		
 		if (hasHtml) {
 			if (mWebView == null) {
@@ -245,6 +244,8 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 		text.setLayoutParams(params);
 		
+		//Instance of the close button relative layout, which will be generated dynamically
+		mCloseButtonLayout = new InterstitialCloseButtonRelativeLayout(context);
 		
 		childLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP|Gravity.RIGHT));
 		childLayout.addView(imageView);
@@ -254,68 +255,48 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		mWebView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 
 		mainLayout.addView(mWebView);
-		mainLayout.addView(childLayout);
-		//mainLayout.addView(text);
 
+		mainLayout.addView(mCloseButtonLayout);
+  
 	     
-	     
-	     /**
-	      * Listeners for calling the close and click events.
-	      * 
-	      */
-		imageView.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				fireCloseEvent();
-				
-				if (mainLayout != null) {
-		            ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
-		            if (parentViewGroup != null) {
-		                parentViewGroup.removeAllViews();
-		            }
-		        }
-			}
-		});
-	     
-	     
-		mWebView.setOnTouchListener(new OnTouchListener() {
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-                fireClickEvent();
-				
-				if (mainLayout != null) {
-		            ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
-		            if (parentViewGroup != null) {
-		                parentViewGroup.removeAllViews();
-		            }
-		        }
-				return true;
-			}
-		});
-		
-		 
+	    // Set a listener for the close button
+		mCloseButtonLayout.setOnClickListener(this);
+	 
+	}
+	
+	/**
+	 * Is removing all the views from the dynamically generated marketplace
+	 * interstitials.
+	 */
+	private void removeAttachedLayout(){
+		if (mainLayout != null) {
+            ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
+            if (parentViewGroup != null) {
+                parentViewGroup.removeAllViews();
+            }
+        }
 	}
 
 
 	@Override
 	public void notifyOnBackPressed() {
-		fireCloseEvent();
-		removeAttachedLayout();
+		fireCloseEventAndRemoveAttachedView();
 	}
 
 	@Override
 	public void notifyOnHomePressed() {
-		fireCloseEvent();
-		removeAttachedLayout();
+		fireCloseEventAndRemoveAttachedView();
 	}
 
 	/**
 	 * Listener which will be called when the close button will be clicked.
-	 * It will fire the close event and remove the interstitial layout.
 	 */
 	@Override
 	public void onClick(View v) {
+		fireCloseEventAndRemoveAttachedView();
+	}
+	
+	private void fireCloseEventAndRemoveAttachedView(){
 		fireCloseEvent();
 		removeAttachedLayout();
 	}
@@ -323,16 +304,16 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	/**
 	 * Method which is setting the orientation according to the one that has 
 	 * been provided via the server's JSON response. If the JSON doesn't have
-	 * that response, then get the existing orientation. In both occasions we 
+	 * that response, then set the existing orientation. In both occasions we 
 	 * lock the screen orientation, so no orientation changes can take place.
 	 */
 	private void setOrientation() {
 
-		if (orientation.equalsIgnoreCase("portrait")) {
+		if (mOrientation.equalsIgnoreCase("portrait")) {
 			lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		} else if (orientation.equalsIgnoreCase("landscape")) {
+		} else if (mOrientation.equalsIgnoreCase("landscape")) {
 			
-			int rotationAsInt = Integer.parseInt(rotation);
+			int rotationAsInt = Integer.parseInt(mRotation);
 
 		    if (Build.VERSION.SDK_INT > 9) {
 		    	// Value 8 for the reverse orientation are available from Gingerbread and above 
@@ -352,6 +333,10 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		
 	}
 	
+	/**
+	 * Method which is sets and locks the provided orientation.
+	 * @param providedOrientation
+	 */
 	private void lockWithProvidedOrientation(int providedOrientation){
 		mActivity.setRequestedOrientation(providedOrientation);
 	}

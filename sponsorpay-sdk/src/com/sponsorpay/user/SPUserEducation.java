@@ -12,10 +12,10 @@ public enum SPUserEducation{
 	high_school("high school"),	
 	in_college("in college"),
 	some_college("some college"),	
-	associates("other"),	
-	bachelors("other"),	
-	masters("other"),	
-	doctorate("other");
+	associates("associates"),	
+	bachelors("bachelors"),	
+	masters("masters"),	
+	doctorate("doctorate");
 	
 	
     public final String education;

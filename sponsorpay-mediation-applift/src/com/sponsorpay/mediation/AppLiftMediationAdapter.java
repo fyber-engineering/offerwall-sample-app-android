@@ -18,37 +18,52 @@ import com.sponsorpay.publisher.mbe.mediation.SPBrandEngageMediationAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
-public class AppLiftMediationAdapter extends SPMediationAdapter{
+public class AppLiftMediationAdapter extends SPMediationAdapter {
 
 	private static final String TAG = "AppLiftAdapter";
-	
-	private static final String ADAPTER_VERSION = "1.0.1";
+
+	private static final String ADAPTER_VERSION = "1.1.0";
 	private static final String ADAPTER_NAME = "AppLift";
-	
+
 	public static final String APP_ID = "app.id";
 	public static final String APP_SECRET = "app.secret";
-	
+	public static final String CACHE_INTERSTITIALS = "cache.interstitials";
+
 	private AppLiftInterstitialMediationAdapter mInterstitialAdapter;
-	
+	private Boolean mCachingNeeded;
+
 	@Override
 	public boolean startAdapter(final Activity activity) {
-		SponsorPayLogger.d(TAG, "Starting AppLift adapter");// - SDK version " + PlayAds.getSDKVersion());
+		SponsorPayLogger.d(TAG, "Starting AppLift adapter");// - SDK version " +
+															// PlayAds.getSDKVersion());
 		try {
-			
-		final Integer appId = Integer.decode(SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_ID, String.class));
-		final String appSecret = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_SECRET, String.class);
-		if (appId != null && StringUtils.notNullNorEmpty(appSecret)) {
-			mInterstitialAdapter = new AppLiftInterstitialMediationAdapter(this);
-			activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					PlayAds.init(activity, appId, appSecret);
-					mInterstitialAdapter.start(activity);
-					PlayAds.addListener(mInterstitialAdapter);
-				}
-			});
-			return true;
-		}
+
+			final Integer appId = Integer.decode(SPMediationConfigurator.getConfiguration(ADAPTER_NAME,
+					APP_ID, String.class));
+			final String appSecret = SPMediationConfigurator.getConfiguration(ADAPTER_NAME, APP_SECRET,
+					String.class);
+
+			mCachingNeeded = SPMediationConfigurator.getConfiguration(getName(),
+					AppLiftMediationAdapter.CACHE_INTERSTITIALS, Boolean.class);
+
+			if (mCachingNeeded == null) {
+				SponsorPayLogger.e(TAG, "Error on parsing the cache parameter \""
+						+ AppLiftMediationAdapter.CACHE_INTERSTITIALS + "\".");
+				return false;
+			}
+
+			if (appId != null && StringUtils.notNullNorEmpty(appSecret)) {
+				mInterstitialAdapter = new AppLiftInterstitialMediationAdapter(this);
+				activity.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						PlayAds.init(activity, appId, appSecret);
+						mInterstitialAdapter.start(activity);
+						PlayAds.addListener(mInterstitialAdapter);
+					}
+				});
+				return true;
+			}
 		} catch (Exception e) {
 			SponsorPayLogger.e(TAG, e.getLocalizedMessage(), e);
 		}
@@ -79,6 +94,11 @@ public class AppLiftMediationAdapter extends SPMediationAdapter{
 	@Override
 	protected Set<? extends Object> getListeners() {
 		return null;
+	}
+
+	/** returns whether the adapter should cache interstitials or not */
+	public Boolean isCachingNeeded() {
+		return mCachingNeeded;
 	}
 
 }

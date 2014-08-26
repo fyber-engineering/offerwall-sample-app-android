@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="/sponsorpay-android-sdk/sponsorpay-android-sdk.jar" sourcepath="/sponsorpay-android-sdk"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry exported="true" kind="lib" path="libs/applovin-sdk-5.3.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

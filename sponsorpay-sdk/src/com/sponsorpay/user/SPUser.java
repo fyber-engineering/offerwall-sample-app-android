@@ -357,14 +357,14 @@ public final class SPUser extends HashMap<String, Object> {
 		return Location.convert(value, Location.FORMAT_DEGREES);
 	}
 
-    private void setLocationDetails(Location location){
-    	if (location != null) {
-    		put(LAT, formatInDegrees(location.getLatitude()));
+	private void setLocationDetails(Location location) {
+		if (location != null) {
+			put(LAT, formatInDegrees(location.getLatitude()));
 			put(LONGT, formatInDegrees(location.getLongitude()));
 		} else {
 			remove(LAT);
 			remove(LONGT);
 		}
-    }
+	}
 
 }

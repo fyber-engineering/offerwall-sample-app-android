@@ -17,14 +17,13 @@ public enum SPUserEducation{
 	masters("masters"),	
 	doctorate("doctorate");
 	
-	
-    public final String education;
-    
-    private SPUserEducation(String education) {
-        this.education = education;
-    }
-    
-    @Override
+	public final String education;
+
+	private SPUserEducation(String education) {
+		this.education = education;
+	}
+
+	@Override
 	public String toString() {
 		return education;
 	}

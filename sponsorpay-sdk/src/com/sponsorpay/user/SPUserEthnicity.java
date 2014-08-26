@@ -18,12 +18,12 @@ public enum SPUserEthnicity{
 	other("other");
 	
 	public final String ethnicity;
-    
-    private SPUserEthnicity(String ethnicity) {
-        this.ethnicity = ethnicity;
-    }
-    
-    @Override
+
+	private SPUserEthnicity(String ethnicity) {
+		this.ethnicity = ethnicity;
+	}
+
+	@Override
 	public String toString() {
 		return ethnicity;
 	}

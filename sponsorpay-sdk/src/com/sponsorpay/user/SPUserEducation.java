@@ -7,13 +7,24 @@
 package com.sponsorpay.user;
 
 public enum SPUserEducation{
-	other,	
-	none,	
-	high_school,	
-	in_college,
-	some_college,	
-	associates,	
-	bachelors,	
-	masters,	
-	doctorate
+	other("other"),	
+	none("none"),	
+	high_school("high school"),	
+	in_college("in college"),
+	some_college("some college"),	
+	associates("other"),	
+	bachelors("other"),	
+	masters("other"),	
+	doctorate("other");
+	
+	
+    public final String education;
+    
+    private SPUserEducation(String education) {
+        this.education = education;
+    }
+    
+    public String getEducation(){
+        return this.education;
+    }
 }

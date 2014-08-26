@@ -118,12 +118,13 @@ public final class SPUser extends HashMap<String, Object> {
 		singleton.put(SEXUAL_ORIENTATION, sexualOrientation);
 	}
 
-	public static SPUserEthnicity getEthnicity() {
-		return (SPUserEthnicity) singleton.get(ETHNICITY);
+	public static String getEthnicity() {
+		SPUserEthnicity spUserEthnicity = (SPUserEthnicity) singleton.get(ETHNICITY);
+		return spUserEthnicity.getEthnicity();
 	}
 
 	public static void setEthnicity(SPUserEthnicity ethnicity) {
-		singleton.put(ETHNICITY, ethnicity);
+		singleton.put(ETHNICITY, ethnicity.getEthnicity());
 	}
 
 	public static Location getLocation() {
@@ -133,7 +134,6 @@ public final class SPUser extends HashMap<String, Object> {
 	public static void setLocation(Location location) {
 		singleton.mLocation = location;
 		singleton.setLocationDetails(location);
-
 	}
 
 	public static SPUserMaritalStatus getMaritalStatus() {
@@ -160,12 +160,13 @@ public final class SPUser extends HashMap<String, Object> {
 		singleton.put(ANNUAL_HOUSEHOLD_INCOME, annualHouseholdIncome);
 	}
 
-	public static SPUserEducation getEducation() {
-		return (SPUserEducation) singleton.get(EDUCATION);
+	public static String getEducation() {		
+		SPUserEducation spUserEducation = (SPUserEducation) singleton.get(EDUCATION);
+		return spUserEducation.getEducation();
 	}
 
 	public static void setEducation(SPUserEducation education) {
-		singleton.put(EDUCATION, education);
+		singleton.put(EDUCATION, education.getEducation());
 	}
 
 	public static String getZipcode() {
@@ -232,12 +233,13 @@ public final class SPUser extends HashMap<String, Object> {
 		singleton.put(LAST_SESSION, last_session);
 	}
 
-	public static SPUserConnection getConnection() {
-		return (SPUserConnection) singleton.get(CONNECTION);
+	public static String getConnection() {
+		SPUserConnection spUserConnection = (SPUserConnection) singleton.get(CONNECTION);
+		return spUserConnection.getConnection();
 	}
 
 	public static void setConnection(SPUserConnection connection) {
-		singleton.put(CONNECTION, connection);
+		singleton.put(CONNECTION, connection.getConnection());
 	}
 
 	public static String getDevice() {

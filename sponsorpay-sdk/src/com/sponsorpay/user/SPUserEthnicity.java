@@ -7,13 +7,24 @@
 package com.sponsorpay.user;
 
 public enum SPUserEthnicity{
-	asian,
-	black,
-	hispanic,
-	indian,
-	middle_eastern,	
-	native_american,	
-	pacific_islander,	
-	white,	
-	other
+	asian("asian"),
+	black("black"),
+	hispanic("hispanic"),
+	indian("indian"),
+	middle_eastern("middle eastern"),	
+	native_american("native american"),	
+	pacific_islander("pacific islander"),	
+	white("white"),	
+	other("other");
+	
+	public final String ethnicity;
+
+	private SPUserEthnicity(String ethnicity) {
+		this.ethnicity = ethnicity;
+	}
+
+	@Override
+	public String toString() {
+		return ethnicity;
+	}
 }

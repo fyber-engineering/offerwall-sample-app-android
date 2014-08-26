@@ -133,7 +133,6 @@ public final class SPUser extends HashMap<String, Object> {
 	public static void setLocation(Location location) {
 		singleton.mLocation = location;
 		singleton.setLocationDetails(location);
-
 	}
 
 	public static SPUserMaritalStatus getMaritalStatus() {
@@ -160,7 +159,7 @@ public final class SPUser extends HashMap<String, Object> {
 		singleton.put(ANNUAL_HOUSEHOLD_INCOME, annualHouseholdIncome);
 	}
 
-	public static SPUserEducation getEducation() {
+	public static SPUserEducation getEducation() {		
 		return (SPUserEducation) singleton.get(EDUCATION);
 	}
 
@@ -358,14 +357,14 @@ public final class SPUser extends HashMap<String, Object> {
 		return Location.convert(value, Location.FORMAT_DEGREES);
 	}
 
-    private void setLocationDetails(Location location){
-    	if (location != null) {
-    		put(LAT, formatInDegrees(location.getLatitude()));
+	private void setLocationDetails(Location location) {
+		if (location != null) {
+			put(LAT, formatInDegrees(location.getLatitude()));
 			put(LONGT, formatInDegrees(location.getLongitude()));
 		} else {
 			remove(LAT);
 			remove(LONGT);
 		}
-    }
+	}
 
 }

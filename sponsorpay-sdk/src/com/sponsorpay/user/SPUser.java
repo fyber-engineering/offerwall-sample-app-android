@@ -118,9 +118,8 @@ public final class SPUser extends HashMap<String, Object> {
 		singleton.put(SEXUAL_ORIENTATION, sexualOrientation);
 	}
 
-	public static String getEthnicity() {
-		SPUserEthnicity spUserEthnicity = (SPUserEthnicity) singleton.get(ETHNICITY);
-		return spUserEthnicity.toString();
+	public static SPUserEthnicity getEthnicity() {
+		return (SPUserEthnicity) singleton.get(ETHNICITY);
 	}
 
 	public static void setEthnicity(SPUserEthnicity ethnicity) {
@@ -160,9 +159,8 @@ public final class SPUser extends HashMap<String, Object> {
 		singleton.put(ANNUAL_HOUSEHOLD_INCOME, annualHouseholdIncome);
 	}
 
-	public static String getEducation() {		
-		SPUserEducation spUserEducation = (SPUserEducation) singleton.get(EDUCATION);
-		return spUserEducation.toString();
+	public static SPUserEducation getEducation() {		
+		return (SPUserEducation) singleton.get(EDUCATION);
 	}
 
 	public static void setEducation(SPUserEducation education) {
@@ -233,9 +231,8 @@ public final class SPUser extends HashMap<String, Object> {
 		singleton.put(LAST_SESSION, last_session);
 	}
 
-	public static String getConnection() {
-		SPUserConnection spUserConnection = (SPUserConnection) singleton.get(CONNECTION);
-		return spUserConnection.toString();
+	public static SPUserConnection getConnection() {
+		return (SPUserConnection) singleton.get(CONNECTION);
 	}
 
 	public static void setConnection(SPUserConnection connection) {

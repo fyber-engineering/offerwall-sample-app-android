@@ -311,16 +311,18 @@ public final class SPUser extends HashMap<String, Object> {
 					Location lastKnownLocation = locationManager.getLastKnownLocation(provider);
 					if (mLastLocation == null) {
 						mLastLocation = lastKnownLocation;
-					}
-					if (mLastLocation.getTime() < lastKnownLocation.getTime()) {
+					}		
+					if (mLastLocation != null && mLastLocation.getTime() < lastKnownLocation.getTime()) {
 						mLastLocation = lastKnownLocation;
 					}
 				}
-				// finally, discard the location if it's more than a day old
-				Calendar yesterday = Calendar.getInstance();
-				yesterday.add(Calendar.DATE, -1);
-				if (mLastLocation.getTime() > yesterday.getTimeInMillis() ) {
-					setLocationDetails(mLastLocation);
+				if (mLastLocation != null) {
+					// finally, discard the location if it's more than a day old
+					Calendar yesterday = Calendar.getInstance();
+					yesterday.add(Calendar.DATE, -1);
+					if (mLastLocation.getTime() > yesterday.getTimeInMillis()) {
+						setLocationDetails(mLastLocation);
+					}
 				}
 			}
 		}

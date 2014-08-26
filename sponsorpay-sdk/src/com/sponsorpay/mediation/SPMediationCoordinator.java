@@ -77,7 +77,11 @@ public class SPMediationCoordinator {
 							if (adapter.startAdapter(activity)) {
 								SponsorPayLogger.d(TAG, "Adapter has been started successfully");
 								mAdapters.put(name, adapter);
+							} else {
+								SponsorPayLogger.w(TAG, "Warning - the adapter has NOT been started.");
 							}
+						} else {
+							SponsorPayLogger.w(TAG, "Adapter version is NOT compatible with this SDK.");
 						}
 					} catch (ClassNotFoundException e) {
 						SponsorPayLogger.e(TAG, "Adapter not found - " + className, e);

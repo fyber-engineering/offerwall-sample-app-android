@@ -15,7 +15,7 @@ import android.content.Context;
 
 import com.sponsorpay.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.credentials.SPCredentials;
-import com.sponsorpay.mediation.SPMediationCoordinator;
+import com.sponsorpay.mediation.SPMediationConfigurationRequester;
 import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.StringUtils;
 
@@ -33,8 +33,8 @@ import com.sponsorpay.utils.StringUtils;
  */
 public class SponsorPay {
 	public static final int MAJOR_RELEASE_NUMBER = 6;
-	public static final int MINOR_RELEASE_NUMBER = 1;
-	public static final int BUGFIX_RELEASE_NUMBER = 2;
+	public static final int MINOR_RELEASE_NUMBER = 5;
+	public static final int BUGFIX_RELEASE_NUMBER = 0;
 	public static final String RELEASE_VERSION_STRING = MAJOR_RELEASE_NUMBER + "." + 
 				MINOR_RELEASE_NUMBER + "." + BUGFIX_RELEASE_NUMBER;
 	
@@ -126,16 +126,20 @@ public class SponsorPay {
 			String securityToken, Activity activity) {
 		Set<String> credentials = new HashSet<String>(SponsorPay.getAllCredentials());
 		Context context = activity.getApplicationContext();
+		boolean firstStart = false;
 		if (credentials.isEmpty()) {
 			HostInfo.getHostInfo(context);
-			SPMediationCoordinator.INSTANCE.startMediationAdapters(activity);
+			firstStart = true;
 		}
 		String credentialsToken = INSTANCE.getCredentialsToken(appId, userId, securityToken,
 						context);
-		
+		if (firstStart) {
+			SPMediationConfigurationRequester.requestConfig(INSTANCE.currentCredentials, activity);
+		}
 		if (!credentials.contains(credentialsToken)) {
 			SponsorPayAdvertiser.register(context);
 		}
+		
 		return credentialsToken;
 	}
 

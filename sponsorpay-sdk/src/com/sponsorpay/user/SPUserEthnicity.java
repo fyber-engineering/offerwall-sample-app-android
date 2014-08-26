@@ -23,7 +23,8 @@ public enum SPUserEthnicity{
         this.ethnicity = ethnicity;
     }
     
-    public String getEthnicity(){
-        return this.ethnicity;
-    }
+    @Override
+	public String toString() {
+		return ethnicity;
+	}
 }

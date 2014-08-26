@@ -120,11 +120,11 @@ public final class SPUser extends HashMap<String, Object> {
 
 	public static String getEthnicity() {
 		SPUserEthnicity spUserEthnicity = (SPUserEthnicity) singleton.get(ETHNICITY);
-		return spUserEthnicity.getEthnicity();
+		return spUserEthnicity.toString();
 	}
 
 	public static void setEthnicity(SPUserEthnicity ethnicity) {
-		singleton.put(ETHNICITY, ethnicity.getEthnicity());
+		singleton.put(ETHNICITY, ethnicity);
 	}
 
 	public static Location getLocation() {
@@ -162,11 +162,11 @@ public final class SPUser extends HashMap<String, Object> {
 
 	public static String getEducation() {		
 		SPUserEducation spUserEducation = (SPUserEducation) singleton.get(EDUCATION);
-		return spUserEducation.getEducation();
+		return spUserEducation.toString();
 	}
 
 	public static void setEducation(SPUserEducation education) {
-		singleton.put(EDUCATION, education.getEducation());
+		singleton.put(EDUCATION, education);
 	}
 
 	public static String getZipcode() {
@@ -235,11 +235,11 @@ public final class SPUser extends HashMap<String, Object> {
 
 	public static String getConnection() {
 		SPUserConnection spUserConnection = (SPUserConnection) singleton.get(CONNECTION);
-		return spUserConnection.getConnection();
+		return spUserConnection.toString();
 	}
 
 	public static void setConnection(SPUserConnection connection) {
-		singleton.put(CONNECTION, connection.getConnection());
+		singleton.put(CONNECTION, connection);
 	}
 
 	public static String getDevice() {

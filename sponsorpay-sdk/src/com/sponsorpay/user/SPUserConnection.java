@@ -15,8 +15,10 @@ public enum SPUserConnection{
     private SPUserConnection(String connection) {
         this.connection = connection;
     }
+
+	@Override
+	public String toString() {
+		return connection;
+	}
     
-    public String getConnection(){
-        return this.connection;
-    }
 }

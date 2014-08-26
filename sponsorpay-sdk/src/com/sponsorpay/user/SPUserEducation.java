@@ -24,7 +24,8 @@ public enum SPUserEducation{
         this.education = education;
     }
     
-    public String getEducation(){
-        return this.education;
-    }
+    @Override
+	public String toString() {
+		return education;
+	}
 }

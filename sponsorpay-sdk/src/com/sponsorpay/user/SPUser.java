@@ -304,8 +304,6 @@ public final class SPUser extends HashMap<String, Object> {
 			Calendar now = Calendar.getInstance();
 			if (mNextUpdate == null || now.after(mNextUpdate)) {
 				// get the latest updated location
-				mNextUpdate = now;
-				mNextUpdate.add(Calendar.MINUTE, 10);
 				List<String> locationProviders =  HostInfo.getHostInfo(null).getLocationProviders();
 				for (String provider : locationProviders) {
 					Location lastKnownLocation = locationManager.getLastKnownLocation(provider);
@@ -322,6 +320,8 @@ public final class SPUser extends HashMap<String, Object> {
 					yesterday.add(Calendar.DATE, -1);
 					if (mLastLocation.getTime() > yesterday.getTimeInMillis()) {
 						setLocationDetails(mLastLocation);
+						mNextUpdate = now;
+						mNextUpdate.add(Calendar.MINUTE, 10);
 					}
 				}
 			}

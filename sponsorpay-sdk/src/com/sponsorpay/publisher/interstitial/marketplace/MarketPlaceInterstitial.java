@@ -112,7 +112,6 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				loadHtml(htmlContent);
 			}
 			setAdAvailable();
-			fireImpressionEvent();
 		}
 		return hasHtml;
 	}
@@ -127,7 +126,6 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	@Override
 	protected boolean show(Activity parentActivity) {
 		mActivity = parentActivity;
-		
 		setOrientation();
 		
 		if(mActivity instanceof SPInterstitialActivity) {
@@ -137,6 +135,8 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		
 		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);            
 		parentActivity.setContentView(mainLayout, layoutparams);
+		
+		fireImpressionEvent();
 		
 		return true;
 	}

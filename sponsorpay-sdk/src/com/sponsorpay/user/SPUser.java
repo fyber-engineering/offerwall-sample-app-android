@@ -21,6 +21,7 @@ import android.text.TextUtils;
 
 import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SponsorPayLogger;
+import com.sponsorpay.utils.StringUtils;
 
 public final class SPUser extends HashMap<String, Object> {
 	
@@ -340,12 +341,15 @@ public final class SPUser extends HashMap<String, Object> {
 	@Override
 	public Object put(String key, Object value) {		
 		
-		// The isProvidedMapDirty is used to check when changes are happening on the map
+		// The isMapDirty is used to check when changes are happening on the map
 		// in order to avoid to continuous creation  of the String from the Map key/values
 		// on the method above (mapToString())
-		Object oldValue = get(key);
-		isMapDirty = oldValue == null || !oldValue.equals(value);
-		return super.put(key, value);
+		if (StringUtils.notNullNorEmpty(key) && value != null) {
+			Object oldValue = get(key);
+			isMapDirty = oldValue == null || !oldValue.equals(value);
+			return super.put(key, value);
+		}
+		return null;
 	}
 	
 	@Override

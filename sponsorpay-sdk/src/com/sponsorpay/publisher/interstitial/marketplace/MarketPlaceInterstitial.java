@@ -85,7 +85,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 					
 				case LOAD_HTML:
 
-					mWebView.loadData(msg.obj.toString(), null, "UTF-8");
+					mWebView.loadDataWithBaseURL(null, msg.obj.toString(), null, "UTF-8", null);
 					break;
 
 				default:

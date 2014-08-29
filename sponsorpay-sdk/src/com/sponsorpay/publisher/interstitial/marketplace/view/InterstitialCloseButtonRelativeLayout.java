@@ -18,7 +18,6 @@ import android.widget.ImageView.ScaleType;
 
 public class InterstitialCloseButtonRelativeLayout extends RelativeLayout{
 	
-	private static final int mCloseButtonGreyColor = Color.parseColor("#7F7F7F");
 	// Range from 0 to 255, where 0 is fully transparent and 255 fully opaque.
 	private static final int FIFTY_PERCENT_TRANSPARENCY = 128;
 	private DisplayMetrics mMetrics;
@@ -44,7 +43,7 @@ public class InterstitialCloseButtonRelativeLayout extends RelativeLayout{
 
 		// create a circle with diameter 30X30 dip and set the background color
 		GradientDrawable circle = new GradientDrawable();
-		circle.setColor(mCloseButtonGreyColor);
+		circle.setColor(Color.BLACK);
 		circle.setShape(GradientDrawable.OVAL);
 		circle.setAlpha(FIFTY_PERCENT_TRANSPARENCY);
 		circle.setStroke((int) Math.round(DrawCloseXView.STROKE_WIDTH), Color.WHITE);

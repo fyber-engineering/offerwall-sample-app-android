@@ -68,7 +68,7 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 			
 			//parsing offers
 			if (StringUtils.notNullNorEmpty(bodyContent)) {
-				String screenOrientation = HostInfo.getHostInfo(null).getScreenOrientation();
+				String screenOrientation = HostInfo.getHostInfo(null).getDeviceDefaultOrientation();
 				SponsorPayLogger.d(TAG, "Parsing ads reponse\n" + bodyContent);
 				try {
 					JSONObject json = new JSONObject(bodyContent);
@@ -91,7 +91,7 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 							ad.getContextData().put("orientation", screenOrientation);
 						}
 						
-						int rotation = HostInfo.getHostInfo(null).getOrientation();
+						int rotation = HostInfo.getHostInfo(null).getRotation();
 						ad.getContextData().put("rotation", Integer.toString(rotation));
 						
 						interstitialAds.add(ad);

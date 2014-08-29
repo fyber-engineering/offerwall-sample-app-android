@@ -35,6 +35,7 @@ import com.sponsorpay.publisher.interstitial.SPInterstitialActivity;
 import com.sponsorpay.publisher.interstitial.SPInterstitialAd;
 import com.sponsorpay.publisher.interstitial.marketplace.view.InterstitialCloseButtonRelativeLayout;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
+import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SPWebClient;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
@@ -48,6 +49,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	protected static final int LOAD_HTML = 1;
 	
 	private int SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+	private int SCREEN_ORIENTATION_REVERSE_PORTRAIT;
 	
 	private Handler       mMainHandler;
 	private WebView       mWebView;
@@ -57,6 +59,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	private Activity      mActivity;
 	private String        mOrientation;
 	private String        mRotation;
+	
 	private InterstitialCloseButtonRelativeLayout mCloseButtonLayout;
 
 
@@ -70,21 +73,21 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				case CREATE_WEBVIEW:
 					
 					MessageInfoHolder holder = (MessageInfoHolder) msg.obj;
-										
+
 					mWebView = new WebView(holder.mContext);
 
 					createCloseButton(holder.mContext);
 
 					mWebView.getSettings().setJavaScriptEnabled(true);
-					mWebView.setWebViewClient(getWebClient());	
-					
+					mWebView.setWebViewClient(getWebClient());
+
 					msg.obj = holder.mHtml;
 					
 				case LOAD_HTML:
-					
-					mWebView.loadDataWithBaseURL("http://engine.sponsorpay.com", msg.obj.toString(), null, "UTF-8", null);
+
+					mWebView.loadData(msg.obj.toString(), null, "UTF-8");
 					break;
-					
+
 				default:
 					break;
 				}
@@ -95,13 +98,13 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	@Override
 	public boolean isAdAvailable(Context context, SPInterstitialAd ad) {
 		removeAttachedLayout();
-		
+
 		String htmlContent = ad.getContextData().get("html");
 		boolean hasHtml = StringUtils.notNullNorEmpty(htmlContent);
-		
+
 		mOrientation = ad.getContextData().get("orientation");
-		mRotation    = ad.getContextData().get("rotation");      
-		
+		mRotation = ad.getContextData().get("rotation");
+
 		if (hasHtml) {
 			if (mWebView == null) {
 				Message msg = Message.obtain(mMainHandler);
@@ -127,15 +130,17 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	protected boolean show(Activity parentActivity) {
 		mActivity = parentActivity;
 		setOrientation();
-		
-		if(mActivity instanceof SPInterstitialActivity) {
+
+		if (mActivity instanceof SPInterstitialActivity) {
 			mActivity = parentActivity;
 			((SPInterstitialActivity) mActivity).setMarketPlaceInterstitialListener(MarketPlaceInterstitial.this);
 		}
 		
-		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT);            
+		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(
+				ViewGroup.LayoutParams.FILL_PARENT,
+				ViewGroup.LayoutParams.FILL_PARENT);
 		parentActivity.setContentView(mainLayout, layoutparams);
-		
+
 		fireImpressionEvent();
 		
 		return true;
@@ -177,24 +182,23 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 				@Override
 				protected void onTargetActivityStart(String targetUrl) {
-					// nothing to do 
+					// nothing to do
 				}
-				
-				
+
 				@Override
-				public void onReceivedError(WebView view, int errorCode, String description,
-						String failingUrl) {
+				public void onReceivedError(WebView view, int errorCode,
+						String description, String failingUrl) {
 					
-					String errorMessage = String.format(
-							"Interstitials WebView triggered an error. "
+					String errorMessage = String
+							.format("Interstitials WebView triggered an error. "
 									+ "Error code: %d, error description: %s. Failing URL: %s",
-							errorCode, description, failingUrl);
-					
+									errorCode, description, failingUrl);
+
 					SponsorPayLogger.e(TAG, errorMessage);
 
 					fireShowErrorEvent(errorMessage);
-				}			
-			};	
+				}
+			};
 		}
 		
 		return mWebClient;
@@ -206,75 +210,43 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 		private MessageInfoHolder(Context context, String html) {
 			this.mContext = context;
-			this.mHtml = html;			
+			this.mHtml = html;
 		}
 	}
 	
-	private void createCloseButton(Context context){
-
+	private void createCloseButton(Context context) {
+		// main FrameLayout which will host the webview and the close button
 		mainLayout = new FrameLayout(context);
-		
-		//RelativeLayout childLayout = new RelativeLayout(context);
-		RelativeLayout childLayout = new RelativeLayout(context);
 
-		//Image with drawable
-		final ImageView imageView;
-		imageView = new ImageView(context);
-		// create a drawable
-		ShapeDrawable circle = new ShapeDrawable(new OvalShape());
-		circle.setIntrinsicHeight(80);
-		circle.setIntrinsicWidth(80);
-		circle.setBounds(new Rect(0, 0, 40, 40));
-		circle.getPaint().setColor(Color.DKGRAY);
-		// set the drawable into the imageviw
-		imageView.setImageDrawable(circle);
-		imageView.setAdjustViewBounds(true);
-		imageView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-		imageView.setPadding(5, 5, 5, 5);
-		imageView.setScaleType(ScaleType.FIT_XY);
-		
-		
-
-		// X close text
-		TextView text = new TextView(context);
-		text.setText("X");
-		text.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
-		text.setTextColor(Color.WHITE);
-		RelativeLayout.LayoutParams params=new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-		text.setLayoutParams(params);
-		
-		//Instance of the close button relative layout, which will be generated dynamically
+		// Instance of the close button relative layout, which will be generated
+		// dynamically
 		mCloseButtonLayout = new InterstitialCloseButtonRelativeLayout(context);
-		
-		childLayout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP|Gravity.RIGHT));
-		childLayout.addView(imageView);
-		childLayout.addView(text);
-		
-		//the webview
-		mWebView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
 
+		// the webview
+		mWebView.setLayoutParams(new FrameLayout.LayoutParams(
+				ViewGroup.LayoutParams.FILL_PARENT,
+				ViewGroup.LayoutParams.FILL_PARENT));
+
+		// attach on the main layout the webview and the close button.
 		mainLayout.addView(mWebView);
 
 		mainLayout.addView(mCloseButtonLayout);
-  
-	     
-	    // Set a listener for the close button
+
+		// Set a listener for the close button
 		mCloseButtonLayout.setOnClickListener(this);
-	 
 	}
 	
 	/**
 	 * Is removing all the views from the dynamically generated marketplace
 	 * interstitials.
 	 */
-	private void removeAttachedLayout(){
+	private void removeAttachedLayout() {
 		if (mainLayout != null) {
-            ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
-            if (parentViewGroup != null) {
-                parentViewGroup.removeAllViews();
-            }
-        }
+			ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
+			if (parentViewGroup != null) {
+				parentViewGroup.removeAllViews();
+			}
+		}
 	}
 
 
@@ -295,49 +267,83 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	public void onClick(View v) {
 		fireCloseEventAndRemoveAttachedView();
 	}
-	
-	private void fireCloseEventAndRemoveAttachedView(){
+
+	private void fireCloseEventAndRemoveAttachedView() {
 		fireCloseEvent();
 		removeAttachedLayout();
 	}
 	
 	/**
-	 * Method which is setting the orientation according to the one that has 
+	 * Method which is setting the orientation according to the one that has
 	 * been provided via the server's JSON response. If the JSON doesn't have
-	 * that response, then set the existing orientation. In both occasions we 
+	 * that response, then set the existing orientation. In both occasions we
 	 * lock the screen orientation, so no orientation changes can take place.
 	 */
 	private void setOrientation() {
 
-		if (mOrientation.equalsIgnoreCase("portrait")) {
-			lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		} else if (mOrientation.equalsIgnoreCase("landscape")) {
-			
-			int rotationAsInt = Integer.parseInt(mRotation);
+		if (Build.VERSION.SDK_INT > 9) {
+			// Value 8 for the reverse orientation are available from
+			// Gingerbread and above
+			SCREEN_ORIENTATION_REVERSE_LANDSCAPE = 8;
+			SCREEN_ORIENTATION_REVERSE_PORTRAIT = 9;
 
-		    if (Build.VERSION.SDK_INT > 9) {
-		    	// Value 8 for the reverse orientation are available from Gingerbread and above 
-		    	SCREEN_ORIENTATION_REVERSE_LANDSCAPE = 8;			    
-			} else {
-		    	SCREEN_ORIENTATION_REVERSE_LANDSCAPE = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-		    }
-		   
-		    //if the rotation is equal to 180 or 270 degrees, then we have one of the reverse orientations
-		    if (rotationAsInt == Surface.ROTATION_270) {		    		
-		    	lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);       
-			} else {				
-		    	lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		    }
-
+		} else {
+			SCREEN_ORIENTATION_REVERSE_LANDSCAPE = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
 		}
 		
+		int rotationAsInt = Integer.parseInt(mRotation);
+		boolean hasDeviceReverseOrientation = HostInfo.getHostInfo(null)
+				.hasDeviceRevserseOrientation();
+
+		if (mOrientation.equalsIgnoreCase("portrait")) {
+
+			if (hasDeviceReverseOrientation) {
+
+				if (rotationAsInt == Surface.ROTATION_270) {
+					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+				} else if (rotationAsInt == Surface.ROTATION_90) {
+					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+				}
+
+			} else {
+
+				// if the rotation is equal to 180 degrees, then we have
+				// the reverse portrait orientation.
+				if (rotationAsInt == Surface.ROTATION_180) {
+					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+				} else if (rotationAsInt == Surface.ROTATION_0) {
+					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+				}
+			}
+
+		} else if (mOrientation.equalsIgnoreCase("landscape")) {
+
+			if (hasDeviceReverseOrientation) {
+
+				if (rotationAsInt == Surface.ROTATION_180) {
+					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+				} else if (rotationAsInt == Surface.ROTATION_0) {
+					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+				}
+
+			} else {
+
+				// if the rotation is equal to 270 degrees, then we have
+				// the reverse landscape orientation.
+				if (rotationAsInt == Surface.ROTATION_270) {
+					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+				} else if (rotationAsInt == Surface.ROTATION_90) {
+					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+				}
+			}
+		}
 	}
 	
 	/**
 	 * Method which is sets and locks the provided orientation.
 	 * @param providedOrientation
 	 */
-	private void lockWithProvidedOrientation(int providedOrientation){
+	private void lockWithProvidedOrientation(int providedOrientation) {
 		mActivity.setRequestedOrientation(providedOrientation);
 	}
 

@@ -289,6 +289,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 		} else {
 			SCREEN_ORIENTATION_REVERSE_LANDSCAPE = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+			SCREEN_ORIENTATION_REVERSE_PORTRAIT = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 		}
 		
 		int rotationAsInt = Integer.parseInt(mRotation);

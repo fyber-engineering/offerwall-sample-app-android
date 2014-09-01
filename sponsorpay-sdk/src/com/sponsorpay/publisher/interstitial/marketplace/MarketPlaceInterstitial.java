@@ -300,10 +300,10 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 			if (hasDeviceReverseOrientation) {
 
-				if (rotationAsInt == Surface.ROTATION_270) {
-					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-				} else if (rotationAsInt == Surface.ROTATION_90) {
+				if (rotationAsInt == Surface.ROTATION_90) {
 					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+				} else {
+					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 				}
 
 			} else {
@@ -312,7 +312,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				// the reverse portrait orientation.
 				if (rotationAsInt == Surface.ROTATION_180) {
 					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_PORTRAIT);
-				} else if (rotationAsInt == Surface.ROTATION_0) {
+				} else {
 					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 				}
 			}
@@ -323,7 +323,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 				if (rotationAsInt == Surface.ROTATION_180) {
 					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-				} else if (rotationAsInt == Surface.ROTATION_0) {
+				} else {
 					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 				}
 
@@ -333,7 +333,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				// the reverse landscape orientation.
 				if (rotationAsInt == Surface.ROTATION_270) {
 					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-				} else if (rotationAsInt == Surface.ROTATION_90) {
+				} else {
 					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 				}
 			}

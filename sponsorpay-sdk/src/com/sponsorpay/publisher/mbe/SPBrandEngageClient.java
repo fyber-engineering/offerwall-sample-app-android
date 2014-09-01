@@ -685,8 +685,13 @@ public class SPBrandEngageClient {
 				public void onReceivedError(WebView view, int errorCode,
 						String description, String failingUrl) {
 					SponsorPayLogger.d(TAG, "onReceivedError url - " + failingUrl + " - " + description );
-					// show error dialog
-					showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+					// show error dialog only if it's not in the validation phase
+					if (mStatus == SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS) {
+						notifyListener(SPBrandEngageClientStatus.ERROR);
+						clearWebViewPage();
+					} else {
+						showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+					}
 					super.onReceivedError(view, errorCode, description, failingUrl);
 				}
 				

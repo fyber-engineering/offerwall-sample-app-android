@@ -290,7 +290,7 @@ public class UrlBuilder {
 						SignatureTools.generateSignatureForParameters(
 								keyValueParams, secretKey));
 			} else {
-				SponsorPayLogger.d(TAG, "It was impossible to add the siganture, the SecretKey has not been provided");
+				SponsorPayLogger.d(TAG, "It was impossible to add the signature, the SecretKey has not been provided");
 			}
 		}
 

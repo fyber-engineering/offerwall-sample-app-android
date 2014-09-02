@@ -1,3 +1,9 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.utils;
 
 import java.util.List;
@@ -60,7 +66,8 @@ public abstract class SignedResponseRequester<V> extends AsyncTask<UrlBuilder, V
 			int statusCode = connection.getResponseCode();
 			String responseBody = connection.getBodyContent();
 			List<String> responseSignatureHeaders = connection.getHeader(SIGNATURE_HEADER);
-			String responseSignature = responseSignatureHeaders.size() > 0 ? responseSignatureHeaders.get(0)
+			String responseSignature = responseSignatureHeaders != null && responseSignatureHeaders.size() > 0 
+					? responseSignatureHeaders.get(0)
 					: StringUtils.EMPTY_STRING;
 					
 			SponsorPayLogger.d(TAG, String.format(

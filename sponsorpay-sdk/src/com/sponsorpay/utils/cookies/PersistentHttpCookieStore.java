@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -20,7 +21,9 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
-import android.util.Log;
+
+import com.sponsorpay.utils.SponsorPayLogger;
+import com.sponsorpay.utils.StringUtils;
 
 /**
  * A shared preferences cookie store.
@@ -55,15 +58,11 @@ public class PersistentHttpCookieStore implements CookieStore {
         if (storedCookieNames != null) {
             String[] cookieNames = TextUtils.split(storedCookieNames, ",");
             for (String name : cookieNames) {
-                String encodedCookie = cookiePrefs.getString(COOKIE_NAME_PREFIX
+                String encodedCookies = cookiePrefs.getString(COOKIE_NAME_PREFIX
                         + name, null);
-                if (encodedCookie != null) {
-                    HttpCookie decodedCookie = decodeCookie(encodedCookie);
-                    if (decodedCookie != null) {
-                        List<HttpCookie> cookies = new ArrayList<HttpCookie>();
-                        cookies.add(decodedCookie);
-                        map.put(URI.create(name), cookies);
-                    }
+                if (StringUtils.notNullNorEmpty(encodedCookies)) {
+                	List<HttpCookie> cookies = decodeCookies(encodedCookies);
+                	map.put(URI.create(name), cookies);
                 }
             }
         }
@@ -74,7 +73,7 @@ public class PersistentHttpCookieStore implements CookieStore {
             throw new NullPointerException("cookie == null");
         }
 
-        uri = cookiesUri(uri, cookie);
+        uri = cookiesUri(uri);
         List<HttpCookie> cookies = map.get(uri);
         if (cookies == null) {
             cookies = new ArrayList<HttpCookie>();
@@ -89,10 +88,31 @@ public class PersistentHttpCookieStore implements CookieStore {
         prefsWriter.putString(COOKIE_NAME_STORE,
                 TextUtils.join(",", map.keySet()));
         prefsWriter.putString(COOKIE_NAME_PREFIX + uri,
-                encodeCookie(new SerializableHttpCookie(cookie)));
+                encodeCookies(cookies));
         prefsWriter.commit();
     }
+    
+    private List<HttpCookie> decodeCookies(String encodedCookies) {
+    	List<HttpCookie> cookies = new LinkedList<HttpCookie>();
+    	String[] serializedCookies = TextUtils.split(encodedCookies, ",");
+        for (String cookie : serializedCookies) {
+        	cookies.add(decodeCookie(cookie));
+        }
+        return cookies;
+    }
 
+    private String encodeCookies(List<HttpCookie> cookies) {
+    	StringBuilder builder = new StringBuilder();
+    	for (HttpCookie cookie : cookies) {
+    		builder.append(encodeCookie(new SerializableHttpCookie(cookie)));
+    		builder.append(",");
+    	}
+    	if (builder.length() > 0) {
+    		builder.deleteCharAt(builder.length()-1);
+    	}
+    	return builder.toString();
+    }
+    
     public synchronized List<HttpCookie> get(URI uri) {
         if (uri == null) {
             throw new NullPointerException("uri == null");
@@ -130,6 +150,7 @@ public class PersistentHttpCookieStore implements CookieStore {
                 }
             }
         }
+
         return Collections.unmodifiableList(result);
     }
 
@@ -159,14 +180,21 @@ public class PersistentHttpCookieStore implements CookieStore {
             throw new NullPointerException("cookie == null");
         }
 
-        uri = cookiesUri(uri, cookie);
+        uri = cookiesUri(uri);
         List<HttpCookie> cookies = map.get(uri);
         if (cookies != null) {
-            SharedPreferences.Editor prefsWriter = cookiePrefs.edit();
-            prefsWriter.remove(COOKIE_NAME_PREFIX + uri);
-            prefsWriter.commit();
-
-            return cookies.remove(cookie);
+        	boolean result = cookies.remove(cookie);
+			if (result) {
+	            SharedPreferences.Editor prefsWriter = cookiePrefs.edit();
+	            if ( cookies.isEmpty()) {
+	            	prefsWriter.remove(COOKIE_NAME_PREFIX + uri);
+	            } else {
+	                prefsWriter.putString(COOKIE_NAME_PREFIX + uri,
+	                        encodeCookies(cookies));
+	            }
+	            prefsWriter.commit();
+        	};
+            return result;
         } else {
             return false;
         }
@@ -195,15 +223,16 @@ public class PersistentHttpCookieStore implements CookieStore {
      * @return cookie encoded as String
      */
     protected String encodeCookie(SerializableHttpCookie cookie) {
-        if (cookie == null)
-            return null;
+        if (cookie == null) {
+        	return null;
+        }
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
             ObjectOutputStream outputStream = new ObjectOutputStream(os);
             outputStream.writeObject(cookie);
         } catch (IOException e) {
-            Log.d(LOG_TAG, "IOException in encodeCookie", e);
+            SponsorPayLogger.d(LOG_TAG, "IOException in encodeCookie - " + e.getLocalizedMessage());
             return null;
         }
 
@@ -229,9 +258,9 @@ public class PersistentHttpCookieStore implements CookieStore {
             cookie = ((SerializableHttpCookie) objectInputStream.readObject())
                     .getCookie();
         } catch (IOException e) {
-            Log.d(LOG_TAG, "IOException in decodeCookie", e);
+        	SponsorPayLogger.d(LOG_TAG, "IOException in decodeCookie - " + e.getLocalizedMessage());
         } catch (ClassNotFoundException e) {
-            Log.d(LOG_TAG, "ClassNotFoundException in decodeCookie", e);
+        	SponsorPayLogger.d(LOG_TAG, "ClassNotFoundException in decodeCookie - " + e.getLocalizedMessage());
         }
 
         return cookie;
@@ -275,14 +304,13 @@ public class PersistentHttpCookieStore implements CookieStore {
         return data;
     }
 
-    // tweaking to store more than one cookie per URI
-    private URI cookiesUri(URI uri, HttpCookie cookie) {
+    private URI cookiesUri(URI uri) {
         if (uri == null) {
             return null;
         }
 
         try {
-            return new URI(uri.getScheme(), uri.getHost(), null, cookie.getName());
+            return new URI(uri.getScheme(), uri.getHost(), null, null);
         } catch (URISyntaxException e) {
             return uri; // probably a URI with no host
         }

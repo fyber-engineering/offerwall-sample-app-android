@@ -1,6 +1,11 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.utils;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +21,8 @@ import java.util.Map;
 
 public class SPHttpConnection {
 	
+	private static final String TAG = "SPHttpConnection";
+
 	public static SPHttpConnection getConnection(String url) throws MalformedURLException {
 		return new SPHttpConnection(url);
 	}
@@ -28,13 +35,17 @@ public class SPHttpConnection {
 	private URL mUrl;
 	private Map<String, List<String>> mHeaders;
 	private int mResponseCode;
-	private List<Header> mHeadersToAdd = new LinkedList<Header>();
+	private List<Header> mHeadersToAdd;
+	private boolean mOpen = false;
 	
 	private SPHttpConnection(String url) throws MalformedURLException {
 		mUrl = new URL(url);
 	}
 	
-	public SPHttpConnection addHeader(String header, String headerValue){
+	public SPHttpConnection addHeader(String header, String headerValue) {
+		if (mHeadersToAdd == null) {
+			 mHeadersToAdd = new LinkedList<Header>();
+		}
 		mHeadersToAdd.add(new Header(header, headerValue));
 		return this;
 	}
@@ -43,21 +54,29 @@ public class SPHttpConnection {
 		HttpURLConnection urlConnection = null;
 		try {
 			urlConnection = (HttpURLConnection) mUrl.openConnection();
-			for (Header header : mHeadersToAdd) {
-				urlConnection.addRequestProperty(header.key, header.value);
+			if (mHeadersToAdd != null) {
+				for (Header header : mHeadersToAdd) {
+					urlConnection.addRequestProperty(header.key, header.value);
+				}
 			}
 			
-			InputStream in = new BufferedInputStream(
-					urlConnection.getInputStream());
-			 mBody = readStream(in);
-			 mHeaders = Collections.unmodifiableMap(urlConnection.getHeaderFields());
-			 mResponseCode = urlConnection.getResponseCode();
+			mResponseCode = urlConnection.getResponseCode();
+			mHeaders = Collections.unmodifiableMap(urlConnection
+					.getHeaderFields());
+			InputStream is = null;
+			try {
+				is = urlConnection.getInputStream();
+			} catch (IOException exception) {
+				is = urlConnection.getErrorStream();
+			}
+			mBody = readStream(is);
 		} catch (Exception e) {
-			e.printStackTrace();
+			SponsorPayLogger.e(TAG, e.getLocalizedMessage(), e);
 		} finally {
 			if (urlConnection != null) {
 				urlConnection.disconnect();
 			}
+			mOpen = true; 
 		}
 		return this;
 	}
@@ -82,23 +101,35 @@ public class SPHttpConnection {
 		return content;
 	}
 
-	// TODO check if this has been open first
-	public String getBodyContent() {
+	public String getBodyContent() throws IOException {
+		if (!mOpen) {
+			throw new IOException("The connection has not been opened yet.");
+		}
 		return mBody;
 	}
 	
-	public Map<String, List<String>> getHeaders() {
+	public Map<String, List<String>> getHeaders() throws IOException {
+		if (!mOpen) {
+			throw new IOException("The connection has not been opened yet.");
+		}
 		return mHeaders;
 	}
 	
-	public List<String> getHeader(String header) {
+	public List<String> getHeader(String header) throws IOException {
+		if (!mOpen) {
+			throw new IOException("The connection has not been opened yet.");
+		}
 		return mHeaders.get(header);
 	}
 	
-	public int getResponseCode() {
+	public int getResponseCode() throws IOException {
+		if (!mOpen) {
+			throw new IOException("The connection has not been opened yet.");
+		}
 		return mResponseCode;
 	}
 	
+	// helper class
 	private class Header {
 		
 		String key;

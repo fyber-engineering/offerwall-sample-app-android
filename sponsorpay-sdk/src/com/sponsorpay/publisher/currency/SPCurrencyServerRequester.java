@@ -181,21 +181,11 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 			SignedServerResponse signedServerResponse) {
 		SPCurrencyServerReponse response = null; 
 		
-//		try {
+		if (signedServerResponse != null) {
+			response = parseResponse(signedServerResponse.getStatusCode(),
+					signedServerResponse.getResponseBody(), signedServerResponse.getResponseSignature());
+		}
 
-			if (signedServerResponse != null) {
-				response = parseResponse(signedServerResponse.getStatusCode(),
-						signedServerResponse.getResponseBody(), signedServerResponse.getResponseSignature());
-			}
-
-//		} catch (Throwable t) {
-//			SponsorPayLogger.e(TAG, "Exception triggered when executing request: " + t);
-//
-//			response = new SPCurrencyServerErrorResponse(
-//					SPCurrencyServerRequestErrorType.ERROR_NO_INTERNET_CONNECTION,
-//					null, t.getMessage());
-//			
-//		}
 		if (response == null) {
 			response = new SPCurrencyServerErrorResponse(
 					SPCurrencyServerRequestErrorType.ERROR_OTHER,

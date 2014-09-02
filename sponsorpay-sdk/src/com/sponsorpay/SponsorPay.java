@@ -6,18 +6,24 @@
 
 package com.sponsorpay;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.net.CookieStore;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import android.app.Activity;
 import android.content.Context;
+import android.webkit.CookieSyncManager;
 
 import com.sponsorpay.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.mediation.SPMediationConfigurationRequester;
 import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.StringUtils;
+import com.sponsorpay.utils.cookies.PersistentHttpCookieStore;
 
 
 /**
@@ -134,6 +140,10 @@ public class SponsorPay {
 		String credentialsToken = INSTANCE.getCredentialsToken(appId, userId, securityToken,
 						context);
 		if (firstStart) {
+			CookieSyncManager.createInstance(activity);
+			CookieStore store = new PersistentHttpCookieStore(activity);
+			CookieManager cookieManager = new CookieManager(store,CookiePolicy.ACCEPT_ORIGINAL_SERVER);
+			CookieHandler.setDefault(cookieManager);
 			SPMediationConfigurationRequester.requestConfig(INSTANCE.currentCredentials, activity);
 		}
 		if (!credentials.contains(credentialsToken)) {

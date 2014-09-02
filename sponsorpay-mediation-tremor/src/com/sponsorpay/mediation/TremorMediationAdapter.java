@@ -85,8 +85,7 @@ public class TremorMediationAdapter extends SPMediationAdapter {
 	}
 
 	private JSONArray getConfigListOfAppIds(){
-		JSONArray metadata = SPMediationConfigurator.getConfiguration(getName(), APP_IDS, JSONArray.class);
-		return metadata;
+		return SPMediationConfigurator.getConfiguration(getName(), APP_IDS, JSONArray.class);
 	}
 	
 }

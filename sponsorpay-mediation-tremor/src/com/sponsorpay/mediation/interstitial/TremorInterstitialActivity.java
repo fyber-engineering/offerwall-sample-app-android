@@ -14,19 +14,16 @@ public class TremorInterstitialActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		SponsorPayLogger.w(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 	}
 	
 	@Override
 	protected void onResume() {
-		SponsorPayLogger.w(TAG, "onResume");
 		super.onResume();
 		showInterstitial();
 	}
 	
 	private void showInterstitial(){
-		SponsorPayLogger.w(TAG, "showInterstitial");
 		if (TremorVideo.isAdReady()) {
 			try {
 				TremorVideo.showAd(this, 1);
@@ -39,17 +36,13 @@ public class TremorInterstitialActivity extends Activity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		SponsorPayLogger.w(TAG, "onActivityResult");
 		super.onActivityResult(requestCode, resultCode, data);
-		SponsorPayLogger.w(TAG, "onActivityResult super passed");
 		TremorInterstitialAdapterHelper.getTremorInterstitialMediationAdapter().processActivityResult(requestCode);
 		finish();
-		SponsorPayLogger.w(TAG, "activity finish() passed");
 	}
 	
 	@Override
 	protected void onDestroy() {
-		SponsorPayLogger.w(TAG, "onDestroy");
 		super.onDestroy();
 	}
 }

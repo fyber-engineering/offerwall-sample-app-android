@@ -28,7 +28,7 @@ import android.util.Log;
  * from http://codereview.stackexchange.com/questions/61494/persistent-cookie-support-using-volley-and-httpurlconnection
  * based on https://github.com/loopj/android-async-http
  */
-public final class PersistentHttpCookieStore implements CookieStore {
+public class PersistentHttpCookieStore implements CookieStore {
     private static final String LOG_TAG = "PersistentHttpCookieStore";
     private static final String COOKIE_PREFS = "CookiePrefsFile";
     private static final String COOKIE_NAME_STORE = "names";
@@ -74,7 +74,7 @@ public final class PersistentHttpCookieStore implements CookieStore {
             throw new NullPointerException("cookie == null");
         }
 
-        uri = cookiesUri(uri);
+        uri = cookiesUri(uri, cookie);
         List<HttpCookie> cookies = map.get(uri);
         if (cookies == null) {
             cookies = new ArrayList<HttpCookie>();
@@ -159,7 +159,7 @@ public final class PersistentHttpCookieStore implements CookieStore {
             throw new NullPointerException("cookie == null");
         }
 
-        uri = cookiesUri(uri);
+        uri = cookiesUri(uri, cookie);
         List<HttpCookie> cookies = map.get(uri);
         if (cookies != null) {
             SharedPreferences.Editor prefsWriter = cookiePrefs.edit();
@@ -275,13 +275,14 @@ public final class PersistentHttpCookieStore implements CookieStore {
         return data;
     }
 
-    private URI cookiesUri(URI uri) {
+    // tweaking to store more than one cookie per URI
+    private URI cookiesUri(URI uri, HttpCookie cookie) {
         if (uri == null) {
             return null;
         }
 
         try {
-            return new URI("http", uri.getHost(), null, null);
+            return new URI(uri.getScheme(), uri.getHost(), null, cookie.getName());
         } catch (URISyntaxException e) {
             return uri; // probably a URI with no host
         }

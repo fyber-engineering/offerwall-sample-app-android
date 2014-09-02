@@ -60,9 +60,6 @@ public class SPHttpConnection {
 				}
 			}
 			
-			mResponseCode = urlConnection.getResponseCode();
-			mHeaders = Collections.unmodifiableMap(urlConnection
-					.getHeaderFields());
 			InputStream is = null;
 			try {
 				is = urlConnection.getInputStream();
@@ -70,6 +67,9 @@ public class SPHttpConnection {
 				is = urlConnection.getErrorStream();
 			}
 			mBody = readStream(is);
+			mResponseCode = urlConnection.getResponseCode();
+			mHeaders = Collections.unmodifiableMap(urlConnection
+					.getHeaderFields());
 		} catch (Exception e) {
 			SponsorPayLogger.e(TAG, e.getLocalizedMessage(), e);
 		} finally {

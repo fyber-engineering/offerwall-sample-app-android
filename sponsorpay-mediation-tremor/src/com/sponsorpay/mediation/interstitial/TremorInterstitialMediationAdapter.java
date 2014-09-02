@@ -7,7 +7,6 @@ import android.content.Intent;
 import com.sponsorpay.mediation.TremorMediationAdapter;
 import com.sponsorpay.mediation.helper.TremorInterstitialAdapterHelper;
 import com.sponsorpay.publisher.interstitial.mediation.SPInterstitialMediationAdapter;
-import com.sponsorpay.utils.SponsorPayLogger;
 import com.tremorvideo.sdk.android.adapter.TremorAdapterCallbackListener;
 import com.tremorvideo.sdk.android.videoad.TremorVideo;
 

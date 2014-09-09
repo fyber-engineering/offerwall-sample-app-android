@@ -13,6 +13,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
@@ -31,6 +32,7 @@ import com.sponsorpay.utils.StringUtils;
  */
 public class SponsorPayPublisher {
 	public static final String PREFERENCES_FILENAME = "SponsorPayPublisherState";
+	public static final String CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR = "Only devices running Android API level 10 and above are supported";
 
 	/**
 	 * Enumeration identifying the different messages which can be displayed in the user interface.
@@ -170,7 +172,7 @@ public class SponsorPayPublisher {
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context,	Boolean shouldStayOpen) {
 		String credentialsToken =  SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, null, null);
+		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, null, null);	
 	}
 
 	/**
@@ -200,8 +202,9 @@ public class SponsorPayPublisher {
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, Boolean shouldStayOpen,
 			String currencyName, HashMap<String, String> customParams) {
-		String credentialsToken =  SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, currencyName, customParams);
+		
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, currencyName, customParams);	
 	}
 	
 	/**
@@ -234,18 +237,21 @@ public class SponsorPayPublisher {
 	 */
 	public static Intent getIntentForOfferWallActivity(String credentialsToken, Context context,
 			Boolean shouldStayOpen, String currencyName, HashMap<String, String> customParams) {
+		
+		if (isAndroidVersionFromGingerbreadAndAbove()) {
+		
+			SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 
-		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
+			Intent intent = new Intent(context, SPOfferWallActivity.class);
+			intent.putExtra(SPOfferWallActivity.EXTRA_CREDENTIALS_TOKEN_KEY, credentials.getCredentialsToken());
+			intent.putExtra(SPOfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
+			intent.putExtra(SPOfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
+			intent.putExtra(SPOfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, customParams);
 
-		Intent intent = new Intent(context, SPOfferWallActivity.class);
-
-		intent.putExtra(SPOfferWallActivity.EXTRA_CREDENTIALS_TOKEN_KEY, credentials.getCredentialsToken());
-		intent.putExtra(SPOfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
-		intent.putExtra(SPOfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
-		intent.putExtra(SPOfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY,
-				customParams);
-
-		return intent;
+			return intent;		
+		}
+		
+		return null;
 	}
 
 
@@ -265,8 +271,8 @@ public class SponsorPayPublisher {
 	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
 	 *            request.
 	 */
-	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
-		requestNewCoins(context, listener, null);
+	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {			
+		requestNewCoins(context, listener, null);		
 	}
 	
 	/**
@@ -286,6 +292,7 @@ public class SponsorPayPublisher {
 	 */
 	public static void requestNewCoins(Context context, SPCurrencyServerListener listener,
 			String customCurrency) {
+		
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
 		requestNewCoins(credentialsToken, context, listener, null, null, customCurrency);
 	}
@@ -317,10 +324,12 @@ public class SponsorPayPublisher {
 			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams, 
 			String customCurrency) {
 		
-		SPVirtualCurrencyConnector vcc = new SPVirtualCurrencyConnector(context, credentialsToken, listener);
-		vcc.setCustomParameters(customParams);
-		vcc.setCurrency(customCurrency);
-		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
+		if (isAndroidVersionFromGingerbreadAndAbove()) {
+			SPVirtualCurrencyConnector vcc = new SPVirtualCurrencyConnector(context, credentialsToken, listener);
+			vcc.setCustomParameters(customParams);
+			vcc.setCurrency(customCurrency);
+			vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
+		}
 	}
 	
 	/**
@@ -353,6 +362,7 @@ public class SponsorPayPublisher {
 	 */
 	public static boolean getIntentForMBEActivity(Activity activity, 
 			SPBrandEngageRequestListener listener) {
+			
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
 		return getIntentForMBEActivity(credentialsToken, activity, listener);
 	}
@@ -422,22 +432,20 @@ public class SponsorPayPublisher {
 	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity, 
 			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters, 
 			SPCurrencyServerListener vcsListener) {
+		
 		SPBrandEngageClient brandEngageClient = SPBrandEngageClient.INSTANCE;
 		boolean canRequestOffers = brandEngageClient.canRequestOffers();
 		if (canRequestOffers) {
-			SPCredentials credentials = SponsorPay
-					.getCredentials(credentialsToken);
-
+			SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 			brandEngageClient.setCurrencyName(currencyName);
-			brandEngageClient
-					.setCustomParameters(parameters);
+			brandEngageClient.setCustomParameters(parameters);
 			brandEngageClient.setCurrencyListener(vcsListener);
-			
-			SPBrandEngageRequest request = new SPBrandEngageRequest(
-					credentials, activity, brandEngageClient, listener);
+
+			SPBrandEngageRequest request = new SPBrandEngageRequest(credentials, activity, brandEngageClient, listener);
 			request.askForOffers();
 		}
-		return canRequestOffers;
+		
+		return canRequestOffers;	
 	}
 	
 	
@@ -459,8 +467,9 @@ public class SponsorPayPublisher {
 	 */
 	public static boolean getIntentForInterstitialActivity(Activity activity, 
 			SPInterstitialRequestListener listener) {
+		
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForInterstitialActivity(credentialsToken, activity, listener);
+		return getIntentForInterstitialActivity(credentialsToken, activity, listener);	
 	}
 	
 	
@@ -500,19 +509,24 @@ public class SponsorPayPublisher {
 	 * @return A boolean that indicates if the actual request has been made to the server.
 	 */
 	public static boolean getIntentForInterstitialActivity(String credentialsToken, Activity activity, 
-			SPInterstitialRequestListener listener, Map<String, String> parameters) {
+			SPInterstitialRequestListener listener, Map<String, String> parameters) {	
+		
 		SPInterstitialClient interstitialClient = SPInterstitialClient.INSTANCE;
 		boolean canRequestAds = interstitialClient.canRequestAds();
 		if (canRequestAds) {
-			SPCredentials credentials = SponsorPay
-					.getCredentials(credentialsToken);
+			SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 			interstitialClient.setRequestListener(listener);
 			interstitialClient.setCustomParameters(parameters);
-
 			interstitialClient.requestAds(credentials, activity);
-
 		}
 		return canRequestAds;
+	}
+	
+	public static boolean isAndroidVersionFromGingerbreadAndAbove(){
+		if (Build.VERSION.SDK_INT >= 10) {
+			return true;
+		}
+		return false;
 	}
 	
 }

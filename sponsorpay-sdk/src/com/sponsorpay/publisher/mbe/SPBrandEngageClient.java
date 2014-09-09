@@ -250,7 +250,7 @@ public class SPBrandEngageClient {
 	 */
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
 		if (canRequestOffers()) {
-			if (Build.VERSION.SDK_INT < 9) {
+			if (!SponsorPayPublisher.isAndroidVersionFromGingerbreadAndAbove()) {
 				//always return no offers
 				processQueryOffersResponse(0);
 			} else {

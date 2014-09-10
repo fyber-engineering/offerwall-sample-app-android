@@ -16,11 +16,9 @@ import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.vungle.publisher.EventListener;
 import com.vungle.publisher.VunglePub;
 
+public class VungleVideoMediationAdapter extends SPBrandEngageMediationAdapter<VungleMediationAdapter>
+		implements EventListener {
 
-public class VungleVideoMediationAdapter extends
-		SPBrandEngageMediationAdapter<VungleMediationAdapter> implements
-		EventListener {
-	
 	public VungleVideoMediationAdapter(VungleMediationAdapter adapter) {
 		super(adapter);
 	}
@@ -41,12 +39,11 @@ public class VungleVideoMediationAdapter extends
 			clearVideoEvent();
 		}
 	}
-	
-	// Vungle EventListener interface 
+
+	// Vungle EventListener interface
 	@Override
-	public void onAdEnd() {
-		// this is fired before onVungleView method
-//		notifyCloseEngagement();
+	public void onAdEnd(boolean wasCallToActionClicked) {
+		// method not used
 	}
 
 	@Override
@@ -56,25 +53,26 @@ public class VungleVideoMediationAdapter extends
 
 	@Override
 	public void onCachedAdAvailable() {
-//		SponsorPayLogger.d(getName(), "onCachedAdAvailable");
+		// method not used
 	}
 
 	@Override
 	public void onAdUnavailable(String arg0) {
-//		SponsorPayLogger.d(getName(), "onAdUnavailable");
+		// method not used
 	}
-	
+
 	@Override
 	public void onVideoView(boolean isCompletedView, int watchedMillis, int videoDurationMillis) {
-        if (isCompletedView) {
-        	// we notify only about the finished event due to the lack of event separation
-        	// the mediation offer will do the conversion and the close
-        	sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
-        } else {
-        	sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventAborted);
-        }
-        // we have to clear the video event manually
-        clearVideoEvent();
+		if (isCompletedView) {
+			// we notify only about the finished event due to the lack of event
+			// separation
+			// the mediation offer will do the conversion and the close
+			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventFinished);
+		} else {
+			sendVideoEvent(SPTPNVideoEvent.SPTPNVideoEventAborted);
+		}
+		// we have to clear the video event manually
+		clearVideoEvent();
 	}
-	
+
 }

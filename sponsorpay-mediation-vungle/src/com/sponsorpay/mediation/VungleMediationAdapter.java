@@ -24,7 +24,8 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 			
 	private static final String TAG = "VungleAdapter";
 
-	private static final String ADAPTER_VERSION = "2.1.0";
+	// Supported Vungle SDK version: 3.2.1
+	private static final String ADAPTER_VERSION = "2.1.1";
 
 	private static final String ADAPTER_NAME = "Vungle";
 	
@@ -93,7 +94,7 @@ public class VungleMediationAdapter extends SPMediationAdapter implements EventL
 	
 	// Vungle EventListener interface 
 	@Override
-	public void onAdEnd() {
+	public void onAdEnd(boolean wasCallToActionClicked) {
 		notifyListeners((Object[])null);
 	}
 

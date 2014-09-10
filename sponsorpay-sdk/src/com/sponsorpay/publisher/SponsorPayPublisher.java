@@ -32,7 +32,7 @@ import com.sponsorpay.utils.StringUtils;
  */
 public class SponsorPayPublisher {
 	public static final String PREFERENCES_FILENAME = "SponsorPayPublisherState";
-	public static final String CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR = "Only devices running Android API level 10 and above are supported";
+	
 
 	/**
 	 * Enumeration identifying the different messages which can be displayed in the user interface.
@@ -172,7 +172,7 @@ public class SponsorPayPublisher {
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context,	Boolean shouldStayOpen) {
 		String credentialsToken =  SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, null, null);	
+		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, null, null);
 	}
 
 	/**
@@ -204,7 +204,7 @@ public class SponsorPayPublisher {
 			String currencyName, HashMap<String, String> customParams) {
 		
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, currencyName, customParams);	
+		return getIntentForOfferWallActivity(credentialsToken, context, shouldStayOpen, currencyName, customParams);
 	}
 	
 	/**
@@ -271,8 +271,8 @@ public class SponsorPayPublisher {
 	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
 	 *            request.
 	 */
-	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {			
-		requestNewCoins(context, listener, null);		
+	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
+		requestNewCoins(context, listener, null);
 	}
 	
 	/**
@@ -323,13 +323,11 @@ public class SponsorPayPublisher {
 	public static void requestNewCoins(String credentialsToken, Context context, 
 			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams, 
 			String customCurrency) {
-		
-		if (isAndroidVersionFromGingerbreadAndAbove()) {
-			SPVirtualCurrencyConnector vcc = new SPVirtualCurrencyConnector(context, credentialsToken, listener);
-			vcc.setCustomParameters(customParams);
-			vcc.setCurrency(customCurrency);
-			vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
-		}
+
+		SPVirtualCurrencyConnector vcc = new SPVirtualCurrencyConnector(context, credentialsToken, listener);
+		vcc.setCustomParameters(customParams);
+		vcc.setCurrency(customCurrency);
+		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
 	}
 	
 	/**
@@ -469,7 +467,7 @@ public class SponsorPayPublisher {
 			SPInterstitialRequestListener listener) {
 		
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForInterstitialActivity(credentialsToken, activity, listener);	
+		return getIntentForInterstitialActivity(credentialsToken, activity, listener);
 	}
 	
 	
@@ -523,10 +521,7 @@ public class SponsorPayPublisher {
 	}
 	
 	public static boolean isAndroidVersionFromGingerbreadAndAbove(){
-		if (Build.VERSION.SDK_INT >= 10) {
-			return true;
-		}
-		return false;
+		return Build.VERSION.SDK_INT >= 10;
 	}
 	
 }

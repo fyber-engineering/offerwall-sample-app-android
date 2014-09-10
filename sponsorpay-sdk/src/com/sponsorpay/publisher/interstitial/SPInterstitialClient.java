@@ -83,7 +83,7 @@ public class SPInterstitialClient {
 		
 		if (!SponsorPayPublisher.isAndroidVersionFromGingerbreadAndAbove()) {
 			return false;
-		}else if (canRequestAds()) {
+		} else if (canRequestAds()) {
 			startQueryingForAds(credentials, activity);
 			return true;
 		} else {

@@ -23,7 +23,6 @@ import com.sponsorpay.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.mediation.SPMediationConfigurationRequester;
 import com.sponsorpay.publisher.SponsorPayPublisher;
-import com.sponsorpay.publisher.currency.SPVirtualCurrencyConnector;
 import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.cookies.PersistentHttpCookieStore;
@@ -137,7 +136,7 @@ public class SponsorPay {
 			String securityToken, Activity activity) {
 		
 		if (SponsorPayPublisher.isAndroidVersionFromGingerbreadAndAbove()) {
-			Log.i(TAG, SPVirtualCurrencyConnector.CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR);
+			Log.i(TAG, "Only devices running Android API level 10 and above are supported");
 		}
 		Set<String> credentials = new HashSet<String>(SponsorPay.getAllCredentials());
 		Context context = activity.getApplicationContext();

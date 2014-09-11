@@ -168,7 +168,9 @@ public class SponsorPayPublisher {
 	 *            redirected out of the app. False to close the Offer Wall.
 	 * 
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
-	 *         startActivityForResult() to launch the {@link SPOfferWallActivity}.
+	 *         startActivityForResult() to launch the {@link SPOfferWallActivity}.Or null
+	 *         if the device is not supported(Running Android OS version prior to Android 2.3
+	 *         (Gingerbread).
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context,	Boolean shouldStayOpen) {
 		String credentialsToken =  SponsorPay.getCurrentCredentials().getCredentialsToken();
@@ -198,7 +200,9 @@ public class SponsorPayPublisher {
 	 *            A map of extra key/value pairs to add to the request URL.
 	 * 
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
-	 *         startActivityForResult() to launch the {@link SPOfferWallActivity}.
+	 *         startActivityForResult() to launch the {@link SPOfferWallActivity}. Or null
+	 *         if the device is not supported(Running Android OS version prior to Android 2.3
+	 *         (Gingerbread).
 	 */
 	public static Intent getIntentForOfferWallActivity(Context context, Boolean shouldStayOpen,
 			String currencyName, HashMap<String, String> customParams) {
@@ -233,7 +237,9 @@ public class SponsorPayPublisher {
 	 *            A map of extra key/value pairs to add to the request URL.
 	 * 
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
-	 *         startActivityForResult() to launch the {@link SPOfferWallActivity}.
+	 *         startActivityForResult() to launch the {@link SPOfferWallActivity}. Or null
+	 *         if the device is not supported(Running Android OS version prior to Android 2.3
+	 *         (Gingerbread).
 	 */
 	public static Intent getIntentForOfferWallActivity(String credentialsToken, Context context,
 			Boolean shouldStayOpen, String currencyName, HashMap<String, String> customParams) {

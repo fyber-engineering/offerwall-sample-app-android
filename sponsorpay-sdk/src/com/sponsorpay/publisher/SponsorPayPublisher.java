@@ -13,7 +13,6 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
@@ -25,6 +24,7 @@ import com.sponsorpay.publisher.mbe.SPBrandEngageClient;
 import com.sponsorpay.publisher.mbe.SPBrandEngageRequest;
 import com.sponsorpay.publisher.mbe.SPBrandEngageRequestListener;
 import com.sponsorpay.publisher.ofw.SPOfferWallActivity;
+import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.StringUtils;
 
 /**
@@ -238,7 +238,7 @@ public class SponsorPayPublisher {
 	public static Intent getIntentForOfferWallActivity(String credentialsToken, Context context,
 			Boolean shouldStayOpen, String currencyName, HashMap<String, String> customParams) {
 		
-		if (isAndroidVersionFromGingerbreadAndAbove()) {
+		if (HostInfo.isSupportedDevice()) {
 		
 			SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 
@@ -518,10 +518,6 @@ public class SponsorPayPublisher {
 			interstitialClient.requestAds(credentials, activity);
 		}
 		return canRequestAds;
-	}
-	
-	public static boolean isAndroidVersionFromGingerbreadAndAbove(){
-		return Build.VERSION.SDK_INT >= 10;
 	}
 	
 }

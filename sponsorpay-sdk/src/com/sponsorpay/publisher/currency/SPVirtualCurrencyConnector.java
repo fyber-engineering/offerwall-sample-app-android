@@ -21,6 +21,7 @@ import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPCurrencyServerReponse;
 import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPVCSResultListener;
+import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
@@ -139,7 +140,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 *            The transaction ID used as excluded lower limit to calculate the delta of coins.
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId) {
-		if (!SponsorPayPublisher.isAndroidVersionFromGingerbreadAndAbove()) {
+		if (!HostInfo.isSupportedDevice()) {
 			SPCurrencyServerErrorResponse errorResponse = new SPCurrencyServerErrorResponse(
 					SPCurrencyServerRequestErrorType.ERROR_OTHER, "",
 					CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR);

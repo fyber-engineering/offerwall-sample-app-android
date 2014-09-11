@@ -135,7 +135,7 @@ public class SponsorPay {
 	public static String start(String appId, String userId,
 			String securityToken, Activity activity) {
 		
-		if (SponsorPayPublisher.isAndroidVersionFromGingerbreadAndAbove()) {
+		if (HostInfo.isSupportedDevice()) {
 			Log.i(TAG, "Only devices running Android API level 10 and above are supported");
 		}
 		Set<String> credentials = new HashSet<String>(SponsorPay.getAllCredentials());

@@ -15,7 +15,7 @@ import android.content.Intent;
 import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.mediation.SPMediationCoordinator;
-import com.sponsorpay.publisher.SponsorPayPublisher;
+import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SponsorPayLogger;
 
 /**
@@ -81,7 +81,7 @@ public class SPInterstitialClient {
 	 */
 	public boolean requestAds(SPCredentials credentials, Activity activity) {
 		
-		if (!SponsorPayPublisher.isAndroidVersionFromGingerbreadAndAbove()) {
+		if (!HostInfo.isSupportedDevice()) {
 			return false;
 		} else if (canRequestAds()) {
 			startQueryingForAds(credentials, activity);

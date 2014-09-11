@@ -50,6 +50,7 @@ import com.sponsorpay.publisher.mbe.mediation.SPMediationValidationEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
+import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SPWebClient;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
@@ -250,7 +251,7 @@ public class SPBrandEngageClient {
 	 */
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
 		if (canRequestOffers()) {
-			if (!SponsorPayPublisher.isAndroidVersionFromGingerbreadAndAbove()) {
+			if (!HostInfo.isSupportedDevice()) {
 				//always return no offers
 				processQueryOffersResponse(0);
 			} else {

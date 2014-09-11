@@ -40,29 +40,26 @@ public class SPBrandEngageActivity extends Activity implements SPBrandEngageClie
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if (savedInstanceState != null) {
 			mPendingClose = savedInstanceState.getBoolean(PENDING_CLOSE_KEY_BUNDLE);
 			mEngagementAlreadyClosed = savedInstanceState.getBoolean(ENGAGMENT_ALREADY_CLOSE_KEY_BUNDLE);
 			mPlayThroughMediation = savedInstanceState.getBoolean(PLAY_THROUGH_MEDIATION_KEY_BUNDLE);
 		} else {
-			// Screen orientation locked to landscape on Gingerbread
 			mPlayThroughMediation = SPBrandEngageClient.INSTANCE.playThroughMediation();
 		}
-		
+
 		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-		
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-	            WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
+
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-		if ( !mPlayThroughMediation &&
-				(Build.VERSION.SDK_INT == 9 || Build.VERSION.SDK_INT == 10)) {
-			setRequestedOrientation(
-					   ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		// Screen orientation locked to landscape on Gingerbread
+		if (!mPlayThroughMediation && (Build.VERSION.SDK_INT == 9 || Build.VERSION.SDK_INT == 10)) {
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
-		
+
 		SPBrandEngageClient.INSTANCE.setStatusListener(this);
 		SPBrandEngageClient.INSTANCE.startEngagement(SPBrandEngageActivity.this, mPlayThroughMediation);
 	}

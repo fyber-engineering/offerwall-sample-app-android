@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.io.StreamCorruptedException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -106,36 +107,50 @@ public class SignatureTools {
 		return hexValue;
 	}
 	
-	public static String serialize(Object obj) {
-	    ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
-	    ObjectOutputStream objectOS;
+	public static String serialize(Serializable obj) {
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos;
 		try {
-			objectOS = new ObjectOutputStream(byteArrayOS);
-			objectOS.writeObject(obj);
-		    objectOS.flush();
-		   
-		    String encodedListToString = new String(byteArrayOS.toByteArray(), "UTF-8");
-		    
-		    objectOS.close();
-		    byteArrayOS.close();
-		   
-		    return encodedListToString;
+			oos = new ObjectOutputStream(baos);
+			oos.writeObject(obj);
+			oos.close();
+			return new String(Base64.encode(baos.toByteArray()));
 		} catch (IOException e) {
 			SponsorPayLogger.e(TAG, "IOException when serialized the Successful VCS response: " + e.getMessage());
 		}
 		return null;
+        
+        
+//	    ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+//	    ObjectOutputStream objectOS;
+//		try {
+//			objectOS = new ObjectOutputStream(byteArrayOS);
+//			objectOS.writeObject(obj);
+//		    objectOS.flush();
+//		   
+//		    String encodedListToString = byteArrayOS.toString();
+//		    
+//		    objectOS.close();
+//		    byteArrayOS.close();
+//		   
+//		    return encodedListToString;
+//		} catch (IOException e) {
+//			SponsorPayLogger.e(TAG, "IOException when serialized the Successful VCS response: " + e.getMessage());
+//		}
+//		return null;
 	}
 	
 	public static Object deserialize(String savedObject) {
-		byte[] savedObjectAsByteArray = savedObject.getBytes();
-	    ByteArrayInputStream byteArrayIS = new ByteArrayInputStream(savedObjectAsByteArray);
-	    ObjectInputStream objectIS;
+		
+		byte [] data = Base64.decode(savedObject);
+        ObjectInputStream ois;
 		try {
-			objectIS = new ObjectInputStream(byteArrayIS);
-			Object desirializedObject = objectIS.readObject();
-			objectIS.close();
-			
-			return desirializedObject;
+			ois = new ObjectInputStream(new ByteArrayInputStream(data));
+			Object o = ois.readObject();
+			ois.close();
+			return o;
+	        
 		} catch (StreamCorruptedException e) {
 			SponsorPayLogger.e(TAG, "StreamCorruptedException when deserialized the Successful VCS response from the: "
 					+ "SharedPreferences: " + e.getMessage());
@@ -146,6 +161,28 @@ public class SignatureTools {
 			SponsorPayLogger.e(TAG, "ClassNotFoundException when deserialized the Successful VCS response from the: " 
 					+ "SharedPreferences: " + e.getMessage());
 		}
-		return null;
+
+        return null;
+        
+//		byte[] savedObjectAsByteArray = savedObject.getBytes();
+//	    ByteArrayInputStream byteArrayIS = new ByteArrayInputStream(savedObjectAsByteArray);
+//	    ObjectInputStream objectIS;
+//		try {
+//			objectIS = new ObjectInputStream(byteArrayIS);
+//			Object desirializedObject = objectIS.readObject();
+//			objectIS.close();
+//			
+//			return desirializedObject;
+//		} catch (StreamCorruptedException e) {
+//			SponsorPayLogger.e(TAG, "StreamCorruptedException when deserialized the Successful VCS response from the: "
+//					+ "SharedPreferences: " + e.getMessage());
+//		} catch (IOException e) {
+//			SponsorPayLogger.e(TAG, "IOException when deserialized the Successful VCS response from the: "
+//					+ "SharedPreferences: " + e.getMessage());
+//		} catch (ClassNotFoundException e) {
+//			SponsorPayLogger.e(TAG, "ClassNotFoundException when deserialized the Successful VCS response from the: " 
+//					+ "SharedPreferences: " + e.getMessage());
+//		}
+//		return null;
 	}
 }

@@ -277,8 +277,8 @@ public class SponsorPayPublisher {
 	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
 	 *            request.
 	 */
-	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
-		requestNewCoins(context, listener, null);
+	public static void requestNewCoins(Context context, SPCurrencyServerListener listener, String vcsId) {
+		requestNewCoins(context, listener, vcsId, null);
 	}
 	
 	/**
@@ -296,11 +296,11 @@ public class SponsorPayPublisher {
 	 * 			  A string representing the custom currency to be used by the toast message to show
 	 * 			  the amount of coins earned.
 	 */
-	public static void requestNewCoins(Context context, SPCurrencyServerListener listener,
+	public static void requestNewCoins(Context context, SPCurrencyServerListener listener, String vcsId,
 			String customCurrency) {
 		
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		requestNewCoins(credentialsToken, context, listener, null, null ,null, customCurrency);
+		requestNewCoins(credentialsToken, context, listener, null, vcsId, null, customCurrency);
 	}
 	
 	/**

@@ -42,14 +42,6 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	private static final String URL_PARAM_VALUE_NO_TRANSACTION = "NO_TRANSACTION";
 
 	private static HashMap<String, CacheInfo> cacheInfo = new HashMap<String, SPVirtualCurrencyConnector.CacheInfo>();
-	
-	/**
-	 * Key for the String containing the latest known transaction ID, which is saved as state in the
-	 * Publisher SDK preferences file (whose name is defined in
-	 * {@link SponsorPayPublisher#PREFERENCES_FILENAME}).
-	 */
-	private static final String STATE_LATEST_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_";
-	private static final String STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR = "_";
 
 	
 	private static boolean showToastNotification = true;
@@ -163,10 +155,12 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 			}
 			return;
 		}
+
 		calendar.add(Calendar.SECOND, VCS_TIMER);
-		setTimerCalendar(calendar); 
-		if (StringUtils.notNullNorEmpty(transactionId)) {
-			transactionId = fetchLatestTransactionIdForCurrentAppAndUser().getLatestTransactionId();
+        setTimerCalendar(calendar); 
+		if (StringUtils.notNullNorEmpty(currencyId)) {
+			VCSStoredResponse storedResponse = fetchLatestTransactionIdForCurrentAppAndUser(currencyId);
+			transactionId = storedResponse.getLatestTransactionId();
 		}
 
 		mShouldShowNotification = showToastNotification;
@@ -181,12 +175,12 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * @param transactionId
 	 *            The transaction ID to save.
 	 */
-	private void saveLatestTransactionForCurrentUser(SPCurrencyServerSuccessfulResponse successfulResponse){	
+	private void saveLatestTransactionForCurrentUser(VCSStoredResponse successfulResponse){	
 		String serializedlistToString = SignatureTools.serialize(successfulResponse);
-		if(StringUtils.notNullNorEmpty(SignatureTools.serialize(successfulResponse))){
+		if(StringUtils.notNullNorEmpty(serializedlistToString)){
 			SharedPreferences prefs = mContext.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 			Editor editor = prefs.edit();
-			editor.putString(generatePreferencesLatestTransactionIdKey(mCredentials), serializedlistToString);
+			editor.putString(successfulResponse.getCurrencyId(), serializedlistToString);
 			editor.commit();
 		}
 	}
@@ -197,8 +191,8 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * 
 	 * @return The retrieved transaction ID or null.
 	 */
-	private VCSStoredResponse fetchLatestTransactionIdForCurrentAppAndUser() {
-		return fetchLatestTransactionId(mContext, mCredentials.getCredentialsToken());
+	private VCSStoredResponse fetchLatestTransactionIdForCurrentAppAndUser(String vcsId) {
+		return fetchLatestTransactionId(mContext, vcsId);
 	}
 
 	/**
@@ -213,11 +207,18 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * @return The retrieved transaction ID or null.
 	 */
 	public static VCSStoredResponse fetchLatestTransactionId(Context context, String vcsId) {
-		
+
 		SharedPreferences prefs = context.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-		String retval = prefs.getString(vcsId, URL_PARAM_VALUE_NO_TRANSACTION);
-		VCSStoredResponse savedResponse = (VCSStoredResponse)SignatureTools.deserialize(retval);
-		
+		String retval = prefs.getString(vcsId, "");
+
+		VCSStoredResponse savedResponse = null;
+		if (StringUtils.notNullNorEmpty(retval)) {
+			savedResponse = (VCSStoredResponse) SignatureTools.deserialize(retval);
+		}
+		if (savedResponse == null) {
+			savedResponse = new VCSStoredResponse(URL_PARAM_VALUE_NO_TRANSACTION, vcsId);
+		}
+
 		return savedResponse;
 	}
 
@@ -226,7 +227,8 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * if required
 	 */
 	private void onDeltaOfCoinsResponse(SPCurrencyServerSuccessfulResponse response) {
-		saveLatestTransactionForCurrentUser(response);
+		VCSStoredResponse vcsStoreResponse = new VCSStoredResponse(response.getLatestTransactionId(), response.getCurrencyId());
+		saveLatestTransactionForCurrentUser(vcsStoreResponse);
 		if (response.getDeltaOfCoins() > 0 && mShouldShowNotification) {
 			String text = String
 					.format(SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_COINS_NOTIFICATION),
@@ -245,10 +247,10 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 		showToastNotification = showNotification;
 	}
 	
-	private static String generatePreferencesLatestTransactionIdKey(SPCredentials credentials) {
-		return STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + credentials.getAppId()
-				+ STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + credentials.getUserId();
-	}
+//	private static String generatePreferencesLatestTransactionIdKey(SPCredentials credentials) {
+//		return STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + credentials.getAppId()
+//				+ STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + credentials.getUserId();
+//	}
 
 	@Override
 	public void onSPCurrencyServerResponseReceived(SPCurrencyServerReponse response) {

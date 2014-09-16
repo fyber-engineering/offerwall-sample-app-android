@@ -19,14 +19,14 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.Window;
 import android.webkit.WebChromeClient;
-import android.webkit.WebView;
 import android.webkit.WebSettings.PluginState;
+import android.webkit.WebView;
 
 import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
-import com.sponsorpay.utils.SPHttpClient;
+import com.sponsorpay.utils.SPHttpConnection;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
@@ -201,7 +201,7 @@ public class SPOfferWallActivity extends Activity {
 
 			SponsorPayLogger.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
 			
-			mWebView.loadUrl(offerwallUrl, SPHttpClient.createUserSegmentationMapForHeaders());
+			mWebView.loadUrl(offerwallUrl, SPHttpConnection.createUserSegmentationMapForHeaders());
 		} catch (RuntimeException ex) {
 			SponsorPayLogger.e(getClass().getSimpleName(),
 					"An exception occurred when launching the Offer Wall", ex);

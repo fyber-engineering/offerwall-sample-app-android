@@ -274,6 +274,9 @@ public class HostInfo {
 			case DisplayMetrics.DENSITY_LOW:
 				mScreenDensityCategory = SCREEN_DENSITY_CATEGORY_VALUE_LOW;
 				break;
+			case DisplayMetrics.DENSITY_XHIGH:
+				mScreenDensityCategory = SCREEN_DENSITY_CATEGORY_VALUE_EXTRA_HIGH;
+				break;
 			default:
 				mScreenDensityCategory = getScreenDensityCategoryFromModernAndroidDevice(densityCategoryDpi);
 			}
@@ -308,6 +311,10 @@ public class HostInfo {
 		}
 		
 		return null == densityCategory ? UNDEFINED_VALUE : densityCategory;
+	}
+	
+	public static boolean isSupportedDevice() {
+		return Build.VERSION.SDK_INT >= 10;
 	}
 	
 	public String getScreenWidth() {

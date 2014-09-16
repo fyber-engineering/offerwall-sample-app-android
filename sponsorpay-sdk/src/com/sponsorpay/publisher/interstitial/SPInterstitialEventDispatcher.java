@@ -6,14 +6,10 @@
 
 package com.sponsorpay.publisher.interstitial;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-
 import android.os.AsyncTask;
 
 import com.sponsorpay.credentials.SPCredentials;
-import com.sponsorpay.utils.SPHttpClient;
+import com.sponsorpay.utils.SPHttpConnection;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
@@ -66,7 +62,7 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 
 		if (ad != null) {
 			builder.addKeyValue("ad_id", ad.getAdId())
-			.addKeyValue("provider_type", ad.getProviderType());
+				.addKeyValue("provider_type", ad.getProviderType());
 		}
 		return builder;
 	}
@@ -87,19 +83,8 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 		
 		SponsorPayLogger.d(TAG, "Sending event to "+ url);
 
-		HttpGet httpRequest = SPHttpClient.createHttpGetWithUserSegmentationHeaders(url);
-		HttpClient httpClient = SPHttpClient.getHttpClient();
-
 		try {
-			HttpResponse httpResponse = httpClient.execute(httpRequest);
-
-			// We're not parsing the response, just making sure that a successful status code has
-			// been received.
-			int responseStatusCode = httpResponse.getStatusLine().getStatusCode();
-			
-			httpResponse.getEntity().consumeContent();
-			
-			returnValue = responseStatusCode == SUCCESSFUL_HTTP_STATUS_CODE;
+			returnValue = SPHttpConnection.getConnection(url).open().getResponseCode() == SUCCESSFUL_HTTP_STATUS_CODE;
 		} catch (Exception e) {
 			SponsorPayLogger.e(TAG,
 					"An exception occurred when trying to send advertiser callback: " + e);

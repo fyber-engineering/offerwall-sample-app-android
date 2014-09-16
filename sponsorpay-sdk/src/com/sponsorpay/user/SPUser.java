@@ -334,6 +334,10 @@ public final class SPUser extends HashMap<String, Object> {
 			return String.format("%tY/%tm/%td", value, value, value);
 		} else if (value instanceof String[]) {
 			return TextUtils.join(",", (String[])value);
+		} else if (value instanceof Location){
+			Location location = (Location) value;
+			return "latitude:"+ formatInDegrees(location.getLatitude())+ ",longitude:"+ formatInDegrees(location.getLongitude())
+					+ ",accuracy:"+location.getAccuracy();
 		}
 		return value.toString();
 	}
@@ -372,5 +376,5 @@ public final class SPUser extends HashMap<String, Object> {
 			remove(LONGT);
 		}
 	}
-
+	
 }

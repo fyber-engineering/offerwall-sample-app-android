@@ -10,10 +10,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,8 +17,7 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 
 import com.sponsorpay.credentials.SPCredentials;
-import com.sponsorpay.utils.HttpResponseParser;
-import com.sponsorpay.utils.SPHttpClient;
+import com.sponsorpay.utils.SPHttpConnection;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
@@ -62,13 +57,10 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 		Thread.currentThread().setName(TAG);
 		LinkedList<SPInterstitialAd> interstitialAds = new LinkedList<SPInterstitialAd>();
 		try {
-			HttpClient httpClient = SPHttpClient.getHttpClient();
 			String requestUrl = params[0].buildUrl();
 			SponsorPayLogger.d(TAG, "Querying URL: " + requestUrl);
-			HttpUriRequest request = SPHttpClient.createHttpGetWithUserSegmentationHeaders(requestUrl);
-			HttpResponse response = httpClient.execute(request);
-	
-			String bodyContent = HttpResponseParser.extractResponseString(response);
+
+			String bodyContent = SPHttpConnection.getConnection(requestUrl).open().getBodyContent();
 			
 			//parsing offers
 			if (StringUtils.notNullNorEmpty(bodyContent)) {
@@ -89,10 +81,8 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 					SponsorPayLogger.e(TAG, e.getMessage(), e);;
 				}
 			}
-		} catch (ClientProtocolException e) {
-			SponsorPayLogger.e(TAG, e.getMessage(), e);;
 		} catch (IOException e) {
-			SponsorPayLogger.e(TAG, e.getMessage(), e);;
+			SponsorPayLogger.e(TAG, e.getMessage(), e);
 		}
 		
 		return interstitialAds.toArray(new SPInterstitialAd[interstitialAds.size()]);

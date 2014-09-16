@@ -265,6 +265,9 @@ public class HostInfo {
 			case DisplayMetrics.DENSITY_LOW:
 				mScreenDensityCategory = SCREEN_DENSITY_CATEGORY_VALUE_LOW;
 				break;
+			case DisplayMetrics.DENSITY_XHIGH:
+				mScreenDensityCategory = SCREEN_DENSITY_CATEGORY_VALUE_EXTRA_HIGH;
+				break;
 			default:
 				mScreenDensityCategory = getScreenDensityCategoryFromModernAndroidDevice(densityCategoryDpi);
 			}

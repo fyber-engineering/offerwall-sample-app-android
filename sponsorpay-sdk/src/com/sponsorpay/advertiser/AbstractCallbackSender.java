@@ -9,14 +9,10 @@ package com.sponsorpay.advertiser;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-
 import android.os.AsyncTask;
 
 import com.sponsorpay.credentials.SPCredentials;
-import com.sponsorpay.utils.SPHttpClient;
+import com.sponsorpay.utils.SPHttpConnection;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.UrlBuilder;
@@ -140,24 +136,9 @@ public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boo
 
 		String callbackUrl = buildUrl();
 
-		HttpGet httpRequest = new HttpGet(callbackUrl);
-		HttpClient httpClient = SPHttpClient.getHttpClient();
-
 		try {
-			HttpResponse httpResponse = httpClient.execute(httpRequest);
-
-			// We're not parsing the response, just making sure that a successful status code has
-			// been received.
-			int responseStatusCode = httpResponse.getStatusLine().getStatusCode();
-			
-			httpResponse.getEntity().consumeContent();
-			
-			if (responseStatusCode == SUCCESSFUL_HTTP_STATUS_CODE) {
-				returnValue = true;
-			} else {
-				returnValue = false;
-			}
-
+			int responseStatusCode = SPHttpConnection.getConnection(callbackUrl).open().getResponseCode();
+			returnValue = responseStatusCode == SUCCESSFUL_HTTP_STATUS_CODE;
 			SponsorPayLogger.d(TAG, "Server returned status code: "
 					+ responseStatusCode);
 		} catch (Exception e) {

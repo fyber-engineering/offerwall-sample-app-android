@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.view.WindowManager.BadTokenException;
+import android.webkit.CookieSyncManager;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -91,6 +92,8 @@ public abstract class SPWebClient extends WebViewClient {
 			Uri uri = Uri.parse(url);
 			String host = uri.getHost();
 			if (host.equals(SPONSORPAY_EXIT_SCHEMA)) {
+				//force sync cookies
+				CookieSyncManager.getInstance().sync();
 				// ?status=<statusCode>&url=<url>)url is optional)
 				int resultCode = parseSponsorPayExitUrlForResultCode(url);
 				String targetUrl = parseSponsorPayExitUrlForTargetUrl(url);
@@ -162,6 +165,9 @@ public abstract class SPWebClient extends WebViewClient {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
+				if(getHostActivity() != null) {
+					getHostActivity().finish();
+				}
 			}
 		});
 		AlertDialog dialog = dialogBuilder.create();

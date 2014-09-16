@@ -324,10 +324,12 @@ public class SPBrandEngageClient {
 	 * Closes the current engagement
 	 */
 	public void closeEngagement() {
-		try {
-			mContext.unregisterReceiver(mNetworkStateReceiver);
-		} catch (IllegalArgumentException e) {
-			SponsorPayLogger.e(TAG, e.getMessage(), e);
+		if (mContext != null) {
+			try {
+				mContext.unregisterReceiver(mNetworkStateReceiver);
+			} catch (IllegalArgumentException e) {
+				SponsorPayLogger.e(TAG, e.getMessage(), e);
+			}
 		}
 		if (mStatus == SPBrandEngageOffersStatus.USER_ENGAGED) {
 			changeStatus(SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE);

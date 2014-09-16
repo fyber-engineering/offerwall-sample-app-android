@@ -304,6 +304,10 @@ public class HostInfo {
 		return null == densityCategory ? UNDEFINED_VALUE : densityCategory;
 	}
 	
+	public static boolean isSupportedDevice() {
+		return Build.VERSION.SDK_INT >= 10;
+	}
+	
 	public String getScreenWidth() {
 		if (0 == mScreenWidth) {
 			mScreenWidth = mDisplayMetrics.widthPixels;

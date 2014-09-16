@@ -21,6 +21,7 @@ import android.text.TextUtils;
 
 import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SponsorPayLogger;
+import com.sponsorpay.utils.StringUtils;
 
 public final class SPUser extends HashMap<String, Object> {
 	
@@ -304,23 +305,25 @@ public final class SPUser extends HashMap<String, Object> {
 			Calendar now = Calendar.getInstance();
 			if (mNextUpdate == null || now.after(mNextUpdate)) {
 				// get the latest updated location
-				mNextUpdate = now;
-				mNextUpdate.add(Calendar.MINUTE, 10);
 				List<String> locationProviders =  HostInfo.getHostInfo(null).getLocationProviders();
 				for (String provider : locationProviders) {
 					Location lastKnownLocation = locationManager.getLastKnownLocation(provider);
 					if (mLastLocation == null) {
 						mLastLocation = lastKnownLocation;
-					}
-					if (mLastLocation.getTime() < lastKnownLocation.getTime()) {
+					}		
+					if (mLastLocation != null && mLastLocation.getTime() < lastKnownLocation.getTime()) {
 						mLastLocation = lastKnownLocation;
 					}
 				}
-				// finally, discard the location if it's more than a day old
-				Calendar yesterday = Calendar.getInstance();
-				yesterday.add(Calendar.DATE, -1);
-				if (mLastLocation.getTime() > yesterday.getTimeInMillis() ) {
-					setLocationDetails(mLastLocation);
+				if (mLastLocation != null) {
+					// finally, discard the location if it's more than a day old
+					Calendar yesterday = Calendar.getInstance();
+					yesterday.add(Calendar.DATE, -1);
+					if (mLastLocation.getTime() > yesterday.getTimeInMillis()) {
+						setLocationDetails(mLastLocation);
+						mNextUpdate = now;
+						mNextUpdate.add(Calendar.MINUTE, 10);
+					}
 				}
 			}
 		}
@@ -338,12 +341,15 @@ public final class SPUser extends HashMap<String, Object> {
 	@Override
 	public Object put(String key, Object value) {		
 		
-		// The isProvidedMapDirty is used to check when changes are happening on the map
+		// The isMapDirty is used to check when changes are happening on the map
 		// in order to avoid to continuous creation  of the String from the Map key/values
 		// on the method above (mapToString())
-		Object oldValue = get(key);
-		isMapDirty = oldValue == null || !oldValue.equals(value);
-		return super.put(key, value);
+		if (StringUtils.notNullNorEmpty(key) && value != null) {
+			Object oldValue = get(key);
+			isMapDirty = oldValue == null || !oldValue.equals(value);
+			return super.put(key, value);
+		}
+		return null;
 	}
 	
 	@Override

@@ -300,7 +300,7 @@ public class SponsorPayPublisher {
 			String customCurrency) {
 		
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		requestNewCoins(credentialsToken, context, listener, null, null, customCurrency);
+		requestNewCoins(credentialsToken, context, listener, null, null ,null, customCurrency);
 	}
 	
 	/**
@@ -327,13 +327,13 @@ public class SponsorPayPublisher {
 	 * 			  the amount of coins earned.
 	 */
 	public static void requestNewCoins(String credentialsToken, Context context, 
-			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams, 
+			SPCurrencyServerListener listener, String transactionId, String currencyId, Map<String, String> customParams, 
 			String customCurrency) {
 
 		SPVirtualCurrencyConnector vcc = new SPVirtualCurrencyConnector(context, credentialsToken, listener);
 		vcc.setCustomParameters(customParams);
 		vcc.setCurrency(customCurrency);
-		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId);
+		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId, currencyId);
 	}
 	
 	/**

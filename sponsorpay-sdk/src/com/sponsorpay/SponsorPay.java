@@ -22,7 +22,6 @@ import android.webkit.CookieSyncManager;
 import com.sponsorpay.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.mediation.SPMediationConfigurationRequester;
-import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.cookies.PersistentHttpCookieStore;

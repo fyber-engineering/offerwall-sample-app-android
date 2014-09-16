@@ -49,7 +49,10 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 	 * JSON keys used to enclose data from a successful response.
 	 */
 	private static final String DELTA_OF_COINS_KEY = "delta_of_coins";
-	private static final String LATEST_TRANSACTION_ID_KEY = "latest_transaction_id";	
+	private static final String LATEST_TRANSACTION_ID_KEY = "latest_transaction_id";
+	private static final String CURRENCY_ID_KEY = "currency_id";
+	private static final String CURRENCY_NAME_KEY = "currency_name";
+	private static final String IS_DEFAULT_KEY = "is_default";
 
 	public interface SPVCSResultListener {
 		public void onSPCurrencyServerResponseReceived(SPCurrencyServerReponse response);
@@ -60,12 +63,13 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 	}
 	
 	public static void requestCurrency(SPVCSResultListener listener,
-			SPCredentials credentials, String transactionId,
+			SPCredentials credentials, String transactionId, String currencyId,
 			Map<String, String> customParameters) {
 
 		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(VCS_URL_KEY);
 		UrlBuilder urlBuilder = UrlBuilder.newBuilder(baseUrl, credentials)
 				.addKeyValue(URL_PARAM_KEY_LAST_TRANSACTION_ID, transactionId)
+				//.addKeyValue(CURRENCY_ID_KEY, currencyId)
 				.addExtraKeysValues(customParameters)
 				.addScreenMetrics()
 				.addSignature();
@@ -141,6 +145,7 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 		} catch (Exception e) {
 			SponsorPayLogger.w(TAG,
 					"An exception was triggered while parsing error response", e);
+
 			errorType = SPCurrencyServerRequestErrorType.ERROR_OTHER;
 			errorMessage = e.getMessage();
 		}
@@ -152,7 +157,11 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 			JSONObject jsonResponse = new JSONObject(responseBody);
 			double deltaOfCoins = jsonResponse.getDouble(DELTA_OF_COINS_KEY);
 			String latestTransactionId = jsonResponse.getString(LATEST_TRANSACTION_ID_KEY);
-			return new SPCurrencyServerSuccesfulResponse(deltaOfCoins, latestTransactionId);
+			String currencyId = jsonResponse.getString(CURRENCY_ID_KEY);
+			String currencyName = jsonResponse.getString(CURRENCY_NAME_KEY);
+			boolean idDefault= jsonResponse.getBoolean(IS_DEFAULT_KEY);
+			
+			return new SPCurrencyServerSuccessfulResponse(deltaOfCoins, latestTransactionId, currencyId, currencyName, idDefault);
 		} catch (Exception e) {
 			SPCurrencyServerRequestErrorType errorType = SPCurrencyServerRequestErrorType.ERROR_INVALID_RESPONSE;
 			String errorMessage = e.getMessage();

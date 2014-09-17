@@ -128,7 +128,7 @@ public class HostInfo {
 		retrieveAccessNetworkValues(context);
 		retrieveDisplayMetrics(context);
 		retrieveAppVersion(context);
-		retrieveReversrOrientation(context);
+		retrieveReverseOrientation(context);
 		
 		setupLocationManager(context);
 		
@@ -143,7 +143,7 @@ public class HostInfo {
 		mBundleName = context.getPackageName();
 	}
 
-	private void retrieveReversrOrientation(Context context){
+	private void retrieveReverseOrientation(Context context){
 		Configuration config = context.getResources().getConfiguration();
 		int rotation = getRotation();
 		//check if orientation matches the rotation, if not, set device as reversed orientation 

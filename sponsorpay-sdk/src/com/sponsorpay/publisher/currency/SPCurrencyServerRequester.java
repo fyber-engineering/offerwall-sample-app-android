@@ -73,6 +73,9 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 				.addExtraKeysValues(customParameters)
 				.addScreenMetrics()
 				.addSignature();
+		if(StringUtils.notNullNorEmpty(transactionId)){
+			urlBuilder.addKeyValue(CURRENCY_ID_KEY, currencyId);
+		}
 		new SPCurrencyServerRequester(listener, credentials.getSecurityToken()).execute(urlBuilder);
 	}
 

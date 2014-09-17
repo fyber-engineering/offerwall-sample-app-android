@@ -6,7 +6,7 @@
 
 package com.sponsorpay.publisher.interstitial;
 
-import com.sponsorpay.publisher.interstitial.marketplace.MarketPlaceInterstitialActivityListener;
+import com.sponsorpay.mediation.SPMediationUserActivityListener;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -27,7 +27,7 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 
 	public final static String SP_ERROR_MESSAGE = "ERROR_MESSAGE";
 	
-	private MarketPlaceInterstitialActivityListener mActivityListener;
+	private SPMediationUserActivityListener mActivityListener;
 
 	
 	@Override
@@ -62,7 +62,7 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 		finish();
 	}
 	
-	public void setMarketPlaceInterstitialListener(MarketPlaceInterstitialActivityListener listener) {
+	public void setMarketPlaceInterstitialListener(SPMediationUserActivityListener listener) {
 		if(mActivityListener == null){
 			mActivityListener = listener;
 		}

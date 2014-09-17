@@ -3,7 +3,7 @@
  *
  * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
-package com.sponsorpay.publisher.interstitial.marketplace;
+package com.sponsorpay.mediation;
 
 import com.sponsorpay.publisher.interstitial.SPInterstitialActivity;
 
@@ -16,7 +16,7 @@ import com.sponsorpay.publisher.interstitial.SPInterstitialActivity;
  * Used internally by the {@link SPInterstitialActivity} in order to be notified
  * when the onBackPressed and the onUserLeaveHint methods are called accordingly.
  */
-public interface MarketPlaceInterstitialActivityListener {
+public interface SPMediationUserActivityListener {
 
 	/**
 	 * Invoked when the back button clicked.
@@ -27,4 +27,5 @@ public interface MarketPlaceInterstitialActivityListener {
 	 * Invoked when the home button is clicked.
 	 */
 	public void notifyOnHomePressed();
+	
 }

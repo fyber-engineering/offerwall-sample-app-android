@@ -99,8 +99,7 @@ public class HostInfo {
 	
 	private LocationManager mLocationManager;
 
-	private Configuration mConfig;
-	private boolean hasDeviceReverseOrientation = false;
+	private boolean mHasDeviceReverseOrientation = false;
 
 	/**
 	 * Constructor. Requires an Android application context which will be used to retrieve
@@ -129,7 +128,7 @@ public class HostInfo {
 		retrieveAccessNetworkValues(context);
 		retrieveDisplayMetrics(context);
 		retrieveAppVersion(context);
-		retrieveConfiguration(context);
+		retrieveReversrOrientation(context);
 		
 		setupLocationManager(context);
 		
@@ -144,8 +143,12 @@ public class HostInfo {
 		mBundleName = context.getPackageName();
 	}
 
-	private void retrieveConfiguration(Context context){
-		mConfig = context.getResources().getConfiguration();
+	private void retrieveReversrOrientation(Context context){
+		Configuration config = context.getResources().getConfiguration();
+		int rotation = getRotation();
+		//check if orientation matches the rotation, if not, set device as reversed orientation 
+		mHasDeviceReverseOrientation = ((rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) && config.orientation == Configuration.ORIENTATION_LANDSCAPE)
+				|| ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) && config.orientation == Configuration.ORIENTATION_PORTRAIT);
 	}
 	
 	private void retrieveAccessNetworkValues(Context context) {
@@ -272,36 +275,20 @@ public class HostInfo {
 	}
 
 	public String getScreenOrientation() {
-		String[] values = { "portrait", "landscape", "portrait", "landscape" };
-		int orientation = getRotation();
-		return values[orientation];
+		String[] values = { "portrait", "landscape", "portrait", "landscape", "portrait" };
+		int rotation = getRotation();
+		if (mHasDeviceReverseOrientation) {
+			rotation += 1;
+		}
+		return values[rotation];
 	}
 
-	public String getReverseScreenOrientation() {
-		String[] values = { "landscape", "portrait", "landscape", "portrait" };
-		int orientation = getRotation();
-		return values[orientation];
-	}
-	
 	public int getRotation(){
 		return mWindowManager.getDefaultDisplay().getRotation();
 	}
 	
-	public String getDeviceDefaultOrientation() {
-
-		int rotation = getRotation();
-
-		if (((rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) && mConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
-				|| ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) && mConfig.orientation == Configuration.ORIENTATION_PORTRAIT)) {
-			hasDeviceReverseOrientation = true;
-			return getReverseScreenOrientation();
-		} else {
-			return getScreenOrientation();
-		}
-	}
-	
 	public boolean hasDeviceRevserseOrientation() {
-		return hasDeviceReverseOrientation;
+		return mHasDeviceReverseOrientation;
 	}
 	
 	public String getScreenDensityCategory() {
@@ -432,7 +419,7 @@ public class HostInfo {
 		if (context.checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
 				== PackageManager.PERMISSION_GRANTED) {
 			providers.add(LocationManager.NETWORK_PROVIDER);
-		};
+		}
 		if (!providers.isEmpty()) {
 			mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 			mProviders = providers;

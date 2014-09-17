@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -22,6 +21,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
+import com.sponsorpay.mediation.SPMediationUserActivityListener;
 import com.sponsorpay.mediation.marketplace.MarketPlaceAdapter;
 import com.sponsorpay.publisher.interstitial.SPInterstitialActivity;
 import com.sponsorpay.publisher.interstitial.SPInterstitialAd;
@@ -33,21 +33,18 @@ import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
 public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<MarketPlaceAdapter> implements
-		MarketPlaceInterstitialActivityListener, OnClickListener {
+		SPMediationUserActivityListener, OnClickListener {
 	
 	private static final String TAG = "MarketPlaceInterstitial";
 	
 	protected static final int CREATE_WEBVIEW = 0;
 	protected static final int LOAD_HTML = 1;
 	
-	private int SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-	private int SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-	
 	private Handler mMainHandler;
 	private WebView mWebView;
 	private WebViewClient mWebClient;
 
-	private FrameLayout mainLayout;
+	private FrameLayout mMainLayout;
 	private Activity mActivity;
 	private String mOrientation;
 	private String mRotation;
@@ -67,7 +64,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 					mWebView = new WebView(holder.mContext);
 
-					createCloseButton(holder.mContext);
+					createMainLayout(holder.mContext);
 
 					mWebView.getSettings().setJavaScriptEnabled(true);
 					mWebView.setWebViewClient(getWebClient());
@@ -130,7 +127,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(
 				ViewGroup.LayoutParams.FILL_PARENT,
 				ViewGroup.LayoutParams.FILL_PARENT);
-		parentActivity.setContentView(mainLayout, layoutparams);
+		parentActivity.setContentView(mMainLayout, layoutparams);
 
 		fireImpressionEvent();
 		
@@ -195,9 +192,9 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		return mWebClient;
 	}
 	
-	private void createCloseButton(Context context) {
+	private void createMainLayout(Context context) {
 		// main FrameLayout which will host the webview and the close button
-		mainLayout = new FrameLayout(context);
+		mMainLayout = new FrameLayout(context);
 
 		// Instance of the close button relative layout, which will be generated
 		// dynamically
@@ -209,9 +206,9 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				ViewGroup.LayoutParams.FILL_PARENT));
 
 		// attach on the main layout the webview and the close button.
-		mainLayout.addView(mWebView);
+		mMainLayout.addView(mWebView);
 
-		mainLayout.addView(mCloseButtonLayout);
+		mMainLayout.addView(mCloseButtonLayout);
 
 		// Set a listener for the close button
 		mCloseButtonLayout.setOnClickListener(this);
@@ -222,8 +219,8 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	 * interstitials.
 	 */
 	private void removeAttachedLayout() {
-		if (mainLayout != null) {
-			ViewGroup parentViewGroup = (ViewGroup) mainLayout.getParent();
+		if (mMainLayout != null) {
+			ViewGroup parentViewGroup = (ViewGroup) mMainLayout.getParent();
 			if (parentViewGroup != null) {
 				parentViewGroup.removeAllViews();
 			}
@@ -262,17 +259,6 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	 */
 	private void setOrientation() {
 
-		if (Build.VERSION.SDK_INT > 9) {
-			// Value 8 for the reverse orientation are available from
-			// Gingerbread and above
-			SCREEN_ORIENTATION_REVERSE_LANDSCAPE = 8;
-			SCREEN_ORIENTATION_REVERSE_PORTRAIT = 9;
-
-		} else {
-			SCREEN_ORIENTATION_REVERSE_LANDSCAPE = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-			SCREEN_ORIENTATION_REVERSE_PORTRAIT = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-		}
-		
 		int rotationAsInt = Integer.parseInt(mRotation);
 		boolean hasDeviceReverseOrientation = HostInfo.getHostInfo(null)
 				.hasDeviceRevserseOrientation();
@@ -282,7 +268,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 			if (hasDeviceReverseOrientation) {
 
 				if (rotationAsInt == Surface.ROTATION_90) {
-					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
 				} else {
 					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 				}
@@ -292,7 +278,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				// if the rotation is equal to 180 degrees, then we have
 				// the reverse portrait orientation.
 				if (rotationAsInt == Surface.ROTATION_180) {
-					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
 				} else {
 					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 				}
@@ -303,7 +289,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 			if (hasDeviceReverseOrientation) {
 
 				if (rotationAsInt == Surface.ROTATION_180) {
-					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
 				} else {
 					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 				}
@@ -313,7 +299,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				// if the rotation is equal to 270 degrees, then we have
 				// the reverse landscape orientation.
 				if (rotationAsInt == Surface.ROTATION_270) {
-					lockWithProvidedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
 				} else {
 					lockWithProvidedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 				}

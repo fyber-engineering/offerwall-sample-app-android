@@ -9,8 +9,6 @@ package com.sponsorpay.publisher.interstitial.marketplace;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -19,16 +17,10 @@ import android.os.Message;
 import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
 
 import com.sponsorpay.mediation.marketplace.MarketPlaceAdapter;
 import com.sponsorpay.publisher.interstitial.SPInterstitialActivity;
@@ -51,17 +43,16 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	private int SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
 	private int SCREEN_ORIENTATION_REVERSE_PORTRAIT;
 	
-	private Handler       mMainHandler;
-	private WebView       mWebView;
+	private Handler mMainHandler;
+	private WebView mWebView;
 	private WebViewClient mWebClient;
 
-	private FrameLayout   mainLayout;
-	private Activity      mActivity;
-	private String        mOrientation;
-	private String        mRotation;
+	private FrameLayout mainLayout;
+	private Activity mActivity;
+	private String mOrientation;
+	private String mRotation;
 	
 	private InterstitialCloseButtonRelativeLayout mCloseButtonLayout;
-
 
 	public MarketPlaceInterstitial(MarketPlaceAdapter adapter) {
 		super(adapter);
@@ -203,16 +194,6 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		
 		return mWebClient;
 	}
-
-	private class MessageInfoHolder {
-		private Context mContext;
-		private String mHtml;
-
-		private MessageInfoHolder(Context context, String html) {
-			this.mContext = context;
-			this.mHtml = html;
-		}
-	}
 	
 	private void createCloseButton(Context context) {
 		// main FrameLayout which will host the webview and the close button
@@ -348,4 +329,15 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		mActivity.setRequestedOrientation(providedOrientation);
 	}
 
+	// Helper class
+	private class MessageInfoHolder {
+		private Context mContext;
+		private String mHtml;
+
+		private MessageInfoHolder(Context context, String html) {
+			this.mContext = context;
+			this.mHtml = html;
+		}
+	}
+	
 }

@@ -97,11 +97,10 @@ public class HostInfo {
 
 	private String mAppVersion;
 	
-
 	private LocationManager mLocationManager;
 
-	private Configuration config;
-	private Boolean hasDeviceReverseOrientation = false;
+	private Configuration mConfig;
+	private boolean hasDeviceReverseOrientation = false;
 
 	/**
 	 * Constructor. Requires an Android application context which will be used to retrieve
@@ -146,7 +145,7 @@ public class HostInfo {
 	}
 
 	private void retrieveConfiguration(Context context){
-		config = context.getResources().getConfiguration();
+		mConfig = context.getResources().getConfiguration();
 	}
 	
 	private void retrieveAccessNetworkValues(Context context) {
@@ -292,8 +291,8 @@ public class HostInfo {
 
 		int rotation = getRotation();
 
-		if (((rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) && config.orientation == Configuration.ORIENTATION_LANDSCAPE)
-				|| ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) && config.orientation == Configuration.ORIENTATION_PORTRAIT)) {
+		if (((rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) && mConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+				|| ((rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) && mConfig.orientation == Configuration.ORIENTATION_PORTRAIT)) {
 			hasDeviceReverseOrientation = true;
 			return getReverseScreenOrientation();
 		} else {
@@ -301,7 +300,7 @@ public class HostInfo {
 		}
 	}
 	
-	public Boolean hasDeviceRevserseOrientation() {
+	public boolean hasDeviceRevserseOrientation() {
 		return hasDeviceReverseOrientation;
 	}
 	

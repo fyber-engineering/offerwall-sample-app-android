@@ -18,8 +18,7 @@ import android.os.AsyncTask;
 
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.utils.HostInfo;
-import com.sponsorpay.utils.HttpResponseParser;
-import com.sponsorpay.utils.SPHttpClient;
+import com.sponsorpay.utils.SPHttpConnection;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;

@@ -273,12 +273,16 @@ public class SponsorPayPublisher {
 	 * 
 	 * @param context
 	 *            Android application context.
+	 * @param currencyId  
+	 *            Optionally, provide the ID of the currency that you want to retrieve. If the provided
+	 *            ID is empty or null, then the default currency will be requested. If an invalid currency ID
+	 *            will be provided then you will receive an invalid application error.           
 	 * @param listener
 	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
 	 *            request.
 	 */
-	public static void requestNewCoins(Context context, SPCurrencyServerListener listener, String vcsId) {
-		requestNewCoins(context, listener, vcsId, null);
+	public static void requestNewCoins(Context context, String currencyId, SPCurrencyServerListener listener) {
+		requestNewCoins(context, currencyId, listener, null);
 	}
 	
 	/**
@@ -292,15 +296,19 @@ public class SponsorPayPublisher {
 	 * @param listener
 	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
 	 *            request.
+	 * @param currencyId  
+	 *            Optionally, provide the ID of the currency that you want to retrieve. If the provided
+	 *            ID is empty or null, then the default currency will be requested. If an invalid currency ID
+	 *            will be provided then you will receive an invalid application error.         
 	 * @param customCurrency
 	 * 			  A string representing the custom currency to be used by the toast message to show
 	 * 			  the amount of coins earned.
 	 */
-	public static void requestNewCoins(Context context, SPCurrencyServerListener listener, String vcsId,
+	public static void requestNewCoins(Context context, String currencyId, SPCurrencyServerListener listener,
 			String customCurrency) {
 		
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		requestNewCoins(credentialsToken, context, listener, null, vcsId, null, customCurrency);
+		requestNewCoins(credentialsToken, context, listener, null, currencyId, null, customCurrency);
 	}
 	
 	/**
@@ -320,6 +328,10 @@ public class SponsorPayPublisher {
 	 *            Optionally, provide the ID of the latest known transaction. The delta of coins
 	 *            will be calculated from this transaction (not included) up to the present. Leave
 	 *            it to null to let the SDK use the latest transaction ID it kept track of.
+	 * @param currencyId
+	 *            Optionally, provide the ID of the currency that you want to retrieve. If the provided
+	 *            ID is empty or null, then the default currency will be requested. If an invalid currency ID
+	 *            will be provided then you will receive an invalid application error.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 * @param customCurrency

@@ -81,15 +81,17 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	protected SPCurrencyServerListener mCurrencyServerListener;
 			
 	/**
-	 * Initializes a new instance with the provided context and application data.
+	 * Initializes a new instance with the provided context and application
+	 * data.
 	 * 
 	 * @param context
 	 *            Android application context.
 	 * @param credentialsToken
 	 *            The token identifying the {@link SPCredentials} to be used.
 	 * @param currencyServerListener
-	 *            {@link SPCurrencyServerListener} registered by the developer code to be notified
-	 *            of the result of requests to the Virtual Currency Server.
+	 *            {@link SPCurrencyServerListener} registered by the developer
+	 *            code to be notified of the result of requests to the Virtual
+	 *            Currency Server.
 	 */
 	public SPVirtualCurrencyConnector(Context context, String credentialsToken, SPCurrencyServerListener currencyServerListener) {
 		mCredentials = SponsorPay.getCredentials(credentialsToken);
@@ -102,7 +104,8 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	}
 
 	/**
-	 * Sets a map of custom key/values to add to the parameters on the requests to the REST API.
+	 * Sets a map of custom key/values to add to the parameters on the requests
+	 * to the REST API.
 	 */
 	public SPVirtualCurrencyConnector setCustomParameters(Map<String, String> customParams) {
 		mCustomParameters = customParams;
@@ -111,8 +114,9 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 
 	/**
 	 * Sets the custom currency name
+	 * 
 	 * @param currency
-	 * 			the custom currency name
+	 *            the custom currency name
 	 * @return
 	 */
 	public SPVirtualCurrencyConnector setCurrency(String currency) {
@@ -134,51 +138,57 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * virtual currency for the current user's transactions newer than the one whose ID is passed.
 	 * The response will be delivered to one of the registered listener's callback methods.
 	 * 
-	 * @param storedResponse
-	 *            The stored VCS response. Will be used as excluded lower limit to calculate the delta of coins.
+	 * @param transactionId
+	 *            Optionally, provide the ID of the latest known transaction. The delta of coins
+	 *            will be calculated from this transaction (not included) up to the present. Leave
+	 *            it to null to let the SDK use the latest transaction ID it kept track of.
+	 * @param currencyId
+	 *            Optionally, provide the ID of the currency that you want to retrieve. If the provided
+	 *            ID is empty or null, then the default currency will be requested. If an invalid currency ID
+	 *            will be provided then you will receive an invalid application error.           
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId, String currencyId) {
 		if (!HostInfo.isSupportedDevice()) {
 			SPCurrencyServerErrorResponse errorResponse = new SPCurrencyServerErrorResponse(
-					SPCurrencyServerRequestErrorType.ERROR_OTHER, "",
-					CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR);
+					SPCurrencyServerRequestErrorType.ERROR_OTHER, "", CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR);
 			mCurrencyServerListener.onSPCurrencyServerError(errorResponse);
 			return;
 		}
 		Calendar calendar = Calendar.getInstance();
 		if (calendar.before(getCachedCalendar(calendar))) {
-			SponsorPayLogger
-					.d(TAG,	"The VCS was queried less than "+ VCS_TIMER +"s ago.Replying with cached response");
+			SponsorPayLogger.d(TAG, "The VCS was queried less than " + VCS_TIMER + "s ago.Replying with cached response");
 			SPCurrencyServerReponse response = getCachedResponse();
 			if (response != null) {
 				onSPCurrencyServerResponseReceived(response);
 			} else {
-				//this shouldn't occur, but still, we'll leave it there
-				mCurrencyServerListener
-				.onSPCurrencyServerError(new SPCurrencyServerErrorResponse(
-						SPCurrencyServerRequestErrorType.ERROR_OTHER,
+				// this shouldn't occur, but still, we'll leave it there
+				mCurrencyServerListener.onSPCurrencyServerError(new 
+						SPCurrencyServerErrorResponse(SPCurrencyServerRequestErrorType.ERROR_OTHER,
 						StringUtils.EMPTY_STRING, "Unknown error"));
 			}
 			return;
 		}
 
 		calendar.add(Calendar.SECOND, VCS_TIMER);
-        setTimerCalendar(calendar); 
-		if (StringUtils.notNullNorEmpty(currencyId)) {
-			transactionId = fetchLatestTransactionIdForCurrentAppAndUser(currencyId);
-		}
-
+		setTimerCalendar(calendar);
 		mShouldShowNotification = showToastNotification;
 
-		SPCurrencyServerRequester.requestCurrency(this, mCredentials, transactionId, currencyId, mCustomParameters);
+		if (StringUtils.notNullNorEmpty(currencyId)) {
+			transactionId = fetchLatestTransactionIdForCurrentAppAndUser(currencyId);
+			SPCurrencyServerRequester.requestCurrency(this, mCredentials, transactionId, currencyId, mCustomParameters);
+		} else {
+			SPCurrencyServerRequester.requestCurrency(this, mCredentials, transactionId, mCustomParameters);
+		}
 	}
 	
 	/**
 	 * Saves the provided transaction ID for the current user into the publisher state preferences
 	 * file. Used to save the latest transaction id as returned by the server.
 	 * 
-	 * @param transactionId
-	 *            The transaction ID to save.
+	 * @param successfulResponse
+	 *            Saves the response that has been received from the server into the shared preferences,
+	 *            with key a standard prefix concatenated with the currency's ID and value the received
+	 *            latest transaction ID.
 	 */
 	private void saveLatestTransactionForCurrentUser(SPCurrencyServerSuccessfulResponse successfulResponse) {
 		SharedPreferences prefs = mContext.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
@@ -198,8 +208,8 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * 
 	 * @return The retrieved transaction ID or null.
 	 */
-	private String fetchLatestTransactionIdForCurrentAppAndUser(String vcsId) {
-		return fetchLatestTransactionId(mContext, vcsId);
+	private String fetchLatestTransactionIdForCurrentAppAndUser(String currencyId) {
+		return fetchLatestTransactionId(mContext, currencyId);
 	}
 
 	/**
@@ -208,16 +218,14 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * 
 	 * @param context
 	 *          Android application context.
-	 * @param vcsId
+	 * @param currencyId
 	 * 			The ID of the requested  VCS.
 	 * 
 	 * @return The retrieved transaction ID or null.
 	 */
-	public static String fetchLatestTransactionId(Context context, String vcsId) {
-
+	public static String fetchLatestTransactionId(Context context, String currencyId) {
 		SharedPreferences prefs = context.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-		String retval = prefs.getString(STATE_TRANSACTION_ID_KEY_PREFIX + vcsId, URL_PARAM_VALUE_NO_TRANSACTION);
-
+		String retval = prefs.getString(STATE_TRANSACTION_ID_KEY_PREFIX + currencyId, URL_PARAM_VALUE_NO_TRANSACTION);
 		return retval;
 	}
 
@@ -227,12 +235,23 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 */
 	private void onDeltaOfCoinsResponse(SPCurrencyServerSuccessfulResponse response) {
 		saveLatestTransactionForCurrentUser(response);
+		// set the currency name. First try to get the name from the response.
+		// If the response doesn't contain a currency name then try to get the
+		// name from the provided currency. Otherwise, show the default VCS.
+		String currencyName = null;
+		try {
+			currencyName = response.getCurrencyName();
+		} catch (NullPointerException ignore) {
+		}
+
+		if (StringUtils.nullOrEmpty(currencyName)) {
+			currencyName = StringUtils.notNullNorEmpty(mCurrency) ? mCurrency : SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_DEFAULT_CURRENCY);
+		}
+		
 		if (response.getDeltaOfCoins() > 0 && mShouldShowNotification) {
 			String text = String
 					.format(SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_COINS_NOTIFICATION),
-							response.getDeltaOfCoins(),
-							StringUtils.notNullNorEmpty(mCurrency) ? mCurrency : 
-								SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_DEFAULT_CURRENCY));
+							response.getDeltaOfCoins(), currencyName);
 			Toast.makeText(mContext, text, Toast.LENGTH_LONG).show();
 		}
 	}
@@ -267,7 +286,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 		private Calendar calendar;
 		private SPCurrencyServerReponse response;
 	}
-	
+
 	private void setTimerCalendar(Calendar calendar) {
 		CacheInfo pair = cacheInfo.get(mCredentials.getCredentialsToken());
 		if (pair == null) {
@@ -276,7 +295,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 		}
 		pair.calendar = calendar;
 	}
-	
+
 	private void setCachedResponse(SPCurrencyServerReponse reponse) {
 		CacheInfo pair = cacheInfo.get(mCredentials.getCredentialsToken());
 		if (pair == null) {
@@ -287,7 +306,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	}
 
 	private Calendar getCachedCalendar(Calendar defaultIfNull) {
-		CacheInfo pair= cacheInfo.get(mCredentials.getCredentialsToken());
+		CacheInfo pair = cacheInfo.get(mCredentials.getCredentialsToken());
 		if (pair == null) {
 			pair = new CacheInfo();
 			pair.calendar = defaultIfNull;
@@ -295,7 +314,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 		}
 		return pair.calendar;
 	}
-	
+
 	private SPCurrencyServerReponse getCachedResponse() {
 		CacheInfo pair = cacheInfo.get(mCredentials.getCredentialsToken());
 		if (pair == null) {

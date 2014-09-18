@@ -42,11 +42,15 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 
 	private static HashMap<String, CacheInfo> cacheInfo = new HashMap<String, SPVirtualCurrencyConnector.CacheInfo>();
 
+		
 	/**
-	 * Key for the String containing the latest known transaction ID, which is saved as state in the
-	 * Publisher SDK preferences file (whose name is defined in
-	 * {@link SponsorPayPublisher#PREFERENCES_FILENAME}).
+	 * Key for the String containing the latest known transaction ID, which is
+	 * saved as state in the Publisher SDK preferences file (whose name is
+	 * defined in {@link SponsorPayPublisher#PREFERENCES_FILENAME}).
 	 */
+	private static final String STATE_LATEST_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_";
+	private static final String STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR = "_";
+	
 	private static final String STATE_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_";
 
 	private static final String DEFAULT_CURRENCY_ID_KEY_PREFIX = "DEFAULT_CURRENCY_ID_KEY";
@@ -66,7 +70,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	/**
 	 * Credentials holding AppID, UserId and Security Token 
 	 */
-	protected SPCredentials mCredentials;
+	protected static SPCredentials mCredentials;
 	
 	/**
 	 * Android application context.
@@ -193,8 +197,11 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	private void saveLatestTransactionForCurrentUser(SPCurrencyServerSuccessfulResponse successfulResponse) {
 		SharedPreferences prefs = mContext.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 		Editor editor = prefs.edit();
-		editor.putString(STATE_TRANSACTION_ID_KEY_PREFIX + successfulResponse.getCurrencyId(), successfulResponse.getLatestTransactionId());
-		
+		editor.putString(
+				generatePreferencesLatestTransactionIdKey(mCredentials) + STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR
+						+ STATE_TRANSACTION_ID_KEY_PREFIX + successfulResponse.getCurrencyId(),
+				successfulResponse.getLatestTransactionId());
+
 		if(successfulResponse.isDefault()){
 			editor.putString(DEFAULT_CURRENCY_ID_KEY_PREFIX, STATE_TRANSACTION_ID_KEY_PREFIX + successfulResponse.getCurrencyId());
 		}
@@ -209,7 +216,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * @return The retrieved transaction ID or null.
 	 */
 	private String fetchLatestTransactionIdForCurrentAppAndUser(String currencyId) {
-		return fetchLatestTransactionId(mContext, currencyId);
+		return fetchLatestTransactionId(mContext, mCredentials.getCredentialsToken(), currencyId);
 	}
 
 	/**
@@ -223,9 +230,12 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * 
 	 * @return The retrieved transaction ID or null.
 	 */
-	public static String fetchLatestTransactionId(Context context, String currencyId) {
+	public static String fetchLatestTransactionId(Context context, String credentialsToken, String currencyId) {
+		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		SharedPreferences prefs = context.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-		String retval = prefs.getString(STATE_TRANSACTION_ID_KEY_PREFIX + currencyId, URL_PARAM_VALUE_NO_TRANSACTION);
+		String retval = prefs.getString(generatePreferencesLatestTransactionIdKey(credentials)
+				+ STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + STATE_TRANSACTION_ID_KEY_PREFIX + currencyId,
+				URL_PARAM_VALUE_NO_TRANSACTION);
 		return retval;
 	}
 
@@ -235,27 +245,31 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 */
 	private void onDeltaOfCoinsResponse(SPCurrencyServerSuccessfulResponse response) {
 		saveLatestTransactionForCurrentUser(response);
-		// set the currency name. First try to get the name from the response.
-		// If the response doesn't contain a currency name then try to get the
-		// name from the provided currency. Otherwise, show the default VCS.
+		// set the currency name. First try to get the provided name. If the
+		// developer didn't provide a currency name, then try to get the
+		// currency name from the response. Otherwise, show the default VCS.
 		String currencyName = null;
-		try {
-			currencyName = response.getCurrencyName();
-		} catch (NullPointerException ignore) {
+
+		if (StringUtils.notNullNorEmpty(mCurrency)) {
+			currencyName = mCurrency;
+		} else {
+			String serverCurrencyResponseName = response.getCurrencyName();
+			currencyName = StringUtils.nullOrEmpty(serverCurrencyResponseName) ? serverCurrencyResponseName
+					: SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_DEFAULT_CURRENCY);
 		}
 
-		if (StringUtils.nullOrEmpty(currencyName)) {
-			currencyName = StringUtils.notNullNorEmpty(mCurrency) ? mCurrency : SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_DEFAULT_CURRENCY);
-		}
-		
 		if (response.getDeltaOfCoins() > 0 && mShouldShowNotification) {
-			String text = String
-					.format(SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_COINS_NOTIFICATION),
-							response.getDeltaOfCoins(), currencyName);
+			String text = String.format(SponsorPayPublisher.getUIString(UIStringIdentifier.VCS_COINS_NOTIFICATION),
+					response.getDeltaOfCoins(), currencyName);
 			Toast.makeText(mContext, text, Toast.LENGTH_LONG).show();
 		}
 	}
 	
+	private static String generatePreferencesLatestTransactionIdKey(SPCredentials credentials) {
+		return STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + credentials.getAppId()
+				+ STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + credentials.getUserId();
+	}
+
 	/**
 	 * Indicates whether the toast notification should be shown after a successful query
 	 * @param showNotification

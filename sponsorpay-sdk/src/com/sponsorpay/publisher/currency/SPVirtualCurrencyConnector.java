@@ -181,6 +181,10 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 			transactionId = fetchLatestTransactionIdForCurrentAppAndUser(currencyId);
 			SPCurrencyServerRequester.requestCurrency(this, mCredentials, transactionId, currencyId, mCustomParameters);
 		} else {
+						
+			if (StringUtils.nullOrEmpty(transactionId)) {
+				transactionId = URL_PARAM_VALUE_NO_TRANSACTION;
+			}
 			SPCurrencyServerRequester.requestCurrency(this, mCredentials, transactionId, mCustomParameters);
 		}
 	}
@@ -203,7 +207,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 				successfulResponse.getLatestTransactionId());
 
 		if(successfulResponse.isDefault()){
-			editor.putString(DEFAULT_CURRENCY_ID_KEY_PREFIX, STATE_TRANSACTION_ID_KEY_PREFIX + successfulResponse.getCurrencyId());
+			editor.putString(DEFAULT_CURRENCY_ID_KEY_PREFIX,  successfulResponse.getCurrencyId());
 		}
 	
 		editor.commit();
@@ -218,6 +222,22 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	private String fetchLatestTransactionIdForCurrentAppAndUser(String currencyId) {
 		return fetchLatestTransactionId(mContext, mCredentials.getCredentialsToken(), currencyId);
 	}
+	
+	/**
+	 * Retrieves the saved latest transaction ID for a given user from the publisher state
+	 * preferences file.
+	 * 
+	 * @param context
+	 *          Android application context.
+	 * @param credentialsToken
+	 * 			The credentials token.
+	 * @param currencyId
+	 * 			The ID of the requested  VCS.
+	 * @return The retrieved transaction ID or null.
+	 */
+	public static String fetchLatestTransactionId(Context context, String credentialsToken) {
+		return fetchLatestTransactionId(context, credentialsToken, null);
+	}
 
 	/**
 	 * Retrieves the saved latest transaction ID for a given user from the publisher state
@@ -225,17 +245,24 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * 
 	 * @param context
 	 *          Android application context.
+	 * @param credentialsToken
+	 * 			The credentials token.
 	 * @param currencyId
 	 * 			The ID of the requested  VCS.
-	 * 
 	 * @return The retrieved transaction ID or null.
 	 */
 	public static String fetchLatestTransactionId(Context context, String credentialsToken, String currencyId) {
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		SharedPreferences prefs = context.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
-		String retval = prefs.getString(generatePreferencesLatestTransactionIdKey(credentials)
+		String retval = null;
+		if (StringUtils.nullOrEmpty(currencyId)) {
+			currencyId = prefs.getString(DEFAULT_CURRENCY_ID_KEY_PREFIX, "0");
+		} 
+		
+		retval = prefs.getString(generatePreferencesLatestTransactionIdKey(credentials)
 				+ STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + STATE_TRANSACTION_ID_KEY_PREFIX + currencyId,
 				URL_PARAM_VALUE_NO_TRANSACTION);
+		
 		return retval;
 	}
 

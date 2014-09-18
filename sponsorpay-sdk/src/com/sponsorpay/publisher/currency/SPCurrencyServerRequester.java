@@ -82,11 +82,18 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 		buildUrlAndMakeServerRequest(listener, credentials, transactionId, currencyId, customParameters);
 	}
 
-	private static void buildUrlAndMakeServerRequest(SPVCSResultListener listener, SPCredentials credentials, String transactionId, String currencyId,
-			Map<String, String> customParameters) {
+	private static void buildUrlAndMakeServerRequest(SPVCSResultListener listener, SPCredentials credentials,
+			String transactionId, String currencyId, Map<String, String> customParameters) {
+
+		if (StringUtils.nullOrEmpty(transactionId)) {
+			transactionId = URL_PARAM_KEY_LAST_TRANSACTION_ID;
+		}
 		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(VCS_URL_KEY);
-		UrlBuilder urlBuilder = UrlBuilder.newBuilder(baseUrl, credentials).addKeyValue(URL_PARAM_KEY_LAST_TRANSACTION_ID, transactionId)
-				.addKeyValue(CURRENCY_ID_KEY, currencyId).addExtraKeysValues(customParameters).addScreenMetrics().addSignature();
+		UrlBuilder urlBuilder = UrlBuilder.newBuilder(baseUrl, credentials)
+				.addKeyValue(URL_PARAM_KEY_LAST_TRANSACTION_ID, transactionId)
+				.addExtraKeysValues(customParameters)
+				.addScreenMetrics()
+				.addSignature();
 
 		if (StringUtils.notNullNorEmpty(currencyId)) {
 			urlBuilder.addKeyValue(CURRENCY_ID_KEY, currencyId);
@@ -94,7 +101,6 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 
 		new SPCurrencyServerRequester(listener, credentials.getSecurityToken()).execute(urlBuilder);
 	}
-
 
 	/**
 	 * Registered {@link AsyncRequestResultListener} to be notified of the request's results when

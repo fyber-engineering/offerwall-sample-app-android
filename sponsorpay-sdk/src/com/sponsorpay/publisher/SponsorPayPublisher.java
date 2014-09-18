@@ -272,6 +272,22 @@ public class SponsorPayPublisher {
 	 * credentials will be used to get the application id and user id.
 	 * 
 	 * @param context
+	 *            Android application context.        
+	 * @param listener
+	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
+	 *            request.
+	 */
+	public static void requestNewCoins(Context context, SPCurrencyServerListener listener) {
+		requestNewCoins(context, listener, null);
+	}
+	
+	/**
+	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
+	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
+	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. The current 
+	 * credentials will be used to get the application id and user id.
+	 * 
+	 * @param context
 	 *            Android application context.
 	 * @param currencyId  
 	 *            Optionally, provide the ID of the currency that you want to retrieve. If the provided
@@ -283,6 +299,28 @@ public class SponsorPayPublisher {
 	 */
 	public static void requestNewCoins(Context context, String currencyId, SPCurrencyServerListener listener) {
 		requestNewCoins(context, currencyId, listener, null);
+	}
+	
+	/**
+	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
+	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
+	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. The current 
+	 * credentials will be used to get the application id and user id.
+	 * 
+	 * @param context
+	 *            Android application context.
+	 * @param listener
+	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
+	 *            request.     
+	 * @param customCurrency
+	 * 			  A string representing the custom currency to be used by the toast message to show
+	 * 			  the amount of coins earned.
+	 */
+	public static void requestNewCoins(Context context, SPCurrencyServerListener listener,
+			String customCurrency) {
+		
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		requestNewCoins(credentialsToken, context, listener, null, null, customCurrency);
 	}
 	
 	/**
@@ -309,6 +347,39 @@ public class SponsorPayPublisher {
 		
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
 		requestNewCoins(credentialsToken, context, listener, null, currencyId, null, customCurrency);
+	}
+	
+	/**
+	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
+	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
+	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. It will use the 
+	 * credentials identified by the provided token id.
+	 * 
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
+	 * @param context
+	 *            Android application context.
+	 * @param listener
+	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
+	 *            request.
+	 * @param transactionId
+	 *            Optionally, provide the ID of the latest known transaction. The delta of coins
+	 *            will be calculated from this transaction (not included) up to the present. Leave
+	 *            it to null to let the SDK use the latest transaction ID it kept track of.
+	 * @param customParams
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * @param customCurrency
+	 * 			  A string representing the custom currency to be used by the toast message to show
+	 * 			  the amount of coins earned.
+	 */
+	public static void requestNewCoins(String credentialsToken, Context context, 
+			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams, 
+			String customCurrency) {
+
+		SPVirtualCurrencyConnector vcc = new SPVirtualCurrencyConnector(context, credentialsToken, listener);
+		vcc.setCustomParameters(customParams);
+		vcc.setCurrency(customCurrency);
+		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId, null);
 	}
 	
 	/**

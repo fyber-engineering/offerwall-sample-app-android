@@ -3,7 +3,6 @@
  *
  * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
-
 package com.sponsorpay.publisher.currency;
 
 import java.util.Map;
@@ -218,8 +217,8 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 		}
 
 		if (response == null) {
-			response = new SPCurrencyServerErrorResponse(SPCurrencyServerRequestErrorType.ERROR_OTHER, StringUtils.EMPTY_STRING, 
-					"Unknow error");
+			response = new SPCurrencyServerErrorResponse(SPCurrencyServerRequestErrorType.ERROR_OTHER,
+					StringUtils.EMPTY_STRING, "Unknow error");
 		}
 
 		return response;

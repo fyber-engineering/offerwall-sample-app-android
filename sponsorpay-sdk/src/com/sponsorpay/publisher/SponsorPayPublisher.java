@@ -3,7 +3,6 @@
  *
  * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
-
 package com.sponsorpay.publisher;
 
 import java.util.EnumMap;
@@ -376,10 +375,7 @@ public class SponsorPayPublisher {
 			SPCurrencyServerListener listener, String transactionId, Map<String, String> customParams, 
 			String customCurrency) {
 
-		SPVirtualCurrencyConnector vcc = new SPVirtualCurrencyConnector(context, credentialsToken, listener);
-		vcc.setCustomParameters(customParams);
-		vcc.setCurrency(customCurrency);
-		vcc.fetchDeltaOfCoinsForCurrentUserSinceTransactionId(transactionId, null);
+		requestNewCoins(credentialsToken, context, listener, transactionId, null, customParams, customCurrency);
 	}
 	
 	/**

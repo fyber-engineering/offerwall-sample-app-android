@@ -5,7 +5,7 @@
  */
 package com.sponsorpay.publisher.currency;
 /**
- * This class is depricated and will be removed on the next major release
+ * This class is deprecated and will be removed on the next major release
  * of the SDK v.7.0.0
  *
  * @deprecated use {@link com.sponsorpay.publisher.currency.SPCurrencyServerSuccessfulResponse} instead.  

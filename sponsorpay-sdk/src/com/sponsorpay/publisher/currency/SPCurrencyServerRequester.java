@@ -60,13 +60,6 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 	public interface SPCurrencyServerReponse {
 
 	}
-	
-	/**
-	 * Method which is being used to request the default currency.
-	 */
-	public static void requestCurrency(SPVCSResultListener listener, SPCredentials credentials, String transactionId, Map<String, String> customParameters) {
-		buildUrlAndMakeServerRequest(listener, credentials, transactionId, null, customParameters);
-	}
 
 	/**
 	 * Method which is being used to request new currency based on the currency

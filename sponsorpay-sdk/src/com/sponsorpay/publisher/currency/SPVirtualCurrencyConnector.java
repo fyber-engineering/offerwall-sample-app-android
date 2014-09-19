@@ -237,7 +237,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 */
 	@Deprecated
 	public static String fetchLatestTransactionId(Context context, String credentialsToken) {
-		return fetchLatestTransactionId(context, credentialsToken );
+		return fetchLatestTransactionId(context, credentialsToken, null);
 	}
 	
 	@Deprecated

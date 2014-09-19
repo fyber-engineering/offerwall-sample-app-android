@@ -28,8 +28,8 @@ public interface SPCurrencyServerListener {
 	 * and the response contains valid data.
 	 * 
 	 * @param response
-	 * 			An instance of {@link SPCurrencyServerSuccessfulResponse} holding the amount of currency earned for
+	 * 			An instance of {@link SPCurrencyServerSuccesfulResponse} holding the amount of currency earned for
 	 * 			this request and the latest transaction id.
 	 */
-	void onSPCurrencyDeltaReceived(SPCurrencyServerSuccessfulResponse response);
+	void onSPCurrencyDeltaReceived(SPCurrencyServerSuccesfulResponse response);
 }

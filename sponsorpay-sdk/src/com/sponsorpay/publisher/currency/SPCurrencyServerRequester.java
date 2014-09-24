@@ -172,9 +172,9 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 			JSONObject jsonResponse = new JSONObject(responseBody);
 			double deltaOfCoins = jsonResponse.getDouble(DELTA_OF_COINS_KEY);
 			String latestTransactionId = jsonResponse.getString(LATEST_TRANSACTION_ID_KEY);
-			String currencyId = jsonResponse.optString(CURRENCY_ID_KEY, "");
-			String currencyName = jsonResponse.optString(CURRENCY_NAME_KEY, "");
-			boolean idDefault= jsonResponse.optBoolean(IS_DEFAULT_KEY, false);
+			String currencyId = jsonResponse.getString(CURRENCY_ID_KEY);
+			String currencyName = jsonResponse.getString(CURRENCY_NAME_KEY);
+			boolean idDefault= jsonResponse.getBoolean(IS_DEFAULT_KEY);
 			
 			return new SPCurrencyServerSuccesfulResponse(deltaOfCoins, latestTransactionId, currencyId, currencyName, idDefault);
 		} catch (Exception e) {

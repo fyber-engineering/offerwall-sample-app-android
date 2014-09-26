@@ -241,7 +241,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	}
 	
 	@Deprecated
-	private static String fetchLatestTransactionId(Context context, String credentialsToken, String currencyId) {
+	public static String fetchLatestTransactionId(Context context, String credentialsToken, String currencyId) {
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		SharedPreferences prefs = context.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 		String retval = null;

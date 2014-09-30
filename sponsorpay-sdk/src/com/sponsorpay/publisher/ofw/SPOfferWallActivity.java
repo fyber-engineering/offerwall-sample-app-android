@@ -25,6 +25,7 @@ import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
+import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
@@ -107,40 +108,45 @@ public class SPOfferWallActivity extends Activity {
 	 */
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-
-		mProgressDialog = new ProgressDialog(this);
-		mProgressDialog.setOwnerActivity(this);
-		mProgressDialog.setIndeterminate(true);
-		mProgressDialog.setMessage(SponsorPayPublisher
-				.getUIString(UIStringIdentifier.LOADING_OFFERWALL));
-		mProgressDialog.show();
-
-		fetchPassedExtras();
-
-		mWebView = new WebView(getApplicationContext());
-		mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
-		setContentView(mWebView);
-
-		mWebView.getSettings().setJavaScriptEnabled(true);
-		mWebView.getSettings().setPluginsEnabled(true);
-
-		mActivityOfferWebClient = new ActivityOfferWebClient(SPOfferWallActivity.this,
-				mShouldStayOpen);
-
-		mWebView.setWebViewClient(mActivityOfferWebClient);
 		
-		mWebView.setWebChromeClient(new WebChromeClient() {
-			@Override
-			public void onProgressChanged(WebView view, int newProgress) {
-				if (newProgress > 50 && mProgressDialog != null) {
-					mProgressDialog.dismiss();
-					mProgressDialog = null;
+		if(HostInfo.isDeviceSupported()) {
+			getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+			
+			mProgressDialog = new ProgressDialog(this);
+			mProgressDialog.setOwnerActivity(this);
+			mProgressDialog.setIndeterminate(true);
+			mProgressDialog.setMessage(SponsorPayPublisher
+					.getUIString(UIStringIdentifier.LOADING_OFFERWALL));
+			mProgressDialog.show();
+			
+			fetchPassedExtras();
+			
+			mWebView = new WebView(getApplicationContext());
+			mWebView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
+			setContentView(mWebView);
+			
+			mWebView.getSettings().setJavaScriptEnabled(true);
+			mWebView.getSettings().setPluginsEnabled(true);
+			
+			mActivityOfferWebClient = new ActivityOfferWebClient(SPOfferWallActivity.this,
+					mShouldStayOpen);
+			
+			mWebView.setWebViewClient(mActivityOfferWebClient);
+			
+			mWebView.setWebChromeClient(new WebChromeClient() {
+				@Override
+				public void onProgressChanged(WebView view, int newProgress) {
+					if (newProgress > 50 && mProgressDialog != null) {
+						mProgressDialog.dismiss();
+						mProgressDialog = null;
+					}
+					super.onProgressChanged(view, newProgress);
 				}
-				super.onProgressChanged(view, newProgress);
-			}
-		});
+			});
+		} else {
+			setResult(-20);
+			finish();
+		}
 
 	}
 

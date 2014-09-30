@@ -140,7 +140,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 *            The transaction ID used as excluded lower limit to calculate the delta of coins.
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId) {
-		if (!HostInfo.isSupportedDevice()) {
+		if (!HostInfo.isDeviceSupported()) {
 			SPCurrencyServerErrorResponse errorResponse = new SPCurrencyServerErrorResponse(
 					SPCurrencyServerRequestErrorType.ERROR_OTHER, "",
 					CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR);

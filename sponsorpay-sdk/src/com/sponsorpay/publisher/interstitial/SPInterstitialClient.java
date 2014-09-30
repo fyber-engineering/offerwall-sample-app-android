@@ -81,7 +81,7 @@ public class SPInterstitialClient {
 	 */
 	public boolean requestAds(SPCredentials credentials, Activity activity) {
 		
-		if (!HostInfo.isSupportedDevice()) {
+		if (!HostInfo.isDeviceSupported()) {
 			availableAd(null);
 			return false;
 		} else if (canRequestAds()) {

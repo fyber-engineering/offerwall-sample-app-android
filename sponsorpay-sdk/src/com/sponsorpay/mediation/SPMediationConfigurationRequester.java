@@ -56,7 +56,7 @@ public class SPMediationConfigurationRequester extends SignedResponseRequester<S
 	 */
 	@Override
 	protected void onPostExecute(SignedServerResponse result) {
-		// even though this is runned inside UI thread, the method below will spawn a new background thread
+		// even though this runs inside UI thread, the method below will spawn a new background thread
 		SPMediationCoordinator.INSTANCE.startMediationAdapters(mActivity);
 	}
 	
@@ -134,6 +134,12 @@ public class SPMediationConfigurationRequester extends SignedResponseRequester<S
 		} else {
 			SponsorPayLogger.d(TAG, "There were no server side credentials to override");
 		}
+	}
+
+	@Override
+	protected SignedServerResponse noConnectionResponse(Throwable t) {
+		//do nothing
+		return null;
 	}
 
 }

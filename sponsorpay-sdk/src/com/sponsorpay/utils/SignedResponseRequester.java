@@ -1,12 +1,13 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
+ */
+
 package com.sponsorpay.utils;
 
+import java.util.List;
 import java.util.Locale;
-
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpUriRequest;
 
 import android.os.AsyncTask;
 
@@ -22,7 +23,7 @@ import android.os.AsyncTask;
  */
 public abstract class SignedResponseRequester<V> extends AsyncTask<UrlBuilder, Void, V>{
 	
-	public static String TAG = "AsyncTaskRequester";
+	public static String TAG = "SignedResponseRequester";
 	
 	/**
 	 * Key of the User-Agent header sent on background requests.
@@ -57,24 +58,17 @@ public abstract class SignedResponseRequester<V> extends AsyncTask<UrlBuilder, V
 		SponsorPayLogger.d(TAG, "Request will be sent to URL + params: "
 				+ requestUrl);
 		
-		HttpUriRequest request = new HttpGet(requestUrl);
-		
-		request.addHeader(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE);
-
-		String acceptLanguageHeaderValue = makeAcceptLanguageHeaderValue();
-		
-		request.addHeader(ACCEPT_LANGUAGE_HEADER_NAME, acceptLanguageHeaderValue);
-
-		
-		HttpClient client = SPHttpClient.getHttpClient();
-		
 		try {
-			HttpResponse response = client.execute(request);
-			int statusCode = response.getStatusLine().getStatusCode();
-			String responseBody = HttpResponseParser.extractResponseString(response);
-			Header[] responseSignatureHeaders = response.getHeaders(SIGNATURE_HEADER);
-			String responseSignature = responseSignatureHeaders.length > 0 ? responseSignatureHeaders[0]
-					.getValue() : StringUtils.EMPTY_STRING;
+			SPHttpConnection connection = SPHttpConnection.getConnection(requestUrl)
+					.addHeader(USER_AGENT_HEADER_NAME, USER_AGENT_HEADER_VALUE)
+					.addHeader(ACCEPT_LANGUAGE_HEADER_NAME, makeAcceptLanguageHeaderValue())
+					.open();
+			int statusCode = connection.getResponseCode();
+			String responseBody = connection.getBodyContent();
+			List<String> responseSignatureHeaders = connection.getHeader(SIGNATURE_HEADER);
+			String responseSignature = responseSignatureHeaders != null && responseSignatureHeaders.size() > 0 
+					? responseSignatureHeaders.get(0)
+					: StringUtils.EMPTY_STRING;
 					
 			SponsorPayLogger.d(TAG, String.format(
 					"Server Response, status code: %d, response body: %s, signature: %s",
@@ -85,11 +79,13 @@ public abstract class SignedResponseRequester<V> extends AsyncTask<UrlBuilder, V
 			
 		} catch (Throwable t) {
 			SponsorPayLogger.e(TAG, "Exception triggered when executing request: " + t);
-			
+			return noConnectionResponse(t);
 		}
 		return parsedSignedResponse(signedServerResponse);
 	}
 	
+	abstract protected V noConnectionResponse(Throwable t);
+
 	abstract protected V parsedSignedResponse(
 			SignedServerResponse signedServerResponse);
 

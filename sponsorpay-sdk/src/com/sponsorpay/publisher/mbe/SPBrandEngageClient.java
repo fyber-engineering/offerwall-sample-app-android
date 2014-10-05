@@ -50,6 +50,7 @@ import com.sponsorpay.publisher.mbe.mediation.SPMediationValidationEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
+import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SPWebClient;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
@@ -250,7 +251,7 @@ public class SPBrandEngageClient {
 	 */
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
 		if (canRequestOffers()) {
-			if (Build.VERSION.SDK_INT < 9) {
+			if (!HostInfo.isDeviceSupported()) {
 				//always return no offers
 				processQueryOffersResponse(0);
 			} else {
@@ -324,10 +325,12 @@ public class SPBrandEngageClient {
 	 * Closes the current engagement
 	 */
 	public void closeEngagement() {
-		try {
-			mContext.unregisterReceiver(mNetworkStateReceiver);
-		} catch (IllegalArgumentException e) {
-			SponsorPayLogger.e(TAG, e.getMessage(), e);
+		if (mContext != null) {
+			try {
+				mContext.unregisterReceiver(mNetworkStateReceiver);
+			} catch (IllegalArgumentException e) {
+				SponsorPayLogger.e(TAG, e.getMessage(), e);
+			}
 		}
 		if (mStatus == SPBrandEngageOffersStatus.USER_ENGAGED) {
 			changeStatus(SP_REQUEST_STATUS_PARAMETER_FINISHED_VALUE);
@@ -685,8 +688,13 @@ public class SPBrandEngageClient {
 				public void onReceivedError(WebView view, int errorCode,
 						String description, String failingUrl) {
 					SponsorPayLogger.d(TAG, "onReceivedError url - " + failingUrl + " - " + description );
-					// show error dialog
-					showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+					// show error dialog only if it's not in the validation phase
+					if (mStatus == SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS) {
+						notifyListener(SPBrandEngageClientStatus.ERROR);
+						clearWebViewPage();
+					} else {
+						showErrorDialog(SponsorPayPublisher.getUIString(UIStringIdentifier.MBE_ERROR_DIALOG_MESSAGE_DEFAULT));
+					}
 					super.onReceivedError(view, errorCode, description, failingUrl);
 				}
 				

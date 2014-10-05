@@ -21,6 +21,7 @@ import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPCurrencyServerReponse;
 import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPVCSResultListener;
+import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
@@ -31,9 +32,11 @@ import com.sponsorpay.utils.StringUtils;
  */
 public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 
-	private static final int VCS_TIMER = 15;
-
 	private static final String TAG = "SPVirtualCurrencyConnector";
+
+	public static final String CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR = "Only devices running Android API level 10 and above are supported";
+
+	private static final int VCS_TIMER = 15;
 	
 	private static final String URL_PARAM_VALUE_NO_TRANSACTION = "NO_TRANSACTION";
 
@@ -137,6 +140,13 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 *            The transaction ID used as excluded lower limit to calculate the delta of coins.
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId) {
+		if (!HostInfo.isDeviceSupported()) {
+			SPCurrencyServerErrorResponse errorResponse = new SPCurrencyServerErrorResponse(
+					SPCurrencyServerRequestErrorType.ERROR_OTHER, "",
+					CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR);
+			mCurrencyServerListener.onSPCurrencyServerError(errorResponse);
+			return;
+		}
 		Calendar calendar = Calendar.getInstance();
 		if (calendar.before(getCachedCalendar(calendar))) {
 			SponsorPayLogger
@@ -243,6 +253,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	@Override
 	public void onSPCurrencyServerResponseReceived(
 			SPCurrencyServerReponse response) {
+		
 		if (response instanceof SPCurrencyServerSuccesfulResponse) {
 			setCachedResponse(new SPCurrencyServerSuccesfulResponse(0, ((SPCurrencyServerSuccesfulResponse) response).getLatestTransactionId()));
 			onDeltaOfCoinsResponse((SPCurrencyServerSuccesfulResponse) response);

@@ -254,7 +254,7 @@ public class SPBrandEngageClient {
 	 */
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
 		if (canRequestOffers()) {
-			if (!HostInfo.isSupportedDevice()) {
+			if (!HostInfo.isDeviceSupported()) {
 				//always return no offers
 				processQueryOffersResponse(0);
 			} else {

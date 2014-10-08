@@ -22,7 +22,7 @@ import com.sponsorpay.utils.UrlBuilder;
  */
 public abstract class AbstractCallbackSender extends AsyncTask<String, Void, Boolean> {
 
-	private static final String TAG = AbstractCallbackSender.class.getSimpleName();
+	private static final String TAG = "AbstractCallbackSender";
 
 	/**
 	 * HTTP status code that the response should have in order to determine that the API has been

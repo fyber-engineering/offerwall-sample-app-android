@@ -6,10 +6,9 @@
 
 package com.sponsorpay.utils;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -81,26 +80,17 @@ public class SPHttpConnection {
 		return this;
 	}
 	
-	private String readStream(InputStream is) throws IOException {
-		String content = null;
-		if (is != null) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			try {
-				StringBuilder sb = new StringBuilder();
-				String line = br.readLine();
+	private String readStream(InputStream inputStream) throws IOException {
 
-				while (line != null) {
-					sb.append(line + '\n');
-					line = br.readLine();
-				}
-				content = sb.toString();
-			} finally {
-				br.close();
-			}
-		}
-		return content;
+	    ByteArrayOutputStream into = new ByteArrayOutputStream();
+	    byte[] buf = new byte[1024];
+	    for (int n; 0 < (n = inputStream.read(buf));) {
+	        into.write(buf, 0, n);
+	    }
+	    into.close();
+	    return new String(into.toByteArray(), "UTF-8");
 	}
-
+	
 	public String getBodyContent() throws IOException {
 		if (!mOpen) {
 			throw new IOException("The connection has not been opened yet.");

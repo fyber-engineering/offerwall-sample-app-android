@@ -33,6 +33,7 @@ import android.view.View.OnTouchListener;
 import android.view.WindowManager.BadTokenException;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout.LayoutParams;
@@ -52,6 +53,7 @@ import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.SPWebClient;
+import com.sponsorpay.utils.SPWebViewSettings;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
@@ -138,7 +140,7 @@ public class SPBrandEngageClient {
 	
 	public static final int TIMEOUT = 10000 ;
 	
-	private static final int VCS_TIMEOUT = 3000 ;
+	private static final int VCS_TIMER = 3000 ;
 
 	private static final int VIDEO_EVENT = 1;
 	private static final int VALIDATION_RESULT = 2;
@@ -532,15 +534,17 @@ public class SPBrandEngageClient {
 		
 		mWebView = new WebView(mContext);
 		
-		mWebView.getSettings().setJavaScriptEnabled(true);
-		mWebView.getSettings().setPluginsEnabled(true);
+		WebSettings webSettings = mWebView.getSettings();
+		webSettings.setJavaScriptEnabled(true);
 
-		mWebView.getSettings().setUseWideViewPort(false);
+		SPWebViewSettings.enablePlugins(webSettings);
+		
+		webSettings.setUseWideViewPort(false);
 		
 		mWebView.setBackgroundColor(0);
 		
 		if (Build.VERSION.SDK_INT < 14) {
-			mWebView.getSettings().setUserAgentString(
+			webSettings.setUserAgentString(
 							"Mozilla/5.0 (X11; CrOS i686 4319.74.0) " +
 							"AppleWebKit/537.36 (KHTML, like Gecko) " +
 							"Chrome/29.0.1547.57 " +
@@ -620,7 +624,7 @@ public class SPBrandEngageClient {
 						SponsorPayLogger.d(TAG, "There's no VCS listener");
 					};
 				}
-			}, VCS_TIMEOUT);
+			}, VCS_TIMER);
 		}
 	}
 	

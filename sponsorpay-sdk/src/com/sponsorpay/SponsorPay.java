@@ -23,6 +23,8 @@ import com.sponsorpay.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.mediation.SPMediationConfigurationRequester;
 import com.sponsorpay.utils.HostInfo;
+import com.sponsorpay.utils.SDKFeaturesProvider;
+import com.sponsorpay.utils.SponsorPayParametersProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.cookies.PersistentHttpCookieStore;
@@ -56,6 +58,7 @@ public class SponsorPay {
 	private HostInfo mHostInfo;
 	
 	protected SponsorPay() {
+		SponsorPayParametersProvider.addParametersProvider(new SDKFeaturesProvider());
 	}
 
 	private SPCredentials getCredentialsFromToken(String token) {

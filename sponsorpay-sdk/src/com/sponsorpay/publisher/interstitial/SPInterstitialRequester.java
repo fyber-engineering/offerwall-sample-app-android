@@ -41,7 +41,9 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 		UrlBuilder urlBuilder = UrlBuilder.newBuilder(getBaseUrl(), credentials)
 				.addExtraKeysValues(customParameters)
 				.addKeyValue(SPInterstitialClient.SP_REQUEST_ID_PARAMETER_KEY, requestId)
-				.addScreenMetrics();
+				.addScreenMetrics()
+				.addScreenOrientation();
+		
 		new SPInterstitialRequester().execute(urlBuilder);
 	}
 	
@@ -69,13 +71,19 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 					JSONObject json = new JSONObject(bodyContent);
 					JSONArray ads = json.getJSONArray("ads");
 					for (int i = 0 ; i < ads.length() ; i++) {
-						JSONObject ad = ads.getJSONObject(i);
-						String providerType = ad.getString("provider_type");
-						String adId = ad.getString("ad_id");
-
-						interstitialAds.add(new SPInterstitialAd(
-								providerType, adId));
-		
+						JSONObject jsonAd = ads.getJSONObject(i);
+						String providerType = jsonAd.getString("provider_type");
+						String adId = jsonAd.getString("ad_id");
+						SPInterstitialAd ad = new SPInterstitialAd(
+								providerType, adId);
+						JSONArray names = jsonAd.names();
+						for (int j = 0 ; j < names.length() ; j++) {
+							String key = names.getString(j);
+							if (!(key.equals("ad_id") || (key.equals("provider_type")))) {
+								ad.setContextData(key, jsonAd.getString(key));
+							}
+						}
+						interstitialAds.add(ad);
 					}
 				} catch (JSONException e) {
 					SponsorPayLogger.e(TAG, e.getMessage(), e);;

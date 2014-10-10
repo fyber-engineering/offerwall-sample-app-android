@@ -81,30 +81,39 @@ public class SPMediationConfigurationRequester extends SignedResponseRequester<S
 		String json = StringUtils.EMPTY_STRING;
 		SharedPreferences sharedpreferences = mActivity
 				.getSharedPreferences(TAG, Context.MODE_PRIVATE);
-		if (signedServerResponse != null && verifySignature(signedServerResponse, mSecurityToken)
-				&& !hasErrorStatusCode(signedServerResponse.getStatusCode())) {
+		if (signedServerResponse != null && !hasErrorStatusCode(signedServerResponse.getStatusCode())) {
 
-			String responseBody = signedServerResponse.getResponseBody();
-
-			if (StringUtils.notNullNorEmpty(responseBody)) {
-
-				Editor editor = sharedpreferences.edit();
-				editor.putString(TAG, responseBody);
-
-				if (editor.commit() ) {
-					SponsorPayLogger.d(TAG,	"Server Side Configuration has been saved successfully.");
-				} else {
-					SponsorPayLogger.d(TAG, "Failed to save Server Side Configuration.");
+			if (verifySignature(signedServerResponse, mSecurityToken)) {
+				SponsorPayLogger.d(TAG,	"The signature is valid, proceeding...");
+				
+				String responseBody = signedServerResponse.getResponseBody();
+	
+				if (StringUtils.notNullNorEmpty(responseBody)) {
+	
+					Editor editor = sharedpreferences.edit();
+					editor.putString(TAG, responseBody);
+	
+					if (editor.commit() ) {
+						SponsorPayLogger.d(TAG,	"Server Side Configuration has been saved successfully.");
+					} else {
+						SponsorPayLogger.d(TAG, "Failed to save Server Side Configuration.");
+					}
+					
+					json = responseBody;
 				}
-				
-				json = responseBody;
-				
+			} else {
+				SponsorPayLogger.d(TAG,	"Invalid signature, those configs will not be used.");
 			}
 		}
 		if (StringUtils.nullOrEmpty(json)) {
+			SponsorPayLogger.d(TAG,	"No configs from the server, fallback to cached version.");
 			// retrieve info from the store preferencs, if any
-			SponsorPayLogger.d(TAG, "Using previously stored json file");
 			json = sharedpreferences.getString(TAG, StringUtils.EMPTY_STRING);
+			if (StringUtils.nullOrEmpty(json)) {
+				SponsorPayLogger.d(TAG, "There were no cached version to use.");
+			} else {
+				SponsorPayLogger.d(TAG, "Using cached json file");
+			}
 		}
 		overrideConfig(json);
 		
@@ -132,7 +141,7 @@ public class SPMediationConfigurationRequester extends SignedResponseRequester<S
 								serverConfigs);
 			}
 		} else {
-			SponsorPayLogger.d(TAG, "There were no server side credentials to override");
+			SponsorPayLogger.d(TAG, "There were no credentials to override");
 		}
 	}
 

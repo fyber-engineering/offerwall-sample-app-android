@@ -319,7 +319,7 @@ public class HostInfo {
 		return null == densityCategory ? UNDEFINED_VALUE : densityCategory;
 	}
 	
-	public static boolean isSupportedDevice() {
+	public static boolean isDeviceSupported() {
 		return Build.VERSION.SDK_INT >= 10;
 	}
 	

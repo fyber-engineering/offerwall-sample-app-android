@@ -23,6 +23,8 @@ public class SponsorPayLogger {
 	
 	private static boolean logging = false;
 
+	private static final String prefix = "[SP] ";
+	
 	public static boolean toggleLogging() {
 		logging = !logging;
 		return logging;
@@ -39,49 +41,49 @@ public class SponsorPayLogger {
 
 	public static void e(String tag, String message) {
 		if (shouldLog()) {
-			Log.e(tag, message);
+			Log.e(prefix +tag, message);
 			INSTANCE.log(Level.ERROR, tag, message, null);
 		}
 	}
 
 	public static void e(String tag, String message, Exception exception) {
 		if (shouldLog()) {
-			Log.w(tag, message, exception);
+			Log.w(prefix +tag, message, exception);
 			INSTANCE.log(Level.ERROR, tag, message, exception);
 		}
 	}
 
 	public static void d(String tag, String message) {
 		if (shouldLog()) {
-			Log.d(tag, message);
+			Log.d(prefix +tag, message);
 			INSTANCE.log(Level.DEBUG, tag, message, null);
 		}
 	}
 
 	public static void i(String tag, String message) {
 		if (shouldLog()) {
-			Log.i(tag, message);
+			Log.i(prefix +tag, message);
 			INSTANCE.log(Level.INFO, tag, message, null);
 		}
 	}
 
 	public static void v(String tag, String message) {
 		if (shouldLog()) {
-			Log.v(tag, message);
+			Log.v(prefix +tag, message);
 			INSTANCE.log(Level.VERBOSE, tag, message, null);
 		}
 	}
 
 	public static void w(String tag, String message) {
 		if (shouldLog()) {
-			Log.w(tag, message);
+			Log.w(prefix +tag, message);
 			INSTANCE.log(Level.WARNING, tag, message, null);
 		}
 	}
 
 	public static void w(String tag, String message, Exception exception) {
 		if (shouldLog()) {
-			Log.w(tag, message, exception);
+			Log.w(prefix + tag, message, exception);
 			INSTANCE.log(Level.WARNING, tag, message, exception);
 		}
 	}

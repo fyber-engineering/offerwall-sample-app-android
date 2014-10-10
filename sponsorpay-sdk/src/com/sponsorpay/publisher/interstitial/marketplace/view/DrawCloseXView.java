@@ -1,3 +1,8 @@
+/**
+ * SponsorPay Android SDK
+ *
+ * Copyright 2011 - 2014 SponsorPay. All rights reserved.
+ */
 package com.sponsorpay.publisher.interstitial.marketplace.view;
 
 import android.content.Context;
@@ -8,28 +13,32 @@ import android.util.DisplayMetrics;
 import android.view.View;
 
 public class DrawCloseXView extends View {
-    private Paint paint;
-    private int densityDependantRadius;
+	public static final float STROKE_WIDTH = 1.5f;
+	private static final int mFixed_radius = 15;
+	// Range from 0 to 255, where 0 is fully transparent and 255 fully opaque.
+	private static final int SEVENTY_PERCENT_OPAQUE = 178;
+	private Paint mPaint;
+	private int mDensityDependantRadius;
     
-    private static final int fixed_radius = 15;
 
     public DrawCloseXView(Context context, DisplayMetrics mDisplayMetrics) {
         super(context);
         
-        paint = new Paint();
-        paint.setAntiAlias(true);
-        paint.setStrokeWidth(1.5f);
-        paint.setColor(Color.WHITE);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeJoin(Paint.Join.ROUND);
-		
-		densityDependantRadius = (int) (fixed_radius * mDisplayMetrics.density);
+		mPaint = new Paint();
+		mPaint.setAntiAlias(true);
+		mPaint.setStrokeWidth(1.5f);
+		mPaint.setAlpha(SEVENTY_PERCENT_OPAQUE);
+		mPaint.setColor(Color.WHITE);
+		mPaint.setStyle(Paint.Style.STROKE);
+		mPaint.setStrokeJoin(Paint.Join.ROUND);
+
+		mDensityDependantRadius = (int) (mFixed_radius * mDisplayMetrics.density);
     }
     
 	@Override
-    public void onDraw(Canvas canvas) {
-    	canvas.drawLine(0, 0, densityDependantRadius, densityDependantRadius, paint);
-		canvas.drawLine(densityDependantRadius, 0, 0, densityDependantRadius, paint);
+	public void onDraw(Canvas canvas) {
+		canvas.drawLine(0, 0, mDensityDependantRadius, mDensityDependantRadius, mPaint);
+		canvas.drawLine(mDensityDependantRadius, 0, 0, mDensityDependantRadius, mPaint);
 	}
     
 }

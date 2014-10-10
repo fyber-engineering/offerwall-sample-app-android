@@ -6,7 +6,7 @@
 
 package com.sponsorpay.publisher.interstitial;
 
-import com.sponsorpay.publisher.interstitial.marketplace.MarketPlaceInterstitialActivityListener;
+import com.sponsorpay.mediation.SPMediationUserActivityListener;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -27,7 +27,7 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 
 	public final static String SP_ERROR_MESSAGE = "ERROR_MESSAGE";
 	
-	private MarketPlaceInterstitialActivityListener setOnHomeAndBackPressedEvent;
+	private SPMediationUserActivityListener mActivityListener;
 
 	
 	@Override
@@ -62,16 +62,16 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 		finish();
 	}
 	
-	public void setMarketPlaceInterstitialListener(MarketPlaceInterstitialActivityListener listener) {
-		if(setOnHomeAndBackPressedEvent == null){
-			setOnHomeAndBackPressedEvent = listener;
+	public void setMarketPlaceInterstitialListener(SPMediationUserActivityListener listener) {
+		if(mActivityListener == null){
+			mActivityListener = listener;
 		}
     }
 
 	@Override
 	protected void onUserLeaveHint() {
-		if (setOnHomeAndBackPressedEvent != null) {
-			setOnHomeAndBackPressedEvent.notifyOnHomePressed();
+		if (mActivityListener != null) {
+			mActivityListener.notifyOnHomePressed();
 		}
 		super.onUserLeaveHint();
 	}
@@ -79,8 +79,8 @@ public class SPInterstitialActivity extends Activity implements SPInterstitialAd
 	
 	@Override
 	public void onBackPressed() {
-		if (setOnHomeAndBackPressedEvent != null) {
-			setOnHomeAndBackPressedEvent.notifyOnBackPressed();
+		if (mActivityListener != null) {
+			mActivityListener.notifyOnBackPressed();
 		}
 		super.onBackPressed();
 	}

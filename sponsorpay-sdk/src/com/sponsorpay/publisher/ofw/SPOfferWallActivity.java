@@ -19,15 +19,15 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.Window;
 import android.webkit.WebChromeClient;
-import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 
 import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
-import com.sponsorpay.utils.SPHttpConnection;
 import com.sponsorpay.utils.HostInfo;
+import com.sponsorpay.utils.SPHttpConnection;
+import com.sponsorpay.utils.SPWebViewSettings;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
@@ -128,7 +128,7 @@ public class SPOfferWallActivity extends Activity {
 			setContentView(mWebView);
 			
 			mWebView.getSettings().setJavaScriptEnabled(true);
-			mWebView.getSettings().setPluginState(PluginState.ON);
+			SPWebViewSettings.enablePlugins(mWebView.getSettings());
 			
 			mActivityOfferWebClient = new ActivityOfferWebClient(SPOfferWallActivity.this,
 					mShouldStayOpen);

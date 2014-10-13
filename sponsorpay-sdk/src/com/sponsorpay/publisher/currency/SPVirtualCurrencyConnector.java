@@ -50,7 +50,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_";
 	private static final String STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR = "_";
 	
-	private static final String STATE_TRANSACTION_ID_KEY_PREFIX = "STATE_LATEST_CURRENCY_TRANSACTION_ID_";
+	private static final String STATE_TRANSACTION_CURRENCY_ID_KEY_PREFIX = "STATE_LATEST_TRANSACTION_CURRENCY_ID_";
 
 	private static final String DEFAULT_CURRENCY_ID_KEY_PREFIX = "DEFAULT_CURRENCY_ID_KEY";
 	private static boolean showToastNotification = true;
@@ -220,7 +220,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * @return The retrieved transaction ID or null.
 	 */
 	private String fetchLatestTransactionIdForRequest() {
-		return fetchLatestTransactionId(mContext, mCredentials.getCredentialsToken(), mCurrency);
+		return fetchLatestTransactionId(mContext, mCredentials.getCredentialsToken(), mCurrencyId);
 	}
 
 	/**
@@ -347,7 +347,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 		}
 		return STATE_LATEST_TRANSACTION_ID_KEY_PREFIX + credentials.getAppId()
 				+ STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR + credentials.getUserId() + STATE_LATEST_TRANSACTION_ID_KEY_SEPARATOR
-				+ STATE_TRANSACTION_ID_KEY_PREFIX + currencyId;
+				+ STATE_TRANSACTION_CURRENCY_ID_KEY_PREFIX + currencyId;
 	}
 	
 	private String getDefaultCurrency() {

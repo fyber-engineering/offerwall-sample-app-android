@@ -3,7 +3,6 @@
  *
  * Copyright 2011 - 2014 SponsorPay. All rights reserved.
  */
-
 package com.sponsorpay.publisher.currency;
 
 import java.util.Map;
@@ -49,7 +48,10 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 	 * JSON keys used to enclose data from a successful response.
 	 */
 	private static final String DELTA_OF_COINS_KEY = "delta_of_coins";
-	private static final String LATEST_TRANSACTION_ID_KEY = "latest_transaction_id";	
+	private static final String LATEST_TRANSACTION_ID_KEY = "latest_transaction_id";
+	private static final String CURRENCY_ID_KEY = "currency_id";
+	private static final String CURRENCY_NAME_KEY = "currency_name";
+	private static final String IS_DEFAULT_KEY = "is_default";
 
 	public interface SPVCSResultListener {
 		public void onSPCurrencyServerResponseReceived(SPCurrencyServerReponse response);
@@ -58,20 +60,39 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 	public interface SPCurrencyServerReponse {
 
 	}
-	
-	public static void requestCurrency(SPVCSResultListener listener,
-			SPCredentials credentials, String transactionId,
+
+	/**
+	 * Method which is being used to request new currency based on the currency
+	 * id that is provided as a parameter. In case that only the default needs
+	 * to be requested call the method: requestCurrency(SPVCSResultListener
+	 * listener, SPCredentials credentials, String transactionId, Map<String,
+	 * String> customParameters)
+	 */
+	public static void requestCurrency(SPVCSResultListener listener, SPCredentials credentials, String transactionId, String currencyId,
 			Map<String, String> customParameters) {
 
+		buildUrlAndMakeServerRequest(listener, credentials, transactionId, currencyId, customParameters);
+	}
+
+	private static void buildUrlAndMakeServerRequest(SPVCSResultListener listener, SPCredentials credentials,
+			String transactionId, String currencyId, Map<String, String> customParameters) {
+
+		if (StringUtils.nullOrEmpty(transactionId)) {
+			transactionId = URL_PARAM_KEY_LAST_TRANSACTION_ID;
+		}
 		String baseUrl = SponsorPayBaseUrlProvider.getBaseUrl(VCS_URL_KEY);
 		UrlBuilder urlBuilder = UrlBuilder.newBuilder(baseUrl, credentials)
 				.addKeyValue(URL_PARAM_KEY_LAST_TRANSACTION_ID, transactionId)
 				.addExtraKeysValues(customParameters)
 				.addScreenMetrics()
 				.addSignature();
+
+		if (StringUtils.notNullNorEmpty(currencyId)) {
+			urlBuilder.addKeyValue(CURRENCY_ID_KEY, currencyId);
+		}
+
 		new SPCurrencyServerRequester(listener, credentials.getSecurityToken()).execute(urlBuilder);
 	}
-
 
 	/**
 	 * Registered {@link AsyncRequestResultListener} to be notified of the request's results when
@@ -115,8 +136,7 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 		} else if (!verifySignature(signedServerResponse, mSecurityToken)) {
 			return new SPCurrencyServerErrorResponse(
 				SPCurrencyServerRequestErrorType.ERROR_INVALID_RESPONSE_SIGNATURE,
-				null,
-				"The signature received in the request did not match the expected one");
+				null, "The signature received in the request did not match the expected one");
 		} else {
 			return parseSuccessfulResponse(responseBody);
 		}
@@ -138,8 +158,8 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 			errorMessage = jsonResponse.getString(ERROR_MESSAGE_KEY);
 			errorType = SPCurrencyServerRequestErrorType.SERVER_RETURNED_ERROR;
 		} catch (Exception e) {
-			SponsorPayLogger.w(TAG,
-					"An exception was triggered while parsing error response", e);
+			SponsorPayLogger.w(TAG, "An exception was triggered while parsing error response", e);
+
 			errorType = SPCurrencyServerRequestErrorType.ERROR_OTHER;
 			errorMessage = e.getMessage();
 		}
@@ -151,7 +171,11 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 			JSONObject jsonResponse = new JSONObject(responseBody);
 			double deltaOfCoins = jsonResponse.getDouble(DELTA_OF_COINS_KEY);
 			String latestTransactionId = jsonResponse.getString(LATEST_TRANSACTION_ID_KEY);
-			return new SPCurrencyServerSuccesfulResponse(deltaOfCoins, latestTransactionId);
+			String currencyId = jsonResponse.getString(CURRENCY_ID_KEY);
+			String currencyName = jsonResponse.getString(CURRENCY_NAME_KEY);
+			boolean idDefault= jsonResponse.getBoolean(IS_DEFAULT_KEY);
+			
+			return new SPCurrencyServerSuccesfulResponse(deltaOfCoins, latestTransactionId, currencyId, currencyName, idDefault);
 		} catch (Exception e) {
 			SPCurrencyServerRequestErrorType errorType = SPCurrencyServerRequestErrorType.ERROR_INVALID_RESPONSE;
 			String errorMessage = e.getMessage();
@@ -176,18 +200,16 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 	}
 
 	@Override
-	protected SPCurrencyServerReponse parsedSignedResponse(
-			SignedServerResponse signedServerResponse) {
-		SPCurrencyServerReponse response = null; 
-		
+	protected SPCurrencyServerReponse parsedSignedResponse(SignedServerResponse signedServerResponse) {
+		SPCurrencyServerReponse response = null;
+
 		if (signedServerResponse != null) {
-			response = parseResponse(signedServerResponse.getStatusCode(),
-					signedServerResponse.getResponseBody(), signedServerResponse.getResponseSignature());
+			response = parseResponse(signedServerResponse.getStatusCode(), signedServerResponse.getResponseBody(), 
+					signedServerResponse.getResponseSignature());
 		}
 
 		if (response == null) {
-			response = new SPCurrencyServerErrorResponse(
-					SPCurrencyServerRequestErrorType.ERROR_OTHER,
+			response = new SPCurrencyServerErrorResponse(SPCurrencyServerRequestErrorType.ERROR_OTHER,
 					StringUtils.EMPTY_STRING, "Unknow error");
 		}
 
@@ -196,9 +218,7 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 
 	@Override
 	protected SPCurrencyServerReponse noConnectionResponse(Throwable t) {
-		return new SPCurrencyServerErrorResponse(
-				SPCurrencyServerRequestErrorType.ERROR_NO_INTERNET_CONNECTION,
-				null, t.getMessage());
+		return new SPCurrencyServerErrorResponse(SPCurrencyServerRequestErrorType.ERROR_NO_INTERNET_CONNECTION, null, t.getMessage());
 	}
 
 }

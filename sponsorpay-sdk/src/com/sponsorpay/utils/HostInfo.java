@@ -8,13 +8,18 @@ package com.sponsorpay.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -25,8 +30,7 @@ import android.view.WindowManager;
 
 
 /**
- * Extracts device information from the host device in which the SDK runs and SponsorPay App ID
- * contained in the Android Application Manifest of the host app.
+ * Extracts device information from the host device in which the SDK runs.
  */
 public class HostInfo {
 
@@ -88,6 +92,8 @@ public class HostInfo {
 	private String mConnectionType;
 
 	private String mAppVersion;
+	
+	private LocationManager mLocationManager;
 
 	/**
 	 * Constructor. Requires an Android application context which will be used to retrieve
@@ -118,6 +124,8 @@ public class HostInfo {
 		retrieveDisplayMetrics(context);
 		retrieveAppVersion(context);
 		
+		setupLocationManager(context);
+		
 		// Get the default locale
 		mLanguageSetting = Locale.getDefault().toString();
 		
@@ -128,7 +136,6 @@ public class HostInfo {
 		mPhoneVersion = android.os.Build.MANUFACTURER + "_" + android.os.Build.MODEL;
 		mBundleName = context.getPackageName();
 	}
-
 
 	private void retrieveAccessNetworkValues(Context context) {
 		mConnectionType = StringUtils.EMPTY_STRING;
@@ -216,6 +223,8 @@ public class HostInfo {
 	private CountDownLatch mIdLatch = new CountDownLatch(1);
 
 	private String mBundleName;
+
+	private List<String> mProviders;
 	
 
 	protected void retrieveAdvertisingId(Context context) {
@@ -304,7 +313,7 @@ public class HostInfo {
 		return null == densityCategory ? UNDEFINED_VALUE : densityCategory;
 	}
 	
-	public static boolean isSupportedDevice() {
+	public static boolean isDeviceSupported() {
 		return Build.VERSION.SDK_INT >= 10;
 	}
 	
@@ -360,11 +369,36 @@ public class HostInfo {
 		return mBundleName;
 	}
 
+	public LocationManager getLocationManager() {
+		return mLocationManager;
+	}
+	
+	public List<String> getLocationProviders() {
+		return mProviders;
+	}
+
+	private void setupLocationManager(Context context) {
+		//set a static boolean to avoid the continuous check
+		List<String> providers = new LinkedList<String>(); 
+		if (context.checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) 
+				== PackageManager.PERMISSION_GRANTED) {
+			providers.add(LocationManager.GPS_PROVIDER);
+			providers.add(LocationManager.PASSIVE_PROVIDER);
+		} 
+		if (context.checkCallingOrSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+				== PackageManager.PERMISSION_GRANTED) {
+			providers.add(LocationManager.NETWORK_PROVIDER);
+		};
+		if (!providers.isEmpty()) {
+			mLocationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+			mProviders = providers;
+		}
+	}
+	
 	// Permission simulation 
 	
 	protected static boolean sSimulateNoReadPhoneStatePermission = false;
 	protected static boolean sSimulateNoAccessNetworkState = false;
-
 	
 	public static void setSimulateNoReadPhoneStatePermission(boolean value) {
 		sSimulateNoReadPhoneStatePermission = value;

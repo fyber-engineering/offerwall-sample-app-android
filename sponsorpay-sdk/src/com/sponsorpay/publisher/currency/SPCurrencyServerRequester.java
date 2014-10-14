@@ -142,7 +142,6 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 		}
 	}
 	
-	
 	/**
 	 * Parses a response containing a non-successful HTTP status code. Tries to extract the error
 	 * code and error message from the response body.

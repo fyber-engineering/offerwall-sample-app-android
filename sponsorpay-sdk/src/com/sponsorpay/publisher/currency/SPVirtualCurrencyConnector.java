@@ -156,7 +156,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 *            will be provided then you will receive an invalid application error.           
 	 */
 	public void fetchDeltaOfCoinsForCurrentUserSinceTransactionId(String transactionId, String currencyId) {
-		if (!HostInfo.isSupportedDevice()) {
+		if (!HostInfo.isDeviceSupported()) {
 			SPCurrencyServerErrorResponse errorResponse = new SPCurrencyServerErrorResponse(
 					SPCurrencyServerRequestErrorType.ERROR_OTHER, "", CURRENT_API_LEVEL_NOT_SUPPORTED_ERROR);
 			mCurrencyServerListener.onSPCurrencyServerError(errorResponse);

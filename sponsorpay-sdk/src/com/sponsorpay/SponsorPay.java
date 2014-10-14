@@ -23,6 +23,7 @@ import com.sponsorpay.advertiser.SponsorPayAdvertiser;
 import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.mediation.SPMediationConfigurationRequester;
 import com.sponsorpay.utils.HostInfo;
+import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 import com.sponsorpay.utils.cookies.PersistentHttpCookieStore;
 
@@ -41,7 +42,7 @@ import com.sponsorpay.utils.cookies.PersistentHttpCookieStore;
 public class SponsorPay {
 	public static final int MAJOR_RELEASE_NUMBER = 6;
 	public static final int MINOR_RELEASE_NUMBER = 5;
-	public static final int BUGFIX_RELEASE_NUMBER = 0;
+	public static final int BUGFIX_RELEASE_NUMBER = 1;
 	public static final String RELEASE_VERSION_STRING = MAJOR_RELEASE_NUMBER + "." + 
 				MINOR_RELEASE_NUMBER + "." + BUGFIX_RELEASE_NUMBER;
 	
@@ -134,27 +135,30 @@ public class SponsorPay {
 	public static String start(String appId, String userId,
 			String securityToken, Activity activity) {
 		
-		if (HostInfo.isSupportedDevice()) {
-			Log.i(TAG, "Only devices running Android API level 10 and above are supported");
-		}
 		Set<String> credentials = new HashSet<String>(SponsorPay.getAllCredentials());
 		Context context = activity.getApplicationContext();
-		boolean firstStart = false;
-		if (credentials.isEmpty()) {
-			HostInfo.getHostInfo(context);
-			firstStart = true;
-		}
+
 		String credentialsToken = INSTANCE.getCredentialsToken(appId, userId, securityToken,
 						context);
-		if (firstStart) {
-			CookieSyncManager.createInstance(activity);
-			CookieStore store = new PersistentHttpCookieStore(activity);
-			CookieManager cookieManager = new CookieManager(store,CookiePolicy.ACCEPT_ORIGINAL_SERVER);
-			CookieHandler.setDefault(cookieManager);
-			SPMediationConfigurationRequester.requestConfig(INSTANCE.currentCredentials, activity);
-		}
-		if (!credentials.contains(credentialsToken)) {
-			SponsorPayAdvertiser.register(context);
+		if (HostInfo.isDeviceSupported()) {
+			if (credentials.isEmpty()) {
+				HostInfo.getHostInfo(context);
+				CookieSyncManager.createInstance(activity);
+				CookieStore store = new PersistentHttpCookieStore(activity);
+				CookieManager cookieManager = new CookieManager(store,CookiePolicy.ACCEPT_ORIGINAL_SERVER);
+				CookieHandler.setDefault(cookieManager);
+				SPMediationConfigurationRequester.requestConfig(INSTANCE.currentCredentials, activity);
+			}
+			if (!credentials.contains(credentialsToken)) {
+				SponsorPayAdvertiser.register(context);
+			}
+		} else {
+			// Always print the message in the logs 
+			if (SponsorPayLogger.isLogging()) {
+				SponsorPayLogger.i(TAG, "Only devices running Android API level 10 and above are supported");
+			} else {
+				Log.i(TAG, "Only devices running Android API level 10 and above are supported");
+			}
 		}
 		
 		return credentialsToken;

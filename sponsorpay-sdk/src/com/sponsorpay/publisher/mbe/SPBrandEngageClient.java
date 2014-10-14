@@ -33,6 +33,7 @@ import android.view.View.OnTouchListener;
 import android.view.WindowManager.BadTokenException;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings.PluginState;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout.LayoutParams;
@@ -51,6 +52,7 @@ import com.sponsorpay.publisher.mbe.mediation.SPMediationVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoEvent;
 import com.sponsorpay.publisher.mbe.mediation.SPTPNVideoValidationResult;
 import com.sponsorpay.utils.HostInfo;
+import com.sponsorpay.utils.SPHttpConnection;
 import com.sponsorpay.utils.SPWebClient;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
@@ -214,7 +216,8 @@ public class SPBrandEngageClient {
 				case LOAD_URL:
 					if (mWebView != null) {
 						String url = msg.obj.toString();
-						mWebView.loadUrl(url);
+						
+						mWebView.loadUrl(url, SPHttpConnection.createUserSegmentationMapForHeaders());
 						if (url.equals(ABOUT_BLANK)) {
 							mWebView = null;
 							mActivity = null;
@@ -251,7 +254,7 @@ public class SPBrandEngageClient {
 	 */
 	public boolean requestOffers(SPCredentials credentials, Activity activity) {
 		if (canRequestOffers()) {
-			if (!HostInfo.isSupportedDevice()) {
+			if (!HostInfo.isDeviceSupported()) {
 				//always return no offers
 				processQueryOffersResponse(0);
 			} else {
@@ -304,8 +307,8 @@ public class SPBrandEngageClient {
 				mActivity = activity;
 				if (!playThroughMediation) {
 					mActivity.addContentView(mWebView, new LayoutParams(
-							LayoutParams.FILL_PARENT,
-							LayoutParams.FILL_PARENT));
+							LayoutParams.MATCH_PARENT,
+							LayoutParams.MATCH_PARENT));
 					mContext.registerReceiver(mNetworkStateReceiver, mIntentFilter);
 				}
 			
@@ -533,7 +536,7 @@ public class SPBrandEngageClient {
 		mWebView = new WebView(mContext);
 		
 		mWebView.getSettings().setJavaScriptEnabled(true);
-		mWebView.getSettings().setPluginsEnabled(true);
+		mWebView.getSettings().setPluginState(PluginState.ON);
 
 		mWebView.getSettings().setUseWideViewPort(false);
 		
@@ -799,7 +802,7 @@ public class SPBrandEngageClient {
 				}
 			};
 			
-			final GestureDetector gestureDetector = new GestureDetector(new OnGestureListener() {
+			final GestureDetector gestureDetector = new GestureDetector(mContext, new OnGestureListener() {
 				
 				@Override
 				public boolean onSingleTapUp(MotionEvent e) {

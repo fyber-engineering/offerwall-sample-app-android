@@ -236,27 +236,22 @@ public class SponsorPayPublisher {
 	 *            A map of extra key/value pairs to add to the request URL.
 	 * 
 	 * @return An Android {@link Intent} which can be used with the {@link Activity} method
-	 *         startActivityForResult() to launch the {@link SPOfferWallActivity}. Or null
-	 *         if the device is not supported(Running Android OS version prior to Android 2.3
-	 *         (Gingerbread).
+	 *         startActivityForResult() to launch the {@link SPOfferWallActivity}.
 	 */
 	public static Intent getIntentForOfferWallActivity(String credentialsToken, Context context,
 			Boolean shouldStayOpen, String currencyName, HashMap<String, String> customParams) {
 		
-		if (HostInfo.isSupportedDevice()) {
-		
+		Intent intent = new Intent(context, SPOfferWallActivity.class);
+		if (HostInfo.isDeviceSupported()) {
 			SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 
-			Intent intent = new Intent(context, SPOfferWallActivity.class);
 			intent.putExtra(SPOfferWallActivity.EXTRA_CREDENTIALS_TOKEN_KEY, credentials.getCredentialsToken());
 			intent.putExtra(SPOfferWallActivity.EXTRA_SHOULD_STAY_OPEN_KEY, shouldStayOpen);
 			intent.putExtra(SPOfferWallActivity.EXTRA_CURRENCY_NAME_KEY, currencyName);
 			intent.putExtra(SPOfferWallActivity.EXTRA_KEYS_VALUES_MAP_KEY, customParams);
 
-			return intent;		
 		}
-		
-		return null;
+		return intent;		
 	}
 
 

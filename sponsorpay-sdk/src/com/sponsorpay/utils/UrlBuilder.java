@@ -80,6 +80,8 @@ public class UrlBuilder {
 	
 	private static final String TIMESTAMP_KEY = "timestamp";
 
+	private static final String SCREEN_ORIENTATION = "orientation";
+	
 	/**
 	 * Request signature parameter key.
 	 */
@@ -92,6 +94,7 @@ public class UrlBuilder {
 	
 	private static final String ADVERTISING_ID_KEY = "google_ad_id";
 	private static final String ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY = "google_ad_id_limited_tracking_enabled";
+
 
 	/**
 	 * Checks that the passed Map of key/value parameters doesn't contain empty or null keys or
@@ -153,6 +156,8 @@ public class UrlBuilder {
 
 	private boolean mShouldAddScreenMetrics = false;
 	
+	private boolean mShouldAddScreenOrientation = false;
+	
 	private boolean mShouldAddUserId = true;
 	
 	private boolean mShouldAddTimestamp = false;
@@ -162,7 +167,6 @@ public class UrlBuilder {
 	private SPCredentials mCredentials;
 
 	private String mCurrency;
-
 	
 	protected UrlBuilder(String resourceUrl, SPCredentials credentials) {
 		mResourceUrl = resourceUrl;
@@ -185,6 +189,11 @@ public class UrlBuilder {
 
 	public UrlBuilder addScreenMetrics() {
 		mShouldAddScreenMetrics = true;
+		return this;
+	}
+	
+	public UrlBuilder addScreenOrientation() {
+		mShouldAddScreenOrientation = true;
 		return this;
 	}
 	
@@ -256,6 +265,10 @@ public class UrlBuilder {
 			keyValueParams.put(SCREEN_DENSITY_X_KEY, hostInfo.getScreenDensityX());
 			keyValueParams.put(SCREEN_DENSITY_Y_KEY, hostInfo.getScreenDensityY());
 			keyValueParams.put(SCREEN_DENSITY_CATEGORY_KEY, hostInfo.getScreenDensityCategory());
+		}
+		
+		if (mShouldAddScreenOrientation) {
+			keyValueParams.put(SCREEN_ORIENTATION, hostInfo.getScreenOrientation());
 		}
 
 		if (mExtraKeysValues != null) {

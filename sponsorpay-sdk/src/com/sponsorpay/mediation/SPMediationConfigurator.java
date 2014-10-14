@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.sponsorpay.SponsorPay;
+import com.sponsorpay.mediation.marketplace.MarketPlaceAdapter;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
@@ -41,14 +42,13 @@ public class SPMediationConfigurator {
 	public Map<String, List<String>> getMediationAdapters() {
 		SponsorPayLogger.d(TAG, "Getting compatible adapters for SDK v" + SponsorPay.RELEASE_VERSION_STRING );
 		
+		Map<String, List<String>> map = new HashMap<String, List<String>>();
 		String jsonString = SPMediationConfigurationFiles.getAdapterInfo();
 		if (StringUtils.notNullNorEmpty(jsonString)) {
 			try {
 				JSONObject json = new JSONObject(jsonString);
 
 				JSONArray array = json.getJSONArray("adapters");
-				Map<String, List<String>> map = new HashMap<String, List<String>>(
-						array.length());
 
 				for (int i = 0; i < array.length(); i++) {
 					JSONObject object = array.getJSONObject(i);
@@ -61,7 +61,7 @@ public class SPMediationConfigurator {
 				}
 
 				SponsorPayLogger.d(TAG, "adapters.info file successfully loaded");
-				return map;
+//				return map;
 			} catch (JSONException e) {
 				SponsorPayLogger.e(TAG, "An JSON error occured while parsing the adapters.info file,"
 						+ " no mediation adapters will be loaded.", e);
@@ -69,7 +69,10 @@ public class SPMediationConfigurator {
 		} else {
 			SponsorPayLogger.e(TAG, "The adapters.info file was not found, no adapters will be loaded.");
 		}
-		return Collections.emptyMap();
+		LinkedList<String> versions = new LinkedList<String>();
+		versions.add(SponsorPay.RELEASE_VERSION_STRING);
+		map.put(MarketPlaceAdapter.class.getCanonicalName(), versions);
+		return map;
 	}
 	
 	public Map<String, Object> getConfigurationForAdapter(String adapter) {

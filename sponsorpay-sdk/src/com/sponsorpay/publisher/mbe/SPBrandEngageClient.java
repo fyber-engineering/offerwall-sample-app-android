@@ -617,7 +617,7 @@ public class SPBrandEngageClient {
 						try {
 							SponsorPayPublisher.requestNewCoins(SponsorPay
 									.getCurrentCredentials().getCredentialsToken(),
-									mContext, mVCSListener, null, null, mCurrency);
+									mContext, mVCSListener, null, null, null, mCurrency);
 						} catch (RuntimeException e) {
 							SponsorPayLogger.e(TAG, "Error in VCS request", e);
 						}

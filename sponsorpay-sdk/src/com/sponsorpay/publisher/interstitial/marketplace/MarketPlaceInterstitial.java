@@ -74,7 +74,10 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 				case LOAD_HTML:
 
-					mWebView.loadDataWithBaseURL(null, mHtmlContent, null, "UTF-8", null);
+					if(StringUtils.notNullNorEmpty(mHtmlContent)){
+						mWebView.loadDataWithBaseURL(null, mHtmlContent, null, "UTF-8", null);
+					}
+					
 					break;
 
 				default:
@@ -220,6 +223,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				parentViewGroup.removeAllViews();
 			}
 		}
+		mHtmlContent = null;
 	}
 
 	@Override

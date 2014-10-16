@@ -14,6 +14,7 @@ import android.net.Uri;
 
 import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
+import com.sponsorpay.publisher.SponsorPayPublisher;
 
 /**
  * <p>
@@ -105,15 +106,16 @@ public class UrlBuilder {
 	public static void validateKeyValueParams(Map<String, String> kvParams) {
 		if (kvParams != null) {
 			for (Entry<String, String> entry : kvParams.entrySet()) {
-				if (StringUtils.nullOrEmpty(entry.getKey())
-						|| StringUtils.nullOrEmpty(entry.getValue())) {
-					throw new IllegalArgumentException(
-							"SponsorPay SDK: Custom Parameters cannot have an empty or null"
-									+ " Key or Value.");
+
+				if (!entry.getKey().equals(SponsorPayPublisher.PLACEMENT_KEY)
+						&& (StringUtils.nullOrEmpty(entry.getKey()) || StringUtils.nullOrEmpty(entry.getValue()))) {
+					throw new IllegalArgumentException("SponsorPay SDK: Custom Parameters cannot have an empty or null"
+							+ " Key or Value.");
 				}
 			}
 		}
 	}
+	
 
 	/**
 	 * Constructs a Map of key / value parameters given an array of keys and an array of values. If

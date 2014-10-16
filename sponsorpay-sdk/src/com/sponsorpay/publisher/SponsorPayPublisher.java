@@ -899,9 +899,14 @@ public class SponsorPayPublisher {
 		}
 		return canRequestAds;
 	}
+
 	private static Map<String, String> setParameterInMap(Map<String, String> parameters, String placementId) {
 		if (parameters == null) {
 			parameters = new HashMap<String, String>();
+		}
+
+		if (StringUtils.nullOrEmpty(placementId)) {
+			placementId = null;
 		}
 		parameters.put(PLACEMENT_KEY, placementId);
 		return parameters;

@@ -62,11 +62,11 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				switch (msg.what) {
 				case CREATE_WEBVIEW:
 
-					MessageInfoHolder holder = (MessageInfoHolder) msg.obj;
+					Context context = (Context) msg.obj;
 
-					mWebView = new WebView(holder.mContext);
+					mWebView = new WebView(context);
 
-					createMainLayout(holder.mContext);
+					createMainLayout(context);
 
 					mWebView.getSettings().setJavaScriptEnabled(true);
 					mWebView.setWebViewClient(getWebClient());
@@ -74,7 +74,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 				case LOAD_HTML:
 
-					mWebView.loadDataWithBaseURL(null, msg.obj.toString(), null, "UTF-8", null);
+					mWebView.loadDataWithBaseURL(null, mHtmlContent, null, "UTF-8", null);
 					break;
 
 				default:
@@ -98,7 +98,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 			if (mWebView == null) {
 				Message msg = Message.obtain(mMainHandler);
 				msg.what = CREATE_WEBVIEW;
-				msg.obj = new MessageInfoHolder(context);
+				msg.obj = context;
 				msg.sendToTarget();
 			}
 			setAdAvailable();
@@ -108,7 +108,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 	@Override
 	protected boolean show(Activity parentActivity) {
-		loadHtml(mHtmlContent);
+		loadHtml(parentActivity.getApplicationContext());
 		mActivity = parentActivity;
 		setOrientation();
 
@@ -126,10 +126,10 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		return true;
 	}
 
-	private void loadHtml(String html) {
+	private void loadHtml(Context context) {
 		Message msg = Message.obtain(mMainHandler);
 		msg.what = LOAD_HTML;
-		msg.obj = html;
+		msg.obj = context;
 		msg.sendToTarget();
 	}
 
@@ -307,17 +307,6 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	 */
 	private void lockWithProvidedOrientation(int providedOrientation) {
 		mActivity.setRequestedOrientation(providedOrientation);
-	}
-
-	// Helper class
-	private class MessageInfoHolder {
-		private Context mContext;
-
-		// private String mHtml;
-
-		private MessageInfoHolder(Context context) {
-			this.mContext = context;
-		}
 	}
 
 }

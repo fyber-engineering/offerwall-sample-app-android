@@ -49,7 +49,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	private String mOrientation;
 	private String mRotation;
 
-	private String htmlContent;
+	private String mHtmlContent;
 
 	private InterstitialCloseButtonRelativeLayout mCloseButtonLayout;
 
@@ -70,6 +70,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 					mWebView.getSettings().setJavaScriptEnabled(true);
 					mWebView.setWebViewClient(getWebClient());
+					break;
 
 				case LOAD_HTML:
 
@@ -87,8 +88,8 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	public boolean isAdAvailable(Context context, SPInterstitialAd ad) {
 		removeAttachedLayout();
 
-		htmlContent = ad.getContextData().get("html");
-		boolean hasHtml = StringUtils.notNullNorEmpty(htmlContent);
+		mHtmlContent = ad.getContextData().get("html");
+		boolean hasHtml = StringUtils.notNullNorEmpty(mHtmlContent);
 
 		mOrientation = ad.getContextData().get("orientation");
 		mRotation = ad.getContextData().get("rotation");
@@ -107,7 +108,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 	@Override
 	protected boolean show(Activity parentActivity) {
-		loadHtml(htmlContent);
+		loadHtml(mHtmlContent);
 		mActivity = parentActivity;
 		setOrientation();
 

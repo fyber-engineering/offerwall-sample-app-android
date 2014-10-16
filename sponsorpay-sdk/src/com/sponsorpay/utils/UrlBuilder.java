@@ -14,7 +14,6 @@ import android.net.Uri;
 
 import com.sponsorpay.SponsorPay;
 import com.sponsorpay.credentials.SPCredentials;
-import com.sponsorpay.publisher.SponsorPayPublisher;
 
 /**
  * <p>
@@ -107,8 +106,7 @@ public class UrlBuilder {
 		if (kvParams != null) {
 			for (Entry<String, String> entry : kvParams.entrySet()) {
 
-				if (!entry.getKey().equals(SponsorPayPublisher.PLACEMENT_KEY)
-						&& (StringUtils.nullOrEmpty(entry.getKey()) || StringUtils.nullOrEmpty(entry.getValue()))) {
+				if (StringUtils.nullOrEmpty(entry.getKey())) {
 					throw new IllegalArgumentException("SponsorPay SDK: Custom Parameters cannot have an empty or null"
 							+ " Key or Value.");
 				}

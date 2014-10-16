@@ -472,7 +472,6 @@ public class SponsorPayPublisher {
 	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
 	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
 	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. It will use the 
->>>>>>> upstream/develop-major
 	 * credentials identified by the provided token id.
 	 * 
 	 * @param credentialsToken

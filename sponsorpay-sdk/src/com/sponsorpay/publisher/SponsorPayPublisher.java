@@ -414,10 +414,6 @@ public class SponsorPayPublisher {
 	 *            ID is empty or null, then the default currency will be requested. If an invalid currency ID
 	 *            will be provided then you will receive an invalid application error.           
 	 * @param listener
-<<<<<<< HEAD
-	 *            {@link SPCurrencyServerListener} which will be notified of the
-	 *            result of the request.
-=======
 	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
 	 *            request.
 	 */
@@ -436,7 +432,6 @@ public class SponsorPayPublisher {
 	 * @param listener
 	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
 	 *            request.     
->>>>>>> upstream/develop-major
 	 * @param customCurrency
 	 *            A string representing the custom currency to be used by the
 	 *            toast message to show the amount of coins earned.
@@ -448,12 +443,6 @@ public class SponsorPayPublisher {
 	}
 
 	/**
-<<<<<<< HEAD
-	 * Sends a request to the SponsorPay currency server to obtain the variation
-	 * in amount of virtual currency for a given user. Returns immediately, and
-	 * the answer is delivered to one of the provided listener's callback
-	 * methods. See {@link SPCurrencyServerListener}. It will use the
-=======
 	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
 	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
 	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. The current 

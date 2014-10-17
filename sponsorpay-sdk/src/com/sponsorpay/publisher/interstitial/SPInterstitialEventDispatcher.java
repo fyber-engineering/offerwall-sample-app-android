@@ -30,8 +30,8 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 	private static final int SUCCESSFUL_HTTP_STATUS_CODE = 200;
 	
 	// those values are hardcoded for now
-	private static String[] additionalParamKey = {"platform", "ad_format", "client", "rewarded"};
-	private static String[] additionalParamValues = {"android", "interstitial", "sdk", "0"};
+	private static String[] additionalParamKey = {"ad_format", "rewarded"};
+	private static String[] additionalParamValues = {"interstitial", "0"};
 
 	public static void trigger(SPCredentials credentials, String requestId,
 			SPInterstitialAd ad, SPInterstitialEvent event) {

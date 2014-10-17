@@ -82,6 +82,7 @@ public class UrlBuilder {
 
 	private static final String SCREEN_ORIENTATION = "orientation";
 	
+	
 	/**
 	 * Request signature parameter key.
 	 */
@@ -95,7 +96,17 @@ public class UrlBuilder {
 	private static final String ADVERTISING_ID_KEY = "google_ad_id";
 	private static final String ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY = "google_ad_id_limited_tracking_enabled";
 
+	/**
+	 * Fixed params for the whole SDK
+	 */
 
+	private static final String URL_PLATFORM_KEY = "platform";
+	private static final String URL_PLATFORM_VALUE = "platform";
+	
+	private static final String URL_CLIENT_KEY = "client";
+	private static final String URL_CLIENT_VALUE = "sdk";
+
+	
 	/**
 	 * Checks that the passed Map of key/value parameters doesn't contain empty or null keys or
 	 * values. If it does, triggers an {@link IllegalArgumentException}.
@@ -241,6 +252,9 @@ public class UrlBuilder {
 
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(APPID_KEY, mCredentials.getAppId());
+
+		keyValueParams.put(URL_PLATFORM_KEY, URL_PLATFORM_VALUE);
+		keyValueParams.put(URL_CLIENT_KEY, URL_CLIENT_VALUE);
 
 		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());
 		keyValueParams.put(PHONE_VERSION_KEY, hostInfo.getPhoneVersion());

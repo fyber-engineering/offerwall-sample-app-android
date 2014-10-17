@@ -101,7 +101,7 @@ public class UrlBuilder {
 	 */
 
 	private static final String URL_PLATFORM_KEY = "platform";
-	private static final String URL_PLATFORM_VALUE = "platform";
+	private static final String URL_PLATFORM_VALUE = "android";
 	
 	private static final String URL_CLIENT_KEY = "client";
 	private static final String URL_CLIENT_VALUE = "sdk";

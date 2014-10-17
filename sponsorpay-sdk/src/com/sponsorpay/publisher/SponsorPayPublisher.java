@@ -445,6 +445,27 @@ public class SponsorPayPublisher {
 		return getIntentForMBEActivity(credentialsToken, activity, listener);
 	}
 	
+	
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 * @param currencyId
+	 *            The custom currency ID. If the default is required then pass null.            
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForMBEActivity(Activity activity, 
+			SPBrandEngageRequestListener listener, String currencyId) {
+			
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForMBEActivity(credentialsToken, activity, listener, currencyId);
+	}
+	
 	/**
 	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
@@ -464,6 +485,31 @@ public class SponsorPayPublisher {
 			SPBrandEngageRequestListener listener, SPCurrencyServerListener vcsListener) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
 		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, vcsListener);
+	}
+	
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and
+	 * registers a listener which will be notified when a response is received.
+	 * 
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of
+	 *            the results of the request.
+	 * @param vcsListener
+	 *            The Virtual Currency Server listener that will be notified
+	 *            after a successful engagement.
+	 * 
+	 * @param currencyId
+	 *            The custom currency ID. If the default is required then pass
+	 *            null.
+	 * @return A boolean that indicates if the actual request has been made to
+	 *         the server.
+	 */
+	public static boolean getIntentForMBEActivity(Activity activity, 
+			SPBrandEngageRequestListener listener, SPCurrencyServerListener vcsListener, String currencyId) {
+		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, vcsListener, currencyId);
 	}
 
 	/**
@@ -485,6 +531,28 @@ public class SponsorPayPublisher {
 		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null);
 	}
 	
+	
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
+	 * 
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 * @param currencyId
+	 *            The custom currency ID. If the default is required then pass
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForMBEActivity(String credentialsToken,
+			Activity activity, SPBrandEngageRequestListener listener, String currencyId) {
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null, currencyId);
+	}
+	
+	
 	/**
 	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
 	 * notified when a response is received.
@@ -504,12 +572,42 @@ public class SponsorPayPublisher {
 	 * @param vcsListener
 	 * 			  The Virtual Currency Server listener that will be notified after a successful 
 	 * 			  engagement.
+	 * @return A boolean that indicates if the actual request has been made to the server.
+	 */
+	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity,
+			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters,
+			SPCurrencyServerListener vcsListener) {
+
+		return getIntentForMBEActivity(credentialsToken, activity, listener, currencyName, parameters, vcsListener, null);
+	}
+	
+	/**
+	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and registers a listener which will be
+	 * notified when a response is received.
 	 * 
+	 * @param credentialsToken
+	 *            The token id of the credentials to be used.
+	 * @param activity
+	 *            Calling activity.
+	 * @param listener
+	 *            {@link SPBrandEngageRequestListener} which will be notified of the results of the
+	 *            request.
+	 * @param currencyName
+	 *            The name of the currency employed by your application. Provide null if you don't
+	 *            use a custom currency name.
+	 * @param parameters
+	 *            A map of extra key/value pairs to add to the request URL.
+	 * @param vcsListener
+	 * 			  The Virtual Currency Server listener that will be notified after a successful 
+	 * 			  engagement.
+	 * @param currencyId
+	 *            The currency ID that will be used. Provide null if you don't
+	 *            use a custom currency ID.
 	 * @return A boolean that indicates if the actual request has been made to the server.
 	 */
 	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity, 
 			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters, 
-			SPCurrencyServerListener vcsListener) {
+			SPCurrencyServerListener vcsListener, String currencyId) {
 		
 		SPBrandEngageClient brandEngageClient = SPBrandEngageClient.INSTANCE;
 		boolean canRequestOffers = brandEngageClient.canRequestOffers();
@@ -518,6 +616,8 @@ public class SponsorPayPublisher {
 			brandEngageClient.setCurrencyName(currencyName);
 			brandEngageClient.setCustomParameters(parameters);
 			brandEngageClient.setCurrencyListener(vcsListener);
+		    brandEngageClient.setCurrencyId(currencyId);
+			
 
 			SPBrandEngageRequest request = new SPBrandEngageRequest(credentials, activity, brandEngageClient, listener);
 			request.askForOffers();

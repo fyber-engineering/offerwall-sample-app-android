@@ -78,6 +78,8 @@ public class UrlBuilder {
 	
 	private static final String CURRENCY_KEY = "currency";
 	
+	private static final String CURRENCY_ID_KEY = "currency_id";
+	
 	private static final String TIMESTAMP_KEY = "timestamp";
 
 	private static final String SCREEN_ORIENTATION = "orientation";
@@ -178,6 +180,7 @@ public class UrlBuilder {
 	private SPCredentials mCredentials;
 
 	private String mCurrency;
+	private String mCurrencyId;
 	
 	protected UrlBuilder(String resourceUrl, SPCredentials credentials) {
 		mResourceUrl = resourceUrl;
@@ -215,6 +218,11 @@ public class UrlBuilder {
 	
 	public UrlBuilder setCurrency(String currency) {
 		mCurrency = currency;
+		return this;
+	}
+	
+	public UrlBuilder setCurrencyId(String currencyId) {
+		mCurrencyId = currencyId;
 		return this;
 	}
 	
@@ -271,6 +279,10 @@ public class UrlBuilder {
 
 		if (StringUtils.notNullNorEmpty(mCurrency)) {
 			keyValueParams.put(CURRENCY_KEY, mCurrency);
+		}
+		
+		if (StringUtils.notNullNorEmpty(mCurrencyId)) {
+			keyValueParams.put(CURRENCY_ID_KEY, mCurrencyId);
 		}
 		
 		if (mShouldAddScreenMetrics) {

@@ -278,7 +278,6 @@ public class SPBrandEngageClient {
 		
 		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials)
 				.setCurrency(mCurrencyName).addExtraKeysValues(mCustomParameters)
-				.addKeyValue(KEY_FOR_CLIENT_CUSTOM_PARAMETER, "sdk").addKeyValue(KEY_FOR_PLATFORM_CUSTOM_PARAMETER, "android")
 				.addKeyValue(KEY_FOR_REWARDED_CUSTOM_PARAMETER, "1").addKeyValue(KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER, "video")
 				.addScreenMetrics().buildUrl();;
 		

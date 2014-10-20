@@ -605,10 +605,10 @@ public class SponsorPayPublisher {
 	 *            use a custom currency ID.
 	 * @return A boolean that indicates if the actual request has been made to the server.
 	 */
-	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity, 
-			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters, 
+	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity,
+			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters,
 			SPCurrencyServerListener vcsListener, String currencyId) {
-		
+
 		SPBrandEngageClient brandEngageClient = SPBrandEngageClient.INSTANCE;
 		boolean canRequestOffers = brandEngageClient.canRequestOffers();
 		if (canRequestOffers) {
@@ -616,8 +616,7 @@ public class SponsorPayPublisher {
 			brandEngageClient.setCurrencyName(currencyName);
 			brandEngageClient.setCustomParameters(parameters);
 			brandEngageClient.setCurrencyListener(vcsListener);
-		    brandEngageClient.setCurrencyId(currencyId);
-			
+			brandEngageClient.setCurrencyId(currencyId);
 
 			SPBrandEngageRequest request = new SPBrandEngageRequest(credentials, activity, brandEngageClient, listener);
 			request.askForOffers();

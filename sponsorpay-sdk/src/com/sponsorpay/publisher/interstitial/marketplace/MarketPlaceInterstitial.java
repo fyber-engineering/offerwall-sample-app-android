@@ -34,12 +34,12 @@ import com.sponsorpay.utils.StringUtils;
 
 public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<MarketPlaceAdapter> implements
 		SPMediationUserActivityListener, OnClickListener {
-	
+
 	private static final String TAG = "MarketPlaceInterstitial";
-	
+
 	protected static final int CREATE_WEBVIEW = 0;
 	protected static final int LOAD_HTML = 1;
-	
+
 	private Handler mMainHandler;
 	private WebView mWebView;
 	private WebViewClient mWebClient;
@@ -48,32 +48,36 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	private Activity mActivity;
 	private String mOrientation;
 	private String mRotation;
-	
+
+	private String mHtmlContent;
+
 	private InterstitialCloseButtonRelativeLayout mCloseButtonLayout;
 
 	public MarketPlaceInterstitial(MarketPlaceAdapter adapter) {
 		super(adapter);
-		
+
 		mMainHandler = new Handler(Looper.getMainLooper()) {
 			@Override
 			public void handleMessage(Message msg) {
 				switch (msg.what) {
 				case CREATE_WEBVIEW:
-					
-					MessageInfoHolder holder = (MessageInfoHolder) msg.obj;
 
-					mWebView = new WebView(holder.mContext);
+					Context context = (Context) msg.obj;
 
-					createMainLayout(holder.mContext);
+					mWebView = new WebView(context);
+
+					createMainLayout(context);
 
 					mWebView.getSettings().setJavaScriptEnabled(true);
 					mWebView.setWebViewClient(getWebClient());
+					break;
 
-					msg.obj = holder.mHtml;
-					
 				case LOAD_HTML:
 
-					mWebView.loadDataWithBaseURL(null, msg.obj.toString(), null, "UTF-8", null);
+					if(StringUtils.notNullNorEmpty(mHtmlContent)){
+						mWebView.loadDataWithBaseURL(null, mHtmlContent, null, "UTF-8", null);
+					}
+					
 					break;
 
 				default:
@@ -87,8 +91,8 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	public boolean isAdAvailable(Context context, SPInterstitialAd ad) {
 		removeAttachedLayout();
 
-		String htmlContent = ad.getContextData().get("html");
-		boolean hasHtml = StringUtils.notNullNorEmpty(htmlContent);
+		mHtmlContent = ad.getContextData().get("html");
+		boolean hasHtml = StringUtils.notNullNorEmpty(mHtmlContent);
 
 		mOrientation = ad.getContextData().get("orientation");
 		mRotation = ad.getContextData().get("rotation");
@@ -97,52 +101,47 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 			if (mWebView == null) {
 				Message msg = Message.obtain(mMainHandler);
 				msg.what = CREATE_WEBVIEW;
-				msg.obj = new MessageInfoHolder(context, htmlContent);
+				msg.obj = context;
 				msg.sendToTarget();
-			} else {
-				loadHtml(htmlContent);
 			}
 			setAdAvailable();
 		}
 		return hasHtml;
 	}
-	
-	private void loadHtml(String html) {
-		Message msg = Message.obtain(mMainHandler);
-		msg.what = LOAD_HTML;
-		msg.obj = html;
-		msg.sendToTarget();
-	}
-	
+
 	@Override
 	protected boolean show(Activity parentActivity) {
+		loadHtml();
 		mActivity = parentActivity;
 		setOrientation();
 
 		if (mActivity instanceof SPInterstitialActivity) {
-			mActivity = parentActivity;
 			((SPInterstitialActivity) mActivity).setMarketPlaceInterstitialListener(MarketPlaceInterstitial.this);
 		}
-		
-		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(
-				ViewGroup.LayoutParams.FILL_PARENT,
+
+		FrameLayout.LayoutParams layoutparams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
 				ViewGroup.LayoutParams.FILL_PARENT);
 		parentActivity.setContentView(mMainLayout, layoutparams);
 
 		fireImpressionEvent();
-		
+
 		return true;
+	}
+
+	private void loadHtml() {
+		Message msg = Message.obtain(mMainHandler);
+		msg.what = LOAD_HTML;
+		msg.sendToTarget();
 	}
 
 	@Override
 	protected void checkForAds(Context context) {
-		//do nothing
+		// do nothing
 	}
-	
-	
+
 	private WebViewClient getWebClient() {
 		if (mWebClient == null) {
-				
+
 			mWebClient = new SPWebClient(null) {
 
 				@Override
@@ -162,7 +161,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				protected Activity getHostActivity() {
 					return mActivity;
 				}
-				
+
 				@Override
 				protected void processSponsorPayScheme(String host, Uri uri) {
 					// nothing more to do, everything is done by super class
@@ -174,13 +173,11 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				}
 
 				@Override
-				public void onReceivedError(WebView view, int errorCode,
-						String description, String failingUrl) {
-					
-					String errorMessage = String
-							.format("Interstitials WebView triggered an error. "
-									+ "Error code: %d, error description: %s. Failing URL: %s",
-									errorCode, description, failingUrl);
+				public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+
+					String errorMessage = String.format("Interstitials WebView triggered an error. "
+							+ "Error code: %d, error description: %s. Failing URL: %s", errorCode, description,
+							failingUrl);
 
 					SponsorPayLogger.e(TAG, errorMessage);
 
@@ -188,10 +185,10 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				}
 			};
 		}
-		
+
 		return mWebClient;
 	}
-	
+
 	private void createMainLayout(Context context) {
 		// main FrameLayout which will host the webview and the close button
 		mMainLayout = new FrameLayout(context);
@@ -201,8 +198,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		mCloseButtonLayout = new InterstitialCloseButtonRelativeLayout(context);
 
 		// the webview
-		mWebView.setLayoutParams(new FrameLayout.LayoutParams(
-				ViewGroup.LayoutParams.FILL_PARENT,
+		mWebView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
 				ViewGroup.LayoutParams.FILL_PARENT));
 
 		// attach on the main layout the webview and the close button.
@@ -213,7 +209,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		// Set a listener for the close button
 		mCloseButtonLayout.setOnClickListener(this);
 	}
-	
+
 	/**
 	 * Is removing all the views from the dynamically generated marketplace
 	 * interstitials.
@@ -225,8 +221,8 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 				parentViewGroup.removeAllViews();
 			}
 		}
+		mHtmlContent = null;
 	}
-
 
 	@Override
 	public void notifyOnBackPressed() {
@@ -250,7 +246,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		fireCloseEvent();
 		removeAttachedLayout();
 	}
-	
+
 	/**
 	 * Method which is setting the orientation according to the one that has
 	 * been provided via the server's JSON response. If the JSON doesn't have
@@ -260,8 +256,7 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 	private void setOrientation() {
 
 		int rotationAsInt = Integer.parseInt(mRotation);
-		boolean hasDeviceReverseOrientation = HostInfo.getHostInfo(null)
-				.hasDeviceRevserseOrientation();
+		boolean hasDeviceReverseOrientation = HostInfo.getHostInfo(null).hasDeviceRevserseOrientation();
 
 		if (mOrientation.equalsIgnoreCase("portrait")) {
 
@@ -306,24 +301,14 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 			}
 		}
 	}
-	
+
 	/**
 	 * Method which is sets and locks the provided orientation.
+	 * 
 	 * @param providedOrientation
 	 */
 	private void lockWithProvidedOrientation(int providedOrientation) {
 		mActivity.setRequestedOrientation(providedOrientation);
 	}
 
-	// Helper class
-	private class MessageInfoHolder {
-		private Context mContext;
-		private String mHtml;
-
-		private MessageInfoHolder(Context context, String html) {
-			this.mContext = context;
-			this.mHtml = html;
-		}
-	}
-	
 }

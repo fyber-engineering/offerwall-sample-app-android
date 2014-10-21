@@ -113,8 +113,6 @@ public class SPBrandEngageClient {
 	private static final String SP_THIRD_PARTY_ID_PARAMETER = "id";
 	private static final String SP_REQUEST_PLAY = "play";
 	
-	private static final String KEY_FOR_CLIENT_CUSTOM_PARAMETER    = "client";
-	private static final String KEY_FOR_PLATFORM_CUSTOM_PARAMETER  = "platform";
 	private static final String KEY_FOR_REWARDED_CUSTOM_PARAMETER  = "rewarded";
 	private static final String KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER = "ad_format";
 	

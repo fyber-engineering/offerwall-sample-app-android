@@ -111,12 +111,11 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 
 	@Override
 	protected boolean show(Activity parentActivity) {
-		loadHtml(parentActivity.getApplicationContext());
+		loadHtml();
 		mActivity = parentActivity;
 		setOrientation();
 
 		if (mActivity instanceof SPInterstitialActivity) {
-			mActivity = parentActivity;
 			((SPInterstitialActivity) mActivity).setMarketPlaceInterstitialListener(MarketPlaceInterstitial.this);
 		}
 
@@ -129,10 +128,9 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		return true;
 	}
 
-	private void loadHtml(Context context) {
+	private void loadHtml() {
 		Message msg = Message.obtain(mMainHandler);
 		msg.what = LOAD_HTML;
-		msg.obj = context;
 		msg.sendToTarget();
 	}
 

@@ -159,7 +159,7 @@ public class SPBrandEngageClient {
 
 	private String mCurrency;
 	private Map<String, String> mCustomParameters;
-	
+	private Map<String, String> mCustomParametersForExplicitRequest;
 	private boolean mShowRewardsNotification = true;
 
 	private SPBrandEngageOffersStatus mStatus = SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS;
@@ -275,8 +275,17 @@ public class SPBrandEngageClient {
 	
 	private void startQueryingOffers(SPCredentials credentials) {
 		
+		Map <String, String> mergedMap = new HashMap<String, String>();
+		if(mapIsNotNullOrEmpty(mCustomParameters)){
+			mergedMap.putAll(mCustomParameters);
+		}
+		
+		if(mapIsNotNullOrEmpty(mCustomParametersForExplicitRequest)){
+			mergedMap.putAll(mCustomParametersForExplicitRequest);
+		}
+		
 		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials)
-				.setCurrency(mCurrency).addExtraKeysValues(mCustomParameters).addKeyValue(KEY_FOR_CLIENT_CUSTOM_PARAMETER, "sdk")
+				.setCurrency(mCurrency).addExtraKeysValues(mergedMap).addKeyValue(KEY_FOR_CLIENT_CUSTOM_PARAMETER, "sdk")
 				.addKeyValue(KEY_FOR_PLATFORM_CUSTOM_PARAMETER, "android").addKeyValue(KEY_FOR_REWARDED_CUSTOM_PARAMETER, "1")
 				.addKeyValue(KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER, "video").addScreenMetrics().buildUrl();
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
@@ -284,6 +293,14 @@ public class SPBrandEngageClient {
 		setClientStatus(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
 		
 		mHandler.sendEmptyMessageDelayed(VALIDATION_RESULT, TIMEOUT);
+	}
+	
+	private boolean mapIsNotNullOrEmpty(Map <String, String> map){
+		if(map == null || map.size()==0){
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**
@@ -468,6 +485,31 @@ public class SPBrandEngageClient {
 	public boolean setCustomParameters(Map<String, String> parameters) {
 		if (canChangeParameters()) {
 			mCustomParameters = parameters;
+			
+			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
+			return true;
+		} else {
+			SponsorPayLogger.d(TAG, "Cannot change custom parameters while a request to the " +
+					"server is going on or an offer is being presented to the user.");
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Sets the additional custom parameters used for this mbe request. It's
+	 * intended to be used only within the SDK's scope and explicitly from the
+	 * getIntentForMBEActivity methods. Use the setCustomParameters to set
+	 * manually the custom parameters
+	 * 
+	 * @param parameters
+	 *            The additional parameters map
+	 * 
+	 * @return true if successful in setting the parameters, false otherwise
+	 */
+	public boolean setParametersForRequest(Map<String, String> parameters) {
+		if (canChangeParameters()) {
+			mCustomParametersForExplicitRequest = parameters;
 			
 			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 			return true;

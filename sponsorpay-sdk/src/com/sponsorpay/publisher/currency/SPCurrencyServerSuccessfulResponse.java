@@ -7,7 +7,7 @@ package com.sponsorpay.publisher.currency;
 
 import com.sponsorpay.publisher.currency.SPCurrencyServerRequester.SPCurrencyServerReponse;
 
-public class SPCurrencyServerSuccesfulResponse implements SPCurrencyServerReponse {
+public class SPCurrencyServerSuccessfulResponse implements SPCurrencyServerReponse {
 
 	private double mDeltaOfCoins;
 	private String mLatestTransactionId;
@@ -15,7 +15,7 @@ public class SPCurrencyServerSuccesfulResponse implements SPCurrencyServerRepons
 	private String mCurrencyName;
 	private boolean mIsDefault;
 
-	public SPCurrencyServerSuccesfulResponse(double deltaOfCoins, String latestTransactionId, String currencyId, 
+	public SPCurrencyServerSuccessfulResponse(double deltaOfCoins, String latestTransactionId, String currencyId, 
 			String currencyName, boolean isDefault) {
 		mDeltaOfCoins = deltaOfCoins;
 		mLatestTransactionId = latestTransactionId;

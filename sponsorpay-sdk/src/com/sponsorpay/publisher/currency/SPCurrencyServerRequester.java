@@ -175,7 +175,7 @@ public class SPCurrencyServerRequester extends SignedResponseRequester<SPCurrenc
 			String currencyName = jsonResponse.getString(CURRENCY_NAME_KEY);
 			boolean idDefault= jsonResponse.getBoolean(IS_DEFAULT_KEY);
 			
-			return new SPCurrencyServerSuccesfulResponse(deltaOfCoins, latestTransactionId, currencyId, currencyName, idDefault);
+			return new SPCurrencyServerSuccessfulResponse(deltaOfCoins, latestTransactionId, currencyId, currencyName, idDefault);
 		} catch (Exception e) {
 			SPCurrencyServerRequestErrorType errorType = SPCurrencyServerRequestErrorType.ERROR_INVALID_RESPONSE;
 			String errorMessage = e.getMessage();

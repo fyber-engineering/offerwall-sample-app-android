@@ -391,7 +391,7 @@ public class SponsorPayPublisher {
 	 * will be used to get the application id and user id.
 	 * 
 	 * @param context
-	 *            Android application context.        
+	 *            Android application context.
 	 * @param listener
 	 *            {@link SPCurrencyServerListener} which will be notified of the
 	 *            result of the request.
@@ -409,29 +409,32 @@ public class SponsorPayPublisher {
 	 * 
 	 * @param context
 	 *            Android application context.
-	 * @param currencyId  
-	 *            Optionally, provide the ID of the currency that you want to retrieve. If the provided
-	 *            ID is empty or null, then the default currency will be requested. If an invalid currency ID
-	 *            will be provided then you will receive an invalid application error.           
+	 * @param currencyId
+	 *            Optionally, provide the ID of the currency that you want to
+	 *            retrieve. If the provided ID is empty or null, then the
+	 *            default currency will be requested. If an invalid currency ID
+	 *            will be provided then you will receive an invalid application
+	 *            error.
 	 * @param listener
-	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
-	 *            request.
+	 *            {@link SPCurrencyServerListener} which will be notified of the
+	 *            result of the request.
 	 */
 	public static void requestNewCoins(Context context, String currencyId, SPCurrencyServerListener listener) {
 		requestNewCoins(context, currencyId, listener, null);
 	}
-	
+
 	/**
-	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
-	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
-	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. The current 
-	 * credentials will be used to get the application id and user id.
+	 * Sends a request to the SponsorPay currency server to obtain the variation
+	 * in amount of virtual currency for a given user. Returns immediately, and
+	 * the answer is delivered to one of the provided listener's callback
+	 * methods. See {@link SPCurrencyServerListener}. The current credentials
+	 * will be used to get the application id and user id.
 	 * 
 	 * @param context
 	 *            Android application context.
 	 * @param listener
-	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
-	 *            request.     
+	 *            {@link SPCurrencyServerListener} which will be notified of the
+	 *            result of the request.
 	 * @param customCurrency
 	 *            A string representing the custom currency to be used by the
 	 *            toast message to show the amount of coins earned.
@@ -443,35 +446,39 @@ public class SponsorPayPublisher {
 	}
 
 	/**
-	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
-	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
-	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. The current 
-	 * credentials will be used to get the application id and user id.
+	 * Sends a request to the SponsorPay currency server to obtain the variation
+	 * in amount of virtual currency for a given user. Returns immediately, and
+	 * the answer is delivered to one of the provided listener's callback
+	 * methods. See {@link SPCurrencyServerListener}. The current credentials
+	 * will be used to get the application id and user id.
 	 * 
 	 * @param context
 	 *            Android application context.
 	 * @param listener
-	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
-	 *            request.
-	 * @param currencyId  
-	 *            Optionally, provide the ID of the currency that you want to retrieve. If the provided
-	 *            ID is empty or null, then the default currency will be requested. If an invalid currency ID
-	 *            will be provided then you will receive an invalid application error.         
+	 *            {@link SPCurrencyServerListener} which will be notified of the
+	 *            result of the request.
+	 * @param currencyId
+	 *            Optionally, provide the ID of the currency that you want to
+	 *            retrieve. If the provided ID is empty or null, then the
+	 *            default currency will be requested. If an invalid currency ID
+	 *            will be provided then you will receive an invalid application
+	 *            error.
 	 * @param customCurrency
-	 * 			  A string representing the custom currency to be used by the toast message to show
-	 * 			  the amount of coins earned.
+	 *            A string representing the custom currency to be used by the
+	 *            toast message to show the amount of coins earned.
 	 */
 	public static void requestNewCoins(Context context, String currencyId, SPCurrencyServerListener listener,
 			String customCurrency) {
-		
+
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
 		requestNewCoins(credentialsToken, context, listener, null, currencyId, null, customCurrency);
 	}
-	
+
 	/**
-	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
-	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
-	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. It will use the 
+	 * Sends a request to the SponsorPay currency server to obtain the variation
+	 * in amount of virtual currency for a given user. Returns immediately, and
+	 * the answer is delivered to one of the provided listener's callback
+	 * methods. See {@link SPCurrencyServerListener}. It will use the
 	 * credentials identified by the provided token id.
 	 * 
 	 * @param credentialsToken
@@ -497,11 +504,12 @@ public class SponsorPayPublisher {
 
 		requestNewCoins(credentialsToken, context, listener, transactionId, null, customParams, customCurrency);
 	}
-	
+
 	/**
-	 * Sends a request to the SponsorPay currency server to obtain the variation in amount of
-	 * virtual currency for a given user. Returns immediately, and the answer is delivered to one of
-	 * the provided listener's callback methods. See {@link SPCurrencyServerListener}. It will use the 
+	 * Sends a request to the SponsorPay currency server to obtain the variation
+	 * in amount of virtual currency for a given user. Returns immediately, and
+	 * the answer is delivered to one of the provided listener's callback
+	 * methods. See {@link SPCurrencyServerListener}. It will use the
 	 * credentials identified by the provided token id.
 	 * 
 	 * @param credentialsToken
@@ -509,25 +517,27 @@ public class SponsorPayPublisher {
 	 * @param context
 	 *            Android application context.
 	 * @param listener
-	 *            {@link SPCurrencyServerListener} which will be notified of the result of the
-	 *            request.
+	 *            {@link SPCurrencyServerListener} which will be notified of the
+	 *            result of the request.
 	 * @param transactionId
-	 *            Optionally, provide the ID of the latest known transaction. The delta of coins
-	 *            will be calculated from this transaction (not included) up to the present. Leave
-	 *            it to null to let the SDK use the latest transaction ID it kept track of.
+	 *            Optionally, provide the ID of the latest known transaction.
+	 *            The delta of coins will be calculated from this transaction
+	 *            (not included) up to the present. Leave it to null to let the
+	 *            SDK use the latest transaction ID it kept track of.
 	 * @param currencyId
-	 *            Optionally, provide the ID of the currency that you want to retrieve. If the provided
-	 *            ID is empty or null, then the default currency will be requested. If an invalid currency ID
-	 *            will be provided then you will receive an invalid application error.
+	 *            Optionally, provide the ID of the currency that you want to
+	 *            retrieve. If the provided ID is empty or null, then the
+	 *            default currency will be requested. If an invalid currency ID
+	 *            will be provided then you will receive an invalid application
+	 *            error.
 	 * @param customParams
 	 *            A map of extra key/value pairs to add to the request URL.
 	 * @param customCurrency
-	 * 			  A string representing the custom currency to be used by the toast message to show
-	 * 			  the amount of coins earned.
+	 *            A string representing the custom currency to be used by the
+	 *            toast message to show the amount of coins earned.
 	 */
-	public static void requestNewCoins(String credentialsToken, Context context, 
-			SPCurrencyServerListener listener, String transactionId, String currencyId, Map<String, String> customParams, 
-			String customCurrency) {
+	public static void requestNewCoins(String credentialsToken, Context context, SPCurrencyServerListener listener,
+			String transactionId, String currencyId, Map<String, String> customParams, String customCurrency) {
 
 		SPVirtualCurrencyConnector vcc = new SPVirtualCurrencyConnector(context, credentialsToken, listener);
 		vcc.setCustomParameters(customParams);
@@ -567,7 +577,7 @@ public class SponsorPayPublisher {
 	public static boolean getIntentForMBEActivity(Activity activity, SPBrandEngageRequestListener listener) {
 
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForMBEActivity(credentialsToken, activity, listener, null);
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null);
 	}
 
 	/**
@@ -579,6 +589,9 @@ public class SponsorPayPublisher {
 	 * @param listener
 	 *            {@link SPBrandEngageRequestListener} which will be notified of
 	 *            the results of the request.
+	 * @param currencyId
+	 *            The custom currency ID. If the default is required then pass
+	 *            null.
 	 * @param placementId
 	 *            The placement ID.
 	 * @return A boolean that indicates if the actual request has been made to
@@ -610,7 +623,7 @@ public class SponsorPayPublisher {
 	public static boolean getIntentForMBEActivity(Activity activity, SPBrandEngageRequestListener listener,
 			SPCurrencyServerListener vcsListener) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, vcsListener, null);
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, vcsListener, null, null);
 	}
 
 	/**
@@ -625,16 +638,19 @@ public class SponsorPayPublisher {
 	 * @param vcsListener
 	 *            The Virtual Currency Server listener that will be notified
 	 *            after a successful engagement.
+	 * @param currencyId
+	 *            The custom currency ID. If the default is required then pass
+	 *            null.
 	 * @param placementId
 	 *            The placement ID.
 	 * @return A boolean that indicates if the actual request has been made to
 	 *         the server.
 	 */
 	public static boolean getIntentForMBEActivity(Activity activity, SPBrandEngageRequestListener listener,
-			SPCurrencyServerListener vcsListener, String placementId) {
-		Map<String, String> parameters = null;
+			SPCurrencyServerListener vcsListener, String currencyId, String placementId) {
 		String credentialsToken = SponsorPay.getCurrentCredentials().getCredentialsToken();
-		return getIntentForMBEActivity(credentialsToken, activity, listener, null, parameters, vcsListener, placementId);
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, vcsListener, currencyId,
+				placementId);
 	}
 
 	/**
@@ -654,7 +670,7 @@ public class SponsorPayPublisher {
 	 */
 	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity,
 			SPBrandEngageRequestListener listener) {
-		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null, null);
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null, null, null);
 	}
 
 	/**
@@ -668,14 +684,15 @@ public class SponsorPayPublisher {
 	 * @param listener
 	 *            {@link SPBrandEngageRequestListener} which will be notified of
 	 *            the results of the request.
-	 * @param placementId
-	 *            The placement ID.
+	 * @param currencyId
+	 *            The custom currency ID. If the default is required then pass * @param
+	 *            placementId The placement ID.
 	 * @return A boolean that indicates if the actual request has been made to
 	 *         the server.
 	 */
 	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity,
 			SPBrandEngageRequestListener listener, String placementId) {
-		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null, placementId);
+		return getIntentForMBEActivity(credentialsToken, activity, listener, null, null, null, null, placementId);
 	}
 
 	/**
@@ -697,7 +714,6 @@ public class SponsorPayPublisher {
 	 * @param vcsListener
 	 *            The Virtual Currency Server listener that will be notified
 	 *            after a successful engagement.
-	 * 
 	 * @return A boolean that indicates if the actual request has been made to
 	 *         the server.
 	 */
@@ -706,20 +722,15 @@ public class SponsorPayPublisher {
 			SPCurrencyServerListener vcsListener) {
 
 		return getIntentForMBEActivity(credentialsToken, activity, listener, currencyName, parameters, vcsListener,
-				null);
+				null, null);
 	}
 
 	/**
 	 * Requests a Mobile BrandEngage Offer to the SponsorPay servers and
 	 * registers a listener which will be notified when a response is received.
+	 * {@link SPBrandEngageRequestListener} which will be notified of the
+	 * results of the request.
 	 * 
-	 * @param credentialsToken
-	 *            The token id of the credentials to be used.
-	 * @param activity
-	 *            Calling activity.
-	 * @param listener
-	 *            {@link SPBrandEngageRequestListener} which will be notified of
-	 *            the results of the request.
 	 * @param currencyName
 	 *            The name of the currency employed by your application. Provide
 	 *            null if you don't use a custom currency name.
@@ -728,14 +739,15 @@ public class SponsorPayPublisher {
 	 * @param vcsListener
 	 *            The Virtual Currency Server listener that will be notified
 	 *            after a successful engagement.
-	 * @param placementId
-	 *            The placement ID.
+	 * @param currencyId
+	 *            The currency ID that will be used. Provide null if you don't
+	 *            use a custom currency ID.
 	 * @return A boolean that indicates if the actual request has been made to
 	 *         the server.
 	 */
 	public static boolean getIntentForMBEActivity(String credentialsToken, Activity activity,
 			SPBrandEngageRequestListener listener, String currencyName, Map<String, String> parameters,
-			SPCurrencyServerListener vcsListener, String placementId) {
+			SPCurrencyServerListener vcsListener, String currencyId, String placementId) {
 
 		SPBrandEngageClient brandEngageClient = SPBrandEngageClient.INSTANCE;
 		boolean canRequestOffers = brandEngageClient.canRequestOffers();
@@ -746,6 +758,7 @@ public class SponsorPayPublisher {
 			brandEngageClient.setCurrencyName(currencyName);
 			brandEngageClient.setParametersForRequest(parameters);
 			brandEngageClient.setCurrencyListener(vcsListener);
+			brandEngageClient.setCurrencyId(currencyId);
 
 			SPBrandEngageRequest request = new SPBrandEngageRequest(credentials, activity, brandEngageClient, listener);
 			request.askForOffers();

@@ -200,7 +200,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 *            with key a standard prefix concatenated with the currency's ID and value the received
 	 *            latest transaction ID.
 	 */
-	private void saveLatestTransactionForCurrentUser(SPCurrencyServerSuccesfulResponse successfulResponse) {
+	private void saveLatestTransactionForCurrentUser(SPCurrencyServerSuccessfulResponse successfulResponse) {
 		SharedPreferences prefs = mContext.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 		Editor editor = prefs.edit();
 		editor.putString(generatePreferencesLatestTransactionIdKey(mCredentials, successfulResponse.getCurrencyId()),
@@ -232,16 +232,8 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * @param credentialsToken
 	 *            The credentials token.
 	 * @return The retrieved transaction ID or null.
-	 * @deprecated This method will be removed on the next major release of the
-	 *             SDK(v7.0.0)
 	 */
-	@Deprecated
-	public static String fetchLatestTransactionId(Context context, String credentialsToken) {
-		return fetchLatestTransactionId(context, credentialsToken, null);
-	}
-	
-	@Deprecated
-	public static String fetchLatestTransactionId(Context context, String credentialsToken, String currencyId) {
+	private String fetchLatestTransactionId(Context context, String credentialsToken, String currencyId) {
 		SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 		SharedPreferences prefs = context.getSharedPreferences(SponsorPayPublisher.PREFERENCES_FILENAME, Context.MODE_PRIVATE);
 		String retval = null;
@@ -263,7 +255,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 	 * Saves the returned latest transaction id and shows the notification
 	 * if required
 	 */
-	private void onDeltaOfCoinsResponse(SPCurrencyServerSuccesfulResponse response) {
+	private void onDeltaOfCoinsResponse(SPCurrencyServerSuccessfulResponse response) {
 		saveLatestTransactionForCurrentUser(response);
 		// set the currency name. First try to get the provided name. If the
 		// developer didn't provide a currency name, then try to get the
@@ -295,8 +287,8 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 
 	@Override
 	public void onSPCurrencyServerResponseReceived(SPCurrencyServerReponse response) {
-		if (response instanceof SPCurrencyServerSuccesfulResponse) {
-			SPCurrencyServerSuccesfulResponse successfulResponse = (SPCurrencyServerSuccesfulResponse) response;
+		if (response instanceof SPCurrencyServerSuccessfulResponse) {
+			SPCurrencyServerSuccessfulResponse successfulResponse = (SPCurrencyServerSuccessfulResponse) response;
 			String defaultCurrency = getDefaultCurrency();
 			String responseCurrencyId = successfulResponse.getCurrencyId();
 			
@@ -313,7 +305,7 @@ public class SPVirtualCurrencyConnector implements SPVCSResultListener {
 				// request again
 				SPCurrencyServerRequester.requestCurrency(this, mCredentials, transactionId , null, mCustomParameters);
 			} else {
-				SPCurrencyServerSuccesfulResponse lastResponse = new SPCurrencyServerSuccesfulResponse(0,
+				SPCurrencyServerSuccessfulResponse lastResponse = new SPCurrencyServerSuccessfulResponse(0,
 						successfulResponse.getLatestTransactionId(), responseCurrencyId,
 						successfulResponse.getCurrencyName(), successfulResponse.isDefault());
 				

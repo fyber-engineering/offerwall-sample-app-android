@@ -113,8 +113,6 @@ public class SPBrandEngageClient {
 	private static final String SP_THIRD_PARTY_ID_PARAMETER = "id";
 	private static final String SP_REQUEST_PLAY = "play";
 	
-	private static final String KEY_FOR_CLIENT_CUSTOM_PARAMETER    = "client";
-	private static final String KEY_FOR_PLATFORM_CUSTOM_PARAMETER  = "platform";
 	private static final String KEY_FOR_REWARDED_CUSTOM_PARAMETER  = "rewarded";
 	private static final String KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER = "ad_format";
 	
@@ -157,7 +155,8 @@ public class SPBrandEngageClient {
 	
 	private boolean mShowingDialog = false;
 
-	private String mCurrency;
+	private String mCurrencyName;
+	private String mCurrencyId;
 	private Map<String, String> mCustomParameters;
 	private Map<String, String> mCustomParametersForExplicitRequest;
 	private boolean mShowRewardsNotification = true;
@@ -275,12 +274,16 @@ public class SPBrandEngageClient {
 	
 	private void startQueryingOffers(SPCredentials credentials) {
 
-		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials).setCurrency(mCurrency)
-				.addExtraKeysValues(mCustomParameters).addExtraKeysValues(mCustomParametersForExplicitRequest)
-				.addKeyValue(KEY_FOR_CLIENT_CUSTOM_PARAMETER, "sdk")
-				.addKeyValue(KEY_FOR_PLATFORM_CUSTOM_PARAMETER, "android")
+		
+		String requestUrl = UrlBuilder.newBuilder(getBaseUrl(), credentials)
+				.setCurrency(mCurrencyName)
+				.addExtraKeysValues(mCustomParameters)
+				.addExtraKeysValues(mCustomParametersForExplicitRequest)
 				.addKeyValue(KEY_FOR_REWARDED_CUSTOM_PARAMETER, "1")
-				.addKeyValue(KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER, "video").addScreenMetrics().buildUrl();
+				.addKeyValue(KEY_FOR_AD_FORMAT_CUSTOM_PARAMETER, "video")
+				.addScreenMetrics()
+				.buildUrl();
+
 		SponsorPayLogger.d(TAG, "Loading URL: " + requestUrl);
 		loadUrl(requestUrl);
 		setClientStatus(SPBrandEngageOffersStatus.QUERYING_SERVER_FOR_OFFERS);
@@ -440,7 +443,7 @@ public class SPBrandEngageClient {
 	}
 	
 	/**
-	 * Sets the currency name used in this engagement
+	 * Sets the currency name which will be used for this engagement
 	 * 
 	 * @param currencyName
 	 * 			The currency name that will override the default one
@@ -449,11 +452,31 @@ public class SPBrandEngageClient {
 	 */
 	public boolean setCurrencyName(String currencyName) {
 		if (canChangeParameters()) {
-			mCurrency = currencyName;
+			mCurrencyName = currencyName;
 			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
 			return true;
 		} else {
-			SponsorPayLogger.d(TAG, "Cannot change the currency while a request to the " +
+			SponsorPayLogger.d(TAG, "Cannot change the currency name while a request to the " +
+					"server is going on or an offer is being presented to the user.");
+			return false;
+		}
+	}
+	
+	/**
+	 * Sets the currency id which will be used for this engagement
+	 * 
+	 * @param currencyId
+	 * 			The currency ID that will override the default one
+	 * 
+	 * @return true if successful in setting the name, false otherwise
+	 */
+	public boolean setCurrencyId(String currencyId) {
+		if (canChangeParameters()) {
+			mCurrencyId = currencyId;
+			setClientStatus(SPBrandEngageOffersStatus.MUST_QUERY_SERVER_FOR_OFFERS);
+			return true;
+		} else {
+			SponsorPayLogger.d(TAG, "Cannot change the currency ID while a request to the " +
 					"server is going on or an offer is being presented to the user.");
 			return false;
 		}
@@ -644,7 +667,7 @@ public class SPBrandEngageClient {
 						try {
 							SponsorPayPublisher.requestNewCoins(SponsorPay
 									.getCurrentCredentials().getCredentialsToken(),
-									mContext, mVCSListener, null, null, null, mCurrency);
+									mContext, mVCSListener, null, mCurrencyId, null, mCurrencyName);
 						} catch (RuntimeException e) {
 							SponsorPayLogger.e(TAG, "Error in VCS request", e);
 						}

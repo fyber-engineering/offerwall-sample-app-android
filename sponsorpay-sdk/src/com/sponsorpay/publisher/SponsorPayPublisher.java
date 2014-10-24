@@ -756,7 +756,7 @@ public class SponsorPayPublisher {
 
 			SPCredentials credentials = SponsorPay.getCredentials(credentialsToken);
 			brandEngageClient.setCurrencyName(currencyName);
-			brandEngageClient.setCustomParameters(parameters);
+			brandEngageClient.setParametersForRequest(parameters);
 			brandEngageClient.setCurrencyListener(vcsListener);
 			brandEngageClient.setCurrencyId(currencyId);
 

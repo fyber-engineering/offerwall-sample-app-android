@@ -40,20 +40,19 @@ public final class SPUser extends HashMap<String, Object> {
 	private static final String AGE      = "age";
 	private static final String BIRTHDAY = "birthdate";
 	private static final String GENDER   = "gender";
-	private static final String SEXUAL_ORIENTATION = "sexualOrientation";
+	private static final String SEXUAL_ORIENTATION = "sexual_orientation";
 	private static final String ETHNICITY = "ethnicity";
 	private static final String LAT       = "lat";
 	private static final String LONGT     = "longt";
-	private static final String MARITAL_STATUS = "maritalStatus";
+	private static final String MARITAL_STATUS = "marital_status";
 	private static final String NUMBER_OF_CHILDRENS     = "children";
-	private static final String ANNUAL_HOUSEHOLD_INCOME = "annualHouseholdIncome";
+	private static final String ANNUAL_HOUSEHOLD_INCOME = "annual_household_income";
 	private static final String EDUCATION = "education";
 	private static final String ZIPCODE   = "zipcode";
-	private static final String POLITICAL_AFFILIATION = "politicalAffiliation";
 	private static final String INTERESTS  = "interests";
 	private static final String IAP        = "iap";
 	private static final String IAP_AMOUNT = "iap_amount";
-	private static final String NUMBER_OF_SESSIONS = "numberOfSessions";
+	private static final String NUMBER_OF_SESSIONS = "number_of_sessions";
 	private static final String PS_TIME      = "ps_time";
 	private static final String LAST_SESSION = "last_session";
 	private static final String CONNECTION   = "connection";
@@ -75,7 +74,6 @@ public final class SPUser extends HashMap<String, Object> {
 		mReservedKeys.add(ANNUAL_HOUSEHOLD_INCOME);
 		mReservedKeys.add(EDUCATION);
 		mReservedKeys.add(ZIPCODE);
-		mReservedKeys.add(POLITICAL_AFFILIATION);
 		mReservedKeys.add(INTERESTS);
 		mReservedKeys.add(IAP);
 		mReservedKeys.add(IAP_AMOUNT);
@@ -95,7 +93,7 @@ public final class SPUser extends HashMap<String, Object> {
 		singleton.put(AGE, age);
 	}
 
-	public Date getBirthdate() {
+	public static Date getBirthdate() {
 		return (Date) singleton.get(BIRTHDAY);
 	}
 
@@ -174,14 +172,6 @@ public final class SPUser extends HashMap<String, Object> {
 
 	public static void setZipcode(String zipcode) {
 		singleton.put(ZIPCODE, zipcode);
-	}
-
-	public static String getPoliticalAffiliation() {
-		return (String) singleton.get(POLITICAL_AFFILIATION);
-	}
-
-	public static void setPoliticalAffiliation(String politicalAffiliation) {
-		singleton.put(POLITICAL_AFFILIATION, politicalAffiliation);
 	}
 
 	public static String[] getInterests() {

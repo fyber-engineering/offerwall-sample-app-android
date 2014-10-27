@@ -918,7 +918,7 @@ public class SponsorPayPublisher {
 		}
 
 		if (StringUtils.nullOrEmpty(placementId)) {
-			placementId = null;
+			placementId = "";
 		}
 		parameters.put(PLACEMENT_KEY, placementId);
 		return parameters;

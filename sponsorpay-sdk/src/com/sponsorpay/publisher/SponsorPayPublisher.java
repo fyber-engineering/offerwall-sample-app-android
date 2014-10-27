@@ -27,13 +27,13 @@ import com.sponsorpay.utils.HostInfo;
 import com.sponsorpay.utils.StringUtils;
 
 /**
- * Provides convenience calls to load and show the mobile Offer Wall and the
- * mobile Interstitial.
+ * Provides convenience calls to load and show the mobile Offer Wall, mobile BrandEnagge
+ * and the mobile Interstitial.
  */
 public class SponsorPayPublisher {
 	public static final String PREFERENCES_FILENAME = "SponsorPayPublisherState";
 
-	public static final String PLACEMENT_KEY = "placement";
+	public static final String PLACEMENT_KEY = "placement_id";
 
 	/**
 	 * Enumeration identifying the different messages which can be displayed in
@@ -918,7 +918,7 @@ public class SponsorPayPublisher {
 		}
 
 		if (StringUtils.nullOrEmpty(placementId)) {
-			placementId = null;
+			placementId = "";
 		}
 		parameters.put(PLACEMENT_KEY, placementId);
 		return parameters;

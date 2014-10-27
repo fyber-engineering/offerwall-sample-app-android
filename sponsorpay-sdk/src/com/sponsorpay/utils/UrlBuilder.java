@@ -115,9 +115,9 @@ public class UrlBuilder {
 	 */
 	public static void validateKeyValueParams(Map<String, String> kvParams) {
 		if (kvParams != null) {
-			for (Entry<String, String> entry : kvParams.entrySet()) {
+			for (String key : kvParams.keySet()) {
 
-				if (StringUtils.nullOrEmpty(entry.getKey())) {
+				if (StringUtils.nullOrEmpty(key)) {
 					throw new IllegalArgumentException("SponsorPay SDK: Custom Parameters cannot have an empty or null"
 							+ " Key or Value.");
 				}

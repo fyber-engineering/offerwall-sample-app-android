@@ -77,8 +77,9 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 						JSONObject jsonAd = ads.getJSONObject(i);
 						String providerType = jsonAd.getString("provider_type");
 						String adId = jsonAd.getString("ad_id");
-						SPInterstitialAd ad = new SPInterstitialAd(
-								providerType, adId);
+						
+						SPInterstitialAd ad = new SPInterstitialAd(providerType, adId);
+						
 						JSONArray names = jsonAd.names();
 						for (int j = 0 ; j < names.length() ; j++) {
 							String key = names.getString(j);

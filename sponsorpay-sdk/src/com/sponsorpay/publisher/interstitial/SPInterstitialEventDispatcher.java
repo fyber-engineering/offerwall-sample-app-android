@@ -6,6 +6,11 @@
 
 package com.sponsorpay.publisher.interstitial;
 
+import java.util.Iterator;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.os.AsyncTask;
 
 import com.sponsorpay.credentials.SPCredentials;
@@ -53,18 +58,53 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 	}
 	
 	private static UrlBuilder getUrlBuilder(SPCredentials credentials, String requestId,
-			SPInterstitialAd ad, SPInterstitialEvent event) {
+			SPInterstitialAd ad, SPInterstitialEvent event)  {
 		UrlBuilder builder = UrlBuilder.newBuilder(getBaseUrl(), credentials)
 				.addKeyValue(SPInterstitialClient.SP_REQUEST_ID_PARAMETER_KEY, requestId)
 				.addKeyValue("event", event.toString())
 				.addExtraKeysValues(UrlBuilder.mapKeysToValues(additionalParamKey, additionalParamValues))
 				.addScreenMetrics();
+		
+		String trackingParametersString = null;
+		
+		try {
+			trackingParametersString  = ad.getContextData().get("tracking_params");
+		} catch (NullPointerException ignore) {
+		}
+		
+		if(StringUtils.notNullNorEmpty(trackingParametersString)){	
+			try {
+				JSONObject trackingParameters = new JSONObject(trackingParametersString);
+				if (trackingParameters != null) {
+					appendTrackingParametersToURL(builder, trackingParameters);
+				}
+			} catch (JSONException ex) {
+				SponsorPayLogger.e(TAG, ex.getMessage());
+			}
+		}
 
 		if (ad != null) {
 			builder.addKeyValue("ad_id", ad.getAdId())
-				.addKeyValue("provider_type", ad.getProviderType());
+			       .addKeyValue("provider_type", ad.getProviderType());
 		}
 		return builder;
+	}
+	
+	private static void appendTrackingParametersToURL(UrlBuilder builder, JSONObject trackingParameters) {
+		Iterator<?> keys = trackingParameters.keys();
+		while (keys.hasNext()) {
+			String key = (String) keys.next();
+			Object value = null;
+			try {
+				value = trackingParameters.get(key);
+			} catch (JSONException exception) {
+				SponsorPayLogger.e(TAG, exception.getMessage());
+				value = null;
+			}
+			if (value != null) {
+				builder.addKeyValue(key, value.toString());
+			}
+		}
 	}
 
 	private static String getBaseUrl() {

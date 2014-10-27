@@ -31,6 +31,7 @@ public class SPInterstitialAd {
 	
 	private Map<String, String> mContextData;
 	
+	
 	public SPInterstitialAd(String providerType, String adId) {
 		mProviderType = providerType;
 		mAdId = adId;

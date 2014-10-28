@@ -86,12 +86,7 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 			try {
 				value = trackingParameters.get(key);
 				if (value != null) {
-					
-					String valueAsString = value.toString();
-					
-					if(!valueAsString.isEmpty()){
-						builder.addKeyValue(key, valueAsString);
-					}
+					builder.addKeyValue(key, value.toString());
 				}
 			} catch (JSONException exception) {
 				SponsorPayLogger.e(TAG, exception.getMessage());

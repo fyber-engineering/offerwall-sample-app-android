@@ -64,28 +64,16 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 				.addKeyValue("event", event.toString())
 				.addExtraKeysValues(UrlBuilder.mapKeysToValues(additionalParamKey, additionalParamValues))
 				.addScreenMetrics();
-		
-		String trackingParametersString = null;
-		
-		try {
-			trackingParametersString  = ad.getContextData().get("tracking_params");
-		} catch (NullPointerException ignore) {
-		}
-		
-		if(StringUtils.notNullNorEmpty(trackingParametersString)){	
-			try {
-				JSONObject trackingParameters = new JSONObject(trackingParametersString);
-				if (trackingParameters != null) {
-					appendTrackingParametersToURL(builder, trackingParameters);
-				}
-			} catch (JSONException ex) {
-				SponsorPayLogger.e(TAG, ex.getMessage());
-			}
-		}
 
 		if (ad != null) {
 			builder.addKeyValue("ad_id", ad.getAdId())
 			       .addKeyValue("provider_type", ad.getProviderType());
+			
+			JSONObject trackingParameters = ad.getTrackingParameters();
+			if (trackingParameters != null) {
+				appendTrackingParametersToURL(builder, trackingParameters);
+			}
+			
 		}
 		return builder;
 	}
@@ -97,12 +85,16 @@ public class SPInterstitialEventDispatcher extends AsyncTask<UrlBuilder, Void, B
 			Object value = null;
 			try {
 				value = trackingParameters.get(key);
+				if (value != null) {
+					
+					String valueAsString = value.toString();
+					
+					if(!valueAsString.isEmpty()){
+						builder.addKeyValue(key, valueAsString);
+					}
+				}
 			} catch (JSONException exception) {
 				SponsorPayLogger.e(TAG, exception.getMessage());
-				value = null;
-			}
-			if (value != null) {
-				builder.addKeyValue(key, value.toString());
 			}
 		}
 	}

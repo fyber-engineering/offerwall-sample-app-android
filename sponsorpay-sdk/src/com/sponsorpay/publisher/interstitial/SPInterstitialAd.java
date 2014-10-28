@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 /**
  * <p>
  * Class holding the information about a specific Interstitial Ad.
@@ -23,17 +25,27 @@ public class SPInterstitialAd {
 	 * The provider type of the ad
 	 */
 	private String mProviderType;
-	
+
 	/**
 	 * SponsorPay internal id of the ad
 	 */
 	private String mAdId;
-	
+
+	/**
+	 * The tracking parameters that are coming from the ad
+	 */
+	private JSONObject mTrackingParameters;
+
+	/**
+	 * It contains all the data that are coming from the ad except from the
+	 * three data above(provider type, ad ID and tracking parameters).
+	 */
 	private Map<String, String> mContextData;
-	
-	public SPInterstitialAd(String providerType, String adId) {
+
+	public SPInterstitialAd(String providerType, String adId, JSONObject trackingParams) {
 		mProviderType = providerType;
 		mAdId = adId;
+		mTrackingParameters = trackingParams;
 	}
 
 	public String getProviderType() {
@@ -50,13 +62,16 @@ public class SPInterstitialAd {
 		}
 		mContextData.put(key, value);
 	}
-	
-	
+
 	public Map<String, String> getContextData() {
 		if (mContextData == null) {
 			return Collections.emptyMap();
 		}
 		return mContextData;
+	}
+
+	public JSONObject getTrackingParameters() {
+		return mTrackingParameters;
 	}
 
 }

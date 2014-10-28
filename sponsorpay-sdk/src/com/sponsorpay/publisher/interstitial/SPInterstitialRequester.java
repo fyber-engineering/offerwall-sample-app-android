@@ -77,12 +77,13 @@ public class SPInterstitialRequester extends AsyncTask<UrlBuilder, Void, SPInter
 						JSONObject jsonAd = ads.getJSONObject(i);
 						String providerType = jsonAd.getString("provider_type");
 						String adId = jsonAd.getString("ad_id");
-						SPInterstitialAd ad = new SPInterstitialAd(
-								providerType, adId);
+						JSONObject trackingParameters= jsonAd.optJSONObject("tracking_params");
+						SPInterstitialAd ad = new SPInterstitialAd(providerType, adId, trackingParameters);
+						
 						JSONArray names = jsonAd.names();
 						for (int j = 0 ; j < names.length() ; j++) {
 							String key = names.getString(j);
-							if (!(key.equals("ad_id") || (key.equals("provider_type")))) {
+							if (!(key.equals("ad_id") || (key.equals("provider_type")|| (key.equals("tracking_params"))))) {
 								ad.setContextData(key, jsonAd.getString(key));
 							}
 						}

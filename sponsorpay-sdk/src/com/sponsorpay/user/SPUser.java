@@ -339,8 +339,10 @@ public final class SPUser extends HashMap<String, Object> {
 		// in order to avoid to continuous creation  of the String from the Map key/values
 		// on the method above (mapToString())
 		if (StringUtils.notNullNorEmpty(key) && value != null) {
-			Object oldValue = get(key);
-			isMapDirty = oldValue == null || !oldValue.equals(value);
+			if (!isMapDirty) {
+				Object oldValue = get(key);
+				isMapDirty = oldValue == null || !oldValue.equals(value);
+			}
 			return super.put(key, value);
 		}
 		return null;

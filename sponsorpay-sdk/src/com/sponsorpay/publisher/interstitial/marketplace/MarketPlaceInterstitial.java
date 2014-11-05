@@ -143,16 +143,28 @@ public class MarketPlaceInterstitial extends SPInterstitialMediationAdapter<Mark
 		if (mWebClient == null) {
 
 			mWebClient = new SPWebClient(null) {
-
+				
+				@Override
+				public boolean shouldOverrideUrlLoading(WebView view, String url) {
+					boolean shouldOverrideUrlLoading = super.shouldOverrideUrlLoading(view, url);
+					if (!shouldOverrideUrlLoading) {
+						fireClickAndOpenURL(url);
+					}
+					return true;
+				}
+				
 				@Override
 				protected void onSponsorPayExitScheme(int resultCode, String targetUrl) {
+					fireClickAndOpenURL(targetUrl);
+				}
+				
+				private void fireClickAndOpenURL(String targetUrl) {
 					Activity hostActivity = getHostActivity();
 
 					if (null == hostActivity) {
 						return;
 					}
 
-					hostActivity.setResult(resultCode);
 					fireClickEvent();
 					launchActivityWithUrl(targetUrl);
 				}

@@ -2,12 +2,16 @@ com.sponsorpay
 com.sponsorpay.advertiser
 com.sponsorpay.credentials
 com.sponsorpay.mediation
+com.sponsorpay.mediation.marketplace
 com.sponsorpay.publisher
 com.sponsorpay.publisher.currency
 com.sponsorpay.publisher.interstitial
+com.sponsorpay.publisher.interstitial.marketplace
+com.sponsorpay.publisher.interstitial.marketplace.view
 com.sponsorpay.publisher.interstitial.mediation
 com.sponsorpay.publisher.mbe
 com.sponsorpay.publisher.mbe.mediation
 com.sponsorpay.publisher.ofw
+com.sponsorpay.user
 com.sponsorpay.utils
 com.sponsorpay.utils.cookies

@@ -77,9 +77,12 @@ public class UrlBuilder {
 	private static final String APP_VERSION_KEY = "app_version";
 	
 	private static final String CURRENCY_KEY = "currency";
-	
+		
 	private static final String TIMESTAMP_KEY = "timestamp";
 
+	private static final String SCREEN_ORIENTATION = "orientation";
+	
+	
 	/**
 	 * Request signature parameter key.
 	 */
@@ -94,6 +97,17 @@ public class UrlBuilder {
 	private static final String ADVERTISING_ID_LIMITED_TRACKING_ENABLED_KEY = "google_ad_id_limited_tracking_enabled";
 
 	/**
+	 * Fixed params for the whole SDK
+	 */
+
+	private static final String URL_PLATFORM_KEY = "platform";
+	private static final String URL_PLATFORM_VALUE = "android";
+	
+	private static final String URL_CLIENT_KEY = "client";
+	private static final String URL_CLIENT_VALUE = "sdk";
+
+	
+	/**
 	 * Checks that the passed Map of key/value parameters doesn't contain empty or null keys or
 	 * values. If it does, triggers an {@link IllegalArgumentException}.
 	 * 
@@ -101,16 +115,16 @@ public class UrlBuilder {
 	 */
 	public static void validateKeyValueParams(Map<String, String> kvParams) {
 		if (kvParams != null) {
-			for (Entry<String, String> entry : kvParams.entrySet()) {
-				if (StringUtils.nullOrEmpty(entry.getKey())
-						|| StringUtils.nullOrEmpty(entry.getValue())) {
-					throw new IllegalArgumentException(
-							"SponsorPay SDK: Custom Parameters cannot have an empty or null"
-									+ " Key or Value.");
+			for (String key : kvParams.keySet()) {
+
+				if (StringUtils.nullOrEmpty(key)) {
+					throw new IllegalArgumentException("SponsorPay SDK: Custom Parameters cannot have an empty or null"
+							+ " Key or Value.");
 				}
 			}
 		}
 	}
+	
 
 	/**
 	 * Constructs a Map of key / value parameters given an array of keys and an array of values. If
@@ -153,6 +167,8 @@ public class UrlBuilder {
 
 	private boolean mShouldAddScreenMetrics = false;
 	
+	private boolean mShouldAddScreenOrientation = false;
+	
 	private boolean mShouldAddUserId = true;
 	
 	private boolean mShouldAddTimestamp = false;
@@ -162,7 +178,6 @@ public class UrlBuilder {
 	private SPCredentials mCredentials;
 
 	private String mCurrency;
-
 	
 	protected UrlBuilder(String resourceUrl, SPCredentials credentials) {
 		mResourceUrl = resourceUrl;
@@ -185,6 +200,11 @@ public class UrlBuilder {
 
 	public UrlBuilder addScreenMetrics() {
 		mShouldAddScreenMetrics = true;
+		return this;
+	}
+	
+	public UrlBuilder addScreenOrientation() {
+		mShouldAddScreenOrientation = true;
 		return this;
 	}
 	
@@ -233,6 +253,9 @@ public class UrlBuilder {
 		keyValueParams.put(SDK_RELEASE_VERSION_KEY, SponsorPay.RELEASE_VERSION_STRING);
 		keyValueParams.put(APPID_KEY, mCredentials.getAppId());
 
+		keyValueParams.put(URL_PLATFORM_KEY, URL_PLATFORM_VALUE);
+		keyValueParams.put(URL_CLIENT_KEY, URL_CLIENT_VALUE);
+
 		keyValueParams.put(OS_VERSION_KEY, hostInfo.getOsVersion());
 		keyValueParams.put(PHONE_VERSION_KEY, hostInfo.getPhoneVersion());
 		keyValueParams.put(LANGUAGE_KEY, hostInfo.getLanguageSetting());
@@ -249,13 +272,17 @@ public class UrlBuilder {
 		if (StringUtils.notNullNorEmpty(mCurrency)) {
 			keyValueParams.put(CURRENCY_KEY, mCurrency);
 		}
-		
+
 		if (mShouldAddScreenMetrics) {
 			keyValueParams.put(SCREEN_WIDTH_KEY, hostInfo.getScreenWidth());
 			keyValueParams.put(SCREEN_HEIGHT_KEY, hostInfo.getScreenHeight());
 			keyValueParams.put(SCREEN_DENSITY_X_KEY, hostInfo.getScreenDensityX());
 			keyValueParams.put(SCREEN_DENSITY_Y_KEY, hostInfo.getScreenDensityY());
 			keyValueParams.put(SCREEN_DENSITY_CATEGORY_KEY, hostInfo.getScreenDensityCategory());
+		}
+		
+		if (mShouldAddScreenOrientation) {
+			keyValueParams.put(SCREEN_ORIENTATION, hostInfo.getScreenOrientation());
 		}
 
 		if (mExtraKeysValues != null) {

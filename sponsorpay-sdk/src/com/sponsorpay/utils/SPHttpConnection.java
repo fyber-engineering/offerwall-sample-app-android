@@ -13,14 +13,19 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import com.sponsorpay.user.SPUser;
 
 
 public class SPHttpConnection {
 	
 	private static final String TAG = "SPHttpConnection";
+	
+	private static final String USER_SEGMENTATION_HEADER_NAME = "X-User-Data";
 
 	public static SPHttpConnection getConnection(String url) throws MalformedURLException {
 		return new SPHttpConnection(url);
@@ -57,6 +62,13 @@ public class SPHttpConnection {
 				for (Header header : mHeadersToAdd) {
 					urlConnection.addRequestProperty(header.key, header.value);
 				}
+			}
+				
+			//If the developer has passed data for user segmentation,
+			//then add them in the headers
+			String userSegmentationData = SPUser.mapToString();
+			if (StringUtils.notNullNorEmpty(userSegmentationData)) {
+				urlConnection.addRequestProperty(USER_SEGMENTATION_HEADER_NAME, userSegmentationData);
 			}
 			
 			InputStream is = null;
@@ -117,6 +129,12 @@ public class SPHttpConnection {
 			throw new IOException("The connection has not been opened yet.");
 		}
 		return mResponseCode;
+	}
+	
+	public static Map<String, String> createUserSegmentationMapForHeaders(){
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put(USER_SEGMENTATION_HEADER_NAME, SPUser.mapToString());
+		return headers;
 	}
 	
 	// helper class

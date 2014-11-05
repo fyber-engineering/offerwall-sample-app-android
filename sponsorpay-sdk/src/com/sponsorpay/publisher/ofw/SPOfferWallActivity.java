@@ -26,6 +26,7 @@ import com.sponsorpay.credentials.SPCredentials;
 import com.sponsorpay.publisher.SponsorPayPublisher;
 import com.sponsorpay.publisher.SponsorPayPublisher.UIStringIdentifier;
 import com.sponsorpay.utils.HostInfo;
+import com.sponsorpay.utils.SPHttpConnection;
 import com.sponsorpay.utils.SPWebViewSettings;
 import com.sponsorpay.utils.SponsorPayBaseUrlProvider;
 import com.sponsorpay.utils.SponsorPayLogger;
@@ -102,7 +103,7 @@ public class SPOfferWallActivity extends Activity {
 
 	/**
 	 * Overridden from {@link Activity}. Upon activity start, extract the user ID from the extra,
-	 * create the web view and setup the interceptor for the web view exit-request.
+	 * create the web view and setup the intercepter for the web view exit-request.
 	 * 
 	 * @param savedInstanceState
 	 *            Android's savedInstanceState
@@ -205,7 +206,8 @@ public class SPOfferWallActivity extends Activity {
 			String offerwallUrl = buildUrl();
 
 			SponsorPayLogger.d(getClass().getSimpleName(), "Offerwall request url: " + offerwallUrl);
-			mWebView.loadUrl(offerwallUrl);
+			
+			mWebView.loadUrl(offerwallUrl, SPHttpConnection.createUserSegmentationMapForHeaders());
 		} catch (RuntimeException ex) {
 			SponsorPayLogger.e(getClass().getSimpleName(),
 					"An exception occurred when launching the Offer Wall", ex);

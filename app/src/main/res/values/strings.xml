@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Sample App</string>
+
+    <string name="action_bar_item_video">Video</string>
+    <string name="action_bar_item_interstitials">Interstitials</string>
+    <string name="action_bar_item_offerwall">Offerwall</string>
+
+    <string name="hello_world">Hello world!</string>
+
+    <string name="action_settings">Settings</string>
+
+    <!-- action bar item tabs  -->
+    <string-array name="action_bar_tabs">
+        <item>@string/action_bar_item_video</item>
+        <item>@string/action_bar_item_interstitials</item>
+        <item>@string/action_bar_item_offerwall</item>
+    </string-array>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

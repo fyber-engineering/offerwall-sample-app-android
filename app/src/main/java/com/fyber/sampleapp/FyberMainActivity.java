@@ -34,7 +34,7 @@ import java.util.Locale;
 
 public class FyberMainActivity extends FragmentActivity {
 
-	private static final String APP_ID = "1245";
+	private static final String APP_ID = "22915";
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide

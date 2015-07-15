@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.fyber.sampleapp.FyberMainActivity;
 import com.fyber.sampleapp.R;
@@ -19,6 +19,7 @@ import com.sponsorpay.publisher.SponsorPayPublisher;
  * create an instance of this fragment.
  */
 public class OfferwallFragment extends Fragment {
+	public static final String SHOW_OFFER_WALL = "Show\r\nOffer Wall";
 	private Button offerwallButton;
 
 	private static final int OFFERWALL_REQUEST_CODE = 8795;
@@ -31,8 +32,7 @@ public class OfferwallFragment extends Fragment {
 	 * @return A new instance of fragment OfferwallFragment.
 	 */
 	public static OfferwallFragment newInstance() {
-		OfferwallFragment fragment = new OfferwallFragment();
-		return fragment;
+		return new OfferwallFragment();
 	}
 
 	public OfferwallFragment() {
@@ -49,13 +49,11 @@ public class OfferwallFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		FrameLayout offerwallFrameLayout = (FrameLayout) inflater.inflate(R.layout.fragment_offerwall,
+		RelativeLayout offerwallFrameLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_offerwall,
 				container, false);
 
-		// note that we're looking for a button with id="@+id/myButton" in your inflated layout
-		// Naturally, this can be any View; it doesn't have to be a button
 		offerwallButton = (Button) offerwallFrameLayout.findViewById(R.id.display_button);
-		FyberMainActivity.setButtonColorAndText(offerwallButton, "Show\r\nOffer Wall", getResources().getColor(R.color.buttonColorSuccess));
+		FyberMainActivity.setButtonColorAndText(offerwallButton, SHOW_OFFER_WALL, getResources().getColor(R.color.buttonColorSuccess));
 
 		offerwallButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -74,7 +72,6 @@ public class OfferwallFragment extends Fragment {
 
 		int fragmentIndex = (requestCode >> 16);
 		if (fragmentIndex != 0) {
-			// Yes. Pass it on...
 			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}

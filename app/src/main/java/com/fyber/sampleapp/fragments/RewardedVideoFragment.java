@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.fyber.sampleapp.FyberMainActivity;
 import com.fyber.sampleapp.R;
@@ -27,12 +27,15 @@ import com.sponsorpay.publisher.mbe.SPBrandEngageRequestListener;
 public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequestListener, SPCurrencyServerListener {
 
 	private static final String TAG = "RewardedVideoFragment";
+	public static final String SHOW_VIDEO = "Show\r\nVideo";
+	public static final String REQUEST_VIDEO = "Request\r\nVideo";
+	public static final String GETTING_OFFERS = "Getting\r\nOffers";
 
 	private Intent mIntent;
 	private Button rewardedVideoButton;
 	private static final int REWARDED_VIDEO_REQUEST_CODE = 8796;
 
-	private FrameLayout rewardedVideoFrameLayout;
+	private RelativeLayout rewardedVideoFrameLayout;
 
 
 	/**
@@ -42,8 +45,7 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 	 * @return A new instance of fragment RewardedVideoFragment.
 	 */
 	public static RewardedVideoFragment newInstance() {
-		RewardedVideoFragment fragment = new RewardedVideoFragment();
-		return fragment;
+		return new RewardedVideoFragment();
 	}
 
 	public RewardedVideoFragment() {
@@ -60,11 +62,9 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		rewardedVideoFrameLayout = (FrameLayout) inflater.inflate(R.layout.fragment_rewarded_video,
+		rewardedVideoFrameLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_rewarded_video,
 				container, false);
 
-		// note that we're looking for a button with id="@+id/myButton" in your inflated layout
-		// Naturally, this can be any View; it doesn't have to be a button
 		rewardedVideoButton = (Button) rewardedVideoFrameLayout.findViewById(R.id.play_button);
 
 		rewardedVideoButton.setOnClickListener(new View.OnClickListener() {
@@ -74,17 +74,19 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 				if (mIntent != null) {
 					startActivityForResult(mIntent, REWARDED_VIDEO_REQUEST_CODE);
 					mIntent = null;
-					FyberMainActivity.setButtonColorAndText(rewardedVideoButton, "Request\r\nVideo", getResources().getColor(R.color.colorPrimary));
+					FyberMainActivity.setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
+							getResources().getColor(R.color.colorPrimary));
 				} else {
 					rewardedVideoButton.startAnimation(FyberMainActivity.getAnimation());
-					rewardedVideoButton.setText("Getting\r\nOffers");
-					SponsorPayPublisher.getIntentForMBEActivity(getActivity(), RewardedVideoFragment.this, RewardedVideoFragment.this);
+					rewardedVideoButton.setText(GETTING_OFFERS);
+					SponsorPayPublisher.getIntentForMBEActivity(getActivity(),
+							RewardedVideoFragment.this, RewardedVideoFragment.this);
 				}
 			}
 		});
 
 		if (mIntent != null) {
-			FyberMainActivity.setButtonColorAndText(rewardedVideoButton, "Show\r\nVideo", getResources().getColor(R.color.buttonColorSuccess));
+			FyberMainActivity.setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
 		}
 
 
@@ -97,7 +99,7 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 		Log.d(TAG, "SPBrandEngage - intent available");
 
 		rewardedVideoButton.startAnimation(FyberMainActivity.getAnimation());
-		FyberMainActivity.setButtonColorAndText(rewardedVideoButton, "Show\r\nVideo", getResources().getColor(R.color.buttonColorSuccess));
+		FyberMainActivity.setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
 		mIntent = spBrandEngageActivity;
 	}
 
@@ -106,7 +108,7 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 		Log.d(TAG, "SPBrandEngage - no offers for the moment");
 		mIntent = null;
 		rewardedVideoButton.startAnimation(FyberMainActivity.getReverseAnimation());
-		rewardedVideoButton.setText("Request\r\nVideo");
+		rewardedVideoButton.setText(REQUEST_VIDEO);
 	}
 
 	@Override
@@ -114,7 +116,7 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 		Log.d(TAG, "SPBrandEngage - an error occurred:\n" + errorMessage);
 		mIntent = null;
 		rewardedVideoButton.startAnimation(FyberMainActivity.getReverseAnimation());
-		rewardedVideoButton.setText("Request\r\nVideo");
+		rewardedVideoButton.setText(REQUEST_VIDEO);
 	}
 
 	@Override
@@ -122,7 +124,8 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case REWARDED_VIDEO_REQUEST_CODE:
-					FyberMainActivity.setButtonColorAndText(rewardedVideoButton, "Request\r\nVideo", getResources().getColor(R.color.colorPrimary));
+					FyberMainActivity.setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
+							getResources().getColor(R.color.colorPrimary));
 					mIntent = null;
 					break;
 				default:

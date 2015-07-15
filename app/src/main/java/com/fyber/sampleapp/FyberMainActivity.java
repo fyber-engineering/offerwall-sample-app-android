@@ -29,12 +29,18 @@ import com.sponsorpay.SponsorPay;
 import com.sponsorpay.utils.SponsorPayLogger;
 import com.sponsorpay.utils.StringUtils;
 
-import java.util.Locale;
-
 
 public class FyberMainActivity extends FragmentActivity {
 
 	private static final String APP_ID = "22915";
+	public static final int DURATION_MILLIS = 300;
+	public static final int DEGREES_360 = 360;
+	public static final int DEGREES_0 = 0;
+	public static final float PIVOT_X_VALUE = 0.5f;
+	public static final float PIVOT_Y_VALUE = 0.5f;
+	public static final int INTERSTITIAL_FRAGMENT_NUMBER = 0;
+	public static final int REWARDED_VIDEO_FRAGMENT_NUMBER = 1;
+	public static final int OFFERWALL_FRAGMENT_NUMBER = 2;
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -126,8 +132,8 @@ public class FyberMainActivity extends FragmentActivity {
 
 	public static Animation getAnimation() {
 		AnimationSet animationSet = new AnimationSet(true);
-		RotateAnimation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-		rotateAnimation.setDuration(300);
+		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_0, DEGREES_360, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
+		rotateAnimation.setDuration(DURATION_MILLIS);
 		animationSet.addAnimation(rotateAnimation);
 
 		return animationSet;
@@ -135,8 +141,8 @@ public class FyberMainActivity extends FragmentActivity {
 
 	public static Animation getReverseAnimation() {
 		AnimationSet animationSet = new AnimationSet(true);
-		RotateAnimation rotateAnimation = new RotateAnimation(360, 0, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-		rotateAnimation.setDuration(300);
+		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_360, DEGREES_0, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
+		rotateAnimation.setDuration(DURATION_MILLIS);
 		animationSet.addAnimation(rotateAnimation);
 
 		return animationSet;
@@ -157,14 +163,13 @@ public class FyberMainActivity extends FragmentActivity {
 		public Fragment getItem(int position) {
 			switch (position) {
 
-				case 0:
-
+				case INTERSTITIAL_FRAGMENT_NUMBER:
 					return InterstitialFragment.newInstance();
 
-				case 1:
+				case REWARDED_VIDEO_FRAGMENT_NUMBER:
 					return RewardedVideoFragment.newInstance();
 
-				case 2:
+				case OFFERWALL_FRAGMENT_NUMBER:
 					return OfferwallFragment.newInstance();
 
 				default:
@@ -182,16 +187,7 @@ public class FyberMainActivity extends FragmentActivity {
 
 		@Override
 		public CharSequence getPageTitle(int position) {
-			Locale l = Locale.getDefault();
-			switch (position) {
-				case 0:
-					return getSpannableString(0);
-				case 1:
-					return getSpannableString(1);
-				case 2:
-					return getSpannableString(2);
-			}
-			return null;
+			return getSpannableString(position);
 		}
 
 		private SpannableString getSpannableString(int position) {

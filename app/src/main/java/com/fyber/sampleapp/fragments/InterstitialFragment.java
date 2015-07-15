@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.fyber.sampleapp.FyberMainActivity;
 import com.fyber.sampleapp.R;
@@ -21,6 +21,9 @@ import com.sponsorpay.publisher.interstitial.SPInterstitialRequestListener;
  * create an instance of this fragment.
  */
 public class InterstitialFragment extends Fragment implements SPInterstitialRequestListener {
+	public static final String SHOW_INTERSTITIAL = "Show\r\nInterstitial";
+	public static final String REQUEST_INTERSTITIALS = "Request\r\nInterstitials";
+	public static final String GETTING_OFFERS = "Getting\r\nOffers";
 	private Intent mIntent;
 
 	private Button interstitialButton;
@@ -28,8 +31,7 @@ public class InterstitialFragment extends Fragment implements SPInterstitialRequ
 
 
 	public static InterstitialFragment newInstance() {
-		InterstitialFragment interstitialFragment = new InterstitialFragment();
-		return interstitialFragment;
+		return new InterstitialFragment();
 	}
 
 
@@ -47,16 +49,16 @@ public class InterstitialFragment extends Fragment implements SPInterstitialRequ
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-		FrameLayout interstitialFrameLayout = (FrameLayout) inflater.inflate(R.layout.fragment_interstitial, container, false);
+		RelativeLayout interstitialFrameLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_interstitial, container, false);
 		interstitialButton = (Button) interstitialFrameLayout.findViewById(R.id.intertstial_start_button);
 		interstitialButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (mIntent != null) {
 					startActivityForResult(mIntent, INTERSTITIAL_REQUEST_CODE);
-					FyberMainActivity.setButtonColorAndText(interstitialButton, "Request\r\nInterstitials", getResources().getColor(R.color.colorPrimary));
+					FyberMainActivity.setButtonColorAndText(interstitialButton, REQUEST_INTERSTITIALS, getResources().getColor(R.color.colorPrimary));
 				} else {
 					interstitialButton.startAnimation(FyberMainActivity.getAnimation());
-					interstitialButton.setText("Getting\r\nOffers");
+					interstitialButton.setText(GETTING_OFFERS);
 					SponsorPayPublisher.getIntentForInterstitialActivity(getActivity(), InterstitialFragment.this);
 				}
 			}
@@ -65,7 +67,7 @@ public class InterstitialFragment extends Fragment implements SPInterstitialRequ
 		});
 
 		if (mIntent != null) {
-			FyberMainActivity.setButtonColorAndText(interstitialButton, "Show\r\nVideo", getResources().getColor(R.color.buttonColorSuccess));
+			FyberMainActivity.setButtonColorAndText(interstitialButton, SHOW_INTERSTITIAL, getResources().getColor(R.color.buttonColorSuccess));
 		}
 
 		return interstitialFrameLayout;
@@ -75,7 +77,7 @@ public class InterstitialFragment extends Fragment implements SPInterstitialRequ
 
 	public void onSPInterstitialAdAvailable(Intent intent) {
 		interstitialButton.startAnimation(FyberMainActivity.getAnimation());
-		FyberMainActivity.setButtonColorAndText(interstitialButton, "Show\r\nInterstitial", getResources().getColor(R.color.buttonColorSuccess));
+		FyberMainActivity.setButtonColorAndText(interstitialButton, SHOW_INTERSTITIAL, getResources().getColor(R.color.buttonColorSuccess));
 		mIntent = intent;
 	}
 
@@ -83,14 +85,14 @@ public class InterstitialFragment extends Fragment implements SPInterstitialRequ
 	public void onSPInterstitialAdNotAvailable() {
 		mIntent = null;
 		interstitialButton.startAnimation(FyberMainActivity.getReverseAnimation());
-		interstitialButton.setText("Request\r\nInterstitial");
+		interstitialButton.setText(SHOW_INTERSTITIAL);
 	}
 
 
 	public void onSPInterstitialAdError(String s) {
 		mIntent = null;
 		interstitialButton.startAnimation(FyberMainActivity.getReverseAnimation());
-		interstitialButton.setText("Request\r\nInterstitial");
+		interstitialButton.setText(SHOW_INTERSTITIAL);
 	}
 
 
@@ -98,7 +100,7 @@ public class InterstitialFragment extends Fragment implements SPInterstitialRequ
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case INTERSTITIAL_REQUEST_CODE:
-					FyberMainActivity.setButtonColorAndText(interstitialButton, "Request\r\nInterstitial", getResources().getColor(R.color.colorPrimary));
+					FyberMainActivity.setButtonColorAndText(interstitialButton, SHOW_INTERSTITIAL, getResources().getColor(R.color.colorPrimary));
 					mIntent = null;
 					break;
 				default:

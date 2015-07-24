@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:theme="@style/FyberMaterialTheme">
         <activity
-            android:name=".FyberMainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -23,20 +23,23 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <!--Fyber activities declaration-->
         <activity
-            android:name="com.sponsorpay.publisher.ofw.SPOfferWallActivity"
+            android:name="com.fyber.ads.ofw.OfferWallActivity"
             android:configChanges="orientation"/>
 
         <activity
-            android:name="com.sponsorpay.publisher.mbe.SPBrandEngageActivity"
+            android:name="com.fyber.ads.videos.RewardedVideoActivity"
             android:configChanges="screenSize|orientation"
-            android:hardwareAccelerated="true"/>
-
+            android:hardwareAccelerated="true"
+            />
 
         <activity
-            android:name="com.sponsorpay.publisher.interstitial.SPInterstitialActivity"
+            android:name="com.fyber.ads.interstitials.InterstitialActivity"
             android:configChanges="screenSize|orientation"
-            android:hardwareAccelerated="true"/>
+            android:theme="@android:style/Theme.Translucent"
+            />
 
 
     </application>

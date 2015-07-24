@@ -4,39 +4,42 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 
-import com.fyber.sampleapp.FyberMainActivity;
+import com.fyber.currency.VirtualCurrencyErrorResponse;
+import com.fyber.currency.VirtualCurrencyResponse;
+import com.fyber.requesters.RequestCallback;
+import com.fyber.requesters.RequestError;
+import com.fyber.requesters.RewardedVideoRequester;
+import com.fyber.requesters.VirtualCurrencyCallback;
+import com.fyber.sampleapp.MainActivity;
 import com.fyber.sampleapp.R;
-import com.sponsorpay.publisher.SponsorPayPublisher;
-import com.sponsorpay.publisher.currency.SPCurrencyServerErrorResponse;
-import com.sponsorpay.publisher.currency.SPCurrencyServerListener;
-import com.sponsorpay.publisher.currency.SPCurrencyServerSuccessfulResponse;
-import com.sponsorpay.publisher.mbe.SPBrandEngageRequestListener;
+import com.fyber.utils.FyberLogger;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RewardedVideoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequestListener, SPCurrencyServerListener {
+public class RewardedVideoFragment extends Fragment implements RequestCallback, VirtualCurrencyCallback {
 
 	private static final String TAG = "RewardedVideoFragment";
 	public static final String SHOW_VIDEO = "Show\r\nVideo";
 	public static final String REQUEST_VIDEO = "Request\r\nVideo";
 	public static final String GETTING_OFFERS = "Getting\r\nOffers";
 
-	private Intent mIntent;
-	private Button rewardedVideoButton;
+	private Intent rewardedVideoIntent;
+	@Bind(R.id.rewarded_video_button) Button rewardedVideoButton;
 	private static final int REWARDED_VIDEO_REQUEST_CODE = 8796;
 
-	private RelativeLayout rewardedVideoFrameLayout;
-
+	//FIXME: since it is mandatory to have public constructor on a fragment is it worth it to have this new instance method
 
 	/**
 	 * Use this factory method to create a new instance of
@@ -61,62 +64,16 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-		rewardedVideoFrameLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_rewarded_video,
+		// Inflate the layout for this fragment
+		View view = inflater.inflate(R.layout.fragment_rewarded_video,
 				container, false);
+		ButterKnife.bind(this, view);
 
-		rewardedVideoButton = (Button) rewardedVideoFrameLayout.findViewById(R.id.play_button);
-
-		rewardedVideoButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// We assume this code is running inside an android.app.Activity subclass
-				if (mIntent != null) {
-					startActivityForResult(mIntent, REWARDED_VIDEO_REQUEST_CODE);
-					mIntent = null;
-					FyberMainActivity.setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
-							getResources().getColor(R.color.colorPrimary));
-				} else {
-					rewardedVideoButton.startAnimation(FyberMainActivity.getAnimation());
-					rewardedVideoButton.setText(GETTING_OFFERS);
-					SponsorPayPublisher.getIntentForMBEActivity(getActivity(),
-							RewardedVideoFragment.this, RewardedVideoFragment.this);
-				}
-			}
-		});
-
-		if (mIntent != null) {
-			FyberMainActivity.setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
+		if (rewardedVideoIntent != null) {
+			MainActivity.setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
 		}
 
-
-		// Inflate the layout for this fragment
-		return rewardedVideoFrameLayout;
-	}
-
-	@Override
-	public void onSPBrandEngageOffersAvailable(Intent spBrandEngageActivity) {
-		Log.d(TAG, "SPBrandEngage - intent available");
-
-		rewardedVideoButton.startAnimation(FyberMainActivity.getAnimation());
-		FyberMainActivity.setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
-		mIntent = spBrandEngageActivity;
-	}
-
-	@Override
-	public void onSPBrandEngageOffersNotAvailable() {
-		Log.d(TAG, "SPBrandEngage - no offers for the moment");
-		mIntent = null;
-		rewardedVideoButton.startAnimation(FyberMainActivity.getReverseAnimation());
-		rewardedVideoButton.setText(REQUEST_VIDEO);
-	}
-
-	@Override
-	public void onSPBrandEngageError(String errorMessage) {
-		Log.d(TAG, "SPBrandEngage - an error occurred:\n" + errorMessage);
-		mIntent = null;
-		rewardedVideoButton.startAnimation(FyberMainActivity.getReverseAnimation());
-		rewardedVideoButton.setText(REQUEST_VIDEO);
+		return view;
 	}
 
 	@Override
@@ -124,9 +81,11 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case REWARDED_VIDEO_REQUEST_CODE:
-					FyberMainActivity.setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
+					rewardedVideoIntent = null;
+					MainActivity.setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
 							getResources().getColor(R.color.colorPrimary));
-					mIntent = null;
+					// If you did not chain a vcs callback in the rewarded video request, you can uncomment the line below and the respective method to make a separate vcs request.
+//					requestVirtualCurrency();
 					break;
 				default:
 					break;
@@ -134,14 +93,97 @@ public class RewardedVideoFragment extends Fragment implements SPBrandEngageRequ
 		}
 	}
 
+	@OnClick(R.id.rewarded_video_button)
+	public void onRewardedVideoButtonCLicked(View view) {
+		// We assume this code is running inside an android.app.Activity subclass
+		if (rewardedVideoIntent != null) {
+			startActivityForResult(rewardedVideoIntent, REWARDED_VIDEO_REQUEST_CODE);
+			rewardedVideoIntent = null;
+			MainActivity.setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
+					getResources().getColor(R.color.colorPrimary));
+		} else {
+			rewardedVideoButton.startAnimation(MainActivity.getClockwiseAnimation());
+			rewardedVideoButton.setText(GETTING_OFFERS);
+			//Requesting a rewarded video ad
+			RewardedVideoRequester
+					.create(this)
+					.withVirtualCurrencyCallback(this) // you can add a vcs listener by chaining an extra method
+					.request(getActivity());
+
+			//FIXME: is it worth to add a link to the dev portal? (http://developer.fyber.com/content/android/basics/rewarding-the-user/vcs/) or something?
+			/*
+			* If you do not chain a vcs callback in the rewarded video request you can always make a separate call for virtual currency.
+			* comment the 'withVirtualCurrencyCallback' line and uncomment the 'requestVirtualCurrency()' on 'onActivityResult'
+			* Have a look at the commented method 'requestVirtualCurrency'
+			*/
+		}
+	}
+
+	// ** RequestCallback methods **
+
 	@Override
-	public void onSPCurrencyServerError(SPCurrencyServerErrorResponse response) {
-		Log.e(TAG, "VCS error received - " + response.getErrorMessage());
+	public void onAdAvailable(Intent intent) {
+		rewardedVideoButton.startAnimation(MainActivity.getClockwiseAnimation());
+		MainActivity.setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
+		rewardedVideoIntent = intent;
 	}
 
 	@Override
-	public void onSPCurrencyDeltaReceived(SPCurrencyServerSuccessfulResponse response) {
-		Log.d(TAG, "VCS coins received - " + response.getDeltaOfCoins());
+	public void onAdNotAvailable() {
+		FyberLogger.d(TAG, "no ad available");
+		resetOfferWallState();
 	}
+
+	@Override
+	public void onRequestError(RequestError requestError) {
+		//FIXME: this is ambiguous. It can either be a video request error or a vcs request error. Should we move to anonymous callbacks?
+		FyberLogger.d(TAG, "error requesting ad: " + requestError.getDescription());
+		resetOfferWallState();
+	}
+
+	private void resetOfferWallState() {
+		rewardedVideoIntent = null;
+		rewardedVideoButton.startAnimation(MainActivity.getReverseClockwiseAnimation());
+		rewardedVideoButton.setText(REQUEST_VIDEO);
+	}
+
+
+	// ** VCS listener **
+	@Override
+	public void onError(VirtualCurrencyErrorResponse response) {
+		FyberLogger.d(TAG, "VCS error received - " + response.getErrorMessage());
+	}
+
+	@Override
+	public void onSuccess(VirtualCurrencyResponse response) {
+		FyberLogger.d(TAG, "VCS coins received - " + response.getDeltaOfCoins());
+
+	}
+
+	/*
+	 * ** separate VCS request **
+	 * Note that you will only have a successful response when querying for virtual currency after watching a rewarded video.
+	 * Uncomment this code and call this method after watching the video
+	  */
+
+//	public void requestVirtualCurrency() {
+//
+//		VirtualCurrencyRequester.create(new VirtualCurrencyCallback() {
+//			@Override
+//			public void onError(VirtualCurrencyErrorResponse virtualCurrencyErrorResponse) {
+//				FyberLogger.d(TAG, "VCS error received - " + virtualCurrencyErrorResponse.getErrorMessage());
+//			}
+//
+//			@Override
+//			public void onSuccess(VirtualCurrencyResponse virtualCurrencyResponse) {
+//				FyberLogger.d(TAG, "VCS coins received - " + virtualCurrencyResponse.getDeltaOfCoins());
+//			}
+//
+//			@Override
+//			public void onRequestError(RequestError requestError) {
+//				FyberLogger.d(TAG, "error requesting vcs: " + requestError.getDescription());
+//			}
+//		});
+//	}
 
 }

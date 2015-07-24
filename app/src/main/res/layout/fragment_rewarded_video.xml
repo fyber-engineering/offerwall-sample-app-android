@@ -1,4 +1,4 @@
-<RelativeLayout
+<LinearLayout
     android:id="@+id/button_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,7 +7,7 @@
     android:gravity="center">
 
     <Button
-        android:id="@+id/play_button"
+        android:id="@+id/rewarded_video_button"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_margin="15dp"
@@ -20,5 +20,5 @@
         android:textColor="#FFF"
         android:textSize="20sp"
         tools:ignore="HardcodedText,UnusedAttribute"/>
-</RelativeLayout>
+</LinearLayout>
 

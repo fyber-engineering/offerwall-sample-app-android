@@ -7,24 +7,35 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 
-import com.fyber.sampleapp.FyberMainActivity;
+import com.fyber.requesters.OfferWallRequester;
+import com.fyber.requesters.RequestCallback;
+import com.fyber.requesters.RequestError;
+import com.fyber.sampleapp.MainActivity;
 import com.fyber.sampleapp.R;
-import com.sponsorpay.publisher.SponsorPayPublisher;
+import com.fyber.utils.FyberLogger;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link OfferwallFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OfferwallFragment extends Fragment {
+public class OfferwallFragment extends Fragment implements RequestCallback {
+	private static final String TAG = OfferwallFragment.class.getSimpleName();
+
 	public static final String SHOW_OFFER_WALL = "Show\r\nOffer Wall";
-	private Button offerwallButton;
+
+	@Bind(R.id.offer_wall_button) Button offerwallButton;
 
 	private static final int OFFERWALL_REQUEST_CODE = 8795;
+	private Intent offerWallIntent;
 
 
+	//FIXME: since it is mandatory to have public constructor on a fragment is it worth it to have this new instance method
 	/**
 	 * Use this factory method to create a new instance of
 	 * this fragment using the provided parameters.
@@ -48,23 +59,14 @@ public class OfferwallFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-		RelativeLayout offerwallFrameLayout = (RelativeLayout) inflater.inflate(R.layout.fragment_offerwall,
-				container, false);
-
-		offerwallButton = (Button) offerwallFrameLayout.findViewById(R.id.display_button);
-		FyberMainActivity.setButtonColorAndText(offerwallButton, SHOW_OFFER_WALL, getResources().getColor(R.color.buttonColorSuccess));
-
-		offerwallButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-                // We assume this code is running inside an android.app.Activity subclass
-				Intent offerWallIntent = SponsorPayPublisher.getIntentForOfferWallActivity(getActivity(), true);
-				startActivityForResult(offerWallIntent, OFFERWALL_REQUEST_CODE);
-			}
-		});
 		// Inflate the layout for this fragment
-		return offerwallFrameLayout;
+		View view = inflater.inflate(R.layout.fragment_offerwall,
+				container, false);
+		ButterKnife.bind(this, view);
+
+		MainActivity.setButtonColorAndText(offerwallButton, SHOW_OFFER_WALL, getResources().getColor(R.color.buttonColorSuccess));
+
+		return view;
 	}
 
 	@Override
@@ -74,6 +76,50 @@ public class OfferwallFragment extends Fragment {
 		if (fragmentIndex != 0) {
 			super.onActivityResult(requestCode, resultCode, data);
 		}
+	}
+
+		@OnClick(R.id.offer_wall_button)
+		public void onOfferWallButtonCLicked(View view) {
+		if (offerWallIntent != null) {
+			startActivityForResult(offerWallIntent, OFFERWALL_REQUEST_CODE);
+		} else {
+			//FIXME: should the comment be different here?
+			//unless the device is not supported OfferWallRequester will always return an intent. However, for consistency reason we use the same callback as for other ad formats
+			//Requesting an offer ad
+			OfferWallRequester
+					.create(this)
+					.request(getActivity());
+		}
+	}
+
+	// ** RequestCallback methods **
+
+	@Override
+	public void onAdAvailable(Intent intent) {
+		offerwallButton.startAnimation(MainActivity.getClockwiseAnimation());
+		MainActivity.setButtonColorAndText(offerwallButton, SHOW_OFFER_WALL, getResources().getColor(R.color.buttonColorSuccess));
+		this.offerWallIntent = intent;
+		startActivityForResult(offerWallIntent, OFFERWALL_REQUEST_CODE);
+
+	}
+
+	//FIXME: validate button sate for offer wall
+	@Override
+	public void onAdNotAvailable() {
+		FyberLogger.d(TAG, "no ad available");
+		resetOfferWallState();
+	}
+
+	@Override
+	public void onRequestError(RequestError requestError) {
+		FyberLogger.d(TAG, "error requesting ad: " + requestError.getDescription());
+		resetOfferWallState();
+	}
+
+	private void resetOfferWallState() {
+		offerWallIntent = null;
+		offerwallButton.startAnimation(MainActivity.getReverseClockwiseAnimation());
+		offerwallButton.setText(SHOW_OFFER_WALL);
 	}
 
 }

@@ -19,10 +19,26 @@ android {
     }
 }
 
+repositories {
+
+    maven {
+        name "Fyber's internal repo"
+        url "https://dl.bintray.com/fyber/internal"
+        credentials {
+            username bintrayUser
+            password bintrayKey
+        }
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    //Google stuff
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.android.support:support-v4:22.1.1'
     compile 'com.google.android.gms:play-services:7.3.0'
-    compile 'com.sponsorpay:sponsorpay-android-sdk:7.2.2'
+    //Fyber SDK
+    compile 'com.fyber:fyber-android-sdk:8.0.0-rc4'
+    //Cool 3rd party libs
+    compile 'com.jakewharton:butterknife:7.0.1'
 }

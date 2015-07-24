@@ -28,14 +28,14 @@ import butterknife.OnClick;
  * Use the {@link RewardedVideoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RewardedVideoFragment extends Fragment implements RequestCallback, VirtualCurrencyCallback {
+public class RewardedVideoFragment extends FyberFragment implements RequestCallback, VirtualCurrencyCallback {
 
 	private static final String TAG = "RewardedVideoFragment";
 	public static final String SHOW_VIDEO = "Show\r\nVideo";
 	public static final String REQUEST_VIDEO = "Request\r\nVideo";
 	public static final String GETTING_OFFERS = "Getting\r\nOffers";
 
-	private Intent rewardedVideoIntent;
+	//	private Intent rewardedVideoIntent;
 	@Bind(R.id.rewarded_video_button) Button rewardedVideoButton;
 	private static final int REWARDED_VIDEO_REQUEST_CODE = 8796;
 
@@ -69,8 +69,8 @@ public class RewardedVideoFragment extends Fragment implements RequestCallback, 
 				container, false);
 		ButterKnife.bind(this, view);
 
-		if (rewardedVideoIntent != null) {
-			MainActivity.setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
+		if (intent != null) {
+			setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
 		}
 
 		return view;
@@ -81,8 +81,8 @@ public class RewardedVideoFragment extends Fragment implements RequestCallback, 
 		if (resultCode == Activity.RESULT_OK) {
 			switch (requestCode) {
 				case REWARDED_VIDEO_REQUEST_CODE:
-					rewardedVideoIntent = null;
-					MainActivity.setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
+					intent = null;
+					setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
 							getResources().getColor(R.color.colorPrimary));
 					// If you did not chain a vcs callback in the rewarded video request, you can uncomment the line below and the respective method to make a separate vcs request.
 //					requestVirtualCurrency();
@@ -95,11 +95,11 @@ public class RewardedVideoFragment extends Fragment implements RequestCallback, 
 
 	@OnClick(R.id.rewarded_video_button)
 	public void onRewardedVideoButtonCLicked(View view) {
-		// We assume this code is running inside an android.app.Activity subclass
-		if (rewardedVideoIntent != null) {
-			startActivityForResult(rewardedVideoIntent, REWARDED_VIDEO_REQUEST_CODE);
-			rewardedVideoIntent = null;
-			MainActivity.setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
+		//if we already have an intent, we start the video activity and reset the button
+		if (intent != null) {
+			startActivityForResult(intent, REWARDED_VIDEO_REQUEST_CODE);
+			intent = null;
+			setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
 					getResources().getColor(R.color.colorPrimary));
 		} else {
 			rewardedVideoButton.startAnimation(MainActivity.getClockwiseAnimation());
@@ -107,7 +107,7 @@ public class RewardedVideoFragment extends Fragment implements RequestCallback, 
 			//Requesting a rewarded video ad
 			RewardedVideoRequester
 					.create(this)
-					.withVirtualCurrencyCallback(this) // you can add a vcs listener by chaining an extra method
+					.withVirtualCurrencyCallback(this) // you can add a vcs listener by chaining this extra method
 					.request(getActivity());
 
 			//FIXME: is it worth to add a link to the dev portal? (http://developer.fyber.com/content/android/basics/rewarding-the-user/vcs/) or something?
@@ -119,36 +119,28 @@ public class RewardedVideoFragment extends Fragment implements RequestCallback, 
 		}
 	}
 
-	// ** RequestCallback methods **
-
 	@Override
-	public void onAdAvailable(Intent intent) {
-		rewardedVideoButton.startAnimation(MainActivity.getClockwiseAnimation());
-		MainActivity.setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
-		rewardedVideoIntent = intent;
+	public String getLogTag() {
+		return TAG;
 	}
 
 	@Override
-	public void onAdNotAvailable() {
-		FyberLogger.d(TAG, "no ad available");
-		resetOfferWallState();
+	public String getRequestText() {
+		return REQUEST_VIDEO;
 	}
 
 	@Override
-	public void onRequestError(RequestError requestError) {
-		//FIXME: this is ambiguous. It can either be a video request error or a vcs request error. Should we move to anonymous callbacks?
-		FyberLogger.d(TAG, "error requesting ad: " + requestError.getDescription());
-		resetOfferWallState();
+	public String getShowText() {
+		return SHOW_VIDEO;
 	}
 
-	private void resetOfferWallState() {
-		rewardedVideoIntent = null;
-		rewardedVideoButton.startAnimation(MainActivity.getReverseClockwiseAnimation());
-		rewardedVideoButton.setText(REQUEST_VIDEO);
+	@Override
+	public Button getButton() {
+		return rewardedVideoButton;
 	}
-
 
 	// ** VCS listener **
+
 	@Override
 	public void onError(VirtualCurrencyErrorResponse response) {
 		FyberLogger.d(TAG, "VCS error received - " + response.getErrorMessage());

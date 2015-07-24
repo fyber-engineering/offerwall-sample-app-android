@@ -24,7 +24,7 @@ import butterknife.OnClick;
  * Use the {@link OfferwallFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OfferwallFragment extends Fragment implements RequestCallback {
+public class OfferwallFragment extends FyberFragment {
 	private static final String TAG = OfferwallFragment.class.getSimpleName();
 
 	public static final String SHOW_OFFER_WALL = "Show\r\nOffer Wall";
@@ -36,6 +36,7 @@ public class OfferwallFragment extends Fragment implements RequestCallback {
 
 
 	//FIXME: since it is mandatory to have public constructor on a fragment is it worth it to have this new instance method
+
 	/**
 	 * Use this factory method to create a new instance of
 	 * this fragment using the provided parameters.
@@ -64,27 +65,19 @@ public class OfferwallFragment extends Fragment implements RequestCallback {
 				container, false);
 		ButterKnife.bind(this, view);
 
-		MainActivity.setButtonColorAndText(offerwallButton, SHOW_OFFER_WALL, getResources().getColor(R.color.buttonColorSuccess));
+		setButtonColorAndText(offerwallButton, SHOW_OFFER_WALL, getResources().getColor(R.color.buttonColorSuccess));
 
 		return view;
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-		int fragmentIndex = (requestCode >> 16);
-		if (fragmentIndex != 0) {
-			super.onActivityResult(requestCode, resultCode, data);
-		}
-	}
-
-		@OnClick(R.id.offer_wall_button)
-		public void onOfferWallButtonCLicked(View view) {
+	@OnClick(R.id.offer_wall_button)
+	public void onOfferWallButtonCLicked(View view) {
 		if (offerWallIntent != null) {
 			startActivityForResult(offerWallIntent, OFFERWALL_REQUEST_CODE);
 		} else {
 			//FIXME: should the comment be different here?
-			//unless the device is not supported OfferWallRequester will always return an intent. However, for consistency reason we use the same callback as for other ad formats
+			//Unless the device is not supported, OfferWallRequester will always return an intent.
+			//However, for consistency reason we use the same callback as for other ad formats
 			//Requesting an offer ad
 			OfferWallRequester
 					.create(this)
@@ -92,34 +85,23 @@ public class OfferwallFragment extends Fragment implements RequestCallback {
 		}
 	}
 
-	// ** RequestCallback methods **
-
 	@Override
-	public void onAdAvailable(Intent intent) {
-		offerwallButton.startAnimation(MainActivity.getClockwiseAnimation());
-		MainActivity.setButtonColorAndText(offerwallButton, SHOW_OFFER_WALL, getResources().getColor(R.color.buttonColorSuccess));
-		this.offerWallIntent = intent;
-		startActivityForResult(offerWallIntent, OFFERWALL_REQUEST_CODE);
-
-	}
-
-	//FIXME: validate button sate for offer wall
-	@Override
-	public void onAdNotAvailable() {
-		FyberLogger.d(TAG, "no ad available");
-		resetOfferWallState();
+	public String getLogTag() {
+		return TAG;
 	}
 
 	@Override
-	public void onRequestError(RequestError requestError) {
-		FyberLogger.d(TAG, "error requesting ad: " + requestError.getDescription());
-		resetOfferWallState();
+	public String getRequestText() {
+		return SHOW_OFFER_WALL;
 	}
 
-	private void resetOfferWallState() {
-		offerWallIntent = null;
-		offerwallButton.startAnimation(MainActivity.getReverseClockwiseAnimation());
-		offerwallButton.setText(SHOW_OFFER_WALL);
+	@Override
+	public String getShowText() {
+		return SHOW_OFFER_WALL;
 	}
 
+	@Override
+	public Button getButton() {
+		return offerwallButton;
+	}
 }

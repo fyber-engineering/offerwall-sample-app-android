@@ -31,6 +31,7 @@ import com.fyber.utils.FyberLogger;
 
 public class MainActivity extends FragmentActivity {
 
+	//FIXME: what are the correct values to use here?
 	private static final String APP_ID = "24913";
 	private static final String SECURITY_TOKEN = "128194d69f9a68d14db869140e1a108b";
 
@@ -63,27 +64,31 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_fyber_main);
 
+//		enabling Fyber logs so that we can see what is going on on the sdk level
 		FyberLogger.enableLogging(true);
 
+		setupViewPager();
+		setupToolbar();
+	}
+
+	private void setupViewPager() {
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the activity.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-		Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
-		toolbar.setTitle(getString(R.string.fyber_header));
-		toolbar.setLogo(R.drawable.ic_launcher);
-
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-
 		mViewPager.setCurrentItem(1);
+	}
 
+	private void setupToolbar() {
+		Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+		toolbar.setTitle(getString(R.string.fyber_header));
+		toolbar.setLogo(R.drawable.ic_launcher);
 	}
 
 
@@ -91,24 +96,35 @@ public class MainActivity extends FragmentActivity {
 	protected void onResume() {
 		super.onResume();
 		try {
-			Fyber.with(APP_ID, this)
-					//FIXME: add values so that uncommenting the code works correctly
+			Fyber fyber = Fyber
+					.with(APP_ID, this)
 					.withSecurityToken(SECURITY_TOKEN)
+					//FIXME: add correct values so that uncommenting the code works correctly. Add comments explaning each line?
 //					.withManualPrecaching()
 //					.withCustomParams(...)
 //					.withUserId(USER_ID)
-					.start();
+					;
+
+			//when you start Fyber sdk you get a Settings object that you can use to customise the sdk behaviour.
+			//Have a look at the method 'customiseFyberSettings' to learn more about possible customisation.
+			Fyber.Settings fyberSettings = fyber.start();
+
+//			customiseFyberSettings(fyberSettings);
+
 		} catch (IllegalArgumentException e) {
 			Log.d(TAG, e.getLocalizedMessage());
 		}
 	}
 
-	public static void setButtonColorAndText(Button button, String text, int color) {
-		Drawable drawable = button.getBackground();
-		ColorFilter filter = new LightingColorFilter(color, color);
-		drawable.setColorFilter(filter);
-		button.setText(text);
+	private void customiseFyberSettings(Fyber.Settings fyberSettings) {
+		fyberSettings.showNotificationOnUserRewarded(false);
+		fyberSettings.closeOfferWallOnRedirect(true);
+		fyberSettings.showNotificationOnUserEngaged(true);
+		fyberSettings.addParameter("myCustomParaKey", "myCustomParaValue");
+		fyberSettings.setCustomUIString(Fyber.Settings.UIStringIdentifier.GENERIC_ERROR, "my custom generic error msg");
 	}
+
+	// ** Animations **
 
 	public static Animation getClockwiseAnimation() {
 		AnimationSet animationSet = new AnimationSet(true);
@@ -165,6 +181,7 @@ public class MainActivity extends FragmentActivity {
 			return 3;
 		}
 
+		//FIXME: we should center the icons and add a descriptive title like in the iOS app
 		@Override
 		public CharSequence getPageTitle(int position) {
 			return getSpannableString(position);

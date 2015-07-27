@@ -27,13 +27,7 @@ import butterknife.OnClick;
 public class OfferwallFragment extends FyberFragment {
 	private static final String TAG = OfferwallFragment.class.getSimpleName();
 
-	public static final String SHOW_OFFER_WALL = "Show\r\nOffer Wall";
-
 	@Bind(R.id.offer_wall_button) Button offerwallButton;
-
-	private static final int OFFERWALL_REQUEST_CODE = 8795;
-	private Intent offerWallIntent;
-
 
 	//FIXME: since it is mandatory to have public constructor on a fragment is it worth it to have this new instance method
 
@@ -65,20 +59,21 @@ public class OfferwallFragment extends FyberFragment {
 				container, false);
 		ButterKnife.bind(this, view);
 
-		setButtonColorAndText(offerwallButton, SHOW_OFFER_WALL, getResources().getColor(R.color.buttonColorSuccess));
+		setButtonToSuccessState();
 
 		return view;
 	}
 
 	@OnClick(R.id.offer_wall_button)
 	public void onOfferWallButtonCLicked(View view) {
-		if (offerWallIntent != null) {
-			startActivityForResult(offerWallIntent, OFFERWALL_REQUEST_CODE);
+		if (isIntentAvailable()) {
+			startActivityForResult(intent, OFFERWALL_REQUEST_CODE);
 		} else {
 			//FIXME: should the comment be different here?
 			//Unless the device is not supported, OfferWallRequester will always return an intent.
 			//However, for consistency reason we use the same callback as for other ad formats
-			//Requesting an offer ad
+
+			//Requesting the offer wall
 			OfferWallRequester
 					.create(this)
 					.request(getActivity());
@@ -92,12 +87,12 @@ public class OfferwallFragment extends FyberFragment {
 
 	@Override
 	public String getRequestText() {
-		return SHOW_OFFER_WALL;
+		return getString(R.string.showOfferWall);
 	}
 
 	@Override
 	public String getShowText() {
-		return SHOW_OFFER_WALL;
+		return getString(R.string.showOfferWall);
 	}
 
 	@Override

@@ -120,7 +120,7 @@ public class MainActivity extends FragmentActivity {
 		fyberSettings.showNotificationOnUserRewarded(false);
 		fyberSettings.closeOfferWallOnRedirect(true);
 		fyberSettings.showNotificationOnUserEngaged(true);
-		fyberSettings.addParameter("myCustomParaKey", "myCustomParaValue");
+		fyberSettings.addParameter("myCustomParamKey", "myCustomParamValue");
 		fyberSettings.setCustomUIString(Fyber.Settings.UIStringIdentifier.GENERIC_ERROR, "my custom generic error msg");
 	}
 
@@ -172,7 +172,6 @@ public class MainActivity extends FragmentActivity {
 					return RewardedVideoFragment.newInstance();
 			}
 			// getItem is called to instantiate the fragment for the given page.
-			// Return a PlaceholderFragment (defined as a static inner class below).
 		}
 
 		@Override

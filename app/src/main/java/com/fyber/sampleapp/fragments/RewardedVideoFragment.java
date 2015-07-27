@@ -1,13 +1,17 @@
 package com.fyber.sampleapp.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.fyber.currency.VirtualCurrencyErrorResponse;
 import com.fyber.currency.VirtualCurrencyResponse;
@@ -15,7 +19,7 @@ import com.fyber.requesters.RequestCallback;
 import com.fyber.requesters.RequestError;
 import com.fyber.requesters.RewardedVideoRequester;
 import com.fyber.requesters.VirtualCurrencyCallback;
-import com.fyber.sampleapp.MainActivity;
+import com.fyber.requesters.VirtualCurrencyRequester;
 import com.fyber.sampleapp.R;
 import com.fyber.utils.FyberLogger;
 
@@ -31,13 +35,8 @@ import butterknife.OnClick;
 public class RewardedVideoFragment extends FyberFragment implements RequestCallback, VirtualCurrencyCallback {
 
 	private static final String TAG = "RewardedVideoFragment";
-	public static final String SHOW_VIDEO = "Show\r\nVideo";
-	public static final String REQUEST_VIDEO = "Request\r\nVideo";
-	public static final String GETTING_OFFERS = "Getting\r\nOffers";
 
-	//	private Intent rewardedVideoIntent;
 	@Bind(R.id.rewarded_video_button) Button rewardedVideoButton;
-	private static final int REWARDED_VIDEO_REQUEST_CODE = 8796;
 
 	//FIXME: since it is mandatory to have public constructor on a fragment is it worth it to have this new instance method
 
@@ -69,53 +68,37 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 				container, false);
 		ButterKnife.bind(this, view);
 
-		if (intent != null) {
-			setButtonColorAndText(rewardedVideoButton, SHOW_VIDEO, getResources().getColor(R.color.buttonColorSuccess));
+		if (isIntentAvailable()) {
+			setButtonToSuccessState();
 		}
 
 		return view;
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == Activity.RESULT_OK) {
-			switch (requestCode) {
-				case REWARDED_VIDEO_REQUEST_CODE:
-					intent = null;
-					setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
-							getResources().getColor(R.color.colorPrimary));
-					// If you did not chain a vcs callback in the rewarded video request, you can uncomment the line below and the respective method to make a separate vcs request.
-//					requestVirtualCurrency();
-					break;
-				default:
-					break;
-			}
-		}
-	}
-
 	@OnClick(R.id.rewarded_video_button)
 	public void onRewardedVideoButtonCLicked(View view) {
-		//if we already have an intent, we start the video activity and reset the button
-		if (intent != null) {
-			startActivityForResult(intent, REWARDED_VIDEO_REQUEST_CODE);
-			intent = null;
-			setButtonColorAndText(rewardedVideoButton, REQUEST_VIDEO,
-					getResources().getColor(R.color.colorPrimary));
-		} else {
-			rewardedVideoButton.startAnimation(MainActivity.getClockwiseAnimation());
-			rewardedVideoButton.setText(GETTING_OFFERS);
-			//Requesting a rewarded video ad
-			RewardedVideoRequester
-					.create(this)
-					.withVirtualCurrencyCallback(this) // you can add a vcs listener by chaining this extra method
-					.request(getActivity());
+		if (!isRequestingState()) {
+			//if we already have an intent, we start the video activity and reset the button
+			if (isIntentAvailable()) {
+				startActivityForResult(intent, REWARDED_VIDEO_REQUEST_CODE);
+				setButtonToOriginalState();
+				resetIntent();
+			} else {
+				setButtonToRequestingMode();
 
-			//FIXME: is it worth to add a link to the dev portal? (http://developer.fyber.com/content/android/basics/rewarding-the-user/vcs/) or something?
+				//Requesting a rewarded video ad
+				RewardedVideoRequester
+						.create(this)
+						.withVirtualCurrencyCallback(this) // you can add a vcs listener by chaining this extra method
+						.request(getActivity());
+
+				//FIXME: is it worth to add a link to the dev portal? (http://developer.fyber.com/content/android/basics/rewarding-the-user/vcs/) or something?
 			/*
 			* If you do not chain a vcs callback in the rewarded video request you can always make a separate call for virtual currency.
 			* comment the 'withVirtualCurrencyCallback' line and uncomment the 'requestVirtualCurrency()' on 'onActivityResult'
 			* Have a look at the commented method 'requestVirtualCurrency'
 			*/
+			}
 		}
 	}
 
@@ -126,12 +109,12 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 
 	@Override
 	public String getRequestText() {
-		return REQUEST_VIDEO;
+		return getString(R.string.requestVideo);
 	}
 
 	@Override
 	public String getShowText() {
-		return SHOW_VIDEO;
+		return getString(R.string.showVideo);
 	}
 
 	@Override
@@ -149,16 +132,16 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 	@Override
 	public void onSuccess(VirtualCurrencyResponse response) {
 		FyberLogger.d(TAG, "VCS coins received - " + response.getDeltaOfCoins());
-
 	}
 
 	/*
 	 * ** separate VCS request **
-	 * Note that you will only have a successful response when querying for virtual currency after watching a rewarded video.
-	 * Uncomment this code and call this method after watching the video
+	 * Note that you will only have a successful response querying for virtual currency after watching a rewarded video.
+	 * Uncomment this code and call this method from 'onActivityResult'
+	 *
 	  */
 
-//	public void requestVirtualCurrency() {
+//	public static void requestVirtualCurrency() {
 //
 //		VirtualCurrencyRequester.create(new VirtualCurrencyCallback() {
 //			@Override

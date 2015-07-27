@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.fyber.requesters.InterstitialRequester;
-import com.fyber.sampleapp.MainActivity;
 import com.fyber.sampleapp.R;
 
 import butterknife.Bind;
@@ -23,12 +22,6 @@ import butterknife.OnClick;
 public class InterstitialFragment extends FyberFragment {
 
 	private static final String TAG = InterstitialFragment.class.getSimpleName();
-
-	public static final String SHOW_INTERSTITIAL = "Show\r\nInterstitial";
-	public static final String REQUEST_INTERSTITIALS = "Request\r\nInterstitials";
-	public static final String GETTING_OFFERS = "Getting\r\nOffers";
-//	private Intent interstitialIntent;
-//	private static final int INTERSTITIAL_REQUEST_CODE = 8792;
 
 	@Bind(R.id.interstitial_button) Button interstitialButton;
 
@@ -60,8 +53,8 @@ public class InterstitialFragment extends FyberFragment {
 		View view = inflater.inflate(R.layout.fragment_interstitial, container, false);
 		ButterKnife.bind(this, view);
 
-		if (intent != null) {
-			setButtonColorAndText(interstitialButton, SHOW_INTERSTITIAL, getResources().getColor(R.color.buttonColorSuccess));
+		if (isIntentAvailable()) {
+			setButtonToSuccessState();
 		}
 
 		return view;
@@ -70,18 +63,19 @@ public class InterstitialFragment extends FyberFragment {
 
 	@OnClick(R.id.interstitial_button)
 	public void onInterterstitialButtonCLicked(View view) {
-		if (intent != null) {
-			startActivityForResult(intent, INTERSTITIAL_REQUEST_CODE);
-			intent = null;
-			setButtonColorAndText(interstitialButton, REQUEST_INTERSTITIALS, getResources().getColor(R.color.colorPrimary));
-		} else {
-			interstitialButton.startAnimation(MainActivity.getClockwiseAnimation());
-			interstitialButton.setText(GETTING_OFFERS);
+		if ( !isRequestingState()) {
+			if (isIntentAvailable()) {
+				startActivityForResult(intent, INTERSTITIAL_REQUEST_CODE);
+				setButtonToOriginalState();
+				resetIntent();
+			} else {
+				setButtonToRequestingMode();
 
-			//request an interstitial ad.
-			InterstitialRequester
-					.create(this)
-					.request(getActivity());
+				//request an interstitial ad.
+				InterstitialRequester
+						.create(this)
+						.request(getActivity());
+			}
 		}
 	}
 
@@ -92,12 +86,12 @@ public class InterstitialFragment extends FyberFragment {
 
 	@Override
 	public String getRequestText() {
-		return REQUEST_INTERSTITIALS;
+		return getString(R.string.requestInterstitial);
 	}
 
 	@Override
 	public String getShowText() {
-		return SHOW_INTERSTITIAL;
+		return getString(R.string.showInterstitial);
 	}
 
 	@Override

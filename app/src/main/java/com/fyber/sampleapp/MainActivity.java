@@ -91,7 +91,6 @@ public class MainActivity extends FragmentActivity {
 		toolbar.setLogo(R.drawable.ic_launcher);
 	}
 
-
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -99,7 +98,7 @@ public class MainActivity extends FragmentActivity {
 			Fyber fyber = Fyber
 					.with(APP_ID, this)
 					.withSecurityToken(SECURITY_TOKEN)
-					//FIXME: add correct values so that uncommenting the code works correctly. Add comments explaning each line?
+					//FIXME: add correct values so that uncommenting the code works correctly. Add comments explaining each line?
 //					.withManualPrecaching()
 //					.withCustomParams(...)
 //					.withUserId(USER_ID)

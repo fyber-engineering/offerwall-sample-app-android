@@ -16,7 +16,6 @@ import com.fyber.currency.VirtualCurrencyResponse;
 import com.fyber.exceptions.IdException;
 import com.fyber.reporters.InstallReporter;
 import com.fyber.reporters.RewardedActionReporter;
-import com.fyber.requesters.OfferWallRequester;
 import com.fyber.requesters.RequestCallback;
 import com.fyber.requesters.RequestError;
 import com.fyber.requesters.RewardedVideoRequester;
@@ -131,8 +130,8 @@ public class NeatFeatures {
 				.withPlacementId("myPlacementId");
 
 		VirtualCurrencyRequester vcsReq = VirtualCurrencyRequester
-				.from(requester) //here is another example where you can create
-				.notifyUserOnCompletion(true)
+				.from(requester) //here is another example where you can create requester from another requester... elaborate
+//				.notifyUserOnCompletion(true)
 				.forCurrencyId("myCurrencyId")
 				.withCallback(new VirtualCurrencyCallback() {
 					@Override
@@ -152,7 +151,7 @@ public class NeatFeatures {
 				});
 
 
-		requester.dicas(vcsReq); // method that replaces adding a vcs and a currency id. Instead we pass a vcsCallback that has both.
+//		requester.dicas(vcsReq); // method that replaces adding a vcs and a currency id. Instead we pass a vcsCallback that has both.
 
 		//here we spare the effort of building a different requester with all the same parameterization and simply use the first one as a basis for the second one.
 		RewardedVideoRequester otherRequester = RewardedVideoRequester

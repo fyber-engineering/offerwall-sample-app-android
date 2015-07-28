@@ -1,9 +1,22 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+
 
 android {
+    signingConfigs {
+    }
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
-
     defaultConfig {
         applicationId "com.fyber.sampleapp"
         minSdkVersion 10
@@ -17,28 +30,42 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-}
+    productFlavors {
 
-repositories {
+        //if we don't add a default flavor there wil on ly be a alpha variant on the build variants
+        internal {
 
-    maven {
-        name "Fyber's internal repo"
-        url "https://dl.bintray.com/fyber/internal"
-        credentials {
-            username bintrayUser
-            password bintrayKey
         }
+
+        alpha {
+
+            dependencies {
+                //we include crashlytics only for the alpha crowd testing program flavor
+                compile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
+                    transitive = true;
+                }
+            }
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    //Google stuff
+    //Google libs
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.android.support:support-v4:22.1.1'
     compile 'com.google.android.gms:play-services:7.3.0'
     //Fyber SDK
     compile 'com.fyber:fyber-android-sdk:8.0.0-rc4'
-    //Cool 3rd party libs
+    //3rd party lib for view dependencies injection
     compile 'com.jakewharton:butterknife:7.0.1'
+
+//    alphaCompile 'com.crashlytics.android:crashlytics:1.+'
 }

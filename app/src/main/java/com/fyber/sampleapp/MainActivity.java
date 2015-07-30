@@ -179,7 +179,7 @@ public class MainActivity extends FragmentActivity {
 			return 3;
 		}
 
-		//FIXME: we should center the icons and add a descriptive title like in the iOS app
+		//FIXME: we should center the icons and add a descriptive title like in the iOS app. Maybe add some colors as well
 		@Override
 		public CharSequence getPageTitle(int position) {
 			return getSpannableString(position);

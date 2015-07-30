@@ -71,7 +71,7 @@ public class OfferwallFragment extends FyberFragment {
 		} else {
 			//FIXME: should the comment be different here?
 			//Unless the device is not supported, OfferWallRequester will always return an intent.
-			//However, for consistency reason we use the same callback as for other ad formats
+			//However, for consistency reason Fyber sdk uses the same callback as other ad formats
 
 			//Requesting the offer wall
 			OfferWallRequester

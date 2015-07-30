@@ -16,8 +16,6 @@
         <item>@string/action_bar_item_offerwall</item>
     </string-array>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="fyber_header">Fyber</string>
 
     <string name="showOfferWall">Show\r\nOffer Wall</string>

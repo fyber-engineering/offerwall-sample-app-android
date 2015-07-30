@@ -23,6 +23,7 @@ import com.fyber.requesters.VirtualCurrencyCallback;
 import com.fyber.requesters.VirtualCurrencyRequester;
 import com.fyber.utils.FyberLogger;
 
+//FIXME: If we all agree that a class like this makes sense then I think it should have a different name. Also, there's should be some kind of mention to it on the actual sample app code.
 /**
  * This class demonstrates a couple of features that the sample app doesn't show you.
  * <p> Here you can see how to take advantage of :</p>

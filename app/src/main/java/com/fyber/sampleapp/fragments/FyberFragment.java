@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.Button;
 
@@ -30,6 +31,13 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
 	private boolean isRequestingState;
 	protected Intent intent;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		// Do not create a new Fragment when the Activity is re-created such as orientation changes.
+		setRetainInstance(true);
+	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {

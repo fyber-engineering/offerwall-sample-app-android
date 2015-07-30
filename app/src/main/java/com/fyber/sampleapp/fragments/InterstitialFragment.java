@@ -41,13 +41,6 @@ public class InterstitialFragment extends FyberFragment {
 		// Required empty public constructor
 	}
 
-
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		// Do not create a new Fragment when the Activity is re-created such as orientation changes.
-		setRetainInstance(true);
-	}
-
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_interstitial, container, false);

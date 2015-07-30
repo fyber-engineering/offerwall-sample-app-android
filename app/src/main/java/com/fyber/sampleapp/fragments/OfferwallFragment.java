@@ -1,6 +1,5 @@
 package com.fyber.sampleapp.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,11 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.fyber.requesters.OfferWallRequester;
-import com.fyber.requesters.RequestCallback;
-import com.fyber.requesters.RequestError;
-import com.fyber.sampleapp.MainActivity;
 import com.fyber.sampleapp.R;
-import com.fyber.utils.FyberLogger;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -66,18 +61,20 @@ public class OfferwallFragment extends FyberFragment {
 
 	@OnClick(R.id.offer_wall_button)
 	public void onOfferWallButtonCLicked(View view) {
-		if (isIntentAvailable()) {
-			startActivityForResult(intent, OFFERWALL_REQUEST_CODE);
-		} else {
-			//FIXME: should the comment be different here?
-			//Unless the device is not supported, OfferWallRequester will always return an intent.
-			//However, for consistency reason Fyber sdk uses the same callback as other ad formats
 
-			//Requesting the offer wall
-			OfferWallRequester
-					.create(this)
-					.request(getActivity());
-		}
+		requestOrShowAd();
+	}
+
+	@Override
+	protected void performRequest() {
+		//FIXME: should the comment be different here?
+		//Unless the device is not supported, OfferWallRequester will always return an intent.
+		//However, for consistency reason Fyber sdk uses the same callback as other ad formats
+
+		//Requesting the offer wall
+		OfferWallRequester
+				.create(this)
+				.request(getActivity());
 	}
 
 	@Override
@@ -98,5 +95,30 @@ public class OfferwallFragment extends FyberFragment {
 	@Override
 	public Button getButton() {
 		return offerwallButton;
+	}
+
+	@Override
+	protected int getRequestCode() {
+		return OFFERWALL_REQUEST_CODE;
+	}
+
+	/*
+	* ** Offer wall specific state methods **
+	 */
+
+	@Override
+	protected boolean isRequestingState() {
+		//offer wall is never in the requesting sate. It is always ready to show.
+		return false;
+	}
+
+	@Override
+	protected void setButtonToRequestingMode() {
+		//do nothing: there is only one state
+	}
+
+	@Override
+	protected void setButtonToOriginalState() {
+		//do nothing: there is only one state
 	}
 }

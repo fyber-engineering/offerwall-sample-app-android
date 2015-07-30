@@ -10,18 +10,11 @@ import android.content.Intent;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.fyber.requesters.RequestCallback;
 import com.fyber.requesters.RequestError;
-import com.fyber.requesters.RewardedVideoRequester;
-import com.fyber.requesters.internal.Requester;
 import com.fyber.sampleapp.MainActivity;
 import com.fyber.sampleapp.R;
 import com.fyber.utils.AdFormat;
@@ -38,13 +31,60 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 	private boolean isRequestingState;
 	protected Intent intent;
 
-	public abstract String getLogTag();
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		//resetting button and intent
+		setButtonToOriginalState();
+		resetIntent();
+		if (resultCode == Activity.RESULT_OK) {
+			switch (requestCode) {
+				case REWARDED_VIDEO_REQUEST_CODE:
+					// If you did not chain a vcs callback in the rewarded video request, you can uncomment the line below and the respective method to make a separate vcs request.
+//					RewardedVideoFragment.requestVirtualCurrency();
+				case INTERSTITIAL_REQUEST_CODE:
+				case OFFERWALL_REQUEST_CODE:
+					resetIntent();
+					setButtonToOriginalState();
+					break;
+				default:
+					break;
+			}
+		}
+	}
 
-	public abstract String getRequestText();
+	/*
+	* ** Fragment specific methods **
+	 */
 
-	public abstract String getShowText();
+	protected abstract String getLogTag();
 
-	public abstract Button getButton();
+	protected abstract String getRequestText();
+
+	protected abstract String getShowText();
+
+	protected abstract Button getButton();
+
+	protected abstract int getRequestCode();
+
+	protected abstract void performRequest();
+
+
+	// request or show ad according to intent availability
+	protected void requestOrShowAd() {
+		//avoid requesting an ad when already requesting
+		if (!isRequestingState()) {
+			//if we already have an intent, we ad activity and reset the button
+			if (isIntentAvailable()) {
+				//start the ad format specific activity
+				startActivityForResult(intent, getRequestCode());
+
+			} else {
+				setButtonToRequestingMode();
+				//perform the ad request. Each Fragment has its own implementation.
+				performRequest();
+			}
+		}
+	}
 
 	// ** RequestCallback methods **
 
@@ -85,33 +125,28 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 		resetButtonStateWithAnimation();
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == Activity.RESULT_OK) {
-			switch (requestCode) {
-				case REWARDED_VIDEO_REQUEST_CODE:
-					// If you did not chain a vcs callback in the rewarded video request, you can uncomment the line below and the respective method to make a separate vcs request.
-//					RewardedVideoFragment.requestVirtualCurrency();
-				case INTERSTITIAL_REQUEST_CODE:
-				case OFFERWALL_REQUEST_CODE:
-					resetIntent();
-					setButtonToOriginalState();
-					break;
-				default:
-					break;
-			}
-		}
-	}
-
-	protected void resetRequestingState() {
+	/*
+	* ** State helper methods **
+	 */
+	private void resetRequestingState() {
 		isRequestingState = false;
 	}
 
-	protected void resetIntent() {
+	private void resetIntent() {
 		intent = null;
 	}
 
+	protected boolean isIntentAvailable() {
+		return intent != null;
+	}
 
+	protected boolean isRequestingState() {
+		return isRequestingState;
+	}
+
+	/*
+	* ** UI state helper methods **
+	 */
 	private void resetButtonStateWithAnimation() {
 		getButton().startAnimation(MainActivity.getReverseClockwiseAnimation());
 		getButton().setText(getRequestText());
@@ -128,7 +163,7 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 	}
 
 	protected void setButtonToOriginalState() {
-		setButtonColorAndText(getButton(), getShowText(), getResources().getColor(R.color.colorPrimary));
+		setButtonColorAndText(getButton(), getRequestText(), getResources().getColor(R.color.colorPrimary));
 	}
 
 	private void setButtonColorAndText(Button button, String text, int color) {
@@ -136,13 +171,5 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 		ColorFilter filter = new LightingColorFilter(color, color);
 		drawable.setColorFilter(filter);
 		button.setText(text);
-	}
-
-	protected boolean isIntentAvailable() {
-		return intent != null;
-	}
-
-	public boolean isRequestingState() {
-		return isRequestingState;
 	}
 }

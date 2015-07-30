@@ -24,6 +24,7 @@ import com.fyber.requesters.VirtualCurrencyRequester;
 import com.fyber.utils.FyberLogger;
 
 //FIXME: If we all agree that a class like this makes sense then I think it should have a different name. Also, there's should be some kind of mention to it on the actual sample app code.
+
 /**
  * This class demonstrates a couple of features that the sample app doesn't show you.
  * <p> Here you can see how to take advantage of :</p>
@@ -152,7 +153,7 @@ public class NeatFeatures {
 				});
 
 
-//		requester.dicas(vcsReq); // method that replaces adding a vcs and a currency id. Instead we pass a vcsCallback that has both.
+//		requester.dicas(vcsReq); // method that replaces adding a vcs and a currency id. Instead we pass a vcsRequester that has both.
 
 		//here we spare the effort of building a different requester with all the same parameterization and simply use the first one as a basis for the second one.
 		RewardedVideoRequester otherRequester = RewardedVideoRequester

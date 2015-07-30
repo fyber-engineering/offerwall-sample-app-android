@@ -35,15 +35,15 @@ public class MainActivity extends FragmentActivity {
 	private static final String APP_ID = "24913";
 	private static final String SECURITY_TOKEN = "128194d69f9a68d14db869140e1a108b";
 
-	public static final int DURATION_MILLIS = 300;
-	public static final int DEGREES_360 = 360;
-	public static final int DEGREES_0 = 0;
-	public static final float PIVOT_X_VALUE = 0.5f;
-	public static final float PIVOT_Y_VALUE = 0.5f;
-	public static final int INTERSTITIAL_FRAGMENT_NUMBER = 0;
-	public static final int REWARDED_VIDEO_FRAGMENT_NUMBER = 1;
-	public static final int OFFERWALL_FRAGMENT_NUMBER = 2;
-	public static final String TAG = "FyberMainActivity";
+	private static final int DURATION_MILLIS = 300;
+	private static final int DEGREES_360 = 360;
+	private static final int DEGREES_0 = 0;
+	private static final float PIVOT_X_VALUE = 0.5f;
+	private static final float PIVOT_Y_VALUE = 0.5f;
+	private static final int INTERSTITIAL_FRAGMENT_NUMBER = 0;
+	private static final int REWARDED_VIDEO_FRAGMENT_NUMBER = 1;
+	private static final int OFFERWALL_FRAGMENT_NUMBER = 2;
+	private static final String TAG = "FyberMainActivity";
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide

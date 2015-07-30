@@ -63,20 +63,8 @@ public class InterstitialFragment extends FyberFragment {
 
 	@OnClick(R.id.interstitial_button)
 	public void onInterterstitialButtonCLicked(View view) {
-		if ( !isRequestingState()) {
-			if (isIntentAvailable()) {
-				startActivityForResult(intent, INTERSTITIAL_REQUEST_CODE);
-				setButtonToOriginalState();
-				resetIntent();
-			} else {
-				setButtonToRequestingMode();
 
-				//request an interstitial ad.
-				InterstitialRequester
-						.create(this)
-						.request(getActivity());
-			}
-		}
+		requestOrShowAd();
 	}
 
 	@Override
@@ -99,4 +87,16 @@ public class InterstitialFragment extends FyberFragment {
 		return interstitialButton;
 	}
 
+	@Override
+	protected int getRequestCode() {
+		return INTERSTITIAL_REQUEST_CODE;
+	}
+
+	@Override
+	protected void performRequest() {
+		//request an interstitial ad.
+		InterstitialRequester
+				.create(this)
+				.request(getActivity());
+	}
 }

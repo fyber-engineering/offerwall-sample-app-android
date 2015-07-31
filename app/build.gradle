@@ -32,9 +32,8 @@ android {
     }
     productFlavors {
 
-        //if we don't add a default flavor there will only be an alpha variant on the build variants
         internal {
-
+            ext.enableCrashlytics = false
         }
 
         alpha {

@@ -182,10 +182,4 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 		button.setText(text);
 	}
 
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		FyberLogger.d("DICAS", "FRAGMENT on destroy view");
-	}
-
 }

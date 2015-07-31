@@ -5,11 +5,13 @@
  */
 package com.fyber.sampleapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.fyber.ads.AdFormat;
 import com.fyber.currency.VirtualCurrencyErrorResponse;
@@ -60,18 +62,18 @@ public class NeatFeatures {
 		}
 	}
 
-	//FIXME: this needs a new Fyber sdk rc to work. (ui sync stuff)
-	public static void threadControlOverRequesterCallback(Context context) {
+	//Fyber sdk offers you control over thread sync on your callbacks. This method exemplifies how to do it
+	public static void requestAdWithSpecificHandler(final Activity activity) {
+
 		/*
 		*
-		* Fyber sdk offers you control over thread sync on your callbacks.
 		* By default Fyber sdk uses the UI thread to call the Requester's callback.
 		* This means that if you are requesting an ad from a background thread you will get your response on the UI thread.
 		* However, you can override this default behaviour and have your response delivered to a specific Handler. Here is an example of how to do it:
 		*
 		 */
 
-		//simulate a Handler from a working thread
+		//create a Handler from a working thread
 		HandlerThread thread = new HandlerThread("handler thread", HandlerThread.MIN_PRIORITY);
 		thread.start();
 		Handler requesterHandler = new Handler(thread.getLooper());
@@ -85,26 +87,24 @@ public class NeatFeatures {
 
 			@Override
 			public void onAdAvailable(Intent intent) {
-				//FIXME: change log after testing
-				FyberLogger.d(TAG, "on Ad available (worker thread ?)");
-				//this code will run on a working thread, it is your responsibility to sync it with the UI thread. Uncommenting the line below will result in a crash.
-//				Toast.makeText(getActivity(), "on adAvailable", Toast.LENGTH_LONG).show();
+				FyberLogger.d(TAG, "on Ad available");
 			}
 
 			@Override
-			public void onAdNotAvailable(AdFormat adFormat)
-			{
+			public void onAdNotAvailable(AdFormat adFormat) {
 				FyberLogger.d(TAG, "ad not available");
 			}
 		});
 
 		//by chaining this method to your requester you are specifying the Handler where you want your callback to be called.
-		requesterWithBackgroundCallback.invokeCallbackOnHandler(requesterHandler);
+		//Note that by doing this the callback code will run on a working thread. You will need to sync with th UI thread if you wish to perform operations on views.
+		requesterWithBackgroundCallback
+				.invokeCallbackOnHandler(requesterHandler);
 
-		requesterWithBackgroundCallback.request(context);
+		requesterWithBackgroundCallback
+				.request(activity);
 	}
 
-	//FIXME: the public API still needs a couple of changes: 'notifyUserOnCompletion' is missing and should be renamed. Method 'dicas' needs a name and might replace 'forCurrencyId'.
 	public static void createRequesterFromAnotherRequester(Context context) {
 
 		/*
@@ -114,59 +114,59 @@ public class NeatFeatures {
 		 */
 
 		//first video requester with extensive customisation
-		RewardedVideoRequester requester = RewardedVideoRequester
+		RewardedVideoRequester rewardedVideoRequester = RewardedVideoRequester
 				.create(new RequestCallback() {
 					@Override
 					public void onAdAvailable(Intent intent) {
-						//do stuff
+						FyberLogger.d(TAG, "on Ad available");
 					}
 
 					@Override
 					public void onAdNotAvailable(AdFormat adFormat) {
-
+						FyberLogger.d(TAG, "on Ad Not available");
 					}
 
 					@Override
 					public void onRequestError(RequestError requestError) {
-
+						FyberLogger.d(TAG, "on request error");
 					}
 				})
 				.addParameter("customParamKey", "customParaVal")
 				.withPlacementId("myPlacementId");
 
 		VirtualCurrencyRequester vcsReq = VirtualCurrencyRequester
-				.from(requester) //here is another example where you can create requester from another requester... elaborate
-//				.notifyUserOnCompletion(true)
-				.forCurrencyId("myCurrencyId")
-				.withCallback(new VirtualCurrencyCallback() {
+				.create(new VirtualCurrencyCallback() {
 					@Override
 					public void onError(VirtualCurrencyErrorResponse virtualCurrencyErrorResponse) {
-
+						FyberLogger.d(TAG, "VCS error received - " + virtualCurrencyErrorResponse.getErrorMessage());
 					}
 
 					@Override
 					public void onSuccess(VirtualCurrencyResponse virtualCurrencyResponse) {
-
+						FyberLogger.d(TAG, "VCS coins received - " + virtualCurrencyResponse.getDeltaOfCoins());
 					}
 
 					@Override
 					public void onRequestError(RequestError requestError) {
-
+						FyberLogger.d(TAG, "error requesting vcs: " + requestError.getDescription());
 					}
-				});
+				})
+				.notifyUserOnReward(true)
+				.forCurrencyId("myCurrencyId");
 
-
-//		requester.dicas(vcsReq); // method that replaces adding a vcs and a currency id. Instead we pass a vcsRequester that has both.
+		//add the vcs requester to the video requester
+		rewardedVideoRequester.withVirtualCurrencyRequester(vcsReq);
 
 		//here we spare the effort of building a different requester with all the same parameterization and simply use the first one as a basis for the second one.
 		RewardedVideoRequester otherRequester = RewardedVideoRequester
-				.from(requester)
+				.from(rewardedVideoRequester)
+						//the only thing different is the placement id
 				.withPlacementId("aDifferentPlacementId");
 
 		//these will be separate requests with different placementsIds but will be handled by the same callbacks and have the same parameterization
-		requester.request(context);
+//		rewardedVideoRequester.request(context);
 		otherRequester.request(context);
 	}
 
-	//Other stuff......
+	//Other stuff......?
 }

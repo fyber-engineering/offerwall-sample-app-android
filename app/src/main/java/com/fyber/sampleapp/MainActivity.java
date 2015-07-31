@@ -1,8 +1,5 @@
 package com.fyber.sampleapp;
 
-import android.content.Intent;
-import android.graphics.ColorFilter;
-import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +18,6 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.RotateAnimation;
-import android.widget.Button;
 
 import com.fyber.Fyber;
 import com.fyber.sampleapp.fragments.InterstitialFragment;
@@ -113,6 +109,8 @@ public class MainActivity extends FragmentActivity {
 			Fyber.Settings fyberSettings = fyber.start();
 
 //			customiseFyberSettings(fyberSettings);
+
+			runNeatFeatures();
 
 		} catch (IllegalArgumentException e) {
 			Log.d(TAG, e.getLocalizedMessage());
@@ -210,4 +208,10 @@ public class MainActivity extends FragmentActivity {
 		};
 	}
 
+	private void runNeatFeatures() {
+		NeatFeatures.reportInstall(this);
+		NeatFeatures.reportRewardedAction(this);
+//		NeatFeatures.requestAdWithSpecificHandler(this);
+//		NeatFeatures.createRequesterFromAnotherRequester(this);
+	}
 }

@@ -19,7 +19,7 @@ allprojects {
         jcenter()
         maven {
             name "Fyber's internal repo"
-            url "https://dl.bintray.com/fyber/internal"
+            url "https://fyber.bintray.com/internal"
             credentials {
                 username bintrayUser
                 password bintrayKey

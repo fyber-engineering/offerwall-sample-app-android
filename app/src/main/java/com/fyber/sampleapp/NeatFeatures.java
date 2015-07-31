@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
+import com.fyber.ads.AdFormat;
 import com.fyber.currency.VirtualCurrencyErrorResponse;
 import com.fyber.currency.VirtualCurrencyResponse;
 import com.fyber.exceptions.IdException;
@@ -84,19 +85,21 @@ public class NeatFeatures {
 
 			@Override
 			public void onAdAvailable(Intent intent) {
-				FyberLogger.d(TAG, "onAdAvailable worker thread ?");
+				//FIXME: change log after testing
+				FyberLogger.d(TAG, "on Ad available (worker thread ?)");
 				//this code will run on a working thread, it is your responsibility to sync it with the UI thread. Uncommenting the line below will result in a crash.
 //				Toast.makeText(getActivity(), "on adAvailable", Toast.LENGTH_LONG).show();
 			}
 
 			@Override
-			public void onAdNotAvailable() {
-				FyberLogger.d(TAG, "onAdNotAvailable");
+			public void onAdNotAvailable(AdFormat adFormat)
+			{
+				FyberLogger.d(TAG, "ad not available");
 			}
 		});
 
 		//by chaining this method to your requester you are specifying the Handler where you want your callback to be called.
-		requesterWithBackgroundCallback.notifyCallbackHandler(requesterHandler);
+		requesterWithBackgroundCallback.invokeCallbackOnHandler(requesterHandler);
 
 		requesterWithBackgroundCallback.request(context);
 	}
@@ -119,7 +122,7 @@ public class NeatFeatures {
 					}
 
 					@Override
-					public void onAdNotAvailable() {
+					public void onAdNotAvailable(AdFormat adFormat) {
 
 					}
 

@@ -1,5 +1,6 @@
 package com.fyber.sampleapp;
 
+import android.content.Intent;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
@@ -95,6 +96,9 @@ public class MainActivity extends FragmentActivity {
 	protected void onResume() {
 		super.onResume();
 		try {
+
+			// ** SDK INITIALIZATION **
+
 			Fyber fyber = Fyber
 					.with(APP_ID, this)
 					.withSecurityToken(SECURITY_TOKEN)
@@ -116,9 +120,9 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void customiseFyberSettings(Fyber.Settings fyberSettings) {
-		fyberSettings.showNotificationOnUserRewarded(false);
+		fyberSettings.notifyUserOnReward(false);
 		fyberSettings.closeOfferWallOnRedirect(true);
-		fyberSettings.showNotificationOnUserEngaged(true);
+		fyberSettings.notifyUserOnCompletion(true);
 		fyberSettings.addParameter("myCustomParamKey", "myCustomParamValue");
 		fyberSettings.setCustomUIString(Fyber.Settings.UIStringIdentifier.GENERIC_ERROR, "my custom generic error msg");
 	}

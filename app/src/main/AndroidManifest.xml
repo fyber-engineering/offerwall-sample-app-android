@@ -24,6 +24,8 @@
             android:name="com.fyber.ads.videos.RewardedVideoActivity"
             android:configChanges="screenSize|orientation"
             android:hardwareAccelerated="true"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@android:style/Theme.Translucent"
             />
 
         <activity

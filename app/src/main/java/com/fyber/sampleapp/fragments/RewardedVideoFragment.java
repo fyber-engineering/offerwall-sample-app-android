@@ -10,8 +10,10 @@ import android.widget.Button;
 import com.fyber.currency.VirtualCurrencyErrorResponse;
 import com.fyber.currency.VirtualCurrencyResponse;
 import com.fyber.requesters.RequestCallback;
+import com.fyber.requesters.RequestError;
 import com.fyber.requesters.RewardedVideoRequester;
 import com.fyber.requesters.VirtualCurrencyCallback;
+import com.fyber.requesters.VirtualCurrencyRequester;
 import com.fyber.sampleapp.R;
 import com.fyber.utils.FyberLogger;
 
@@ -24,7 +26,7 @@ import butterknife.OnClick;
  * Use the {@link RewardedVideoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RewardedVideoFragment extends FyberFragment implements RequestCallback, VirtualCurrencyCallback {
+public class RewardedVideoFragment extends FyberFragment implements RequestCallback {
 
 	private static final String TAG = "RewardedVideoFragment";
 
@@ -96,7 +98,7 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 		//Requesting a rewarded video ad
 		RewardedVideoRequester
 				.create(this)
-				.withVirtualCurrencyCallback(this) // you can add a vcs listener by chaining this extra method
+				.withVirtualCurrencyRequester(getVcsRequester()) // you can add a vcs listener by chaining this extra method
 				.request(getActivity());
 
 		//FIXME: is it worth to add a link to the dev portal? (http://developer.fyber.com/content/android/basics/rewarding-the-user/vcs/) or something?
@@ -107,43 +109,37 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 			*/
 	}
 
-	// ** VCS listener **
+	private VirtualCurrencyRequester getVcsRequester() {
+		VirtualCurrencyRequester vcsRequester = VirtualCurrencyRequester.create(new VirtualCurrencyCallback() {
+			@Override
+			public void onError(VirtualCurrencyErrorResponse virtualCurrencyErrorResponse) {
+				FyberLogger.d(TAG, "VCS error received - " + virtualCurrencyErrorResponse.getErrorMessage());
+			}
 
-	@Override
-	public void onError(VirtualCurrencyErrorResponse response) {
-		FyberLogger.d(TAG, "VCS error received - " + response.getErrorMessage());
+			@Override
+			public void onSuccess(VirtualCurrencyResponse virtualCurrencyResponse) {
+				FyberLogger.d(TAG, "VCS coins received - " + virtualCurrencyResponse.getDeltaOfCoins());
+			}
+
+			@Override
+			public void onRequestError(RequestError requestError) {
+				FyberLogger.d(TAG, "error requesting vcs: " + requestError.getDescription());
+			}
+		});
+		return vcsRequester;
 	}
 
-	@Override
-	public void onSuccess(VirtualCurrencyResponse response) {
-		FyberLogger.d(TAG, "VCS coins received - " + response.getDeltaOfCoins());
-	}
 
 	/*
 	 * ** separate VCS request **
+	 *
 	 * Note that you will only have a successful response querying for virtual currency after watching a rewarded video.
-	 * Uncomment this code and call this method from 'onActivityResult'
+	 * Uncomment this code and call this method from 'onActivityResult'.
 	 *
 	  */
 
-//	public static void requestVirtualCurrency() {
-//
-//		VirtualCurrencyRequester.create(new VirtualCurrencyCallback() {
-//			@Override
-//			public void onError(VirtualCurrencyErrorResponse virtualCurrencyErrorResponse) {
-//				FyberLogger.d(TAG, "VCS error received - " + virtualCurrencyErrorResponse.getErrorMessage());
-//			}
-//
-//			@Override
-//			public void onSuccess(VirtualCurrencyResponse virtualCurrencyResponse) {
-//				FyberLogger.d(TAG, "VCS coins received - " + virtualCurrencyResponse.getDeltaOfCoins());
-//			}
-//
-//			@Override
-//			public void onRequestError(RequestError requestError) {
-//				FyberLogger.d(TAG, "error requesting vcs: " + requestError.getDescription());
-//			}
-//		});
-//	}
+	public void requestVirtualCurrency() {
+		getVcsRequester().request(getActivity());
+	}
 
 }

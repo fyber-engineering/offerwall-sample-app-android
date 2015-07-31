@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.fyber.ads.AdFormat;
 import com.fyber.requesters.InterstitialRequester;
 import com.fyber.sampleapp.R;
 
@@ -60,6 +61,18 @@ public class InterstitialFragment extends FyberFragment {
 		requestOrShowAd();
 	}
 
+	/*
+	* ** Code to perform an interstitial ad request **
+	 */
+
+	@Override
+	protected void performRequest() {
+		//request an interstitial ad.
+		InterstitialRequester
+				.create(this)
+				.request(getActivity());
+	}
+
 	@Override
 	public String getLogTag() {
 		return TAG;
@@ -85,11 +98,4 @@ public class InterstitialFragment extends FyberFragment {
 		return INTERSTITIAL_REQUEST_CODE;
 	}
 
-	@Override
-	protected void performRequest() {
-		//request an interstitial ad.
-		InterstitialRequester
-				.create(this)
-				.request(getActivity());
-	}
 }

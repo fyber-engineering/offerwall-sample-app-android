@@ -14,11 +14,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.widget.Button;
 
+import com.fyber.ads.AdFormat;
+import com.fyber.ads.videos.RewardedVideoClient;
 import com.fyber.requesters.RequestCallback;
 import com.fyber.requesters.RequestError;
 import com.fyber.sampleapp.MainActivity;
 import com.fyber.sampleapp.R;
-import com.fyber.utils.AdFormat;
 import com.fyber.utils.FyberLogger;
 
 public abstract class FyberFragment extends Fragment implements RequestCallback {
@@ -48,12 +49,8 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 			switch (requestCode) {
 				case REWARDED_VIDEO_REQUEST_CODE:
 					// If you did not chain a vcs callback in the rewarded video request, you can uncomment the line below and the respective method to make a separate vcs request.
-//					RewardedVideoFragment.requestVirtualCurrency();
-				case INTERSTITIAL_REQUEST_CODE:
-				case OFFERWALL_REQUEST_CODE:
-					resetIntent();
-					setButtonToOriginalState();
-					break;
+					//FIXME: this should be done elegantly
+//					requestVirtualCurrency();
 				default:
 					break;
 			}
@@ -62,7 +59,7 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
 	/*
 	* ** Fragment specific methods **
-	 */
+	*/
 
 	protected abstract String getLogTag();
 
@@ -77,7 +74,7 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 	protected abstract void performRequest();
 
 
-	// request or show ad according to intent availability
+	// when a button is clicked, request or show the ad according to intent availability
 	protected void requestOrShowAd() {
 		//avoid requesting an ad when already requesting
 		if (!isRequestingState()) {
@@ -94,15 +91,17 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 		}
 	}
 
-	// ** RequestCallback methods **
+	/*
+	* ** RequestCallback methods **
+	*/
 
 	@Override
 	public void onAdAvailable(Intent intent) {
 		resetRequestingState();
 		this.intent = intent;
 		//if you are using a general purpose requestCallback like this you might want to verify which adFormat will this intent show.
-		//You can use the AdFormat class to obtain an AdFormat from a given intent. Then you perform ad format specific actions e.g.:
-		AdFormat adFormat = AdFormat.getFromIntent(intent);
+		//You can use the AdFormat class to obtain an AdFormat from a given intent. Then you can perform ad format specific actions e.g.:
+		AdFormat adFormat = AdFormat.fromIntent(intent);
 		switch (adFormat) {
 			case OFFER_WALL:
 				//in our sample app, we want to show the offer wall in a single step.
@@ -117,7 +116,7 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 	}
 
 	@Override
-	public void onAdNotAvailable() {
+	public void onAdNotAvailable(AdFormat adFormat) {
 		FyberLogger.d(getLogTag(), "No ad available");
 		resetRequestingState();
 		resetIntent();
@@ -135,7 +134,8 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
 	/*
 	* ** State helper methods **
-	 */
+	*/
+
 	private void resetRequestingState() {
 		isRequestingState = false;
 	}
@@ -154,7 +154,8 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
 	/*
 	* ** UI state helper methods **
-	 */
+	*/
+
 	private void resetButtonStateWithAnimation() {
 		getButton().startAnimation(MainActivity.getReverseClockwiseAnimation());
 		getButton().setText(getRequestText());
@@ -180,4 +181,11 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 		drawable.setColorFilter(filter);
 		button.setText(text);
 	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		FyberLogger.d("DICAS", "FRAGMENT on destroy view");
+	}
+
 }

@@ -1,8 +1,4 @@
-package com.fyber.sampleapp; /**
- * Fyber Android SDK
- * <p/>
- * Copyright (c) 2015 Fyber. All rights reserved.
- */
+package com.fyber.sampleapp;
 
 import android.os.Bundle;
 import android.util.Log;

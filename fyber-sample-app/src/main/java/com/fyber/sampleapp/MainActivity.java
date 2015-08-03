@@ -76,7 +76,7 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_fyber_main);
 		ButterKnife.bind(this);
 
-//		enabling Fyber logs so that we can see what is going on on the SDK level
+//		enabling Fyber logs so that we can see what is going on the SDK level
 		FyberLogger.enableLogging(BuildConfig.DEBUG);
 
 		setupViewPager();
@@ -140,7 +140,7 @@ public class MainActivity extends FragmentActivity {
 		return animationSet;
 	}
 
-	public static Animation getReverseClockwiseAnimation() {
+	public static Animation getCounterclockwiseAnimation() {
 		AnimationSet animationSet = new AnimationSet(true);
 		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_360, DEGREES_0, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
 		rotateAnimation.setDuration(DURATION_MILLIS);

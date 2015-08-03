@@ -75,7 +75,7 @@ public class FyberSdkExtraFeatures {
 		thread.start();
 		Handler requesterHandler = new Handler(thread.getLooper());
 
-		final RewardedVideoRequester requesterWithBackgroundCallback = RewardedVideoRequester.create(new RequestCallback() {
+		RewardedVideoRequester.create(new RequestCallback() {
 
 			@Override
 			public void onRequestError(RequestError requestError) {
@@ -91,14 +91,11 @@ public class FyberSdkExtraFeatures {
 			public void onAdNotAvailable(AdFormat adFormat) {
 				FyberLogger.d(TAG, "ad not available");
 			}
-		});
+		})
 
-		//by chaining this method to your requester you are specifying the Handler where you want your callback to be called.
-		//Note that by doing this the callback code will run on a working thread. You will need to sync with th UI thread if you wish to perform operations on views.
-		requesterWithBackgroundCallback
-				.invokeCallbackOnHandler(requesterHandler);
-
-		requesterWithBackgroundCallback
+				//by chaining this method to your requester you are specifying the Handler where you want your callback to be called.
+				//Note that by doing this the callback code will run on a working thread. You will need to sync with th UI thread if you wish to perform operations on views.
+				.invokeCallbackOnHandler(requesterHandler)
 				.request(activity);
 	}
 

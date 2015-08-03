@@ -25,10 +25,13 @@ import com.fyber.sampleapp.fragments.OfferwallFragment;
 import com.fyber.sampleapp.fragments.RewardedVideoFragment;
 import com.fyber.utils.FyberLogger;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 
 // Fyber SDK takes advantage of the power of annotations to make mediation simpler to integrate.
 // To enable mediation in this app simply uncomment @FyberSDK annotation line below.
-// Also, and make sure you have the right dependencies in your gradle file.
+// Also, make sure you have the right dependencies in your gradle file.
 //@FyberSDK
 public class MainActivity extends FragmentActivity {
 
@@ -62,6 +65,8 @@ public class MainActivity extends FragmentActivity {
 	 */
 	ViewPager mViewPager;
 
+	@Bind(R.id.tool_bar) Toolbar toolbar;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -69,9 +74,10 @@ public class MainActivity extends FragmentActivity {
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_fyber_main);
+		ButterKnife.bind(this);
 
 //		enabling Fyber logs so that we can see what is going on on the SDK level
-		FyberLogger.enableLogging(true);
+		FyberLogger.enableLogging(BuildConfig.DEBUG);
 
 		setupViewPager();
 		setupToolbar();
@@ -88,7 +94,6 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void setupToolbar() {
-		Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
 		toolbar.setTitle(getString(R.string.fyber_header));
 		toolbar.setLogo(R.drawable.ic_launcher);
 	}
@@ -100,16 +105,14 @@ public class MainActivity extends FragmentActivity {
 
 			// ** SDK INITIALIZATION **
 
-			Fyber fyber = Fyber
+			//when you start Fyber SDK you get a Settings object that you can use to customise the SDK behaviour.
+			//Have a look at the method 'customiseFyberSettings' to learn more about possible customisation.
+			Fyber.Settings fyberSettings = Fyber
 					.with(APP_ID, this)
 					.withSecurityToken(SECURITY_TOKEN)
 //					.withManualPrecaching() // by default Fyber SDK will start precaching. If you wish to start precaching only at a later time you can uncomment this line and use 'CacheManager' to start, pause or resume on demand.
 //					.withUserId(USER_ID) // if you do not provide an user id Fyber SDK will generate one for you
-					;
-
-			//when you start Fyber SDK you get a Settings object that you can use to customise the SDK behaviour.
-			//Have a look at the method 'customiseFyberSettings' to learn more about possible customisation.
-			Fyber.Settings fyberSettings = fyber.start();
+					.start();
 
 //			customiseFyberSettings(fyberSettings);
 
@@ -119,11 +122,11 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void customiseFyberSettings(Fyber.Settings fyberSettings) {
-		fyberSettings.notifyUserOnReward(false);
-		fyberSettings.closeOfferWallOnRedirect(true);
-		fyberSettings.notifyUserOnCompletion(true);
-		fyberSettings.addParameter("myCustomParamKey", "myCustomParamValue");
-		fyberSettings.setCustomUIString(Fyber.Settings.UIStringIdentifier.GENERIC_ERROR, "my custom generic error msg");
+		fyberSettings.notifyUserOnReward(false)
+				.closeOfferWallOnRedirect(true)
+				.notifyUserOnCompletion(true)
+				.addParameter("myCustomParamKey", "myCustomParamValue")
+				.setCustomUIString(Fyber.Settings.UIStringIdentifier.GENERIC_ERROR, "my custom generic error msg");
 	}
 
 	// ** Animations **
@@ -219,8 +222,8 @@ public class MainActivity extends FragmentActivity {
 
 //	public void runExtraFeatures() {
 //		FyberSdkExtraFeatures.reportInstall(this);
-////		FyberSdkExtraFeatures.reportRewardedAction(this);
-//////		FyberSdkExtraFeatures.requestAdWithSpecificHandler(this);
-////////		FyberSdkExtraFeatures.createRequesterFromAnotherRequester(this);
+//		FyberSdkExtraFeatures.reportRewardedAction(this);
+//		FyberSdkExtraFeatures.requestAdWithSpecificHandler(this);
+//		FyberSdkExtraFeatures.createRequesterFromAnotherRequester(this);
 //	}
 }

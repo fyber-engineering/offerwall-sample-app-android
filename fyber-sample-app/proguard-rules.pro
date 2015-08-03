@@ -1,6 +1,4 @@
-
-# Butter knife
-
+# Butterknife
 -keep class butterknife.** { *; }
 -dontwarn butterknife.internal.**
 -keep class **$$ViewBinder { *; }
@@ -15,15 +13,14 @@
 
 # Fyber Mediation
 
-#-keep class com.sponsorpay.mediation.** { *;}
-
 -keepattributes JavascriptInterface
 
 -keep class android.webkit.JavascriptInterface
 
+# Annotation for Mediation only
+
+-dontwarn com.fyber.mediation.annotations.MediationAPI
+
 # Google Advertising Id
 
 -keep class com.google.android.gms.ads.identifier.** { *; }
-
-#Annotation for Mediation only
--dontwarn com.fyber.mediation.annotations.MediationAPI

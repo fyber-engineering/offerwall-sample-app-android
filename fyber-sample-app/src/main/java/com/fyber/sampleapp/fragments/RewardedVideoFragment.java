@@ -1,7 +1,5 @@
 package com.fyber.sampleapp.fragments;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +8,6 @@ import android.widget.Button;
 
 import com.fyber.currency.VirtualCurrencyErrorResponse;
 import com.fyber.currency.VirtualCurrencyResponse;
-import com.fyber.requesters.RequestCallback;
 import com.fyber.requesters.RequestError;
 import com.fyber.requesters.RewardedVideoRequester;
 import com.fyber.requesters.VirtualCurrencyCallback;
@@ -22,7 +19,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class RewardedVideoFragment extends FyberFragment implements RequestCallback {
+public class RewardedVideoFragment extends FyberFragment implements VirtualCurrencyCallback {
 
 	private static final String TAG = "RewardedVideoFragment";
 
@@ -61,7 +58,7 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 		//Requesting a rewarded video ad
 		RewardedVideoRequester
 				.create(this)
-						// you can add a virtual Currency Requester by chaining this extra method
+				// you can add a virtual Currency Requester by chaining this extra method
 				.withVirtualCurrencyRequester(getVirtualCurrencyRequester())
 				.request(getActivity());
 	}
@@ -98,23 +95,28 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 	// creates a new virtual currency requester to be used in a rewarded video request or on a separate virtual currency request.
 
 	private VirtualCurrencyRequester getVirtualCurrencyRequester() {
-		VirtualCurrencyRequester vcsRequester = VirtualCurrencyRequester.create(new VirtualCurrencyCallback() {
-			@Override
-			public void onError(VirtualCurrencyErrorResponse virtualCurrencyErrorResponse) {
-				FyberLogger.d(TAG, "VCS error received - " + virtualCurrencyErrorResponse.getErrorMessage());
-			}
+		return VirtualCurrencyRequester.create(this)
+				//
+//				.notifyUserOnReward(true)
+				/* this is the currency id for RV ad format
+				 you can refer to this -- link to doc*/
+//				.forCurrencyId("coins")
+				;
+	}
 
-			@Override
-			public void onSuccess(VirtualCurrencyResponse virtualCurrencyResponse) {
-				FyberLogger.d(TAG, "VCS coins received - " + virtualCurrencyResponse.getDeltaOfCoins());
-			}
+	@Override
+	public void onError(VirtualCurrencyErrorResponse virtualCurrencyErrorResponse) {
+		FyberLogger.d(TAG, "VCS error received - " + virtualCurrencyErrorResponse.getErrorMessage());
+	}
 
-			@Override
-			public void onRequestError(RequestError requestError) {
-				FyberLogger.d(TAG, "error requesting vcs: " + requestError.getDescription());
-			}
-		});
-		return vcsRequester;
+	@Override
+	public void onSuccess(VirtualCurrencyResponse virtualCurrencyResponse) {
+		FyberLogger.d(TAG, "VCS coins received - " + virtualCurrencyResponse.getDeltaOfCoins());
+	}
+
+	@Override
+	public void onRequestError(RequestError requestError) {
+		FyberLogger.d(TAG, "error requesting vcs: " + requestError.getDescription());
 	}
 
 

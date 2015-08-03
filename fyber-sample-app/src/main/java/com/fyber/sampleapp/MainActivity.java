@@ -65,7 +65,8 @@ public class MainActivity extends FragmentActivity {
 	 */
 	ViewPager mViewPager;
 
-	@Bind(R.id.tool_bar) Toolbar toolbar;
+	@Bind(R.id.tool_bar)
+	Toolbar toolbar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -110,10 +111,12 @@ public class MainActivity extends FragmentActivity {
 			Fyber.Settings fyberSettings = Fyber
 					.with(APP_ID, this)
 					.withSecurityToken(SECURITY_TOKEN)
-//					.withManualPrecaching() // by default Fyber SDK will start precaching. If you wish to start precaching only at a later time you can uncomment this line and use 'CacheManager' to start, pause or resume on demand.
-//					.withUserId(USER_ID) // if you do not provide an user id Fyber SDK will generate one for you
+// by default Fyber SDK will start precaching. If you wish to start precaching only at a later time you can uncomment this line and use 'CacheManager' to start, pause or resume on demand.
+//					.withManualPrecaching()
+// if you do not provide an user id Fyber SDK will generate one for you
+//					.withUserId(USER_ID)
 					.start();
-
+// comment here?
 //			customiseFyberSettings(fyberSettings);
 
 		} catch (IllegalArgumentException e) {

@@ -62,7 +62,7 @@ dependencies {
     compile 'com.android.support:support-v4:22.1.1'
     compile 'com.google.android.gms:play-services:7.3.0'
     //Fyber SDK
-    compile 'com.fyber:fyber-android-sdk:8.0.0-rc8'
+    compile 'com.fyber:fyber-android-sdk:8.0.0-GM'
     //3rd party lib for view dependencies injection
     compile 'com.jakewharton:butterknife:7.0.1'
 

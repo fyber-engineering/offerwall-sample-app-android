@@ -24,8 +24,19 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile file(keyStoreFile)
+            storePassword keyStorePassword
+            keyAlias keyStoreAlias
+            keyPassword keyStoreAliasPassword
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -53,6 +64,7 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'LICENSE.txt'
     }
+
 }
 
 dependencies {

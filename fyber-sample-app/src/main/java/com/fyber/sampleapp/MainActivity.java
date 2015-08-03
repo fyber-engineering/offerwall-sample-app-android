@@ -84,21 +84,6 @@ public class MainActivity extends FragmentActivity {
 		setupToolbar();
 	}
 
-	private void setupViewPager() {
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the Activity.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-		// Set up the ViewPager with the sections adapter.
-		mViewPager = (ViewPager) findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-		mViewPager.setCurrentItem(1);
-	}
-
-	private void setupToolbar() {
-		toolbar.setTitle(getString(R.string.fyber_header));
-		toolbar.setLogo(R.drawable.ic_launcher);
-	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -111,12 +96,12 @@ public class MainActivity extends FragmentActivity {
 			Fyber.Settings fyberSettings = Fyber
 					.with(APP_ID, this)
 					.withSecurityToken(SECURITY_TOKEN)
-// by default Fyber SDK will start precaching. If you wish to start precaching only at a later time you can uncomment this line and use 'CacheManager' to start, pause or resume on demand.
+// by default Fyber SDK will start precaching. If you wish to only start precaching at a later time you can uncomment this line and use 'CacheManager' to start, pause or resume on demand.
 //					.withManualPrecaching()
 // if you do not provide an user id Fyber SDK will generate one for you
 //					.withUserId(USER_ID)
 					.start();
-// comment here?
+// uncomment to customise Fyber SDK
 //			customiseFyberSettings(fyberSettings);
 
 		} catch (IllegalArgumentException e) {
@@ -124,6 +109,7 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
+	//User Settings to customise Fyber SDK behaviour
 	private void customiseFyberSettings(Fyber.Settings fyberSettings) {
 		fyberSettings.notifyUserOnReward(false)
 				.closeOfferWallOnRedirect(true)
@@ -132,31 +118,24 @@ public class MainActivity extends FragmentActivity {
 				.setCustomUIString(Fyber.Settings.UIStringIdentifier.GENERIC_ERROR, "my custom generic error msg");
 	}
 
-	// ** Animations **
+	/*
+	* ** Fyber SDK: other features **
+	*
+	* > this method shows you a couple of features from Fyber SDK that we left out of the sample app:
+	* > report installs and rewarded actions (mainly for advertisers)
+	* > control over which thread should the requester callback run on
+	* > creating a new Requester from an existing Requester
+	*/
 
-	public static Animation getClockwiseAnimation() {
-		AnimationSet animationSet = new AnimationSet(true);
-		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_0, DEGREES_360, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
-		rotateAnimation.setDuration(DURATION_MILLIS);
-		animationSet.addAnimation(rotateAnimation);
+//	public void runExtraFeatures() {
+//		FyberSdkExtraFeatures.reportInstall(this);
+//		FyberSdkExtraFeatures.reportRewardedAction(this);
+//		FyberSdkExtraFeatures.requestAdWithSpecificHandler(this);
+//		FyberSdkExtraFeatures.createRequesterFromAnotherRequester(this);
+//	}
 
-		return animationSet;
-	}
+	// ** Fragment navigation with page adapter helper methods**
 
-	public static Animation getCounterclockwiseAnimation() {
-		AnimationSet animationSet = new AnimationSet(true);
-		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_360, DEGREES_0, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
-		rotateAnimation.setDuration(DURATION_MILLIS);
-		animationSet.addAnimation(rotateAnimation);
-
-		return animationSet;
-	}
-
-
-	/**
-	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-	 * one of the sections/tabs/pages.
-	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
 		public SectionsPagerAdapter(FragmentManager fm) {
@@ -214,19 +193,41 @@ public class MainActivity extends FragmentActivity {
 		};
 	}
 
-	/*
-	* ** Fyber SDK: other features **
-	*
-	* > this method shows you a couple of features from Fyber SDK that we left out of the sample app:
-	* > report installs and rewarded actions (mainly for advertisers)
-	* > control over which thread should the requester callback run on
-	* > creating a new Requester from an existing Requester
-	*/
+	// ** Init helper functions **
 
-//	public void runExtraFeatures() {
-//		FyberSdkExtraFeatures.reportInstall(this);
-//		FyberSdkExtraFeatures.reportRewardedAction(this);
-//		FyberSdkExtraFeatures.requestAdWithSpecificHandler(this);
-//		FyberSdkExtraFeatures.createRequesterFromAnotherRequester(this);
-//	}
+	private void setupViewPager() {
+		// Create the adapter that will return a fragment for each of the three
+		// primary sections of the Activity.
+		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+		// Set up the ViewPager with the sections adapter.
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setAdapter(mSectionsPagerAdapter);
+		mViewPager.setCurrentItem(1);
+	}
+
+	private void setupToolbar() {
+		toolbar.setTitle(getString(R.string.fyber_header));
+		toolbar.setLogo(R.drawable.ic_launcher);
+	}
+
+	// ** Animations **
+
+	public static Animation getClockwiseAnimation() {
+		AnimationSet animationSet = new AnimationSet(true);
+		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_0, DEGREES_360, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
+		rotateAnimation.setDuration(DURATION_MILLIS);
+		animationSet.addAnimation(rotateAnimation);
+
+		return animationSet;
+	}
+
+	public static Animation getCounterclockwiseAnimation() {
+		AnimationSet animationSet = new AnimationSet(true);
+		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_360, DEGREES_0, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
+		rotateAnimation.setDuration(DURATION_MILLIS);
+		animationSet.addAnimation(rotateAnimation);
+
+		return animationSet;
+	}
+
 }

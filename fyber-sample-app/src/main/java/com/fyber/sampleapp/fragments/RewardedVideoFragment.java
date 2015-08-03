@@ -58,7 +58,7 @@ public class RewardedVideoFragment extends FyberFragment implements VirtualCurre
 		//Requesting a rewarded video ad
 		RewardedVideoRequester
 				.create(this)
-				// you can add a virtual Currency Requester by chaining this extra method
+						// you can add a virtual Currency Requester by chaining this extra method
 				.withVirtualCurrencyRequester(getVirtualCurrencyRequester())
 				.request(getActivity());
 	}
@@ -96,10 +96,10 @@ public class RewardedVideoFragment extends FyberFragment implements VirtualCurre
 
 	private VirtualCurrencyRequester getVirtualCurrencyRequester() {
 		return VirtualCurrencyRequester.create(this)
-				//
+				// user will get a toast notification upon reward
 //				.notifyUserOnReward(true)
-				/* this is the currency id for RV ad format
-				 you can refer to this -- link to doc*/
+//				this is the currency id for RV ad format
+//				 you can refer to this -- http://developer.fyber.com/content/android/basics/rewarding-the-user/vcs/
 //				.forCurrencyId("coins")
 				;
 	}

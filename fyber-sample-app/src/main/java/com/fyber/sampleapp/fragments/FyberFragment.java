@@ -5,7 +5,6 @@
  */
 package com.fyber.sampleapp.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
@@ -15,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.widget.Button;
 
 import com.fyber.ads.AdFormat;
-import com.fyber.ads.videos.RewardedVideoClient;
 import com.fyber.requesters.RequestCallback;
 import com.fyber.requesters.RequestError;
 import com.fyber.sampleapp.MainActivity;
@@ -97,7 +95,7 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 				break;
 			default:
 				//we only animate the button if it is not an Offer Wall Intent.
-				getButton().startAnimation(MainActivity.getClockwiseAnimation());
+				getButton().startAnimation(MainActivity.getCounterclockwiseAnimation());
 				setButtonToSuccessState();
 				break;
 		}
@@ -144,7 +142,7 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 	*/
 
 	private void resetButtonStateWithAnimation() {
-		getButton().startAnimation(MainActivity.getReverseClockwiseAnimation());
+		getButton().startAnimation(MainActivity.getCounterclockwiseAnimation());
 		getButton().setText(getRequestText());
 	}
 

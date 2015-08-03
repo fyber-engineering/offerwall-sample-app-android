@@ -65,6 +65,7 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'LICENSE.txt'
     }
+
 }
 
 dependencies {

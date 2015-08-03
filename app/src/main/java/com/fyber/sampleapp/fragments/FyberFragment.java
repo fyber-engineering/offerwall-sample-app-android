@@ -28,8 +28,6 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 	protected static final int OFFERWALL_REQUEST_CODE = 8795;
 	protected static final int REWARDED_VIDEO_REQUEST_CODE = 8796;
 
-	private static final String GETTING_OFFERS = "Getting\r\nOffers";
-
 	private boolean isRequestingState;
 	protected Intent intent;
 
@@ -42,19 +40,9 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		//resetting button and intent
+		//resetting button and Intent
 		setButtonToOriginalState();
 		resetIntent();
-		if (resultCode == Activity.RESULT_OK) {
-			switch (requestCode) {
-				case REWARDED_VIDEO_REQUEST_CODE:
-					// If you did not chain a vcs callback in the rewarded video request, you can uncomment the line below and the respective method to make a separate vcs request.
-					//FIXME: this should be done elegantly
-//					requestVirtualCurrency();
-				default:
-					break;
-			}
-		}
 	}
 
 	/*
@@ -74,13 +62,13 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 	protected abstract void performRequest();
 
 
-	// when a button is clicked, request or show the ad according to intent availability
+	// when a button is clicked, request or show the ad according to Intent availability
 	protected void requestOrShowAd() {
 		//avoid requesting an ad when already requesting
 		if (!isRequestingState()) {
-			//if we already have an intent, we ad activity and reset the button
+			//if we already have an Intent, we start the ad Activity
 			if (isIntentAvailable()) {
-				//start the ad format specific activity
+				//start the ad format specific Activity
 				startActivityForResult(intent, getRequestCode());
 
 			} else {
@@ -99,8 +87,8 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 	public void onAdAvailable(Intent intent) {
 		resetRequestingState();
 		this.intent = intent;
-		//if you are using a general purpose requestCallback like this you might want to verify which adFormat will this intent show.
-		//You can use the AdFormat class to obtain an AdFormat from a given intent. Then you can perform ad format specific actions e.g.:
+		//if you are using a general purpose requestCallback like this you might want to verify which adFormat will this Intent show.
+		//You can use the AdFormat class to obtain an AdFormat from a given Intent. Then you can perform ad format specific actions e.g.:
 		AdFormat adFormat = AdFormat.fromIntent(intent);
 		switch (adFormat) {
 			case OFFER_WALL:
@@ -108,7 +96,7 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 				startActivityForResult(intent, OFFERWALL_REQUEST_CODE);
 				break;
 			default:
-				//we only animate the button if it is not an offer wall intent.
+				//we only animate the button if it is not an Offer Wall Intent.
 				getButton().startAnimation(MainActivity.getClockwiseAnimation());
 				setButtonToSuccessState();
 				break;
@@ -125,8 +113,7 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
 	@Override
 	public void onRequestError(RequestError requestError) {
-		//FIXME: this is ambiguous. In the case of the rewarded video, it can either be a video request error or a vcs request error. Should we move to anonymous callbacks?
-		FyberLogger.d(getLogTag(), "error requesting ad: " + requestError.getDescription());
+		FyberLogger.d(getLogTag(), "Semething went wrong with the request: " + requestError.getDescription());
 		resetRequestingState();
 		resetIntent();
 		resetButtonStateWithAnimation();
@@ -163,7 +150,7 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
 	protected void setButtonToRequestingMode() {
 		getButton().startAnimation(MainActivity.getClockwiseAnimation());
-		getButton().setText(GETTING_OFFERS);
+		getButton().setText(getString(R.string.getting_offers));
 		isRequestingState = true;
 	}
 

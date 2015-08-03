@@ -26,20 +26,25 @@ import com.fyber.sampleapp.fragments.RewardedVideoFragment;
 import com.fyber.utils.FyberLogger;
 
 
+// Fyber SDK takes advantage of the power of annotations to make mediation simpler to integrate.
+// To enable mediation in this app simply uncomment @FyberSDK annotation line below.
+// Also, and make sure you have the right dependencies in your gradle file.
+//@FyberSDK
 public class MainActivity extends FragmentActivity {
 
-	//FIXME: what are the correct values to use here?
-	private static final String APP_ID = "24913";
-	private static final String SECURITY_TOKEN = "128194d69f9a68d14db869140e1a108b";
+	private static final String APP_ID = "22915";
+	private static final String SECURITY_TOKEN = "token";
+
+	private static final String USER_ID = "userId";
 
 	private static final int DURATION_MILLIS = 300;
 	private static final int DEGREES_360 = 360;
 	private static final int DEGREES_0 = 0;
 	private static final float PIVOT_X_VALUE = 0.5f;
 	private static final float PIVOT_Y_VALUE = 0.5f;
-	private static final int INTERSTITIAL_FRAGMENT_NUMBER = 0;
-	private static final int REWARDED_VIDEO_FRAGMENT_NUMBER = 1;
-	private static final int OFFERWALL_FRAGMENT_NUMBER = 2;
+	private static final int INTERSTITIAL_FRAGMENT = 0;
+	private static final int REWARDED_VIDEO_FRAGMENT = 1;
+	private static final int OFFER_WALL_FRAGMENT = 2;
 	private static final String TAG = "FyberMainActivity";
 
 	/**
@@ -65,7 +70,7 @@ public class MainActivity extends FragmentActivity {
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.activity_fyber_main);
 
-//		enabling Fyber logs so that we can see what is going on on the sdk level
+//		enabling Fyber logs so that we can see what is going on on the SDK level
 		FyberLogger.enableLogging(true);
 
 		setupViewPager();
@@ -74,7 +79,7 @@ public class MainActivity extends FragmentActivity {
 
 	private void setupViewPager() {
 		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the activity.
+		// primary sections of the Activity.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -98,19 +103,15 @@ public class MainActivity extends FragmentActivity {
 			Fyber fyber = Fyber
 					.with(APP_ID, this)
 					.withSecurityToken(SECURITY_TOKEN)
-					//FIXME: add correct values so that uncommenting the code works correctly. Add comments explaining each line?
-//					.withManualPrecaching()
-//					.withCustomParams(...)
-//					.withUserId(USER_ID)
+//					.withManualPrecaching() // by default Fyber SDK will start precaching. If you wish to start precaching only at a later time you can uncomment this line and use 'CacheManager' to start, pause or resume on demand.
+//					.withUserId(USER_ID) // if you do not provide an user id Fyber SDK will generate one for you
 					;
 
-			//when you start Fyber sdk you get a Settings object that you can use to customise the sdk behaviour.
+			//when you start Fyber SDK you get a Settings object that you can use to customise the SDK behaviour.
 			//Have a look at the method 'customiseFyberSettings' to learn more about possible customisation.
 			Fyber.Settings fyberSettings = fyber.start();
 
 //			customiseFyberSettings(fyberSettings);
-
-			runNeatFeatures();
 
 		} catch (IllegalArgumentException e) {
 			Log.d(TAG, e.getLocalizedMessage());
@@ -160,17 +161,17 @@ public class MainActivity extends FragmentActivity {
 		public Fragment getItem(int position) {
 			switch (position) {
 
-				case INTERSTITIAL_FRAGMENT_NUMBER:
-					return InterstitialFragment.newInstance();
+				case INTERSTITIAL_FRAGMENT:
+					return new InterstitialFragment();
 
-				case REWARDED_VIDEO_FRAGMENT_NUMBER:
-					return RewardedVideoFragment.newInstance();
+				case REWARDED_VIDEO_FRAGMENT:
+					return new RewardedVideoFragment();
 
-				case OFFERWALL_FRAGMENT_NUMBER:
-					return OfferwallFragment.newInstance();
+				case OFFER_WALL_FRAGMENT:
+					return new OfferwallFragment();
 
 				default:
-					return RewardedVideoFragment.newInstance();
+					return new RewardedVideoFragment();
 			}
 			// getItem is called to instantiate the fragment for the given page.
 		}
@@ -181,7 +182,6 @@ public class MainActivity extends FragmentActivity {
 			return 3;
 		}
 
-		//FIXME: we should center the icons and add a descriptive title like in the iOS app. Maybe add some colors as well
 		@Override
 		public CharSequence getPageTitle(int position) {
 			return getSpannableString(position);
@@ -208,10 +208,19 @@ public class MainActivity extends FragmentActivity {
 		};
 	}
 
-	private void runNeatFeatures() {
-		NeatFeatures.reportInstall(this);
-		NeatFeatures.reportRewardedAction(this);
-//		NeatFeatures.requestAdWithSpecificHandler(this);
-//		NeatFeatures.createRequesterFromAnotherRequester(this);
-	}
+	/*
+	* ** Fyber SDK: other features **
+	*
+	* > this method shows you a couple of features from Fyber SDK that we left out of the sample app:
+	* > report installs and rewarded actions (mainly for advertisers)
+	* > control over which thread should the requester callback run on
+	* > creating a new Requester from an existing Requester
+	*/
+
+//	public void runExtraFeatures() {
+//		FyberSdkExtraFeatures.reportInstall(this);
+////		FyberSdkExtraFeatures.reportRewardedAction(this);
+//////		FyberSdkExtraFeatures.requestAdWithSpecificHandler(this);
+////////		FyberSdkExtraFeatures.createRequesterFromAnotherRequester(this);
+//	}
 }

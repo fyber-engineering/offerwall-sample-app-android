@@ -1,6 +1,9 @@
 package com.fyber.sampleapp.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,31 +24,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RewardedVideoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class RewardedVideoFragment extends FyberFragment implements RequestCallback {
 
 	private static final String TAG = "RewardedVideoFragment";
 
 	@Bind(R.id.rewarded_video_button) Button rewardedVideoButton;
 
-	//FIXME: since it is mandatory to have public constructor on a fragment is it worth it to have this new instance method
-
-	/**
-	 * Use this factory method to create a new instance of
-	 * this fragment using the provided parameters.
-	 *
-	 * @return A new instance of fragment RewardedVideoFragment.
-	 */
-	public static RewardedVideoFragment newInstance() {
-		return new RewardedVideoFragment();
-	}
-
 	public RewardedVideoFragment() {
-		// Required empty public constructor
 	}
 
 	@Override
@@ -62,11 +47,49 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 		return view;
 	}
 
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == Activity.RESULT_OK) {
+			switch (requestCode) {
+				case REWARDED_VIDEO_REQUEST_CODE:
+					// If you did not chain a vcs callback in the rewarded video request, you can uncomment the line below and the respective method to make a separate virtual currency request.
+//					requestVirtualCurrencyWithDelay();
+				default:
+					break;
+			}
+		}
+	}
+
+	// using butter knife to link Button click
 	@OnClick(R.id.rewarded_video_button)
 	public void onRewardedVideoButtonCLicked(View view) {
 
 		requestOrShowAd();
 	}
+
+	/*
+	* ** Code to perform a Rewarded Video request **
+	*/
+
+	@Override
+	protected void performRequest() {
+		//Requesting a rewarded video ad
+		RewardedVideoRequester
+				.create(this)
+				.withVirtualCurrencyRequester(getVcsRequester()) // you can add a virtual currency listener listener by chaining this extra method
+				.request(getActivity());
+
+			/*
+			* If you do not chain a vcs callback in the rewarded video request you can always make a separate call for virtual currency.
+			* Comment the 'withVirtualCurrencyCallback' line above and uncomment the 'requestVirtualCurrency()' on 'onActivityResult'
+			* Have a look at the commented method 'requestVirtualCurrency' at the end of this class.
+			*/
+	}
+
+	/*
+	* ** FyberFragment methods **
+	*/
 
 	@Override
 	public String getLogTag() {
@@ -75,12 +98,12 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 
 	@Override
 	public String getRequestText() {
-		return getString(R.string.requestVideo);
+		return getString(R.string.request_video);
 	}
 
 	@Override
 	public String getShowText() {
-		return getString(R.string.showVideo);
+		return getString(R.string.show_video);
 	}
 
 	@Override
@@ -93,21 +116,7 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 		return REWARDED_VIDEO_REQUEST_CODE;
 	}
 
-	@Override
-	protected void performRequest() {
-		//Requesting a rewarded video ad
-		RewardedVideoRequester
-				.create(this)
-				.withVirtualCurrencyRequester(getVcsRequester()) // you can add a vcs listener by chaining this extra method
-				.request(getActivity());
-
-		//FIXME: is it worth to add a link to the dev portal? (http://developer.fyber.com/content/android/basics/rewarding-the-user/vcs/) or something?
-			/*
-			* If you do not chain a vcs callback in the rewarded video request you can always make a separate call for virtual currency.
-			* comment the 'withVirtualCurrencyCallback' line and uncomment the 'requestVirtualCurrency()' on 'onActivityResult'
-			* Have a look at the commented method 'requestVirtualCurrency'
-			*/
-	}
+	// creates a new virtual currency requester to be used in a rewarded video request or on a separate virtual currency request.
 
 	private VirtualCurrencyRequester getVcsRequester() {
 		VirtualCurrencyRequester vcsRequester = VirtualCurrencyRequester.create(new VirtualCurrencyCallback() {
@@ -129,14 +138,24 @@ public class RewardedVideoFragment extends FyberFragment implements RequestCallb
 		return vcsRequester;
 	}
 
-
 	/*
 	 * ** separate VCS request **
 	 *
 	 * Note that you will only have a successful response querying for virtual currency after watching a rewarded video.
-	 * Uncomment this code and call this method from 'onActivityResult'.
+	 * Also it is recommended to provide a 3 second delay before requesting virtual currency if you are calling the method from 'onActivityResult'
 	 *
 	  */
+
+
+	//we run the virtual currency request with a delay of 3 seconds to make sure that the reward has been paid after watching the video.
+	private void requestVirtualCurrencyWithDelay() {
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				requestVirtualCurrency();
+			}
+		}, 3000);
+	}
 
 	public void requestVirtualCurrency() {
 		getVcsRequester().request(getActivity());

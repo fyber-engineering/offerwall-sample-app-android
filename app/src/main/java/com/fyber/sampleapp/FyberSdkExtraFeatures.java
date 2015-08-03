@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.fyber.ads.AdFormat;
 import com.fyber.currency.VirtualCurrencyErrorResponse;
@@ -24,24 +23,22 @@ import com.fyber.requesters.RequestError;
 import com.fyber.requesters.RewardedVideoRequester;
 import com.fyber.requesters.VirtualCurrencyCallback;
 import com.fyber.requesters.VirtualCurrencyRequester;
+import com.fyber.sampleapp.fragments.FyberFragment;
 import com.fyber.utils.FyberLogger;
-
-//FIXME: If we all agree that a class like this makes sense then I think it should have a different name. Also, there's should be some kind of mention to it on the actual sample app code.
 
 /**
  * This class demonstrates a couple of features that the sample app doesn't show you.
  * <p> Here you can see how to take advantage of :</p>
  * <ul>
- * <li>Advertiser reporters</li>
- * <li>Thread control on Requesters</li>
- * <li>Different ways of using requesters and reporters</li>
- * <li>Other stuff</li>
+ * <li>Advertiser Reporters</li>
+ * <li>Thread control on Requesters' callbacks</li>
+ * <li>Different ways of using Requesters and Reporters</li>
  * <ul>
  */
-public class NeatFeatures {
+public class FyberSdkExtraFeatures {
 
 
-	private static final String TAG = NeatFeatures.class.getSimpleName();
+	private static final String TAG = FyberSdkExtraFeatures.class.getSimpleName();
 
 	public static void reportInstall(Context context) {
 
@@ -62,12 +59,12 @@ public class NeatFeatures {
 		}
 	}
 
-	//Fyber sdk offers you control over thread sync on your callbacks. This method exemplifies how to do it
+	//Fyber SDK offers you control over thread sync on your callbacks. This method exemplifies how to do it
 	public static void requestAdWithSpecificHandler(final Activity activity) {
 
 		/*
 		*
-		* By default Fyber sdk uses the UI thread to call the Requester's callback.
+		* By default Fyber SDK uses the UI thread to call the Requester's callback.
 		* This means that if you are requesting an ad from a background thread you will get your response on the UI thread.
 		* However, you can override this default behaviour and have your response delivered to a specific Handler. Here is an example of how to do it:
 		*
@@ -105,7 +102,7 @@ public class NeatFeatures {
 				.request(activity);
 	}
 
-	public static void createRequesterFromAnotherRequester(Context context) {
+	public static void createRequesterFromAnotherRequester(final Activity activity) {
 
 		/*
 		* In some situations it might be useful to build a Requester from another requester.
@@ -152,7 +149,7 @@ public class NeatFeatures {
 					}
 				})
 				.notifyUserOnReward(true)
-				.forCurrencyId("myCurrencyId");
+				.forCurrencyId("coins");
 
 		//add the vcs requester to the video requester
 		rewardedVideoRequester.withVirtualCurrencyRequester(vcsReq);
@@ -163,10 +160,7 @@ public class NeatFeatures {
 						//the only thing different is the placement id
 				.withPlacementId("aDifferentPlacementId");
 
-		//these will be separate requests with different placementsIds but will be handled by the same callbacks and have the same parameterization
-//		rewardedVideoRequester.request(context);
-		otherRequester.request(context);
+		//this will be a separate Requester with different placementsId but will be handled by the same callbacks and have the same parameterization
+		otherRequester.request(activity);
 	}
-
-	//Other stuff......?
 }

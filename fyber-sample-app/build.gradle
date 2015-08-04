@@ -23,7 +23,7 @@ android {
         applicationId "com.fyber.sampleapp"
         minSdkVersion 10
         targetSdkVersion 22
-        versionCode System.getenv("BUILD_NUMBER") ?: 1
+        versionCode System.getenv("BUILD_NUMBER") as Integer ?: 1
         versionName "1.0"
     }
 

@@ -1,0 +1,86 @@
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+
+
+android {
+
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "com.fyber.sampleapp"
+        minSdkVersion 10
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(keyStoreFile)
+            storePassword keyStorePassword
+            keyAlias keyStoreAlias
+            keyPassword keyStoreAliasPassword
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    productFlavors {
+
+        internal {
+            ext.enableCrashlytics = false
+        }
+
+        alpha {
+
+            dependencies {
+                //we include crashlytics only for the alpha crowd testing program flavor
+                compile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
+                    transitive = true;
+                }
+            }
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    //Google libs
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.google.android.gms:play-services-ads:7.5.0'
+    //Fyber SDK
+    compile 'com.fyber:fyber-android-sdk:8.0.0-GM'
+    //3rd party lib for view dependencies injection
+    compile 'com.jakewharton:butterknife:7.0.1'
+
+    //if you want to use mediation you must uncomment the following dependencies:
+    //Also you have to uncomment the @FyberSDK annotation in the MainActivity
+//    provided 'com.fyber:sdk-annotations:1.0.0-rc2'
+//    provided 'com.fyber:sdk-annotations-processor:1.0.0-rc2'
+
+}

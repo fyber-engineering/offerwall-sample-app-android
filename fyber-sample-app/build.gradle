@@ -58,6 +58,18 @@ android {
                     transitive = true;
                 }
             }
+            ext.betaDistributionGroupAliases="delta"
+        }
+        applicationVariants.all { variant ->
+            if (buildType.name.equals('release')) {
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        def fileName = outputFile.name.replace('release.apk', "${versionName}.apk")
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+            }
         }
     }
 

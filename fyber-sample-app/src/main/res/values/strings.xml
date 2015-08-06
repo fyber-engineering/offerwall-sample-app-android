@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Sample App</string>
+    <string name="app_name">Fyber Sample</string>
 
     <string name="action_bar_item_video">Video</string>
     <string name="action_bar_item_interstitials">Interstitials</string>

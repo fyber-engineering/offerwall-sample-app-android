@@ -59,7 +59,7 @@ android {
 
             dependencies {
                 //we include crashlytics only for the alpha crowd testing program flavor
-                compile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
+                alphaCompile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
                     transitive = true;
                 }
                 //crashlytics group name
@@ -69,21 +69,21 @@ android {
                 provided 'com.fyber:sdk-annotations:1.0.0-rc2'
                 provided 'com.fyber:sdk-annotations-processor:1.0.0-rc2'
 
-                compile 'com.squareup.dagger:dagger:1.2.2'
-                //adapters
-                compile 'com.fyber:fyber-mediation-adcolony:2.2.2_r3'
-                compile 'com.fyber:fyber-mediation-admob:7.5.0_r2'
-                compile 'com.fyber:fyber-mediation-applovin:6.0.0_r2'
-                compile 'com.fyber:fyber-mediation-chartboost:5.5.0_r2'
-                compile 'com.fyber:fyber-mediation-facebook:4.3.0_r2'
-                compile 'com.fyber:fyber-mediation-flurry:5.5.0_r3'
-                compile 'com.fyber:fyber-mediation-inmobi:4.5.5_r2'
-                compile 'com.fyber:fyber-mediation-adcolony:2.2.2_r3'
-                compile 'com.fyber:fyber-mediation-mediabrix:1.7.1_r2'
-                compile 'com.fyber:fyber-mediation-millennial:5.4.0_r3'
-                compile 'com.fyber:fyber-mediation-tremor:3.10.0.22_r2'
-                compile 'com.fyber:fyber-mediation-unityads:1.4.4_r2'
-                compile 'com.fyber:fyber-mediation-vungle:3.3.1_r2'
+               alphaCompile 'com.squareup.dagger:dagger:1.2.2'
+               //adapters
+               alphaCompile 'com.fyber:fyber-mediation-adcolony:2.2.2_r3'
+               alphaCompile 'com.fyber:fyber-mediation-admob:7.5.0_r2'
+               alphaCompile 'com.fyber:fyber-mediation-applovin:6.0.0_r2'
+               alphaCompile 'com.fyber:fyber-mediation-chartboost:5.5.0_r2'
+               alphaCompile 'com.fyber:fyber-mediation-facebook:4.3.0_r2'
+               alphaCompile 'com.fyber:fyber-mediation-flurry:5.5.0_r3'
+               alphaCompile 'com.fyber:fyber-mediation-inmobi:4.5.5_r2'
+               alphaCompile 'com.fyber:fyber-mediation-adcolony:2.2.2_r3'
+               alphaCompile 'com.fyber:fyber-mediation-mediabrix:1.7.1_r2'
+               alphaCompile 'com.fyber:fyber-mediation-millennial:5.4.0_r3'
+               alphaCompile 'com.fyber:fyber-mediation-tremor:3.10.0.22_r2'
+               alphaCompile 'com.fyber:fyber-mediation-unityads:1.4.4_r2'
+               alphaCompile 'com.fyber:fyber-mediation-vungle:3.3.1_r2'
 
             }
         }

@@ -1,4 +1,5 @@
 # Butterknife
+
 -keep class butterknife.** { *; }
 -dontwarn butterknife.internal.**
 -keep class **$$ViewBinder { *; }
@@ -24,3 +25,4 @@
 # Google Advertising Id
 
 -keep class com.google.android.gms.ads.identifier.** { *; }
+

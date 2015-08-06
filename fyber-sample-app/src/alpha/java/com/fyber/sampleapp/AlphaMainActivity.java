@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.fyber.annotations.FyberSDK;
 
 import io.fabric.sdk.android.Fabric;
 
+@FyberSDK
 public class AlphaMainActivity extends MainActivity {
 
 	@Override

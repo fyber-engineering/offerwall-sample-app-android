@@ -160,6 +160,7 @@ public class MainActivity extends FragmentActivity {
 	private void setupTabStrip() {
 		// Get PagerTabStrip
 		PagerTabStrip strip = PagerTabStrip.class.cast(findViewById(R.id.pager_header));
+		strip.setDrawFullUnderline(true);
 		strip.setBackgroundColor(getResources().getColor(R.color.textColorPrimary));
 		strip.setTabIndicatorColor(getResources().getColor(R.color.colorAdAvailable));
 	}

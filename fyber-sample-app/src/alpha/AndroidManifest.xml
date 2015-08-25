@@ -18,6 +18,20 @@
             </intent-filter>
         </activity>
 
+            <!--<activity-->
+                <!--android:name="com.jirbo.adcolony.AdColonyOverlay"-->
+                <!--android:configChanges="keyboardHidden|orientation|screenSize"-->
+                <!--android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />-->
+            <!--<activity-->
+                <!--android:name="com.jirbo.adcolony.AdColonyFullscreen"-->
+                <!--android:configChanges="keyboardHidden|orientation|screenSize"-->
+                <!--android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />-->
+            <!--<activity-->
+                <!--android:name="com.jirbo.adcolony.AdColonyBrowser"-->
+                <!--android:configChanges="keyboardHidden|orientation|screenSize"-->
+                <!--android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />-->
+
+
             <meta-data
                 android:name="io.fabric.ApiKey"
                 android:value="043fee630558deebb1ef35b008b2ac7da41454b6" />

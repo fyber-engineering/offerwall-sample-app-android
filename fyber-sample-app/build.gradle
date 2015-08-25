@@ -14,6 +14,7 @@ buildscript {
 }
 
 
+
 android {
 
     compileSdkVersion 22
@@ -69,21 +70,30 @@ android {
                 provided 'com.fyber:sdk-annotations:1.0.0-rc2'
                 provided 'com.fyber:sdk-annotations-processor:1.0.0-rc2'
 
-               alphaCompile 'com.squareup.dagger:dagger:1.2.2'
-               //adapters
-               alphaCompile 'com.fyber:fyber-mediation-adcolony:2.2.2_r3'
-               alphaCompile 'com.fyber:fyber-mediation-admob:7.5.0_r2'
-               alphaCompile 'com.fyber:fyber-mediation-applovin:6.0.0_r2'
-               alphaCompile 'com.fyber:fyber-mediation-chartboost:5.5.0_r2'
-               alphaCompile 'com.fyber:fyber-mediation-facebook:4.3.0_r2'
-               alphaCompile 'com.fyber:fyber-mediation-flurry:5.5.0_r3'
-               alphaCompile 'com.fyber:fyber-mediation-inmobi:4.5.5_r2'
-               alphaCompile 'com.fyber:fyber-mediation-adcolony:2.2.2_r3'
-               alphaCompile 'com.fyber:fyber-mediation-mediabrix:1.7.1_r2'
-               alphaCompile 'com.fyber:fyber-mediation-millennial:5.4.0_r3'
-               alphaCompile 'com.fyber:fyber-mediation-tremor:3.10.0.22_r2'
-               alphaCompile 'com.fyber:fyber-mediation-unityads:1.4.4_r2'
-               alphaCompile 'com.fyber:fyber-mediation-vungle:3.3.1_r2'
+                alphaCompile 'com.squareup.dagger:dagger:1.2.2'
+
+                //adapters
+                alphaCompile 'com.fyber:fyber-mediation-unityads:1.4.7-r2'
+//                alphaCompile 'com.fyber:fyber-mediation-adcolony:2.2.2-r3'
+//                alphaCompile 'Adapters-Android:fyber-mediation-admob:7.5.0-r2'
+//                alphaCompile 'Adapters-Android:fyber-mediation-applovin:6.0.0-r2'
+//                alphaCompile 'Adapters-Android:fyber-mediation-chartboost:5.5.0-r2'
+//                alphaCompile 'Adapters-Android:fyber-mediation-facebook:4.3.0-r2'
+//                alphaCompile 'Adapters-Android:fyber-mediation-flurry:5.5.0-r3'
+//                alphaCompile 'Adapters-Android:fyber-mediation-inmobi:4.5.5-r2'
+//                alphaCompile 'Adapters-Android:fyber-mediation-mediabrix:1.7.1-r2'
+//                alphaCompile 'Adapters-Android:fyber-mediation-millennial:5.4.0-r3'
+//                alphaCompile 'Adapters-Android:fyber-mediation-tremor:3.10.0.22-r2'
+//                alphaCompile 'Adapters-Android:fyber-mediation-vungle:3.3.1-r2'
+
+                //tmp dependency declaration for incomplete adColony publish
+                compile name: 'fyber-mediation-adcolony-2.2.2-r3' , ext: 'aar'
+
+//                compile fileTree(dir: 'libs', include: ['*.jar'])
+
+//                compile files('libs/adcolony.jar')
+//                compile files('libs/classes.jar')
+
 
             }
         }
@@ -108,6 +118,9 @@ android {
         exclude 'LICENSE.txt'
     }
 
+//    dexOptions {
+//        preDexLibraries = false
+//    }
 }
 
 dependencies {
@@ -116,7 +129,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.google.android.gms:play-services-ads:7.5.0'
     //Fyber SDK
-    compile 'com.fyber:fyber-android-sdk:8.0.0-GM'
+    compile 'com.fyber:fyber-android-sdk:8.0.0-GM3'
     //3rd party lib for view dependencies injection
     compile 'com.jakewharton:butterknife:7.0.1'
 

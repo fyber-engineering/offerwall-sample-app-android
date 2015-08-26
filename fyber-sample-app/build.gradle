@@ -58,13 +58,14 @@ android {
 
             proguardFile 'src/alpha/proguard-rules.pro'
 
+            //crashlytics group name
+            ext.betaDistributionGroupAliases = "alpha"
+
             dependencies {
                 //we include crashlytics only for the alpha crowd testing program flavor
                 alphaCompile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
                     transitive = true;
                 }
-                //crashlytics group name
-                ext.betaDistributionGroupAliases="delta"
 
                 //mediation dependencies
                 provided 'com.fyber:sdk-annotations:1.0.0-rc2'
@@ -87,7 +88,7 @@ android {
 //                alphaCompile 'Adapters-Android:fyber-mediation-vungle:3.3.1-r2'
 
                 //tmp dependency declaration for incomplete adColony publish
-                compile name: 'fyber-mediation-adcolony-2.2.2-r3' , ext: 'aar'
+                compile name: 'fyber-mediation-adcolony-2.2.2-r3', ext: 'aar'
 
 //                compile fileTree(dir: 'libs', include: ['*.jar'])
 

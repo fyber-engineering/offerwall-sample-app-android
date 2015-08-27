@@ -1,11 +1,15 @@
 package com.fyber.sampleapp.fragments;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.fyber.Fyber;
+import com.fyber.ads.videos.RewardedVideoActivity;
 import com.fyber.currency.VirtualCurrencyErrorResponse;
 import com.fyber.currency.VirtualCurrencyResponse;
 import com.fyber.requesters.RequestError;
@@ -61,6 +65,31 @@ public class RewardedVideoFragment extends FyberFragment implements VirtualCurre
 						// you can add a virtual Currency Requester by chaining this extra method
 				.withVirtualCurrencyRequester(getVirtualCurrencyRequester())
 				.request(getActivity());
+	}
+
+	/*
+	* Checking activity result for rewarded video engagement status
+	 */
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == Activity.RESULT_OK && requestCode == REWARDED_VIDEO_REQUEST_CODE) {
+			String engagementStatus = data.getStringExtra(RewardedVideoActivity.ENGAGEMENT_STATUS);
+				switch (engagementStatus) {
+				case RewardedVideoActivity.REQUEST_STATUS_PARAMETER_FINISHED_VALUE:
+					FyberLogger.i(TAG, "The video has finished after completing. The user will be rewarded.");
+					break;
+				case RewardedVideoActivity.REQUEST_STATUS_PARAMETER_ABORTED_VALUE:
+					FyberLogger.i(TAG, "The video has finished before completing. The user might have aborted it, either explicitly (by tapping the close button) or implicitly (by switching to another app) or it was interrupted by an asynchronous event like an incoming phone call.");
+					break;
+				case RewardedVideoActivity.REQUEST_STATUS_PARAMETER_ERROR:
+					FyberLogger.i(TAG, "The video was interrupted or failed to play due to an error.");
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 	/*

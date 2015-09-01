@@ -58,7 +58,7 @@ android {
 
             proguardFile 'src/alpha/proguard-rules.pro'
 
-            //crashlytics group name
+            //crashlytics group aliases name
             ext.betaDistributionGroupAliases = "alpha"
 
             dependencies {
@@ -75,7 +75,7 @@ android {
 
                 //adapters
                 alphaCompile 'com.fyber:fyber-mediation-unityads:1.4.7-r2'
-//                alphaCompile 'com.fyber:fyber-mediation-adcolony:2.2.2-r3'
+                alphaCompile 'com.fyber:fyber-mediation-adcolony:2.2.2-r3'
 //                alphaCompile 'Adapters-Android:fyber-mediation-admob:7.5.0-r2'
 //                alphaCompile 'Adapters-Android:fyber-mediation-applovin:6.0.0-r2'
 //                alphaCompile 'Adapters-Android:fyber-mediation-chartboost:5.5.0-r2'
@@ -88,7 +88,7 @@ android {
 //                alphaCompile 'Adapters-Android:fyber-mediation-vungle:3.3.1-r2'
 
                 //tmp dependency declaration for incomplete adColony publish
-                compile name: 'fyber-mediation-adcolony-2.2.2-r3', ext: 'aar'
+//                compile name: 'fyber-mediation-adcolony-2.2.2-r3', ext: 'aar'
 
 //                compile fileTree(dir: 'libs', include: ['*.jar'])
 

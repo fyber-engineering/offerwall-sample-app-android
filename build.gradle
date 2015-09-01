@@ -33,6 +33,6 @@ allprojects {
             }
         }
         maven { url 'https://maven.fabric.io/public' }
-        flatDir dirs: 'libs'
+//        flatDir dirs: 'libs'
     }
 }

@@ -17,13 +17,15 @@ buildscript {
 
 android {
 
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
+
+    useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "com.fyber.sampleapp"
         minSdkVersion 10
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 1
         versionName "1.0"
     }
@@ -71,11 +73,11 @@ android {
                 provided 'com.fyber:sdk-annotations:1.0.0-rc2'
                 provided 'com.fyber:sdk-annotations-processor:1.0.0-rc2'
 
-                alphaCompile 'com.squareup.dagger:dagger:1.2.2'
+//                alphaCompile 'com.squareup.dagger:dagger:1.2.2'
 
                 //adapters
-                alphaCompile 'com.fyber:fyber-mediation-unityads:1.4.7-r2'
-                alphaCompile 'com.fyber:fyber-mediation-adcolony:2.2.2-r3'
+//                alphaCompile 'com.fyber:fyber-mediation-unityads:1.4.7-r2'
+//                alphaCompile 'com.fyber:fyber-mediation-adcolony:2.2.2-r3'
 //                alphaCompile 'Adapters-Android:fyber-mediation-admob:7.5.0-r2'
 //                alphaCompile 'Adapters-Android:fyber-mediation-applovin:6.0.0-r2'
 //                alphaCompile 'Adapters-Android:fyber-mediation-chartboost:5.5.0-r2'
@@ -125,10 +127,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    //compile fileTree(dir: 'libs', include: ['*.jar'])
     //Google libs
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.google.android.gms:play-services-ads:7.5.0'
+    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.google.android.gms:play-services-ads:7.8.0'
     //Fyber SDK
     compile 'com.fyber:fyber-android-sdk:8.0.0-GM3'
     //3rd party lib for view dependencies injection

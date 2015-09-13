@@ -1,0 +1,9 @@
+keyStoreFile=
+keyStorePassword=
+keyStoreAlias=
+keyStoreAliasPassword=
+# Google Play Services and Maven
+# Install using Android SDK Manager  "Google Repository" package (Extras --> Google Repository).
+# Within this repo you will be able to use Google Play Services library with Maven.
+# Add the path to 'SDK-folder/extras/google/m2repository/'.
+localAndroidMavenRepo=

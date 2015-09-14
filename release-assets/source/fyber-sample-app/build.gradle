@@ -3,15 +3,16 @@ apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
 buildscript {
-
-
-
     dependencies {
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
     }
 }
 
 repositories {
+    maven {
+        url "${localAndroidMavenRepo}"
+    }
+
     maven {
         name "Fyber's maven repo"
         url "https://fyber.bintray.com/maven"
@@ -66,13 +67,13 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:7.8.0'
 
     //Fyber SDK
-    compile 'com.fyber:fyber-android-sdk:@version@'
+    compile 'com.fyber:fyber-sdk:@version@'
     //3rd party lib for view dependencies injection
     compile 'com.jakewharton:butterknife:7.0.1'
 
     //if you want to use mediation you must uncomment the following dependencies:
     //Also you have to uncomment the @FyberSDK annotation in the MainActivity
-//    provided 'com.fyber:sdk-annotations:1.0.0'
-//    provided 'com.fyber:sdk-annotations-processor:1.0.0'
+//    provided 'com.fyber:fyber-annotations:1.0.0'
+//    provided 'com.fyber:fyber-annotations-compiler:1.0.0'
 
 }

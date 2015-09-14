@@ -24,20 +24,5 @@ allprojects {
 
     repositories {
         jcenter()
-        maven {
-            name "Fyber's internal repo"
-            url "https://fyber.bintray.com/internal"
-            credentials {
-                username bintrayUser
-                password bintrayKey
-            }
-        }
-        maven { 
-            url 'https://maven.fabric.io/public' 
-        }
-        maven {
-            url "${localAndroidMavenRepo}"
-        }
-//        flatDir dirs: 'libs'
     }
 }

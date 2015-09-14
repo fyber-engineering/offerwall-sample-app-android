@@ -1,0 +1,79 @@
+apply plugin: 'android-sdk-manager'
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+buildscript {
+    dependencies {
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
+    }
+}
+
+repositories {
+    maven {
+        url "${localAndroidMavenRepo}"
+    }
+
+    maven {
+        name "Fyber's maven repo"
+        url "https://fyber.bintray.com/maven"
+    }
+}
+
+android {
+
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
+
+    useLibrary 'org.apache.http.legacy'
+
+    defaultConfig {
+        applicationId "com.fyber.sampleapp"
+        minSdkVersion 10
+        targetSdkVersion 23
+        versionCode @versionCode@
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(keyStoreFile)
+            storePassword keyStorePassword
+            keyAlias keyStoreAlias
+            keyPassword keyStoreAliasPassword
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'LICENSE.txt'
+    }
+
+}
+
+dependencies {
+    //Google libs
+    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.google.android.gms:play-services-ads:7.8.0'
+
+    //Fyber SDK
+    compile 'com.fyber:fyber-sdk:@version@'
+    //3rd party lib for view dependencies injection
+    compile 'com.jakewharton:butterknife:7.0.1'
+
+    //if you want to use mediation you must uncomment the following dependencies:
+    //Also you have to uncomment the @FyberSDK annotation in the MainActivity
+//    provided 'com.fyber:fyber-annotations:1.0.0'
+//    provided 'com.fyber:fyber-annotations-compiler:1.0.0'
+
+}

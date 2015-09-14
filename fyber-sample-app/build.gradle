@@ -132,7 +132,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'com.google.android.gms:play-services-ads:7.8.0'
     //Fyber SDK
-    compile 'com.fyber:fyber-sdk:8.0.0'
+//    compile 'com.fyber:fyber-sdk:8.0.0'
     //3rd party lib for view dependencies injection
     compile 'com.jakewharton:butterknife:7.0.1'
 
@@ -141,4 +141,18 @@ dependencies {
 //    provided 'com.fyber:fyber-annotations:1.0.0'
 //    provided 'com.fyber:fyber-annotations-compiler:1.0.0'
 
+}
+
+if (!parent?.parent) {
+    println 'Running from sample app project only'
+    
+    dependencies {
+        compile 'com.fyber:fyber-sdk:8.0.0'
+    }
+} else {
+    def taskPath = pathPrefix ?: ''
+
+    dependencies {
+        compile project("${taskPath}:fyber-sdk")
+    }
 }

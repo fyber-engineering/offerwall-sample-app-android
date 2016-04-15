@@ -70,8 +70,8 @@ android {
                 }
 
                 //mediation dependencies
-                provided 'com.fyber:fyber-annotations:1.0.0'
-                provided 'com.fyber:fyber-annotations-compiler:1.0.1'
+                provided 'com.fyber:fyber-annotations:1.1.0'
+                provided 'com.fyber:fyber-annotations-compiler:1.2.0'
 
 //                alphaCompile 'com.squareup.dagger:dagger:1.2.2'
 

@@ -32,6 +32,14 @@ allprojects {
                 password bintrayKey
             }
         }
+        maven {
+            name "Fyber's main repo"
+            url "https://fyber.bintray.com/maven"
+            credentials {
+                username bintrayUser
+                password bintrayKey
+            }
+        }
         maven { 
             url 'https://maven.fabric.io/public' 
         }

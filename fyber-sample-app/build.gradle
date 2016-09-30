@@ -15,15 +15,13 @@ buildscript {
 
 android {
 
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.2"
-
-    useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "com.fyber.sampleapp"
         minSdkVersion 10
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 1
         versionName "1.0"
     }
@@ -127,8 +125,8 @@ android {
 dependencies {
     //compile fileTree(dir: 'libs', include: ['*.jar'])
     //Google libs
-    compile 'com.google.android.gms:play-services-ads:8.4.0'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.google.android.gms:play-services-ads:9.6.1'
+    compile 'com.android.support:appcompat-v7:24.2.1'
 
     //Fyber SDK
 //    compile 'com.fyber:fyber-sdk:8.0.0'
@@ -146,7 +144,7 @@ if (!parent?.parent) {
     println 'Running from sample app project only'
     
     dependencies {
-        compile 'com.fyber:fyber-sdk:8.4.0'
+        compile 'com.fyber:fyber-sdk:8.5.1'
     }
 } else {
     def taskPath = pathPrefix ?: ''

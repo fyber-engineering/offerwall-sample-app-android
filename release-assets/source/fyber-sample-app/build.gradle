@@ -19,8 +19,6 @@ android {
     compileSdkVersion 24
     buildToolsVersion "23.0.2"
 
-    useLibrary 'org.apache.http.legacy'
-
     defaultConfig {
         applicationId "com.fyber.sampleapp"
         minSdkVersion 10

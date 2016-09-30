@@ -1,17 +1,15 @@
 package com.fyber.sampleapp.fragments;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.fyber.ads.AdFormat;
 import com.fyber.requesters.InterstitialRequester;
 import com.fyber.sampleapp.R;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -19,7 +17,7 @@ public class InterstitialFragment extends FyberFragment {
 
 	private static final String TAG = InterstitialFragment.class.getSimpleName();
 
-	@Bind(R.id.interstitial_button) Button interstitialButton;
+	@BindView(R.id.interstitial_button) Button interstitialButton;
 
 	public InterstitialFragment() {
 	}

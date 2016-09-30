@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.fyber.Fyber;
 import com.fyber.ads.videos.RewardedVideoActivity;
 import com.fyber.currency.VirtualCurrencyErrorResponse;
 import com.fyber.currency.VirtualCurrencyResponse;
@@ -19,7 +18,7 @@ import com.fyber.requesters.VirtualCurrencyRequester;
 import com.fyber.sampleapp.R;
 import com.fyber.utils.FyberLogger;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -27,7 +26,7 @@ public class RewardedVideoFragment extends FyberFragment implements VirtualCurre
 
 	private static final String TAG = "RewardedVideoFragment";
 
-	@Bind(R.id.rewarded_video_button) Button rewardedVideoButton;
+	@BindView(R.id.rewarded_video_button) Button rewardedVideoButton;
 
 	public RewardedVideoFragment() {
 	}

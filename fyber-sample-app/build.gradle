@@ -1,7 +1,3 @@
-apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
-apply plugin: 'android-apt'
-
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
@@ -13,8 +9,9 @@ buildscript {
     }
 }
 
-buildscript {
-}
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+apply plugin: 'android-apt'
 
 android {
 

@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId "com.fyber.sampleapp"
-        minSdkVersion 10
+        minSdkVersion 14
         targetSdkVersion 24
         versionCode @versionCode@
         versionName "1.1"

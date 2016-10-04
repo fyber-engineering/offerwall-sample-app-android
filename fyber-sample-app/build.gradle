@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId "com.fyber.sampleapp"
-        minSdkVersion 10
+        minSdkVersion 14
         targetSdkVersion 24
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 1
         versionName "1.1"

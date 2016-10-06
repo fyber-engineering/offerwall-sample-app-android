@@ -25,7 +25,7 @@ import com.fyber.sampleapp.fragments.OfferwallFragment;
 import com.fyber.sampleapp.fragments.RewardedVideoFragment;
 import com.fyber.utils.FyberLogger;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
@@ -65,7 +65,7 @@ public class MainActivity extends FragmentActivity {
 	 */
 	ViewPager mViewPager;
 
-	@Bind(R.id.tool_bar)
+	@BindView(R.id.tool_bar)
 	Toolbar toolbar;
 
 	@Override

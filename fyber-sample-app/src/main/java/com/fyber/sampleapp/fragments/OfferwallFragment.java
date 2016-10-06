@@ -1,7 +1,6 @@
 package com.fyber.sampleapp.fragments;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +9,14 @@ import android.widget.Button;
 import com.fyber.requesters.OfferWallRequester;
 import com.fyber.sampleapp.R;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class OfferwallFragment extends FyberFragment {
 	private static final String TAG = OfferwallFragment.class.getSimpleName();
 
-	@Bind(R.id.offer_wall_button) Button offerwallButton;
+	@BindView(R.id.offer_wall_button) Button offerwallButton;
 
 	public OfferwallFragment() {
 	}

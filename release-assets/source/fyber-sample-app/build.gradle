@@ -5,7 +5,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'android-apt'
+apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     maven {
@@ -15,14 +15,13 @@ repositories {
 }
 
 android {
-
-    compileSdkVersion 24
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         applicationId "com.fyber.sampleapp"
         minSdkVersion 14
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode @versionCode@
         versionName "1.1"
     }
@@ -59,8 +58,8 @@ configurations {
 
 dependencies {
     //Google libs
-    compile 'com.google.android.gms:play-services-ads:9.6.1'
-    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.google.android.gms:play-services-ads:10.0.1'
+    compile 'com.android.support:appcompat-v7:25.1.0'
     
     //Fyber SDK
     compile 'com.fyber:fyber-sdk:@version@'
@@ -71,6 +70,6 @@ dependencies {
     //if you want to use mediation you must uncomment the following dependencies:
     //Also you have to uncomment the @FyberSDK annotation in the MainActivity
 //    provided 'com.fyber:fyber-annotations:1.2.0'
-//    apt 'com.fyber:fyber-annotations-compiler:1.3.0'
+//    apt 'com.fyber:fyber-annotations-compiler:1.3.2'
 
 }

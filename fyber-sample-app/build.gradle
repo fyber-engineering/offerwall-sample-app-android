@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        jcenter()
         maven { url 'https://maven.fabric.io/public' }
     }
 
@@ -14,9 +15,8 @@ apply plugin: 'io.fabric'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "com.fyber.sampleapp"
@@ -28,7 +28,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(keyStoreFile)
+            storeFile new File(keyStoreFile)
             storePassword keyStorePassword
             keyAlias keyStoreAlias
             keyPassword keyStoreAliasPassword
@@ -52,7 +52,6 @@ android {
         // Includes Crashlytics and Mediation.
         // Some mediation proguard specific entries as well
         alpha {
-
             proguardFile 'src/alpha/proguard-rules.pro'
 
             //crashlytics group aliases name
@@ -60,13 +59,13 @@ android {
 
             dependencies {
                 //we include crashlytics only for the alpha crowd testing program flavor
-                alphaCompile('com.crashlytics.sdk.android:crashlytics:2.5.0@aar') {
+                alphaCompile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
                     transitive = true;
                 }
 
                 //mediation dependencies
-                provided 'com.fyber:fyber-annotations:1.2.0'
-                apt 'com.fyber:fyber-annotations-compiler:1.3.0'
+                provided 'com.fyber:fyber-annotations:1.3.0'
+                apt 'com.fyber:fyber-annotations-compiler:1.4.0'
 
 //                alphaCompile 'com.squareup.dagger:dagger:1.2.2'
 
@@ -91,13 +90,11 @@ android {
 
 //                compile files('libs/adcolony.jar')
 //                compile files('libs/classes.jar')
-
-
             }
         }
 
         applicationVariants.all { variant ->
-            if (buildType.name.equals('release')) {
+            if (buildType.name == 'release') {
                 variant.outputs.each { output ->
                     def outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
@@ -126,34 +123,25 @@ configurations {
 }
 
 dependencies {
-    //compile fileTree(dir: 'libs', include: ['*.jar'])
-    //Google libs
-    compile 'com.google.android.gms:play-services-ads:10.0.1'
-    compile 'com.android.support:appcompat-v7:25.1.0'
+    // Google libs
+    compile 'com.google.android.gms:play-services-ads:10.2.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
 
-    //Fyber SDK
-//    compile 'com.fyber:fyber-sdk:8.7.0'
-    //3rd party lib for view dependencies injection
-    compile 'com.jakewharton:butterknife:8.4.0'
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    // 3rd party lib for view dependencies injection
+    compile 'com.jakewharton:butterknife:8.5.1'
+    apt 'com.jakewharton:butterknife-compiler:8.5.1'
 
-    //if you want to use mediation you must uncomment the following dependencies:
-    //Also you have to uncomment the @FyberSDK annotation in the MainActivity
-//    provided 'com.fyber:fyber-annotations:1.2.0'
-//    apt 'com.fyber:fyber-annotations-compiler:1.3.2'
-
+    // If you want to use mediation you must uncomment the following dependencies:
+    // Also you have to uncomment the @FyberSDK annotation in the MainActivity
+//    provided 'com.fyber:fyber-annotations:1.3.0'
+//    apt 'com.fyber:fyber-annotations-compiler:1.4.0'
 }
 
-if (!parent?.parent) {
-    println 'Running from sample app project only'
-    
-    dependencies {
-        compile 'com.fyber:fyber-sdk:8.7.0'
-    }
-} else {
-    def taskPath = pathPrefix ?: ''
-
-    dependencies {
-        compile project("${taskPath}:fyber-sdk")
+dependencies {
+    Project sdkProject = rootProject.allprojects.find { Project p -> p.path.contains(':fyber-sdk') }
+    if (sdkProject == null) {
+        compile 'com.fyber:fyber-sdk:8.11.0'
+    } else {
+        compile project(sdkProject.path)
     }
 }

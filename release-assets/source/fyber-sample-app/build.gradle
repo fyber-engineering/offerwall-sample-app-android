@@ -16,7 +16,7 @@ repositories {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "com.fyber.sampleapp"
@@ -57,19 +57,18 @@ configurations {
 }
 
 dependencies {
-    //Google libs
+    // Google libs
     compile 'com.google.android.gms:play-services-ads:10.0.1'
-    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
     
-    //Fyber SDK
+    // Fyber SDK
     compile 'com.fyber:fyber-sdk:@version@'
-    //3rd party lib for view dependencies injection
-    compile 'com.jakewharton:butterknife:8.4.0'
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    // 3rd party lib for view dependencies injection
+    compile 'com.jakewharton:butterknife:8.5.1'
+    apt 'com.jakewharton:butterknife-compiler:8.5.1'
 
-    //if you want to use mediation you must uncomment the following dependencies:
-    //Also you have to uncomment the @FyberSDK annotation in the MainActivity
-//    provided 'com.fyber:fyber-annotations:1.2.0'
-//    apt 'com.fyber:fyber-annotations-compiler:1.3.2'
-
+    // If you want to use mediation you must uncomment the following dependencies:
+    // Also you have to uncomment the @FyberSDK annotation in the MainActivity
+//    provided 'com.fyber:fyber-annotations:1.3.0'
+//    apt 'com.fyber:fyber-annotations-compiler:1.4.0'
 }

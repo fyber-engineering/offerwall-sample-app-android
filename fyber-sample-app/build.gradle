@@ -94,7 +94,7 @@ android {
                 //mediation dependencies
                 compileOnly 'com.fyber:fyber-annotations:1.3.0'
                 annotationProcessor 'com.fyber:fyber-annotations:1.3.0'
-                annotationProcessor 'com.fyber:fyber-annotations-compiler:1.4.0'
+                annotationProcessor 'com.fyber:fyber-annotations-compiler:1.5.0'
 
 //                alphaImplementation 'com.squareup.dagger:dagger:1.2.2'
 
@@ -170,7 +170,7 @@ dependencies {
     // Also you have to uncomment the @FyberSDK annotation in the MainActivity
 //    compileOnly 'com.fyber:fyber-annotations:1.3.0'
 //    annotationProcessor 'com.fyber:fyber-annotations:1.3.0'
-//    annotationProcessor 'com.fyber:fyber-annotations-compiler:1.4.0'
+//    annotationProcessor 'com.fyber:fyber-annotations-compiler:1.5.0'
 //
 //    if (sdkProject == null) {
 //        annotationProcessor 'com.fyber:fyber-sdk:8.19.0'

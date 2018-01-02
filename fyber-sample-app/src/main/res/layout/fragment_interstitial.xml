@@ -15,7 +15,7 @@
         android:fontFamily="sans-serif-light"
         android:gravity="center"
         android:stateListAnimator="@null"
-        android:text="Request\r\nInterstitial"
+        android:text="Request\nInterstitial"
         android:textColor="#FFF"
         android:textSize="20sp"
         tools:ignore="HardcodedText,UnusedAttribute"/>

@@ -5,8 +5,6 @@
     <string name="action_bar_item_interstitials">Interstitials</string>
     <string name="action_bar_item_offerwall">Offerwall</string>
 
-    <string name="hello_world">Hello world!</string>
-
     <string name="action_settings">Settings</string>
 
     <!-- action bar item tabs  -->
@@ -18,13 +16,13 @@
 
     <string name="fyber_header">Fyber</string>
 
-    <string name="show_offer_wall">Show\r\nOffer Wall</string>
+    <string name="show_offer_wall">Show\nOffer Wall</string>
 
-    <string name="request_interstitial">Request\r\nInterstitial</string>
-    <string name="show_interstitial">Show\r\nInterstitial</string>
+    <string name="request_interstitial">Request\nInterstitial</string>
+    <string name="show_interstitial">Show\nInterstitial</string>
 
-    <string name="request_video">Request\r\nVideo</string>
-    <string name="show_video">Show\r\nVideo</string>
+    <string name="request_video">Request\nVideo</string>
+    <string name="show_video">Show\nVideo</string>
 
-    <string name="getting_offers">Getting\r\nOffers</string>
+    <string name="getting_offers">Getting\nOffers</string>
 </resources>

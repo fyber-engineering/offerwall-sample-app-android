@@ -160,6 +160,7 @@ dependencies {
 
     // If you want to use mediation you must uncomment the following dependencies:
     // Also you have to uncomment the @FyberSDK annotation in the MainActivity
+    // Don't forget either to add your mediation bundles here with `annotationProcessor` configuration
 //    compileOnly 'com.fyber:fyber-annotations:1.3.0'
 //    annotationProcessor 'com.fyber:fyber-annotations:1.3.0'
 //    annotationProcessor 'com.fyber:fyber-annotations-compiler:1.5.0'

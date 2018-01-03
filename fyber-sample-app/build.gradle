@@ -91,11 +91,6 @@ android {
                     transitive = true
                 }
 
-                //mediation dependencies
-                compileOnly 'com.fyber:fyber-annotations:1.3.0'
-                annotationProcessor 'com.fyber:fyber-annotations:1.3.0'
-                annotationProcessor 'com.fyber:fyber-annotations-compiler:1.5.0'
-
 //                alphaImplementation 'com.squareup.dagger:dagger:1.2.2'
 
                 //adapters

@@ -16,7 +16,7 @@
         android:fontFamily="sans-serif-light"
         android:gravity="center"
         android:stateListAnimator="@null"
-        android:text="Request\r\nVideo"
+        android:text="Request\nVideo"
         android:textColor="#FFF"
         android:textSize="20sp"
         tools:ignore="HardcodedText,UnusedAttribute"/>

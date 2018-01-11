@@ -2,7 +2,6 @@ package com.fyber.sampleapp;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.fyber.annotations.FyberSDK;

@@ -115,7 +115,7 @@ android {
                     File outputFile = output.outputFile
                     if (outputFile != null && outputFile.name.endsWith('.apk')) {
                         String fileName = outputFile.name.replace('release.apk', "${versionName}.apk")
-                        outputFileName = new File(outputFile.parent, fileName)
+                        outputFileName = new File(fileName)
                     }
                 }
             }

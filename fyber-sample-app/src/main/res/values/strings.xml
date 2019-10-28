@@ -1,14 +1,7 @@
 <resources>
     <string name="app_name">Fyber Sample</string>
 
-    <string name="action_bar_item_offerwall">Offerwall</string>
-
     <string name="action_settings">Settings</string>
-
-    <!-- action bar item tabs  -->
-    <string-array name="action_bar_tabs">
-        <item>@string/action_bar_item_offerwall</item>
-    </string-array>
 
     <string name="fyber_header">Fyber</string>
 

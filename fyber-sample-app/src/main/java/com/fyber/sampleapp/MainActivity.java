@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
@@ -46,6 +47,8 @@ public class MainActivity extends FragmentActivity {
 	private static final float PIVOT_Y_VALUE = 0.5f;
 	private static final String TAG = "FyberMainActivity";
 
+	Fragment fragment;
+
 	@BindView(R.id.tool_bar)
 	Toolbar toolbar;
 
@@ -62,6 +65,14 @@ public class MainActivity extends FragmentActivity {
 		FyberLogger.enableLogging(BuildConfig.DEBUG);
 
 		setupToolbar();
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		fragment = fragmentManager.findFragmentById(R.id.offer_wall_fragment_layout);
+		if (fragment == null) {
+			FragmentTransaction fragmentTransaction =fragmentManager.beginTransaction();
+			fragment = new OfferwallFragment();
+			fragmentTransaction.add(android.R.id.content, fragment);
+			fragmentTransaction.commit();
+		}
 	}
 
 	@Override
@@ -121,4 +132,23 @@ public class MainActivity extends FragmentActivity {
 		toolbar.setLogo(R.drawable.ic_launcher);
 	}
 
+	// ** Animations **
+
+	public static Animation getClockwiseAnimation() {
+		AnimationSet animationSet = new AnimationSet(true);
+		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_0, DEGREES_360, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
+		rotateAnimation.setDuration(DURATION_MILLIS);
+		animationSet.addAnimation(rotateAnimation);
+
+		return animationSet;
+	}
+
+	public static Animation getCounterclockwiseAnimation() {
+		AnimationSet animationSet = new AnimationSet(true);
+		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_360, DEGREES_0, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
+		rotateAnimation.setDuration(DURATION_MILLIS);
+		animationSet.addAnimation(rotateAnimation);
+
+		return animationSet;
+	}
 }

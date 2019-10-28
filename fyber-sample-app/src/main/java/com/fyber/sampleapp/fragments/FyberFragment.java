@@ -23,9 +23,7 @@ import com.fyber.utils.FyberLogger;
 
 public abstract class FyberFragment extends Fragment implements RequestCallback {
 
-	protected static final int INTERSTITIAL_REQUEST_CODE = 8792;
 	protected static final int OFFERWALL_REQUEST_CODE = 8795;
-	protected static final int REWARDED_VIDEO_REQUEST_CODE = 8796;
 
 	private boolean isRequestingState;
 	protected Intent intent;

@@ -21,9 +21,7 @@ import android.view.animation.AnimationSet;
 import android.view.animation.RotateAnimation;
 
 import com.fyber.Fyber;
-import com.fyber.sampleapp.fragments.InterstitialFragment;
 import com.fyber.sampleapp.fragments.OfferwallFragment;
-import com.fyber.sampleapp.fragments.RewardedVideoFragment;
 import com.fyber.utils.FyberLogger;
 
 import butterknife.BindView;
@@ -46,25 +44,7 @@ public class MainActivity extends FragmentActivity {
 	private static final int DEGREES_0 = 0;
 	private static final float PIVOT_X_VALUE = 0.5f;
 	private static final float PIVOT_Y_VALUE = 0.5f;
-	private static final int INTERSTITIAL_FRAGMENT = 0;
-	private static final int REWARDED_VIDEO_FRAGMENT = 1;
-	private static final int OFFER_WALL_FRAGMENT = 2;
 	private static final String TAG = "FyberMainActivity";
-
-	/**
-	 * The {@link android.support.v4.view.PagerAdapter} that will provide
-	 * fragments for each of the sections. We use a
-	 * {@link FragmentPagerAdapter} derivative, which will keep every
-	 * loaded fragment in memory. If this becomes too memory intensive, it
-	 * may be best to switch to a
-	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-	 */
-	SectionsPagerAdapter mSectionsPagerAdapter;
-
-	/**
-	 * The {@link ViewPager} that will host the section contents.
-	 */
-	ViewPager mViewPager;
 
 	@BindView(R.id.tool_bar)
 	Toolbar toolbar;
@@ -81,7 +61,6 @@ public class MainActivity extends FragmentActivity {
 //		enabling Fyber logs so that we can see what is going on the SDK level
 		FyberLogger.enableLogging(BuildConfig.DEBUG);
 
-		setupViewPager();
 		setupToolbar();
 	}
 
@@ -135,100 +114,11 @@ public class MainActivity extends FragmentActivity {
 //		FyberSdkExtraFeatures.createRequesterFromAnotherRequester(this);
 //	}
 
-	// ** Fragment navigation with page adapter helper methods**
-
-	public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-		public SectionsPagerAdapter(FragmentManager fm) {
-			super(fm);
-		}
-
-		@Override
-		public Fragment getItem(int position) {
-			switch (position) {
-
-				case INTERSTITIAL_FRAGMENT:
-					return new InterstitialFragment();
-
-				case REWARDED_VIDEO_FRAGMENT:
-					return new RewardedVideoFragment();
-
-				case OFFER_WALL_FRAGMENT:
-					return new OfferwallFragment();
-
-				default:
-					return new RewardedVideoFragment();
-			}
-			// getItem is called to instantiate the fragment for the given page.
-		}
-
-		@Override
-		public int getCount() {
-			// Show 3 total pages ( one for each ad format).
-			return 3;
-		}
-
-		@Override
-		public CharSequence getPageTitle(int position) {
-			return getSpannableString(position);
-		}
-
-		private SpannableString getSpannableString(int position) {
-			Drawable image;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				image = getDrawable(imageResId[position]);
-			} else {
-				image = getResources().getDrawable(imageResId[position]);
-			}
-			image.setBounds(0, 0, image.getIntrinsicWidth(), image.getIntrinsicHeight());
-			SpannableString spannableString = new SpannableString(" ");
-			ImageSpan imageSpan = new ImageSpan(image, ImageSpan.ALIGN_BOTTOM);
-			spannableString.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-			return spannableString;
-		}
-
-		private int[] imageResId = {
-				R.drawable.ic_action_icon_interstitial,
-				R.drawable.ic_action_icon_rewarded_video,
-				R.drawable.ic_action_icon_offerwall
-		};
-	}
-
 	// ** Init helper functions **
-
-	private void setupViewPager() {
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the Activity.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-		// Set up the ViewPager with the sections adapter.
-		mViewPager = findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
-		mViewPager.setCurrentItem(1);
-	}
 
 	private void setupToolbar() {
 		toolbar.setTitle(getString(R.string.fyber_header));
 		toolbar.setLogo(R.drawable.ic_launcher);
-	}
-
-	// ** Animations **
-
-	public static Animation getClockwiseAnimation() {
-		AnimationSet animationSet = new AnimationSet(true);
-		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_0, DEGREES_360, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
-		rotateAnimation.setDuration(DURATION_MILLIS);
-		animationSet.addAnimation(rotateAnimation);
-
-		return animationSet;
-	}
-
-	public static Animation getCounterclockwiseAnimation() {
-		AnimationSet animationSet = new AnimationSet(true);
-		RotateAnimation rotateAnimation = new RotateAnimation(DEGREES_360, DEGREES_0, Animation.RELATIVE_TO_SELF, PIVOT_X_VALUE, Animation.RELATIVE_TO_SELF, PIVOT_Y_VALUE);
-		rotateAnimation.setDuration(DURATION_MILLIS);
-		animationSet.addAnimation(rotateAnimation);
-
-		return animationSet;
 	}
 
 }

@@ -1,19 +1,11 @@
 package com.fyber.sampleapp;
 
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -25,7 +17,6 @@ import com.fyber.Fyber;
 import com.fyber.sampleapp.fragments.OfferwallFragment;
 import com.fyber.utils.FyberLogger;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
@@ -49,22 +40,18 @@ public class MainActivity extends FragmentActivity {
 
 	Fragment fragment;
 
-	@BindView(R.id.tool_bar)
-	Toolbar toolbar;
-
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		setContentView(R.layout.activity_fyber_main);
+		setContentView(R.layout.activity_main);
 		ButterKnife.bind(this);
 
 //		enabling Fyber logs so that we can see what is going on the SDK level
 		FyberLogger.enableLogging(BuildConfig.DEBUG);
 
-		setupToolbar();
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		fragment = fragmentManager.findFragmentById(R.id.offer_wall_fragment_layout);
 		if (fragment == null) {
@@ -124,13 +111,6 @@ public class MainActivity extends FragmentActivity {
 //		FyberSdkExtraFeatures.requestAdWithSpecificHandler(this);
 //		FyberSdkExtraFeatures.createRequesterFromAnotherRequester(this);
 //	}
-
-	// ** Init helper functions **
-
-	private void setupToolbar() {
-		toolbar.setTitle(getString(R.string.fyber_header));
-		toolbar.setLogo(R.drawable.ic_launcher);
-	}
 
 	// ** Animations **
 

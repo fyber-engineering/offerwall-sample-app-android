@@ -9,7 +9,7 @@ import com.fyber.annotations.FyberSDK;
 import io.fabric.sdk.android.Fabric;
 
 @FyberSDK
-public class AlphaMainActivity extends MainActivity {
+public class AlphaMainActivity extends SplashScreenActivity {
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {

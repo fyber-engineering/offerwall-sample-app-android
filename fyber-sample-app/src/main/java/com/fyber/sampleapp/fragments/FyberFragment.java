@@ -23,9 +23,7 @@ import com.fyber.utils.FyberLogger;
 
 public abstract class FyberFragment extends Fragment implements RequestCallback {
 
-	protected static final int INTERSTITIAL_REQUEST_CODE = 8792;
 	protected static final int OFFERWALL_REQUEST_CODE = 8795;
-	protected static final int REWARDED_VIDEO_REQUEST_CODE = 8796;
 
 	private boolean isRequestingState;
 	protected Intent intent;
@@ -89,16 +87,12 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 		//if you are using a general purpose requestCallback like this you might want to verify which adFormat will this Intent show.
 		//You can use the AdFormat class to obtain an AdFormat from a given Intent. Then you can perform ad format specific actions e.g.:
 		AdFormat adFormat = AdFormat.fromIntent(intent);
-		switch (adFormat) {
-			case OFFER_WALL:
-				//in our sample app, we want to show the offer wall in a single step.
-				startActivityForResult(intent, OFFERWALL_REQUEST_CODE);
-				break;
-			default:
-				//we only animate the button if it is not an Offer Wall Intent.
-				getButton().startAnimation(MainActivity.getCounterclockwiseAnimation());
-				setButtonToSuccessState();
-				break;
+		if (adFormat == AdFormat.OFFER_WALL) {
+			startActivityForResult(intent, OFFERWALL_REQUEST_CODE);
+		} else {
+			//we only animate the button if it is not an Offer Wall Intent.
+			getButton().startAnimation(MainActivity.getCounterclockwiseAnimation());
+			setButtonToSuccessState();
 		}
 	}
 
@@ -117,7 +111,6 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 		resetIntent();
 		resetButtonStateWithAnimation();
 	}
-
 	/*
 	* ** State helper methods **
 	*/

@@ -1,28 +1,13 @@
 <resources>
     <string name="app_name">Fyber Sample</string>
 
-    <string name="action_bar_item_video">Video</string>
-    <string name="action_bar_item_interstitials">Interstitials</string>
-    <string name="action_bar_item_offerwall">Offerwall</string>
-
     <string name="action_settings">Settings</string>
-
-    <!-- action bar item tabs  -->
-    <string-array name="action_bar_tabs">
-        <item>@string/action_bar_item_video</item>
-        <item>@string/action_bar_item_interstitials</item>
-        <item>@string/action_bar_item_offerwall</item>
-    </string-array>
 
     <string name="fyber_header">Fyber</string>
 
     <string name="show_offer_wall">Show\nOffer Wall</string>
 
-    <string name="request_interstitial">Request\nInterstitial</string>
-    <string name="show_interstitial">Show\nInterstitial</string>
-
-    <string name="request_video">Request\nVideo</string>
-    <string name="show_video">Show\nVideo</string>
-
     <string name="getting_offers">Getting\nOffers</string>
+    <string name="offer_wall_edge_logo">Offer wall edge logo</string>
+    <string name="copyright_launch_screen">Copyright © 2019 Fyber. All rights reserved.</string>
 </resources>

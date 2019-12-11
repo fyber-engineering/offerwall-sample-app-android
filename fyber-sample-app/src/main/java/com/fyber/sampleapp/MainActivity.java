@@ -91,7 +91,6 @@ public class MainActivity extends FragmentActivity {
 	private void customiseFyberSettings(Fyber.Settings fyberSettings) {
 		fyberSettings.notifyUserOnReward(false)
 				.closeOfferWallOnRedirect(true)
-				.notifyUserOnCompletion(true)
 				.addParameter("myCustomParamKey", "myCustomParamValue")
 				.setCustomUIString(Fyber.Settings.UIStringIdentifier.GENERIC_ERROR, "my custom generic error msg");
 	}
@@ -104,13 +103,6 @@ public class MainActivity extends FragmentActivity {
 	* > control over which thread should the requester callback run on
 	* > creating a new Requester from an existing Requester
 	*/
-
-//	public void runExtraFeatures() {
-//		FyberSdkExtraFeatures.reportInstall(this);
-//		FyberSdkExtraFeatures.reportRewardedAction(this);
-//		FyberSdkExtraFeatures.requestAdWithSpecificHandler(this);
-//		FyberSdkExtraFeatures.createRequesterFromAnotherRequester(this);
-//	}
 
 	// ** Animations **
 

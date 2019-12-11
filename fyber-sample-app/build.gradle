@@ -142,6 +142,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-v4'
     }
     implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     compileOnly 'com.fyber:fyber-annotations:1.3.0'
 
     // 3rd party lib for view dependencies injection

@@ -151,7 +151,7 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
     if (sdkProject == null) {
-        implementation 'com.fyber:fyber-sdk:9.0.0-dev'
+        implementation 'com.fyber:fyber-sdk:9.2.0'
     } else {
         implementation project(sdkProject.path)
     }

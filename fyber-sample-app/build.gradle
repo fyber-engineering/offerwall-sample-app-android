@@ -1,170 +1,31 @@
-buildscript {
-    repositories {
-        jcenter()
-        google()
-        maven { url 'https://maven.fabric.io/public' }
-    }
-
-    dependencies {
-        classpath 'io.fabric.tools:gradle:1.25.1'
-    }
-}
-
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
-
-repositories {
-    jcenter()
-    google()
-    mavenLocal()
-    maven {
-        name "Fyber's internal repo"
-        url "https://fyber.bintray.com/internal"
-        credentials {
-            username bintrayUser
-            password bintrayKey
-        }
-    }
-    maven {
-        name "Fyber's main repo"
-        url "https://fyber.bintray.com/maven"
-        credentials {
-            username bintrayUser
-            password bintrayKey
-        }
-    }
-    maven {
-        url 'https://maven.fabric.io/public'
-    }
-}
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "com.fyber.sampleapp"
-        minSdkVersion 14
-        targetSdkVersion 27
+        minSdkVersion 16
+        targetSdkVersion 30
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 1
         versionName "1.1"
     }
 
-    signingConfigs {
-        release {
-            storeFile file(keyStoreFile)
-            storePassword keyStorePassword
-            keyAlias keyStoreAlias
-            keyPassword keyStoreAliasPassword
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
-
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    flavorDimensions "sdk"
-
-    productFlavors {
-        internal {
-            ext.enableCrashlytics = false
-            dimension "sdk"
-        }
-
-        //flavour for crowd testing.
-        // Includes Crashlytics and Mediation.
-        // Some mediation proguard specific entries as well
-        alpha {
-            proguardFile 'src/alpha/proguard-rules.pro'
-            dimension "sdk"
-            matchingFallbacks = ['internal']
-
-            //crashlytics group aliases name
-            ext.betaDistributionGroupAliases = "alpha"
-
-            dependencies {
-                //we include crashlytics only for the alpha crowd testing program flavor
-                alphaImplementation('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
-                    transitive = true
-                }
-
-//                alphaImplementation 'com.squareup.dagger:dagger:1.2.2'
-
-                //adapters
-//                alphaImplementation 'com.fyber:fyber-mediation-unityads:2.1.1-r1'
-//                alphaImplementation 'com.fyber:fyber-mediation-adcolony:3.2.1-r2'
-//                alphaImplementation 'com.fyber:fyber-mediation-admob:11.6.0-r1'
-//                alphaImplementation 'com.fyber:fyber-mediation-applovin:7.6.0-r1'
-//                alphaImplementation 'com.fyber:fyber-mediation-chartboost:7.0.1-r1'
-//                alphaImplementation 'com.fyber:fyber-mediation-facebook:4.27.0-r1'
-//                alphaImplementation 'com.fyber:fyber-mediation-flurry:6.8.0-r1'
-//                alphaImplementation 'com.fyber:fyber-mediation-inmobi:7.0.0-r1'
-//                alphaImplementation 'com.fyber:fyber-mediation-mediabrix:1.8.2-r1'
-//                alphaImplementation 'com.fyber:fyber-mediation-millennial:6.3.1-r2'
-//                alphaImplementation 'com.fyber:fyber-mediation-tremor:3.13.0.82-r1'
-//                alphaImplementation 'com.fyber:fyber-mediation-vungle:5.3.2-r1'
-            }
-        }
-
-        applicationVariants.all { variant ->
-            if (buildType.name == 'release') {
-                variant.outputs.all { output ->
-                    File outputFile = output.outputFile
-                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                        String fileName = outputFile.name.replace('release.apk', "${versionName}.apk")
-                        outputFileName = new File(fileName)
-                    }
-                }
-            }
-        }
-    }
-
-    packagingOptions {
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'LICENSE.txt'
-    }
-
-//    dexOptions {
-//        preDexLibraries = false
-//    }
 }
 
-Project sdkProject = rootProject.allprojects.find { Project p -> p.path.contains(':fyber-sdk') }
-
 dependencies {
-    // Google libs
-    implementation('com.google.android.gms:play-services-ads:11.8.0') {
-        exclude group: 'com.android.support', module: 'support-v4'
-    }
-    implementation 'com.android.support:appcompat-v7:27.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     compileOnly 'com.fyber:fyber-annotations:1.3.0'
 
     // 3rd party lib for view dependencies injection
-    implementation 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    implementation 'com.jakewharton:butterknife:10.2.3'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
 
-    if (sdkProject == null) {
-        implementation 'com.fyber:fyber-sdk:9.0.0-dev'
-    } else {
-        implementation project(sdkProject.path)
-    }
-
-    // If you want to use mediation you must uncomment the following dependencies:
-    // Also you have to uncomment the @FyberSDK annotation in the MainActivity
-    // Don't forget either to add your mediation bundles here with `annotationProcessor` configuration
-//    annotationProcessor 'com.fyber:fyber-annotations:1.3.0'
-//    annotationProcessor 'com.fyber:fyber-annotations-compiler:1.5.0'
-//
-//    if (sdkProject == null) {
-//        annotationProcessor 'com.fyber:fyber-sdk:8.19.0'
-//    } else {
-//        annotationProcessor project(sdkProject.path)
-//    }
+    implementation 'com.fyber:fyber-sdk:9.2.0'
 }

@@ -18,8 +18,8 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.1'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     compileOnly 'com.fyber:fyber-annotations:1.3.0'
 
@@ -27,5 +27,5 @@ dependencies {
     implementation 'com.jakewharton:butterknife:10.2.3'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
 
-    implementation 'com.fyber:fyber-sdk:9.2.0'
+    implementation 'com.fyber:offerwall-sdk:9.2.2'
 }

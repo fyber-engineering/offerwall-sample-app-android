@@ -1,4 +1,4 @@
-package com.fyber.sampleapp.fragments;
+package com.fyber.offerwall.sampleapp.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,8 +9,8 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.fyber.offerwall.sampleapp.R;
 import com.fyber.requesters.OfferWallRequester;
-import com.fyber.sampleapp.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

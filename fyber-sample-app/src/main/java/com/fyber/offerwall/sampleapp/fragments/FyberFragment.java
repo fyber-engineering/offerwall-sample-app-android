@@ -3,7 +3,7 @@
  * <p/>
  * Copyright (c) 2015 Fyber. All rights reserved.
  */
-package com.fyber.sampleapp.fragments;
+package com.fyber.offerwall.sampleapp.fragments;
 
 import android.content.Intent;
 import android.graphics.ColorFilter;
@@ -16,10 +16,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.fyber.ads.AdFormat;
+import com.fyber.offerwall.sampleapp.MainActivity;
+import com.fyber.offerwall.sampleapp.R;
 import com.fyber.requesters.RequestCallback;
 import com.fyber.requesters.RequestError;
-import com.fyber.sampleapp.MainActivity;
-import com.fyber.sampleapp.R;
 import com.fyber.utils.FyberLogger;
 
 public abstract class FyberFragment extends Fragment implements RequestCallback {

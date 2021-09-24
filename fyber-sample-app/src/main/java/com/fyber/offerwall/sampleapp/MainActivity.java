@@ -1,4 +1,4 @@
-package com.fyber.sampleapp;
+package com.fyber.offerwall.sampleapp;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.fyber.Fyber;
-import com.fyber.sampleapp.fragments.OfferwallFragment;
+import com.fyber.offerwall.sampleapp.fragments.OfferwallFragment;
 import com.fyber.utils.FyberLogger;
 
 import butterknife.ButterKnife;

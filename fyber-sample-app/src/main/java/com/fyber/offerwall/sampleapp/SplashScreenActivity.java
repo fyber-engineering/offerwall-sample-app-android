@@ -1,4 +1,4 @@
-package com.fyber.sampleapp;
+package com.fyber.offerwall.sampleapp;
 
 import android.content.Intent;
 import android.os.Bundle;

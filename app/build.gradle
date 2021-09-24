@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def ofwVersion = '9.2.2'
+
 android {
     compileSdkVersion 31
 
@@ -8,7 +10,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 31
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: 1
-        versionName "9.2.2"
+        versionName ofwVersion
     }
 
     compileOptions {
@@ -34,5 +36,5 @@ dependencies {
     implementation 'com.jakewharton:butterknife:10.2.3'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
 
-    implementation 'com.fyber:offerwall-sdk:9.2.2'
+    implementation 'com.fyber:offerwall-sdk:' + ofwVersion
 }

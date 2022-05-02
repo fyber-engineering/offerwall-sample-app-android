@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.2'
+        classpath 'com.android.tools.build:gradle:7.0.4'
         classpath 'com.jakewharton:butterknife-gradle-plugin:10.2.3'
     }
 }
@@ -14,11 +14,5 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-        maven {
-            url "https://inneractive-assets.s3-eu-west-1.amazonaws.com/offerwall-sdk/android/maven"
-            content {
-                includeGroup("com.fyber")
-            }
-        }
     }
 }

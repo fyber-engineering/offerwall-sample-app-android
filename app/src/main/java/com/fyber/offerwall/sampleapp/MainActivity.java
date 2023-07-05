@@ -18,8 +18,6 @@ import com.fyber.Fyber;
 import com.fyber.offerwall.sampleapp.fragments.OfferwallFragment;
 import com.fyber.utils.FyberLogger;
 
-import butterknife.ButterKnife;
-
 
 // Fyber SDK takes advantage of the power of annotations to make mediation simpler to integrate.
 // To enable mediation in this app simply uncomment @FyberSDK annotation line below.
@@ -48,7 +46,6 @@ public class MainActivity extends FragmentActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                              WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
 
 //		enabling Fyber logs so that we can see what is going on the SDK level
         FyberLogger.enableLogging(BuildConfig.DEBUG);

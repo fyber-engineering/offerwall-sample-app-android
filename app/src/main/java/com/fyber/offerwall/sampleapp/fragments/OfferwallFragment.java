@@ -12,32 +12,25 @@ import androidx.annotation.Nullable;
 import com.fyber.offerwall.sampleapp.R;
 import com.fyber.requesters.OfferWallRequester;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-
 public class OfferwallFragment extends FyberFragment {
     private static final String TAG = OfferwallFragment.class.getSimpleName();
 
-    @BindView(R.id.offer_wall_button)
     Button offerwallButton;
-
-    public OfferwallFragment() {
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_offerwall, container, false);
-        ButterKnife.bind(this, view);
+        return inflater.inflate(R.layout.fragment_offerwall, container, false);
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        offerwallButton = view.findViewById(R.id.offer_wall_button);
+        offerwallButton.setOnClickListener(this::onOfferWallButtonCLicked);
         setButtonToSuccessState();
-
-        return view;
     }
 
     // using butter knife to link Button click
-    @OnClick(R.id.offer_wall_button)
     public void onOfferWallButtonCLicked(View view) {
         requestOrShowAd();
     }

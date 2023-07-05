@@ -18,16 +18,12 @@ import androidx.fragment.app.Fragment;
 import com.fyber.ads.AdFormat;
 import com.fyber.offerwall.sampleapp.MainActivity;
 import com.fyber.offerwall.sampleapp.R;
-import com.fyber.requesters.RequestCallback;
 import com.fyber.requesters.RequestError;
 import com.fyber.utils.FyberLogger;
 
-public abstract class FyberFragment extends Fragment implements RequestCallback {
-
-    protected static final int OFFERWALL_REQUEST_CODE = 8795;
+public abstract class FyberFragment extends Fragment {
 
     private boolean isRequestingState;
-    protected Intent intent;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,9 +34,8 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //resetting button and Intent
+        //resetting button
         setButtonToOriginalState();
-        resetIntent();
     }
 
     /*
@@ -55,8 +50,6 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
     protected abstract Button getButton();
 
-    protected abstract int getRequestCode();
-
     protected abstract void performRequest();
 
 
@@ -64,16 +57,9 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
     protected void requestOrShowAd() {
         //avoid requesting an ad when already requesting
         if (!isRequestingState()) {
-            //if we already have an Intent, we start the ad Activity
-            if (isIntentAvailable()) {
-                //start the ad format specific Activity
-                startActivityForResult(intent, getRequestCode());
-
-            } else {
-                setButtonToRequestingMode();
-                //perform the ad request. Each Fragment has its own implementation.
-                performRequest();
-            }
+            setButtonToRequestingMode();
+            // perform the ad request. Each Fragment has its own implementation.
+            performRequest();
         }
     }
 
@@ -81,35 +67,15 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
      * ** RequestCallback methods **
      */
 
-    @Override
-    public void onAdAvailable(Intent intent) {
-        resetRequestingState();
-        this.intent = intent;
-        //if you are using a general purpose requestCallback like this you might want to verify which adFormat will this Intent show.
-        //You can use the AdFormat class to obtain an AdFormat from a given Intent. Then you can perform ad format specific actions e.g.:
-        AdFormat adFormat = AdFormat.fromIntent(intent);
-        if (adFormat == AdFormat.OFFER_WALL) {
-            startActivityForResult(intent, OFFERWALL_REQUEST_CODE);
-        } else {
-            //we only animate the button if it is not an Offer Wall Intent.
-            getButton().startAnimation(MainActivity.getCounterclockwiseAnimation());
-            setButtonToSuccessState();
-        }
-    }
-
-    @Override
     public void onAdNotAvailable(AdFormat adFormat) {
         FyberLogger.d(getLogTag(), "No ad available");
         resetRequestingState();
-        resetIntent();
         resetButtonStateWithAnimation();
     }
 
-    @Override
     public void onRequestError(RequestError requestError) {
-        FyberLogger.d(getLogTag(), "Semething went wrong with the request: " + requestError.getDescription());
+        FyberLogger.d(getLogTag(), "Something went wrong with the request: " + requestError.getDescription());
         resetRequestingState();
-        resetIntent();
         resetButtonStateWithAnimation();
     }
     /*
@@ -118,14 +84,6 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
 
     private void resetRequestingState() {
         isRequestingState = false;
-    }
-
-    private void resetIntent() {
-        intent = null;
-    }
-
-    protected boolean isIntentAvailable() {
-        return intent != null;
     }
 
     protected boolean isRequestingState() {
@@ -147,8 +105,8 @@ public abstract class FyberFragment extends Fragment implements RequestCallback 
         isRequestingState = true;
     }
 
-    protected void setButtonToSuccessState() {
-        setButtonColorAndText(getButton(), getShowText(), getResources().getColor(R.color.buttonColorSuccess));
+    protected void setButtonToSuccessState(Button button, String text) {
+        setButtonColorAndText(button, text, getResources().getColor(R.color.buttonColorSuccess));
     }
 
     protected void setButtonToOriginalState() {

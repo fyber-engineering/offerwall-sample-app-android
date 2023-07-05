@@ -6,6 +6,7 @@
     <string name="fyber_header">Fyber</string>
 
     <string name="show_offer_wall">Show\nOffer Wall</string>
+    <string name="request_currency">Request\nVirtual Currency</string>
 
     <string name="getting_offers">Getting\nOffers</string>
     <string name="offer_wall_edge_logo">Offer wall edge logo</string>

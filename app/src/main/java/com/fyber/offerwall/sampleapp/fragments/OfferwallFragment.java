@@ -9,13 +9,19 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.fyber.fairbid.ads.OfferWall;
+import com.fyber.fairbid.ads.offerwall.ShowOptions;
+import com.fyber.fairbid.ads.offerwall.VirtualCurrencyRequestOptions;
 import com.fyber.offerwall.sampleapp.R;
-import com.fyber.requesters.OfferWallRequester;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class OfferwallFragment extends FyberFragment {
     private static final String TAG = OfferwallFragment.class.getSimpleName();
 
     Button offerwallButton;
+    Button requestCurrencyButton;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -26,28 +32,62 @@ public class OfferwallFragment extends FyberFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         offerwallButton = view.findViewById(R.id.offer_wall_button);
-        offerwallButton.setOnClickListener(this::onOfferWallButtonCLicked);
-        setButtonToSuccessState();
+        offerwallButton.setOnClickListener(this::onOfferWallButtonClicked);
+        requestCurrencyButton = view.findViewById(R.id.vcs_request_button);
+        requestCurrencyButton.setOnClickListener(this::onRequestVcsButtonClicked);
+        setButtonToSuccessState(offerwallButton, getShowText());
+        setButtonToSuccessState(requestCurrencyButton, getRequestVcsText());
     }
 
     // using butter knife to link Button click
-    public void onOfferWallButtonCLicked(View view) {
+    public void onOfferWallButtonClicked(View view) {
         requestOrShowAd();
     }
 
+    public void onRequestVcsButtonClicked(View view) {
+        requestCurrency();
+    }
+
     /*
-     * ** Code to perform a an Offer Wall request **
+     * ** Code to perform an Offer Wall request **
      */
 
     @Override
     protected void performRequest() {
-        //Unless the device is not supported, OfferWallRequester will always return an Intent.
-        //However, for consistency reasons Offer Wall has the same callback as other ad formats
+        // You can request the offer wall with the default placement just by calling the following method:
+        // OfferWall.show();
 
-        //Requesting the offer wall
-        OfferWallRequester
-                .create(this)
-                .request(getActivity());
+        // You can customize the OfferWall behaviour using the ShowOptions class
+        boolean closeOnRedirect = true;
+        Map<String, String> customParameters = new HashMap<>();
+        customParameters.put("key", "value");
+        ShowOptions showOptions = new ShowOptions(closeOnRedirect, customParameters);
+        // If you don't need to pass the custom params with your show request,
+        // you can omit this value within the ShowOptions constructor.
+        // ShowOptions showOptions = new ShowOptions(closeOnRedirect);
+
+        // Then, you can request to show the OfferWall with given options:
+        OfferWall.show(showOptions);
+
+        // If you need to display the offer wall for a given placement, you can achieve this by calling the following method:
+        // OfferWall.show(showOptions, "placement Id");
+    }
+
+    /*
+     * ** Code to perform a Virtual Currency request **
+     */
+    private void requestCurrency() {
+        // If you want to request for default currency, you just can call this method:
+        // OfferWall.requestCurrency();
+
+        // If you need some behaviour customization or request for a specific custom currency,
+        // you should use the VirtualCurrencyRequestOptions class, that accepts the following parameters:
+        // - whether the toast message should appear upon the successful gratification,
+        // - the ID of the currency that you want to request for. This parameter is optional.
+        boolean showToastOnReward = true;
+        String currencyId = "coin";
+        VirtualCurrencyRequestOptions options = new VirtualCurrencyRequestOptions(showToastOnReward, currencyId);
+        OfferWall.requestCurrency(options);
     }
 
     /*
@@ -69,14 +109,13 @@ public class OfferwallFragment extends FyberFragment {
         return getString(R.string.show_offer_wall);
     }
 
-    @Override
-    public Button getButton() {
-        return offerwallButton;
+    public String getRequestVcsText() {
+        return getString(R.string.request_currency);
     }
 
     @Override
-    protected int getRequestCode() {
-        return OFFERWALL_REQUEST_CODE;
+    public Button getButton() {
+        return offerwallButton;
     }
 
     /*

@@ -10,7 +10,12 @@
         android:id="@+id/offer_wall_button"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_margin="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
         android:background="@drawable/add_button_selector"
         android:elevation="9dp"
         android:fontFamily="sans-serif-light"
@@ -18,5 +23,25 @@
         android:stateListAnimator="@null"
         android:textColor="#FFF"
         android:textSize="20sp"
-        tools:ignore="HardcodedText,UnusedAttribute"/>
+        tools:ignore="HardcodedText,UnusedAttribute" />
+
+    <Button
+        android:id="@+id/vcs_request_button"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_below="@id/offer_wall_button"
+        android:layout_marginStart="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/add_button_selector"
+        android:elevation="9dp"
+        android:fontFamily="sans-serif-light"
+        android:stateListAnimator="@null"
+        android:textColor="#FFF"
+        android:textSize="20sp"
+        android:text="@string/request_currency"
+        tools:ignore="HardcodedText,UnusedAttribute" />
 </RelativeLayout>

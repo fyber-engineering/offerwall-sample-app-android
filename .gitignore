@@ -1,18 +1,40 @@
-gen/
-bin/
-.idea/
-.gradle
-build/
+# built application files
+*.apk
+*.ap_
 
-.directory
-test_servers
-.irb-history
-screenshot_*.png
-.irbrc
-com_crashlytics_export_strings.xml
-/AndroidManifest.xml
-**/local.properties
-**/gradle.properties
-**/.calabash_settings
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Windows thumbnail db
+Thumbs.db
+
+# OSX files
+.DS_Store
+
+# Eclipse project files
+.classpath
+.project
+proguard/
+
+# Intellij project files
 *.iml
-fabric.properties
+*.ipr
+*.iws
+.idea/
+
+# other build/caching files
+build/
+.gradle/
+.navigation
+captures/
+output.json

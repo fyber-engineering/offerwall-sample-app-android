@@ -1,1 +1,12 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        google()
+    }
+    plugins {
+        id 'com.fyber.fairbid-sdk-plugin' version '3.41.0'
+        id 'com.android.application'
+    }
+}
+
 include ':app'

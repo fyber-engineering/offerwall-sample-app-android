@@ -1,13 +1,8 @@
 <resources>
-    <string name="app_name">Fyber Sample</string>
-
+    <string name="app_name">DT OfferWall Sample</string>
     <string name="action_settings">Settings</string>
-
-    <string name="fyber_header">Fyber</string>
-
     <string name="show_offer_wall">Show\nOffer Wall</string>
     <string name="request_currency">Request\nVirtual Currency</string>
-
     <string name="getting_offers">Getting\nOffers</string>
     <string name="offer_wall_edge_logo">Offer wall edge logo</string>
     <string name="copyright_launch_screen">Copyright © 2023 DT. All rights reserved.</string>

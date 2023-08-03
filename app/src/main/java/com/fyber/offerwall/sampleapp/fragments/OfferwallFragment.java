@@ -58,7 +58,7 @@ public class OfferwallFragment extends FyberFragment {
         // OfferWall.show();
 
         // You can customize the OfferWall behaviour using the ShowOptions class
-        boolean closeOnRedirect = true;
+        boolean closeOnRedirect = false;
         Map<String, String> customParameters = new HashMap<>();
         customParameters.put("key", "value");
         ShowOptions showOptions = new ShowOptions(closeOnRedirect, customParameters);

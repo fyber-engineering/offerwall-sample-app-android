@@ -85,7 +85,7 @@ public class OfferwallFragment extends FyberFragment {
         // - whether the toast message should appear upon the successful gratification,
         // - the ID of the currency that you want to request for. This parameter is optional.
         boolean showToastOnReward = true;
-        String currencyId = "coin";
+        String currencyId = "coins";
         VirtualCurrencyRequestOptions options = new VirtualCurrencyRequestOptions(showToastOnReward, currencyId);
         OfferWall.requestCurrency(options);
     }

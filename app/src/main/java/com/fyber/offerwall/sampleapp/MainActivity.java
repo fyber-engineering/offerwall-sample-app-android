@@ -25,8 +25,8 @@ import com.fyber.fairbid.internal.VirtualCurrencySettings;
 import com.fyber.offerwall.sampleapp.fragments.OfferwallFragment;
 
 public class MainActivity extends FragmentActivity {
-    private static final String APP_ID = "22915";
-    private static final String SECURITY_TOKEN = "token";
+    private static final String APP_ID = "135704";
+    private static final String SECURITY_TOKEN = "sec_135704";
 
     private static final String USER_ID = "userId";
 

@@ -1,15 +1,17 @@
 plugins {
     id 'com.fyber.fairbid-sdk-plugin'
     id 'com.android.application'
+    id 'kotlin-android'
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 33
+    namespace 'com.fyber.offerwall.sampleapp'
 
     defaultConfig {
         applicationId "com.fyber.offerwall.sample"
-        minSdkVersion 16
-        targetSdkVersion 33
+        minSdk 16
+        targetSdk 33
         versionCode 1
         versionName "1.0"
     }
@@ -25,7 +27,14 @@ android {
             signingConfig debug.signingConfig
         }
     }
-    namespace 'com.fyber.offerwall.sampleapp'
+
+    packagingOptions {
+        resources.excludes.add("META-INF/*")
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
 }
 
 dependencies {

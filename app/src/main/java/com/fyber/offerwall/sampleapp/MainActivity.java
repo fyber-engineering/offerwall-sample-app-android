@@ -117,7 +117,7 @@ public class MainActivity extends FragmentActivity {
             // The following one allows you defining all starting parameters, including Virtual Currency settings
             // and decide whether you want to limit the usage of Google Advertising ID. Otherwise, use the calls
             // demonstrated above.
-            OfferWall.start(this, APP_ID, offerWallListener, disableAdvertisingId, vcSettings);
+            OfferWall.start(this, APP_ID, offerWallListener, "fb3876c383844db96d6ddece3c0cd9eb7f9029b0e7f319f0a98da55c1b76d802", disableAdvertisingId, vcSettings);
         } catch (IllegalArgumentException e) {
             Log.d(TAG, e.getLocalizedMessage());
         }
